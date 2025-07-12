@@ -1,9 +1,9 @@
 <template>
     <JdModal modal="mArticuloCategoria" :buttons="buttons" @button-click="(action) => this[action]()">
         <div class="container-datos">
-            <JdInput label="Nombre" :nec="true" v-model="articulo_categoria.nombre" />
-            <JdTextArea label="Descripción" v-model="articulo_categoria.descripcion" />
-            <JdSwitch label="Activo" v-model="articulo_categoria.activo" />
+            <JdInput label="Nombre" :nec="true" v-model="articulo_categoria.nombre" :disabled="modal.mode == 3" />
+            <JdTextArea label="Descripción" v-model="articulo_categoria.descripcion" :disabled="modal.mode == 3" />
+            <JdSwitch label="Activo" v-model="articulo_categoria.activo" :disabled="modal.mode == 3" />
         </div>
     </JdModal>
 </template>
@@ -32,6 +32,7 @@ export default {
         useModals: useModals(),
         useVistas: useVistas(),
 
+        modal: {},
         articulo_categoria: {},
 
         buttons: [
@@ -40,16 +41,17 @@ export default {
         ],
     }),
     created() {
+        this.modal = this.useModals.mArticuloCategoria
         this.articulo_categoria = this.useModals.mArticuloCategoria.item
 
         this.showButtons()
     },
     methods: {
         showButtons() {
-            if (this.useModals.mArticuloCategoria.mode == 1) {
+            if (this.modal.mode == 1) {
                 this.buttons[0].show = true
             }
-            else {
+            else if (this.modal.mode == 2) {
                 this.buttons[1].show = true
             }
         },

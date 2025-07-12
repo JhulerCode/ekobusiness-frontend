@@ -2,17 +2,19 @@
     <JdModal modal="mSocio" :buttons="buttons" @button-click="(action) => this[action]()">
         <div class="container-datos">
             <JdSelect label="Tipo doc" :nec="true" v-model="socio.doc_tipo" :lista="modal.documentos_identidad || []"
-                mostrar="nombre" style="grid-column: 1/3;" />
+                mostrar="nombre" :disabled="modal.mode == 3" style="grid-column: 1/3;" />
 
-            <JdInput label="Nro documento" :nec="true" v-model="socio.doc_numero" style="grid-column: 3/5" />
+            <JdInput label="Nro documento" :nec="true" v-model="socio.doc_numero" :disabled="modal.mode == 3"
+                style="grid-column: 3/5" />
 
-            <JdInput label="Razón social o nombre" :nec="true" v-model="socio.nombres" style="grid-column: 1/5" />
+            <JdInput label="Razón social o nombre" :nec="true" v-model="socio.nombres" :disabled="modal.mode == 3"
+                style="grid-column: 1/5" />
 
-            <JdInput label="E-mail" v-model="socio.correo" style="grid-column: 1/3" />
+            <JdInput label="E-mail" v-model="socio.correo" :disabled="modal.mode == 3" style="grid-column: 1/3" />
 
-            <JdInput label="Teléfono" v-model="socio.telefono1" style="grid-column: 1/3" />
+            <JdInput label="Teléfono" v-model="socio.telefono1" :disabled="modal.mode == 3" style="grid-column: 1/3" />
 
-            <JdSwitch label="Activo?" v-model="socio.activo" />
+            <JdSwitch label="Activo?" v-model="socio.activo" :disabled="modal.mode == 3" />
         </div>
 
         <div class="extra-datos">
@@ -86,10 +88,10 @@ export default {
     },
     methods: {
         showButtons() {
-            if (this.useModals.mSocio.mode == 1) {
+            if (this.modal.mode == 1) {
                 this.buttons[0].show = true
             }
-            else {
+            else if (this.modal.mode == 2) {
                 this.buttons[1].show = true
             }
         },
@@ -117,7 +119,7 @@ export default {
 
             return false
         },
-        shapeDatos(){
+        shapeDatos() {
             for (const a of this.socio.direcciones) a.selected = false
             for (const a of this.socio.contactos) a.selected = false
             for (const a of this.socio.bancos) a.selected = false

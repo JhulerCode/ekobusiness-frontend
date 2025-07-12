@@ -1,15 +1,15 @@
 <template>
     <div class="direcciones">
         <div class="container-datos">
-            <JdInput label="Nombre" :nec="true" v-model="nuevo.nombre" />
+            <JdInput label="Nombre" :nec="true" v-model="nuevo.nombre" :disabled="modal.mode == 3" />
 
-            <JdTextArea label="Dirección" :nec="true" v-model="nuevo.direccion" />
+            <JdTextArea label="Dirección" :nec="true" v-model="nuevo.direccion" :disabled="modal.mode == 3" />
 
-            <JdTextArea label="Referencia" v-model="nuevo.referencia" />
+            <JdTextArea label="Referencia" v-model="nuevo.referencia" :disabled="modal.mode == 3" />
 
-            <JdSwitch label="Principal?" v-model="nuevo.principal" />
+            <JdSwitch label="Principal?" v-model="nuevo.principal" :disabled="modal.mode == 3" />
 
-            <div class="botones">
+            <div class="botones" v-if="modal.mode != 3">
                 <JdButton text="Agregar" tipo="3" @click="agregar()" v-if="!this.nuevo.id" />
                 <JdButton text="Nuevo" tipo="3" @click="setNuevo()" v-if="this.nuevo.id" />
                 <JdButton text="Eliminar" tipo="3" @click="eliminar()" v-if="this.nuevo.id" />
@@ -55,6 +55,7 @@ export default {
         useModals: useModals(),
         useVistas: useVistas(),
 
+        modal: {},
         socio: {},
         nuevo: { principal: false },
 
@@ -63,6 +64,7 @@ export default {
         ],
     }),
     created() {
+        this.modal = this.useModals.mSocio
         this.socio = this.useModals.mSocio.item
     },
     methods: {

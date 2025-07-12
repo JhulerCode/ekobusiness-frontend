@@ -10,8 +10,8 @@
         </div>
 
         <JdTable :name="tableName" :columns="columns" :datos="vista.precio_listas || []" :colAct="true"
-            :configFiltros="openConfigFiltros" :configCols="true" :reload="loadListaPrecios"
-            :rowOptions="tableRowOptions" @rowOptionSelected="runMethod">
+            :configFiltros="openConfigFiltros" :reload="loadListaPrecios" :rowOptions="tableRowOptions"
+            @rowOptionSelected="runMethod">
         </JdTable>
     </div>
 
@@ -69,15 +69,6 @@ export default {
                 sort: true
             },
             {
-                id: 'descripcion',
-                title: 'Descripción',
-                type: 'text',
-                width: '20rem',
-                show: true,
-                seek: false,
-                sort: false
-            },
-            {
                 id: 'moneda',
                 title: 'Moneda',
                 prop: 'moneda1.nombre',
@@ -94,6 +85,15 @@ export default {
                 type: 'select',
                 format: 'yesno',
                 width: '10rem',
+                show: true,
+                seek: false,
+                sort: false
+            },
+            {
+                id: 'descripcion',
+                title: 'Descripción',
+                type: 'text',
+                width: '20rem',
                 show: true,
                 seek: false,
                 sort: false
@@ -216,5 +216,4 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

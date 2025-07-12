@@ -10,8 +10,7 @@
 
         <JdTable :name="tableName" :columns="columns" :datos="vista.socios || []" :colAct="true"
             :configFiltros="openConfigFiltros" :configCols="true" :reload="loadSocios" :actions="tableActions"
-            @actionClick="runMethod" :rowOptions="tableRowOptions" @rowOptionSelected="runMethod"
-            ref="jdtable">
+            @actionClick="runMethod" :rowOptions="tableRowOptions" @rowOptionSelected="runMethod" ref="jdtable">
         </JdTable>
     </div>
 
@@ -123,8 +122,9 @@ export default {
             { icon: 'fa-solid fa-trash-can', text: "Eliminar", action: "eliminarBulk" },
         ],
         tableRowOptions: [
-            { id: 1, label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar', permiso: 'vClientes_editar' },
-            { id: 2, label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar', permiso: 'vClientes_eliminar' },
+            { label: 'Ver', icon: 'fa-regular fa-folder-open', action: 'ver', permiso: 'vClientes_ver' },
+            { label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar', permiso: 'vClientes_editar' },
+            { label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar', permiso: 'vClientes_eliminar' },
         ],
     }),
     created() {
@@ -237,6 +237,15 @@ export default {
 
         runMethod(method, item) {
             this[method](item)
+        },
+        async ver(item) {
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.socios}/uno/${item.id}`)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            this.useModals.setModal('mSocio', 'Ver proveedor', 3, res.data)
         },
         async editar(item) {
             this.useAuth.setLoading(true, 'Cargando...')

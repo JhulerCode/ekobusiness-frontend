@@ -2,31 +2,36 @@
     <JdModal modal="mColaborador" :buttons="buttons" @button-click="(action) => this[action]()">
         <div class="container-todo">
             <div class="container-datos">
-                <JdInput label="Nombres" :nec="true" v-model="colaborador.nombres" />
-                <JdInput label="Apellidos" :nec="true" v-model="colaborador.apellidos" />
+                <JdInput label="Nombres" :nec="true" v-model="colaborador.nombres" :disabled="modal.mode == 3" />
+                <JdInput label="Apellidos" :nec="true" v-model="colaborador.apellidos" :disabled="modal.mode == 3" />
 
                 <JdSelect label="Tipo documento" :nec="true" v-model="colaborador.doc_tipo"
-                    :lista="modal.documentos_identidad || []" />
-                <JdInput label="Nro documento" :nec="true" v-model="colaborador.doc_numero" />
+                    :lista="modal.documentos_identidad || []" :disabled="modal.mode == 3" />
+                <JdInput label="Nro documento" :nec="true" v-model="colaborador.doc_numero"
+                    :disabled="modal.mode == 3" />
 
-                <JdInput label="Fecha de nacimiento" type="date" v-model="colaborador.fecha_nacimiento" />
-                <JdSelect label="Sexo" v-model="colaborador.sexo" :lista="modal.generos || []" />
+                <JdInput label="Fecha de nacimiento" type="date" v-model="colaborador.fecha_nacimiento"
+                    :disabled="modal.mode == 3" />
+                <JdSelect label="Sexo" v-model="colaborador.sexo" :lista="modal.generos || []"
+                    :disabled="modal.mode == 3" />
 
-                <JdInput label="Dirección" v-model="colaborador.direccion" />
-                <JdInput label="Teléfono" v-model="colaborador.telefono" />
+                <JdInput label="Dirección" v-model="colaborador.direccion" :disabled="modal.mode == 3" />
+                <JdInput label="Teléfono" v-model="colaborador.telefono" :disabled="modal.mode == 3" />
 
-                <JdInput label="Cargo" :nec="true" v-model="colaborador.cargo" />
-                <JdSwitch label="Activo" v-model="colaborador.activo" />
-                <JdSwitch label="Tiene usuario?" v-model="colaborador.has_signin" />
+                <JdInput label="Cargo" :nec="true" v-model="colaborador.cargo" :disabled="modal.mode == 3" />
+                <JdSwitch label="Activo" v-model="colaborador.activo" :disabled="modal.mode == 3" />
+                <JdSwitch label="Tiene usuario?" v-model="colaborador.has_signin" :disabled="modal.mode == 3" />
             </div>
 
             <div class="right" v-if="colaborador.has_signin">
                 <div class="container-accesos">
                     <JdSelect label="Vista inicial" :nec="true" v-model="colaborador.vista_inicial" :lista="vistas"
-                        mostrar="label" />
-                    <JdInput label="Usuario" :nec="true" v-model="colaborador.usuario" />
+                        mostrar="label" :disabled="modal.mode == 3" />
+
+                    <JdInput label="Usuario" :nec="true" v-model="colaborador.usuario" :disabled="modal.mode == 3" />
+
                     <div>
-                        <JdInput label="Contraseña" v-model="colaborador.contrasena" />
+                        <JdInput label="Contraseña" v-model="colaborador.contrasena" :disabled="modal.mode == 3" />
                         <small class="fa-solid fa-triangle-exclamation"></small>
                         <small> No modificar este campo si no desea actualizar la contraseña</small>
                     </div>
@@ -60,7 +65,7 @@
 
                                 <div class="permisos" v-if="b.permisos && modal.vistaExpandida === b.id">
                                     <JdCheckBox :label="c.label" v-model="c.val" v-for="c in b.permisos" :key="c.id"
-                                        class="mrg-btm05" />
+                                        class="mrg-btm05" :disabled="modal.mode == 3" />
                                 </div>
                             </div>
                         </div>
@@ -122,10 +127,10 @@ export default {
     },
     methods: {
         showButtons() {
-            if (this.useModals.mColaborador.mode == 1) {
+            if (this.modal.mode == 1) {
                 this.buttons[0].show = true
             }
-            else {
+            else if (this.modal.mode == 2) {
                 this.buttons[1].show = true
             }
         },
@@ -141,10 +146,10 @@ export default {
             }
 
             this.colaborador.permisos = this.recolectarPermisosSeleccionados()
-            
+
             if (this.colaborador.has_signin) {
                 const asd = this.colaborador.permisos.includes(this.colaborador.vista_inicial)
-                
+
                 if (!asd) {
                     jmsg('error', 'Seleccione una vista inicial que tenga permiso')
                     return true

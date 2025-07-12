@@ -133,8 +133,9 @@ export default {
             { icon: 'fa-solid fa-trash-can', text: "Eliminar", action: "eliminarBulk", permiso: 'vProveedores_eliminarBulk' },
         ],
         tableRowOptions: [
-            { id: 1, label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar', permiso: 'vProveedores_editar' },
-            { id: 2, label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar', permiso: 'vProveedores_eliminar' },
+            { label: 'Ver', icon: 'fa-regular fa-folder-open', action: 'ver', permiso: 'vProveedores_ver' },
+            { label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar', permiso: 'vProveedores_editar' },
+            { label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar', permiso: 'vProveedores_eliminar' },
         ],
     }),
     created() {
@@ -257,6 +258,20 @@ export default {
 
         runMethod(method, item) {
             this[method](item)
+        },
+        async ver(item) {
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.socios}/uno/${item.id}`)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            const send = {
+                item: res.data,
+                precio_listas: [{ ...res.data.precio_lista1 }]
+            }
+
+            this.useModals.setModal('mSocio', 'Ver proveedor', 3, send, true)
         },
         async editar(item) {
             this.useAuth.setLoading(true, 'Cargando...')

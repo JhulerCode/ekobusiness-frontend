@@ -160,8 +160,9 @@ export default {
             },
         ],
         tableRowOptions: [
-            { id: 1, label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar', permiso: 'vColaboradores_editar' },
-            { id: 2, label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar', permiso: 'vColaboradores_eliminar' },
+            { label: 'Ver', icon: 'fa-regular fa-folder-open', action: 'ver', permiso: 'vColaboradores_ver' },
+            { label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar', permiso: 'vColaboradores_editar' },
+            { label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar', permiso: 'vColaboradores_eliminar' },
         ],
     }),
     created() {
@@ -219,6 +220,15 @@ export default {
 
         runMethod(method, item) {
             this[method](item)
+        },
+        async ver(item) {
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.colaboradores}/uno/${item.id}`)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            this.useModals.setModal('mColaborador', 'Ver colaborador', 3, res.data)
         },
         async editar(item) {
             this.useAuth.setLoading(true, 'Cargando...')

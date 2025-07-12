@@ -2,26 +2,28 @@
     <div class="finanzas">
         <div class="container-datos1">
             <JdSelect label="Lista de precios" v-model="socio.precio_lista" :lista="modal.precio_listas"
-                :loaded="modal.precio_listasLoaded" @reload="loadPrecioLista()" style="grid-column: 1/4;"
-                v-if="this.socio.tipo == 1" />
+                :loaded="modal.precio_listasLoaded" @reload="loadPrecioLista()" :disabled="modal.mode == 3"
+                style="grid-column: 1/4;" v-if="this.socio.tipo == 1" />
 
-            <JdInput label="Límite crédito" type="number" v-model="socio.credito" style="grid-column: 4/6;" />
+            <JdInput label="Límite crédito" type="number" v-model="socio.credito" :disabled="modal.mode == 3"
+                style="grid-column: 4/6;" />
         </div>
 
         <span>- - - Bancos - - -</span>
         <div class="bancos">
             <div class="container-datos">
-                <JdInput label="Nombre" :nec="true" v-model="nuevo.nombre" />
+                <JdInput label="Nombre" :nec="true" v-model="nuevo.nombre" :disabled="modal.mode == 3" />
 
-                <JdSelect label="Moneda" :nec="true" v-model="nuevo.moneda" :lista="modal.monedas" />
+                <JdSelect label="Moneda" :nec="true" v-model="nuevo.moneda" :lista="modal.monedas"
+                    :disabled="modal.mode == 3" />
 
-                <JdInput label="NC" :nec="true" v-model="nuevo.nc" />
+                <JdInput label="NC" :nec="true" v-model="nuevo.nc" :disabled="modal.mode == 3" />
 
-                <JdInput label="CCI" :nec="true" v-model="nuevo.cci" />
+                <JdInput label="CCI" :nec="true" v-model="nuevo.cci" :disabled="modal.mode == 3" />
 
-                <JdSwitch label="Principal?" v-model="nuevo.principal" />
+                <JdSwitch label="Principal?" v-model="nuevo.principal" :disabled="modal.mode == 3" />
 
-                <div class="botones">
+                <div class="botones" v-if="modal.mode != 3">
                     <JdButton text="Agregar" tipo="3" @click="agregar()" v-if="!this.nuevo.id" />
                     <JdButton text="Nuevo" tipo="3" @click="setNuevo()" v-if="this.nuevo.id" />
                     <JdButton text="Eliminar" tipo="3" @click="eliminar()" v-if="this.nuevo.id" />
@@ -82,8 +84,11 @@ export default {
         this.socio = this.useModals.mSocio.item
 
         if (this.modal.precio_listasLoaded) return
-        if (this.socio.tipo == 2) return
-        this.loadPrecioLista()
+        if (this.socio.tipo == 1) {
+            if (this.modal.mode != 3) {
+                this.loadPrecioLista()
+            }
+        }
     },
     methods: {
         async loadPrecioLista() {

@@ -10,7 +10,7 @@
         </div>
 
         <JdTable :name="tableName" :columns="columns" :datos="vista.articulo_categorias || []" :colAct="true"
-            :configFiltros="openConfigFiltros" :configCols="true" :reload="loadCategorias" :rowOptions="tableRowOptions"
+            :configFiltros="openConfigFiltros" :reload="loadCategorias" :rowOptions="tableRowOptions"
             @rowOptionSelected="runMethod">
         </JdTable>
     </div>
@@ -60,10 +60,21 @@ export default {
                 id: 'nombre',
                 title: 'Nombre',
                 type: 'text',
-                width: '20rem',
+                width: '15rem',
                 show: true,
                 seek: true,
                 sort: true
+            },
+            {
+                id: 'activo',
+                title: 'Activo?',
+                prop: 'activo1.nombre',
+                type: 'select',
+                format: 'yesno',
+                width: '10rem',
+                show: true,
+                seek: false,
+                sort: false
             },
             {
                 id: 'descripcion',
@@ -74,21 +85,11 @@ export default {
                 seek: false,
                 sort: false
             },
-            {
-                id: 'activo',
-                title: 'Activo?',
-                prop: 'activo1.nombre',
-                type: 'select',
-                format: 'yesno',
-                width: '15rem',
-                show: true,
-                seek: false,
-                sort: false
-            },
         ],
         tableRowOptions: [
-            { id: 1, label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar', permiso: 'vProductoCategorias_editar' },
-            { id: 2, label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar', permiso: 'vProductoCategorias_eliminar' },
+            { label: 'Ver', icon: 'fa-regular fa-folder-open', action: 'ver', permiso: 'vProductoCategorias_ver' },
+            { label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar', permiso: 'vProductoCategorias_editar' },
+            { label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar', permiso: 'vProductoCategorias_eliminar' },
         ],
     }),
     created() {
@@ -144,6 +145,15 @@ export default {
 
         runMethod(method, item) {
             this[method](item)
+        },
+        async ver(item) {
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.articulo_categorias}/uno/${item.id}`)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            this.useModals.setModal('mArticuloCategoria', 'Ver categoría', 3, res.data)
         },
         async editar(item) {
             this.useAuth.setLoading(true, 'Cargando...')

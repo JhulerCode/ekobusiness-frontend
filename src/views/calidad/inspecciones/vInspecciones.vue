@@ -107,6 +107,7 @@ export default {
             // },
         ],
         tableRowOptions: [
+            { label: 'Ver', icon: 'fa-regular fa-folder-open', action: 'ver', permiso: 'vInspecciones_ver' },
             { label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar', permiso: 'vInspecciones_editar' },
             { label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar', permiso: 'vInspecciones_eliminar' },
         ],
@@ -168,6 +169,20 @@ export default {
 
         runMethod(method, item) {
             this[method](item)
+        },
+        async ver(item) {
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.inspecciones}/uno/${item.id}`)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            const send = {
+                item: res.data,
+                socios: [{ ...res.data.socio1 }]
+            }
+
+            this.useModals.setModal('mInspeccion', 'Ver inspección', 3, send, true)
         },
         async editar(item) {
             this.useAuth.setLoading(true, 'Cargando...')

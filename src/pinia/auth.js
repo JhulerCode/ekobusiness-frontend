@@ -69,6 +69,7 @@ export const useAuth = defineStore('auth', {
                         id: 'vProveedores', label: 'Proveedores', permisos: [
                             { id: 'vProveedores', label: 'Acceder' },
                             { id: 'vProveedores_crear', label: 'Crear' },
+                            { id: 'vProveedores_ver', label: 'Ver' },
                             { id: 'vProveedores_editar', label: 'Editar' },
                             { id: 'vProveedores_eliminar', label: 'Eliminar' },
 
@@ -151,6 +152,7 @@ export const useAuth = defineStore('auth', {
                         id: 'vClientes', label: 'Clientes', permisos: [
                             { id: 'vClientes', label: 'Acceder' },
                             { id: 'vClientes_crear', label: 'Crear' },
+                            { id: 'vClientes_ver', label: 'Ver' },
                             { id: 'vClientes_editar', label: 'Editar' },
                             { id: 'vClientes_eliminar', label: 'Eliminar' },
                         ]
@@ -323,6 +325,7 @@ export const useAuth = defineStore('auth', {
                         id: 'vInspecciones', label: 'Inspecciones', permisos: [
                             { id: 'vInspecciones', label: 'Acceder' },
                             { id: 'vInspecciones_crear', label: 'Crear' },
+                            { id: 'vInspecciones_ver', label: 'Ver' },
                             { id: 'vInspecciones_editar', label: 'Editar' },
                             { id: 'vInspecciones_eliminar', label: 'Eliminar' },
                         ]
@@ -392,6 +395,7 @@ export const useAuth = defineStore('auth', {
                         id: 'vColaboradores', label: 'Colaboradores', permisos: [
                             { id: 'vColaboradores', label: 'Acceder' },
                             { id: 'vColaboradores_crear', label: 'Crear' },
+                            { id: 'vColaboradores_ver', label: 'Ver' },
                             { id: 'vColaboradores_editar', label: 'Editar' },
                             { id: 'vColaboradores_eliminar', label: 'Eliminar' },
                         ]

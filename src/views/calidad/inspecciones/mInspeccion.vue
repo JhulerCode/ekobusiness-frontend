@@ -1,21 +1,23 @@
 <template>
     <JdModal modal="mInspeccion" :buttons="buttons" @button-click="(action) => this[action]()">
         <div class="container-datos">
-            <JdInput label="Fecha" :nec="true" type="date" v-model="inspeccion.fecha" />
+            <JdInput label="Fecha" :nec="true" type="date" v-model="inspeccion.fecha" :disabled="modal.mode == 3" />
             <JdSelect label="Cliente" :nec="true" :lista="modal.socios" mostrar="nombres_apellidos"
-                v-model="inspeccion.socio" />
-            <JdInput label="Puntuación" :nec="true" type="number" v-model="inspeccion.puntuacion" />
-            <JdInput label="Puntuación máxima" :nec="true" type="number" v-model="inspeccion.puntuacion_maxima" />
+                v-model="inspeccion.socio" :disabled="modal.mode == 3" />
+            <JdInput label="Puntuación" :nec="true" type="number" v-model="inspeccion.puntuacion"
+                :disabled="modal.mode == 3" />
+            <JdInput label="Puntuación máxima" :nec="true" type="number" v-model="inspeccion.puntuacion_maxima"
+                :disabled="modal.mode == 3" />
         </div>
 
         <div>
             <div class="agregar">
                 <strong>--- Correcciones ---</strong>
-                <JdButton icon="fa-solid fa-plus" text="Agregar" tipo="2" @click="addNew()" />
+                <JdButton icon="fa-solid fa-plus" text="Agregar" tipo="2" @click="addNew()" v-if="modal.mode != 3" />
             </div>
 
             <JdTable :columns="columns" :datos="inspeccion.correcciones" :seeker="false" :colAct="true"
-                :download="false">
+                :download="false" :inputsDisabled="modal.mode == 3">
                 <template v-slot:cAction="{ item }">
                     <JdButton icon="fa-solid fa-trash" title="Eliminar" tipo="2" :small="true"
                         @click="removeItem(item)" />
@@ -57,8 +59,8 @@ export default {
         inspeccion: {},
 
         buttons: [
-            { text: 'Grabar', action: 'crear', spin: false },
-            { text: 'Actualizar', action: 'modificar', spin: false },
+            { text: 'Grabar', action: 'crear' },
+            { text: 'Actualizar', action: 'modificar' },
         ],
 
         columns: [
@@ -85,14 +87,15 @@ export default {
         this.inspeccion = this.useModals.mInspeccion.item
 
         this.showButtons()
-        this.loadSocios()
+
+        if (this.modal.mode != 3) this.loadSocios()
     },
     methods: {
         showButtons() {
-            if (this.useModals.mInspeccion.mode == 1) {
+            if (this.modal.mode == 1) {
                 this.buttons[0].show = true
             }
-            else {
+            else if (this.modal.mode == 2) {
                 this.buttons[1].show = true
             }
         },

@@ -6,6 +6,10 @@
                 <i class="fa-solid fa-sliders" @click="openPreferencias"></i>
                 <span>Preferencias</span>
             </li>
+            <li @click="updateSession">
+                <i class="fa-solid fa-rotate-right"></i>
+                <span>Actualizar sesión</span>
+            </li>
             <li @click="logout">
                 <i class="fa-solid fa-right-from-bracket"></i>
                 <span>Salir del sistema</span>
@@ -38,6 +42,9 @@ export default {
         async openPreferenciasUsuario() {
             this.useModals.setModal('mUserPreferences', 'Preferencias', null, null, true)
             this.useModals.show.mUserMenu = false
+        },
+        updateSession() {
+            this.useAuth.login()
         },
         async logout() {
             await this.useAuth.logout(this.$router)

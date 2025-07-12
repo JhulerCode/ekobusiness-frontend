@@ -51,6 +51,8 @@
 import { useAuth } from '@/pinia/auth.js'
 import { useModals } from '@/pinia/modals'
 
+import { urls, patch } from '@/utils/crud'
+
 export default {
     components: {
         // mUserMenu,
@@ -60,19 +62,24 @@ export default {
         useAuth: useAuth(),
         useModals: useModals(),
     }),
-    created() {
-        if (this.useAuth.isDarkMode) {
-            document.body.classList.add('dark-mode')
-        }
-    },
     methods: {
         toogleNavbar() {
             this.useAuth.showNavbar = !this.useAuth.showNavbar
         },
 
-        darkLigthMode() {
-            document.body.classList.toggle('dark-mode')
-            this.useAuth.isDarkMode = document.body.classList.contains('dark-mode')
+        async darkLigthMode() {
+            const send = {
+                id: this.useAuth.usuario.colaborador,
+                theme: this.useAuth.isDarkMode == true ? '1' : '2',
+            }
+
+            this.useAuth.setLoading(true, 'Actualizando...')
+            const res = await patch(`${urls.colaboradores}/preferencias`, send, false)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            this.useAuth.setTheme(send.theme)
         },
         fullScreen() {
             // Alterna el modo pantalla completa

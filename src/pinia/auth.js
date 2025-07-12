@@ -90,11 +90,11 @@ export const useAuth = defineStore('auth', {
                             { id: 'vArticulos_crear', label: 'Crear' },
                             { id: 'vArticulos_editar', label: 'Editar' },
                             { id: 'vArticulos_eliminar', label: 'Eliminar' },
-                            
+
                             { id: 'vArticulos_clonar', label: 'Clonar' },
                             { id: 'vArticulos_kardex', label: 'Ver kardex' },
                             { id: 'vArticulos_ajusteStock', label: 'Ajuste stock' },
-                            
+
                             { id: 'vArticulos_importar', label: 'Importar' },
                             { id: 'vArticulos_editarBulk', label: 'Editar masivo' },
                             { id: 'vArticulos_eliminarBulk', label: 'Eliminar masivo' },
@@ -133,7 +133,7 @@ export const useAuth = defineStore('auth', {
                             { id: 'vCompras', label: 'Acceder' },
                             { id: 'vCompras_crear', label: 'Crear' },
                             { id: 'vCompras_ver', label: 'Ver' },
-                            
+
                             { id: 'vCompras_anular', label: 'Anular' },
                         ]
                     },
@@ -169,11 +169,11 @@ export const useAuth = defineStore('auth', {
                             { id: 'vProductosTerminados_crear', label: 'Crear' },
                             { id: 'vProductosTerminados_editar', label: 'Editar' },
                             { id: 'vProductosTerminados_eliminar', label: 'Eliminar' },
-                            
+
                             { id: 'vProductosTerminados_clonar', label: 'Clonar' },
                             { id: 'vProductosTerminados_kardex', label: 'Ver kardex' },
                             { id: 'vProductosTerminados_ajusteStock', label: 'Ajuste stock' },
-                            
+
                             { id: 'vProductosTerminados_crearCombo', label: 'Crear combo' },
                             { id: 'vProductosTerminados_importar', label: 'Importar' },
                             { id: 'vProductosTerminados_editarBulk', label: 'Editar masivo' },
@@ -253,7 +253,7 @@ export const useAuth = defineStore('auth', {
                             { id: 'vProgramaLuxury_ver', label: 'Ver' },
                             { id: 'vProgramaLuxury_editar', label: 'Editar' },
                             { id: 'vProgramaLuxury_eliminar', label: 'Eliminar' },
-                            
+
                             { id: 'vProgramaLuxury_salidaInsumos', label: 'Salida de insumos' },
                             { id: 'vProgramaLuxury_productosCuarentena', label: 'Productos en cuarentena' },
                             { id: 'vProgramaLuxury_verProductosPedidos', label: 'Ver productos pedidos' },
@@ -432,6 +432,8 @@ export const useAuth = defineStore('auth', {
 
             this.usuario = deepCopy(result.data)
             this.permisos = this.usuario.permisos
+
+            this.setTheme(this.usuario.theme)
             this.setPrimaryColor(this.usuario.color)
 
             return true
@@ -492,13 +494,25 @@ export const useAuth = defineStore('auth', {
             }
         },
 
-        //----- PRIMARY COLOR ----- //
+        //----- PREFERENCIAS ----- //
+        setTheme(theme) {
+            console.log(theme)
+            this.usuario.theme = theme
+            this.isDarkMode = theme == '2'
+
+            if (theme == '1') {
+                document.body.classList.remove('dark-mode')
+            }
+            else {
+                document.body.classList.add('dark-mode')
+            }
+        },
         setPrimaryColor(color) {
             if (!color) return
 
+            this.usuario.color = color
             document.documentElement.style.setProperty('--primary-color', color)
             document.documentElement.style.setProperty('--primary-color-dark', this.obscurecerColor(color))
-            // console.log(this.obscurecerColor('#2c47aa', 10))
         },
         obscurecerColor(color, porcentaje = 10) {
             const r = parseInt(color.substring(1, 3), 16);

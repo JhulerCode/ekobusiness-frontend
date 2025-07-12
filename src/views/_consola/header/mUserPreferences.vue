@@ -1,6 +1,7 @@
 <template>
     <JdModal modal="mUserPreferences" :buttons="buttons" @button-click="(action) => this[action]()">
         <div class="container-datos">
+            <JdSelect label="Tema" :nec="true" v-model="modal.usuario.theme" :lista="themes" />
             <JdInput label="Color principal" :nec="true" type="color" v-model="modal.usuario.color" />
             <JdSelect label="Formato fecha" :nec="true" v-model="modal.usuario.format_date" :lista="fecha_formatos"
                 mostrar="id" />
@@ -46,6 +47,11 @@ export default {
             { id: 'YY/MM/DD' },
         ],
 
+        themes: [
+            { id: '1', nombre: 'Claro' },
+            { id: '2', nombre: 'Oscuro' },
+        ],
+
         buttons: [
             { text: 'Actualizar', action: 'modificar', show: true },
         ],
@@ -58,6 +64,7 @@ export default {
         async modificar() {
             const send = {
                 id: this.modal.usuario.colaborador,
+                theme: this.modal.usuario.theme,
                 color: this.modal.usuario.color,
                 format_date: this.modal.usuario.format_date
             }
@@ -68,8 +75,9 @@ export default {
 
             if (res.code != 0) return
 
-            this.useAuth.usuario.color = this.modal.usuario.color
+            this.useAuth.setTheme(this.modal.usuario.theme)
             this.useAuth.setPrimaryColor(this.modal.usuario.color)
+
             this.useAuth.usuario.format_date = this.modal.usuario.format_date
 
             this.useModals.show.mUserPreferences = false

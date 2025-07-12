@@ -1,9 +1,9 @@
 <template>
     <main>
         <MainHead />
-        
+
         <div class="main-body">
-            <SideBar class="side-bar"/>
+            <SideBar class="side-bar" />
 
             <MainCenter />
         </div>
@@ -14,7 +14,7 @@
 
     <mLogin v-if="useModals?.show?.mLogin" />
 
-    <LoadingSpin v-if="useAuth.loading.show" :text="useAuth.loading.text" scale="1.5" style="z-index: 3"/>
+    <LoadingSpin v-if="useAuth.loading.show" :text="useAuth.loading.text" scale="1.5" style="z-index: 3" />
 </template>
 
 <script>
@@ -75,7 +75,7 @@ main {
     overflow-x: hidden;
     background-color: var(--bg-color2);
     // background-color: var(--primary-color);
-    
+
     .main-body {
         height: 100%;
         // display: flex;
@@ -97,5 +97,4 @@ main {
 //         grid-template-columns: auto 100% !important;
 //         // overflow-x: hidden;
 //     }
-// }
-</style>
+// }</style>

@@ -4,7 +4,7 @@
             <strong>Proveedores</strong>
 
             <div class="buttons">
-                <JdButton text="Nuevo" @click="nuevo()" v-if="useAuth.verifyPermiso('vProveedores_crear')" />
+                <JdButton text="Nuevo" @click="nuevo()" v-if="useAuth.verifyPermiso('vProveedores:crear')" />
             </div>
         </div>
 
@@ -129,13 +129,13 @@ export default {
             }
         ],
         tableActions: [
-            { icon: 'fa-solid fa-pen-to-square', text: "Editar", action: "editarBulk", permiso: 'vProveedores_editarBulk' },
-            { icon: 'fa-solid fa-trash-can', text: "Eliminar", action: "eliminarBulk", permiso: 'vProveedores_eliminarBulk' },
+            { icon: 'fa-solid fa-pen-to-square', text: "Editar", action: "editarBulk", permiso: 'vProveedores:editarBulk' },
+            { icon: 'fa-solid fa-trash-can', text: "Eliminar", action: "eliminarBulk", permiso: 'vProveedores:eliminarBulk' },
         ],
         tableRowOptions: [
-            { label: 'Ver', icon: 'fa-regular fa-folder-open', action: 'ver', permiso: 'vProveedores_ver' },
-            { label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar', permiso: 'vProveedores_editar' },
-            { label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar', permiso: 'vProveedores_eliminar' },
+            { label: 'Ver', icon: 'fa-regular fa-folder-open', action: 'ver', permiso: 'vProveedores:ver' },
+            { label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar', permiso: 'vProveedores:editar' },
+            { label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar', permiso: 'vProveedores:eliminar' },
         ],
     }),
     created() {
@@ -145,7 +145,7 @@ export default {
         this.verifyRowSelectIsActive()
 
         if (this.vista.loaded) return
-        this.loadSocios()
+        if (this.useAuth.verifyPermiso('vProveedores:listar') == true) this.loadSocios()
     },
     methods: {
         setQuery() {

@@ -5,7 +5,7 @@
 
             <div class="buttons">
                 <JdButton text="Nuevo" title="Crear nuevo" @click="nuevo()"
-                    v-if="useAuth.verifyPermiso('vMaquinas_crear')" />
+                    v-if="useAuth.verifyPermiso('vMaquinas:crear')" />
             </div>
         </div>
 
@@ -92,8 +92,8 @@ export default {
             },
         ],
         tableRowOptions: [
-            { id: 1, label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar', permiso: 'vMaquinas_editar' },
-            { id: 2, label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar', permiso: 'vMaquinas_eliminar' },
+            { id: 1, label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar', permiso: 'vMaquinas:editar' },
+            { id: 2, label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar', permiso: 'vMaquinas:eliminar' },
         ],
     }),
     created() {
@@ -101,8 +101,7 @@ export default {
         this.useAuth.setColumns(this.tableName, this.columns)
 
         if (this.vista.loaded) return
-
-        this.loadMaquinas()
+        if (this.useAuth.verifyPermiso('vMaquinas:listar') == true) this.loadMaquinas()
     },
     methods: {
         setQuery() {

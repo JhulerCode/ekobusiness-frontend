@@ -142,7 +142,7 @@ export default {
                 this.buttons[3].show = true
             }
 
-            if (this.useAuth.verifyPermiso('vCompras_crear', 'vCompras_ver', 'vVentas_crear', 'vVentas_ver')) {
+            if (this.useAuth.verifyPermiso('vCompras:crear', 'vCompras:ver', 'vVentas:crear', 'vVentas:ver')) {
                 this.buttons[1].show = true
             }
         },

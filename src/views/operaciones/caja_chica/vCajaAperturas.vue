@@ -5,7 +5,7 @@
 
             <div class="buttons">
                 <JdButton text="Nuevo" title="Crear nuevo" @click="nuevo()"
-                    v-if="useAuth.verifyPermiso('vCajaAperturas_aperturarCaja')" />
+                    v-if="useAuth.verifyPermiso('vCajaAperturas:aperturarCaja')" />
             </div>
         </div>
 
@@ -110,10 +110,10 @@ export default {
             },
         ],
         tableRowOptions: [
-            { id: 1, label: 'Ver', icon: 'fa-solid fa-up-right-from-square', action: 'ver', permiso: 'vCajaAperturas_ver' },
-            { id: 2, label: 'Cerrar caja', icon: 'fa-solid fa-check-double', action: 'cerrarCaja', permiso: 'vCajaAperturas_cerrarCaja', ocultar: { estado: 2 } },
-            { id: 3, label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar', permiso: 'vCajaAperturas_eliminar', ocultar: { estado: 2 } },
-            { id: 4, label: 'Movimientos', icon: 'fa-solid fa-right-left', action: 'agregarMovimientos', permiso: 'vCajaMovimientos', ocultar: { estado: 2 } },
+            { id: 1, label: 'Ver', icon: 'fa-solid fa-up-right-from-square', action: 'ver', permiso: 'vCajaAperturas:ver' },
+            { id: 2, label: 'Cerrar caja', icon: 'fa-solid fa-check-double', action: 'cerrarCaja', permiso: 'vCajaAperturas:cerrarCaja', ocultar: { estado: 2 } },
+            { id: 3, label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar', permiso: 'vCajaAperturas:eliminar', ocultar: { estado: 2 } },
+            { id: 4, label: 'Movimientos', icon: 'fa-solid fa-right-left', action: 'agregarMovimientos', permiso: 'vCajaMovimientos:listar', ocultar: { estado: 2 } },
         ],
     }),
     created() {
@@ -121,8 +121,7 @@ export default {
         this.useAuth.setColumns(this.tableName, this.columns)
 
         if (this.vista.loaded) return
-
-        this.loadCajaAperturas()
+        if (this.useAuth.verifyPermiso('vCajaAperturas:listar') == true) this.loadCajaAperturas()
     },
     methods: {
         setQuery() {

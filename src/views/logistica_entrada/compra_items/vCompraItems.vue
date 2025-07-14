@@ -129,7 +129,7 @@ export default {
             },
         ],
         tableRowOptions: [
-            { id: 1, label: 'Inspeccionar', icon: 'fa-solid fa-star', action: 'crearFormatoValue', permiso: 'vCompraItems_inspeccion' },
+            { id: 1, label: 'Inspeccionar', icon: 'fa-solid fa-star', action: 'crearFormatoValue', permiso: 'vCompraItems:inspeccion' },
         ],
     }),
     async created() {
@@ -139,7 +139,7 @@ export default {
 
         if (this.vista.loaded) return
 
-        this.loadTransaccionItems()
+        if (this.useAuth.verifyPermiso('vCompraItems:listar') == true) this.loadTransaccionItems()
     },
     methods: {
         initFiltros() {
@@ -258,5 +258,4 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

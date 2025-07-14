@@ -7,13 +7,13 @@
                 <input type="file" ref="excel" accept=".xlsx, .xls, .csv" hidden @change="importar" />
 
                 <JdButton icon="fa-solid fa-file-excel" text="Importar" tipo="2" @click="this.$refs.excel.click()"
-                    v-if="useAuth.verifyPermiso('vProductosTerminados_importar')" />
+                    v-if="useAuth.verifyPermiso('vProductosTerminados:importar')" />
 
                 <JdButton text="Nuevo combo" tipo="2" @click="nuevoCombo()"
-                    v-if="useAuth.verifyPermiso('vProductosTerminados_crearCombo')" />
+                    v-if="useAuth.verifyPermiso('vProductosTerminados:crearCombo')" />
 
                 <JdButton text="Crear nuevo" @click="nuevo()"
-                    v-if="useAuth.verifyPermiso('vProductosTerminados_crear')" />
+                    v-if="useAuth.verifyPermiso('vProductosTerminados:crear')" />
             </div>
         </div>
 
@@ -211,16 +211,16 @@ export default {
             // },
         ],
         tableActions: [
-            { icon: 'fa-solid fa-pen-to-square', text: "Editar", action: "editarBulk", permiso: 'vProductosTerminados_editarBulk' },
-            { icon: 'fa-solid fa-trash-can', text: "Eliminar", action: "eliminarBulk", permiso: 'vProductosTerminados_eliminarBulk' },
+            { icon: 'fa-solid fa-pen-to-square', text: "Editar", action: "editarBulk", permiso: 'vProductosTerminados:editarBulk' },
+            { icon: 'fa-solid fa-trash-can', text: "Eliminar", action: "eliminarBulk", permiso: 'vProductosTerminados:eliminarBulk' },
         ],
         tableRowOptions: [
-            { label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar', permiso: 'vProductosTerminados_editar' },
-            { label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar', permiso: 'vProductosTerminados_eliminar' },
-            { label: 'Clonar', icon: 'fa-solid fa-copy', action: 'clonar', permiso: 'vProductosTerminados_clonar', ocultar: { is_combo: true } },
-            { label: 'Ver kardex', icon: 'fa-solid fa-table-list', action: 'verKardex', permiso: 'vProductosTerminados_kardex' },
-            { label: 'Receta', icon: 'fa-solid fa-flask', action: 'showReceta', permiso: 'vReceta', ocultar: { is_combo: true } },
-            { label: 'Ajuste stock', icon: 'fa-solid fa-wrench', action: 'ajusteStock', permiso: 'vProductosTerminados_ajusteStock' },
+            { label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar', permiso: 'vProductosTerminados:editar' },
+            { label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar', permiso: 'vProductosTerminados:eliminar' },
+            { label: 'Clonar', icon: 'fa-solid fa-copy', action: 'clonar', permiso: 'vProductosTerminados:clonar', ocultar: { is_combo: true } },
+            { label: 'Ver kardex', icon: 'fa-solid fa-table-list', action: 'verKardex', permiso: 'vProductosTerminados:kardex' },
+            { label: 'Receta', icon: 'fa-solid fa-flask', action: 'showReceta', permiso: 'vReceta:listar', ocultar: { is_combo: true } },
+            { label: 'Ajuste stock', icon: 'fa-solid fa-wrench', action: 'ajusteStock', permiso: 'vProductosTerminados:ajusteStock' },
         ],
     }),
     async created() {
@@ -230,7 +230,7 @@ export default {
         this.verifyRowSelectIsActive()
 
         if (this.vista.loaded) return
-        this.loadArticulos()
+        if (this.useAuth.verifyPermiso('vProductosTerminados:listar') == true) this.loadArticulos()
     },
     methods: {
         setQuery() {

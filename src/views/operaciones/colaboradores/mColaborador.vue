@@ -64,6 +64,11 @@
                                 </div>
 
                                 <div class="permisos" v-if="b.permisos && modal.vistaExpandida === b.id">
+                                    <div class="permisos-acciones">
+                                        <JdButton text="Sel. todo" tipo="3" @click="selectAll(b.id)" />
+                                        <JdButton text="Sel. ninguno" tipo="3" @click="selectNone(b.id)" />
+                                    </div>
+
                                     <JdCheckBox :label="c.label" v-model="c.val" v-for="c in b.permisos" :key="c.id"
                                         class="mrg-btm05" :disabled="modal.mode == 3" />
                                 </div>
@@ -82,6 +87,7 @@ import JdInput from '@/components/inputs/JdInput.vue'
 import JdSwitch from '@/components/inputs/JdSwitch.vue'
 import JdSelect from '@/components/inputs/JdSelect.vue'
 import JdCheckBox from '@/components/inputs/JdCheckBox.vue'
+import JdButton from '@/components/inputs/JdButton.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
@@ -98,6 +104,7 @@ export default {
         JdSwitch,
         JdSelect,
         JdCheckBox,
+        JdButton,
     },
     data: () => ({
         useAuth: useAuth(),
@@ -108,13 +115,13 @@ export default {
         colaborador: {},
 
         buttons: [
-            { text: 'Grabar', action: 'crear', spin: false, permiso: 'vColaboradores_crear' },
-            { text: 'Actualizar', action: 'modificar', spin: false, permiso: 'vColaboradores_editar' },
+            { text: 'Grabar', action: 'crear', spin: false, permiso: 'vColaboradores:crear' },
+            { text: 'Actualizar', action: 'modificar', spin: false, permiso: 'vColaboradores:editar' },
         ],
     }),
     computed: {
         vistas() {
-            return this.useAuth.listaPermisos.map(a => a.vistas.map(b => ({ id: b.id, label: b.label }))).flat()
+            return this.useAuth.menu.map(a => a.children.map(b => ({ id: b.goto, label: b.label }))).flat()
         },
     },
     created() {
@@ -147,14 +154,14 @@ export default {
 
             this.colaborador.permisos = this.recolectarPermisosSeleccionados()
 
-            if (this.colaborador.has_signin) {
-                const asd = this.colaborador.permisos.includes(this.colaborador.vista_inicial)
+            // if (this.colaborador.has_signin) {
+            //     const asd = this.colaborador.permisos.includes(this.colaborador.vista_inicial)
 
-                if (!asd) {
-                    jmsg('error', 'Seleccione una vista inicial que tenga permiso')
-                    return true
-                }
-            }
+            //     if (!asd) {
+            //         jmsg('error', 'Seleccione una vista inicial que tenga permiso')
+            //         return true
+            //     }
+            // }
 
             return false
         },
@@ -176,9 +183,6 @@ export default {
 
             this.useVistas.addItem('vColaboradores', 'colaboradores', res.data)
 
-            if (this.useAuth.usuario.id == this.colaborador.id) {
-                this.useAuth.permisos = this.colaborador.permisos
-            }
             this.useModals.show.mColaborador = false
         },
         async modificar() {
@@ -244,7 +248,34 @@ export default {
         },
         toggleVista(id) {
             this.modal.vistaExpandida = this.modal.vistaExpandida === id ? null : id
-        }
+        },
+
+        selectAll(id) {
+            for (const a of this.useAuth.listaPermisos) {
+                if (a.vistas) {
+                    for (const b of a.vistas) {
+                        if (b.id == id) {
+                            for (const c of b.permisos) {
+                                c.val = true
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        selectNone(id) {
+            for (const a of this.useAuth.listaPermisos) {
+                if (a.vistas) {
+                    for (const b of a.vistas) {
+                        if (b.id == id) {
+                            for (const c of b.permisos) {
+                                c.val = false
+                            }
+                        }
+                    }
+                }
+            }
+        },
     }
 }
 </script>
@@ -303,6 +334,11 @@ export default {
 
             .permisos {
                 margin-left: 1rem;
+
+                .permisos-acciones {
+                    display: flex;
+                    margin-bottom: 0.25rem;
+                }
             }
         }
     }

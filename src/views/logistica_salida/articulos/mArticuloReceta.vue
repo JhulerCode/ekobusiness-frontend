@@ -1,6 +1,6 @@
 <template>
     <JdModal modal="mArticuloReceta">
-        <div class="agregar" v-if="useAuth.verifyPermiso('vReceta_crear')">
+        <div class="agregar" v-if="useAuth.verifyPermiso('vReceta:crear')">
             <JdSelectQuery label="Artículo" :nec="true" v-model="nuevo.articulo" :spin="spinArticulos"
                 :lista="articulos" @search="searchArticulos" @elegir="setArticulo" style="grid-column: 1/5" />
 
@@ -11,11 +11,11 @@
 
         <JdTable :columns="columns" :datos="receta.receta_insumos || []" :seeker="false" :download="false"
             :colAct="true" class="jd-table" height="29rem" @onChange="(action, a) => this[action](a)"
-            :inputsDisabled="!this.useAuth.verifyPermiso('vReceta_editar')">
+            :inputsDisabled="!this.useAuth.verifyPermiso('vReceta:editar')">
 
             <template v-slot:cAction="{ item }">
                 <JdButton :small="true" tipo="2" icon="fa-solid fa-trash-can" title="Eliminar" @click="quitar(item)"
-                    v-if="this.useAuth.verifyPermiso('vReceta_eliminar')" />
+                    v-if="this.useAuth.verifyPermiso('vReceta:eliminar')" />
             </template>
 
             <template v-slot:cOrden="{ item }">
@@ -114,7 +114,7 @@ export default {
 
         this.loadDatosSistema()
 
-        if (this.useAuth.verifyPermiso('vReceta_editar') == false) this.columns[0].show = false
+        if (this.useAuth.verifyPermiso('vReceta:editar') == false) this.columns[0].show = false
     },
     methods: {
         async searchArticulos(txtBuscar) {

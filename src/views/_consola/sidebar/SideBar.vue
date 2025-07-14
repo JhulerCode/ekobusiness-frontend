@@ -25,8 +25,6 @@
                 </div>
             </div>
         </aside>
-        <!-- {{ menu }}
-        {{ this.useAuth.permisos }} -->
     </div>
 </template>
 
@@ -43,16 +41,17 @@ export default {
     }),
     computed: {
         menu() {
-            const tienePermiso = (a) => {
-                if (a.children) {
-                    const hijos = a.children.filter(b => !b.goto || this.useAuth.verifyPermiso(b.goto))
-                    return hijos.length > 0 ? { ...a, children: hijos } : null
-                }
+            return this.useAuth.menu
+                .map(seccion => {
+                    const hijosFiltrados = seccion.children.filter(a =>
+                        (this.useAuth.usuario.permisos || []).some(p => p.startsWith(a.goto + ':'))
+                    )
 
-                return !a.goto || this.useAuth.verifyPermiso(a.goto) ? a : null
-            }
-
-            return this.useAuth.menu.map(tienePermiso).filter(Boolean)
+                    return hijosFiltrados.length > 0
+                        ? { ...seccion, children: hijosFiltrados }
+                        : null
+                })
+                .filter(seccion => seccion !== null)
         },
     },
     methods: {
@@ -61,13 +60,12 @@ export default {
         }
     },
     created() {
-        // console.log(this.useAuth.permisos)
-        for (const a of this.menu) {
-            const asd = a.children.some(b => useVistas.show?.[b.goto])
-            if (asd) {
-                this.grupoExpandido = a.label
-            }
-        }
+        // for (const a of this.menu) {
+        //     const asd = a.children.some(b => useVistas.show?.[b.goto])
+        //     if (asd) {
+        //         this.grupoExpandido = a.label
+        //     }
+        // }
     }
 }
 </script>

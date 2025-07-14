@@ -4,16 +4,16 @@
             {{ modal.moneda?.nombre }}
         </div>
 
-        <div class="container-datos" v-if="useAuth.verifyPermiso('vTipoCambios_crear', 'vTipoCambios_editar')">
+        <div class="container-datos" v-if="useAuth.verifyPermiso('vTipoCambios:crear', 'vTipoCambios:editar')">
             <JdInput label="Fecha" :nec="true" type="date" v-model="tipo_cambio.fecha" />
             <JdInput label="Compra" :nec="true" type="number" v-model="tipo_cambio.compra" />
             <JdInput label="Venta" :nec="true" type="number" v-model="tipo_cambio.venta" />
 
             <JdButton icon="fa-solid fa-plus" text="Agregar" tipo="2" @click="crear()"
-                v-if="useAuth.verifyPermiso('vTipoCambios_crear') && tipo_cambio.id == null" />
+                v-if="useAuth.verifyPermiso('vTipoCambios:crear') && tipo_cambio.id == null" />
 
             <JdButton icon="fa-solid fa-pen-to-square" text="Actualizar" tipo="2" @click="editar()"
-                v-if="useAuth.verifyPermiso('vTipoCambios_editar') && tipo_cambio.id != null" />
+                v-if="useAuth.verifyPermiso('vTipoCambios:editar') && tipo_cambio.id != null" />
         </div>
 
         <JdTable :columns="columns" :datos="modal.tipo_cambios || []" maxHeight="30rem" :reload="loadTipoCambios"
@@ -82,8 +82,8 @@ export default {
             },
         ],
         tableRowOptions: [
-            { id: 1, label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'edit', permiso: 'vTipoCambios_editar' },
-            { id: 2, label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar', permiso: 'vTipoCambios_eliminar', ocultar: { estado: 2 } },
+            { id: 1, label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'edit', permiso: 'vTipoCambios:editar' },
+            { id: 2, label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar', permiso: 'vTipoCambios:eliminar', ocultar: { estado: 2 } },
         ],
     }),
     created() {

@@ -5,7 +5,7 @@
 
             <div class="buttons">
                 <JdButton text="Nuevo" title="Crear nuevo" @click="nuevo()"
-                    v-if="useAuth.verifyPermiso('vRegistrosSanitarios_crear')" />
+                    v-if="useAuth.verifyPermiso('vRegistrosSanitarios:crear')" />
             </div>
         </div>
 
@@ -125,9 +125,9 @@ export default {
             },
         ],
         tableRowOptions: [
-            { id: 1, label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar', permiso: 'vRegistrosSanitarios_editar' },
+            { id: 1, label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar', permiso: 'vRegistrosSanitarios:editar' },
             // { id: 2, label: 'Subir documento', icon: 'fa-solid fa-pen-to-square', action: 'uploadFile', permiso: 'vDocumentos_calidad_editar' },
-            { id: 3, label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar', permiso: 'vRegistrosSanitarios_eliminar' },
+            { id: 3, label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar', permiso: 'vRegistrosSanitarios:eliminar' },
         ]
     }),
     created() {
@@ -135,8 +135,7 @@ export default {
         this.useAuth.setColumns(this.tableName, this.columns)
 
         if (this.vista.loaded) return
-
-        this.loadDocumentos()
+        if (this.useAuth.verifyPermiso('vRegistrosSanitarios:listar') == true) this.loadDocumentos()
     },
     methods: {
         setQuery() {

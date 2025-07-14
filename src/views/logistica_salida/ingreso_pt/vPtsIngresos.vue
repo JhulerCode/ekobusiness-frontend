@@ -5,7 +5,7 @@
 
             <div class="buttons">
                 <JdButton text="Ver cuarentena" @click="verCuarentena()"
-                    v-if="useAuth.verifyPermiso('vPtsIngresos_verCuarentena')" />
+                    v-if="useAuth.verifyPermiso('vPtsIngresos:verCuarentena')" />
             </div>
         </div>
 
@@ -146,7 +146,7 @@ export default {
 
         if (this.vista.loaded) return
 
-        this.loadTransacciones()
+        if (this.useAuth.verifyPermiso('vPtsIngresos:listar') == true) this.loadTransacciones()
     },
     methods: {
         initFiltros() {

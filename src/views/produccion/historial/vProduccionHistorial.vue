@@ -123,12 +123,12 @@ export default {
             }
         ],
         tableRowOptions: [
-            { label: 'Ver', icon: 'fa-regular fa-eye', action: 'ver', permiso: 'vProduccionHistorial_ver' },
-            { label: 'Salida de insumos', icon: 'fa-regular fa-circle-down', action: 'salidaInsumos', permiso: 'vProduccionHistorial_salidaInsumos' },
-            { label: 'Control de pesos', icon: 'fa-solid fa-star', action: 'controlPesos', permiso: 'vProduccionHistorial_controlPesos' },
-            { label: 'Control del PPC', icon: 'fa-solid fa-star', action: 'crearPpc', permiso: 'vProduccionHistorial_controlPpc' },
-            { label: 'Productos en cuarentena', icon: 'fa-solid fa-boxes-stacked', action: 'productosCuarentena', permiso: 'vProduccionHistorial_productosCuarentena' },
-            { label: 'Productos terminados', icon: 'fa-solid fa-boxes-stacked', action: 'productosTerminados', permiso: 'vProduccionHistorial_productosTerminados' },
+            { label: 'Ver', icon: 'fa-solid fa-folder-open', action: 'ver', permiso: 'vProduccionHistorial:ver' },
+            { label: 'Salida de insumos', icon: 'fa-regular fa-circle-down', action: 'salidaInsumos', permiso: 'vProduccionHistorial:salidaInsumos' },
+            { label: 'Control de pesos', icon: 'fa-solid fa-star', action: 'controlPesos', permiso: 'vProduccionHistorial:controlPesos' },
+            { label: 'Control del PPC', icon: 'fa-solid fa-star', action: 'crearPpc', permiso: 'vProduccionHistorial:controlPpc' },
+            { label: 'Productos en cuarentena', icon: 'fa-solid fa-boxes-stacked', action: 'productosCuarentena', permiso: 'vProduccionHistorial:productosCuarentena' },
+            { label: 'Productos terminados', icon: 'fa-solid fa-boxes-stacked', action: 'productosTerminados', permiso: 'vProduccionHistorial:productosTerminados' },
         ]
     }),
     created() {
@@ -137,8 +137,7 @@ export default {
         this.useAuth.setColumns(this.tableName, this.columns)
 
         if (this.vista.loaded) return
-
-        this.loadProduccionOrdenes()
+        if (this.useAuth.verifyPermiso('vProduccionHistorial:listar') == true) this.loadProduccionOrdenes()
     },
     methods: {
         initFiltros() {

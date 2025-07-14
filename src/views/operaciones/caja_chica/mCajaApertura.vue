@@ -34,17 +34,17 @@
             </p>
 
             <div class="container-agregar"
-                v-if="modal.mode == 4 && useAuth.verifyPermiso('vCajaMovimientos_crear', 'vCajaMovimientos_editar')">
+                v-if="modal.mode == 4 && useAuth.verifyPermiso('vCajaMovimientos:crear', 'vCajaMovimientos:editar')">
                 <div class="container-nuevo">
                     <JdInput label="Fecha" :nec="true" type="date" v-model="modal.nuevo.fecha" />
                     <JdInput label="Detalle" :nec="true" type="text" v-model="modal.nuevo.detalle" />
                     <JdInput label="Monto" :nec="true" type="number" v-model="modal.nuevo.monto" />
 
                     <JdButton text="Grabar" tipo="2" @click="addMovimiento"
-                        v-if="useAuth.verifyPermiso('vCajaMovimientos_crear') && modal.nuevo?.id == null" />
+                        v-if="useAuth.verifyPermiso('vCajaMovimientos:crear') && modal.nuevo?.id == null" />
 
                     <JdButton icon="fa-solid fa-pen-to-square" text="Actualizar" tipo="2" @click="editarMovimiento"
-                        v-if="useAuth.verifyPermiso('vCajaMovimientos_editar') && modal.nuevo?.id != null" />
+                        v-if="useAuth.verifyPermiso('vCajaMovimientos:editar') && modal.nuevo?.id != null" />
                 </div>
             </div>
 
@@ -125,8 +125,8 @@ export default {
             }
         ],
         tableRowOptions: [
-            { id: 1, label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editMovimiento', permiso: 'vCajaMovimientos_editar' },
-            { id: 2, label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'deleteMovimiento', permiso: 'vCajaMovimientos_eliminar', ocultar: { estado: 2 } },
+            { id: 1, label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editMovimiento', permiso: 'vCajaMovimientos:editar' },
+            { id: 2, label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'deleteMovimiento', permiso: 'vCajaMovimientos:eliminar', ocultar: { estado: 2 } },
         ],
     }),
     created() {

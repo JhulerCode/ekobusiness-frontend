@@ -16,7 +16,7 @@
                 <JdButton icon="fa-solid fa-plus" text="Agregar" tipo="2" @click="addNew()" v-if="modal.mode != 3" />
             </div>
 
-            <JdTable :columns="columns" :datos="inspeccion.correcciones" :seeker="false" :colAct="true"
+            <JdTable :columns="columns" :datos="inspeccion.correcciones" :seeker="false" :colAct="modal.mode != 3"
                 :download="false" :inputsDisabled="modal.mode == 3">
                 <template v-slot:cAction="{ item }">
                     <JdButton icon="fa-solid fa-trash" title="Eliminar" tipo="2" :small="true"
@@ -88,7 +88,9 @@ export default {
 
         this.showButtons()
 
-        if (this.modal.mode != 3) this.loadSocios()
+        if (this.modal.mode != 3) {
+            this.loadSocios()
+        }
     },
     methods: {
         showButtons() {

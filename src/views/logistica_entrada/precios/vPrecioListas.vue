@@ -5,7 +5,7 @@
 
             <div class="buttons">
                 <JdButton text="Nuevo" title="Crear nuevo" @click="nuevo()"
-                    v-if="useAuth.verifyPermiso('vPrecioListas_crear')" />
+                    v-if="useAuth.verifyPermiso('vPrecioListas:crear')" />
             </div>
         </div>
 
@@ -100,9 +100,9 @@ export default {
             },
         ],
         tableRowOptions: [
-            { id: 1, label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar', permiso: 'vPrecioListas_editar' },
-            { id: 2, label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar', permiso: 'vPrecioListas_eliminar' },
-            { id: 3, label: 'Artículos', icon: 'fa-solid fa-tags', action: 'verArticulos', permiso: 'vPrecioListaItems' },
+            { id: 1, label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar', permiso: 'vPrecioListas:editar' },
+            { id: 2, label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar', permiso: 'vPrecioListas:eliminar' },
+            { id: 3, label: 'Artículos', icon: 'fa-solid fa-tags', action: 'verArticulos', permiso: 'vPrecioListaItems:listar' },
         ],
     }),
     created() {
@@ -111,7 +111,7 @@ export default {
 
         if (this.vista.loaded) return
 
-        this.loadListaPrecios()
+        if (this.useAuth.verifyPermiso('vPrecioListas:listar') == true) this.loadListaPrecios()
     },
     methods: {
         setQuery() {

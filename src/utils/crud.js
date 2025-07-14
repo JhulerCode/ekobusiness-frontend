@@ -46,16 +46,18 @@ async function get(url) {
         return { code: -2 }
     }
 
+    if (query.status == 401) {
+        jmsg('error', 'Acceso denegado: autenticación incorrecta')
+        useModals().setModal('mLogin', 'Sesión terminada', null, null)
+        return { code: 401 }
+    }
+
     if (query.status == 403) {
         jmsg('error', 'Acceso denegado: permisos insuficientes')
         return { code: 403 }
     }
 
     const res = await query.json()
-
-    if (res.code == -2) {
-        useModals().setModal('mLogin', 'Sesión terminada', null, null)
-    }
 
     if (res.code == -1) jmsg('error', 'Algo salió mal')
 
@@ -82,16 +84,18 @@ async function post(url, item, ms) {
         return { code: -2 }
     }
 
+    if (query.status == 401) {
+        jmsg('error', 'Acceso denegado: autenticación incorrecta')
+        useModals().setModal('mLogin', 'Sesión terminada', null, null)
+        return { code: 401 }
+    }
+
     if (query.status == 403) {
         jmsg('error', 'Acceso denegado: permisos insuficientes')
         return { code: 403 }
     }
 
     const res = await query.json()
-
-    if (res.code == -2) {
-        useModals().setModal('mLogin', 'Sesión terminada', null, null)
-    }
 
     if (res.code == -1) jmsg('error', 'Algo salió mal')
 
@@ -124,16 +128,18 @@ async function patch(url, item, ms) {
         return { code: -2 }
     }
 
+    if (query.status == 401) {
+        jmsg('error', 'Acceso denegado: autenticación incorrecta')
+        useModals().setModal('mLogin', 'Sesión terminada', null, null)
+        return { code: 401 }
+    }
+
     if (query.status == 403) {
         jmsg('error', 'Acceso denegado: permisos insuficientes')
         return { code: 403 }
     }
 
     const res = await query.json()
-
-    if (res.code == -2) {
-        useModals().setModal('mLogin', 'Sesión terminada', null, null)
-    }
 
     if (res.code == -1) jmsg('error', 'Algo salió mal')
 
@@ -166,16 +172,18 @@ async function delet(url, item, ms) {
         return { code: -2 }
     }
 
+    if (query.status == 401) {
+        jmsg('error', 'Acceso denegado: autenticación incorrecta')
+        useModals().setModal('mLogin', 'Sesión terminada', null, null)
+        return { code: 401 }
+    }
+
     if (query.status == 403) {
         jmsg('error', 'Acceso denegado: permisos insuficientes')
         return { code: 403 }
     }
 
     const res = await query.json()
-
-    if (res.code == -2) {
-        useModals().setModal('mLogin', 'Sesión terminada', null, null)
-    }
 
     if (res.code == -1) jmsg('error', 'Algo salió mal')
 

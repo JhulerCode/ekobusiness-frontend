@@ -75,7 +75,7 @@ export default {
             },
         ],
         tableRowOptions: [
-            { id: 1, label: 'Ver', icon: 'fa-regular fa-folder-open', action: 'ver', permiso: 'vFormatosPhs' },
+            { id: 1, label: 'Ver', icon: 'fa-regular fa-folder-open', action: 'ver', permiso: 'vFormatosPhs:listar' },
         ],
 
         columns1: [],

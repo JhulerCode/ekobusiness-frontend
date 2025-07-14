@@ -5,9 +5,9 @@
 
             <div class="buttons">
                 <JdButton text="Recuperar guardado" tipo="2" @click="recuperarGuardado()"
-                    v-if="useAuth.avances.mCompraPedido && useAuth.verifyPermiso('vCompraPedidos_crear')" />
+                    v-if="useAuth.avances.mCompraPedido && useAuth.verifyPermiso('vCompraPedidos:crear')" />
 
-                <JdButton text="Nuevo" @click="nuevo()" v-if="useAuth.verifyPermiso('vCompraPedidos_crear')" />
+                <JdButton text="Nuevo" @click="nuevo()" v-if="useAuth.verifyPermiso('vCompraPedidos:crear')" />
             </div>
         </div>
 
@@ -148,12 +148,12 @@ export default {
             },
         ],
         tableRowOptions: [
-            { id: 1, label: 'Ver', icon: 'fa-regular fa-folder-open', action: 'ver', permiso: 'vCompraPedidos_ver' },
-            { id: 2, label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar', permiso: 'vCompraPedidos_editar', ocultar: { estado: 0 } },
-            { id: 3, label: 'Anular', icon: 'fa-solid fa-ban', action: 'anular', permiso: 'vCompraPedidos_anular', ocultar: { estado: 0 } },
+            { id: 1, label: 'Ver', icon: 'fa-regular fa-folder-open', action: 'ver', permiso: 'vCompraPedidos:ver' },
+            { id: 2, label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar', permiso: 'vCompraPedidos:editar', ocultar: { estado: 0 } },
+            { id: 3, label: 'Anular', icon: 'fa-solid fa-ban', action: 'anular', permiso: 'vCompraPedidos:anular', ocultar: { estado: 0 } },
             // { id: 4, label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar' },
-            { id: 5, label: 'Exportar en PDF', icon: 'fa-regular fa-file-pdf', action: 'generarPdf', permiso: 'vCompraPedidos_generarPdf' },
-            { id: 6, label: 'Ingresar mercadería', icon: 'fa-regular fa-circle-up', action: 'ingresarMercaderia', permiso: 'vCompraPedidos_ingresarMercaderia', ocultar: { estado: 0 } },
+            { id: 5, label: 'Exportar en PDF', icon: 'fa-regular fa-file-pdf', action: 'generarPdf', permiso: 'vCompraPedidos:generarPdf' },
+            { id: 6, label: 'Ingresar mercadería', icon: 'fa-regular fa-circle-up', action: 'ingresarMercaderia', permiso: 'vCompraPedidos:ingresarMercaderia', ocultar: { estado: 0 } },
         ],
     }),
     async created() {
@@ -163,7 +163,7 @@ export default {
 
         if (this.vista.loaded) return
 
-        this.loadPedidos()
+        if (this.useAuth.verifyPermiso('vCompraPedidos:listar') == true) this.loadPedidos()
     },
     methods: {
         initFiltros() {

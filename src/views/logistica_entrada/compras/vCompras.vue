@@ -5,9 +5,9 @@
 
             <div class="buttons">
                 <JdButton text="Recuperar guardado" tipo="2" @click="recuperarGuardado()"
-                    v-if="useAuth.avances.mCompra && useAuth.verifyPermiso('vCompras_crear')" />
+                    v-if="useAuth.avances.mCompra && useAuth.verifyPermiso('vCompras:crear')" />
 
-                <JdButton text="Nuevo" @click="nuevo()" v-if="useAuth.verifyPermiso('vCompras_crear')" />
+                <JdButton text="Nuevo" @click="nuevo()" v-if="useAuth.verifyPermiso('vCompras:crear')" />
             </div>
         </div>
 
@@ -149,10 +149,10 @@ export default {
             },
         ],
         tableRowOptions: [
-            { label: 'Ver', icon: 'fa-regular fa-folder-open', action: 'ver', permiso: 'vCompras_ver' },
-            // { label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar', permiso: 'vCompras_ver' },
-            { label: 'Anular', icon: 'fa-solid fa-ban', action: 'anular', permiso: 'vCompras_anular', ocultar: { estado: 0 } },
-            // { label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar', permiso: 'vCompras_anular' },
+            { label: 'Ver', icon: 'fa-regular fa-folder-open', action: 'ver', permiso: 'vCompras:ver' },
+            // { label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar', permiso: 'vCompras:ver' },
+            { label: 'Anular', icon: 'fa-solid fa-ban', action: 'anular', permiso: 'vCompras:anular', ocultar: { estado: 0 } },
+            // { label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar', permiso: 'vCompras:anular' },
         ],
     }),
     async created() {
@@ -162,7 +162,7 @@ export default {
 
         if (this.vista.loaded) return
 
-        this.loadTransacciones()
+        if (this.useAuth.verifyPermiso('vCompras:listar') == true) this.loadTransacciones()
     },
     methods: {
         initFiltros() {

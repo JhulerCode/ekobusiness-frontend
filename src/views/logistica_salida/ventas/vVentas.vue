@@ -5,9 +5,9 @@
 
             <div class="buttons">
                 <JdButton text="Recuperar guardado" tipo="2" @click="recuperarGuardado()"
-                    v-if="useAuth.verifyPermiso('vVentas_crear') && useAuth.avances.mVenta" />
+                    v-if="useAuth.verifyPermiso('vVentas:crear') && useAuth.avances.mVenta" />
 
-                <JdButton text="Nuevo" @click="nuevo()" v-if="useAuth.verifyPermiso('vVentas_crear')" />
+                <JdButton text="Nuevo" @click="nuevo()" v-if="useAuth.verifyPermiso('vVentas:crear')" />
             </div>
         </div>
 
@@ -143,11 +143,11 @@ export default {
             },
         ],
         tableRowOptions: [
-            { id: 1, label: 'Ver', icon: 'fa-regular fa-folder-open', action: 'ver', permiso: 'vVentas_ver' },
+            { id: 1, label: 'Ver', icon: 'fa-regular fa-folder-open', action: 'ver', permiso: 'vVentas:ver' },
             // { id: 2, label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar' },
-            { id: 3, label: 'Anular', icon: 'fa-solid fa-ban', action: 'anular', permiso: 'vVentas_anular', ocultar: { estado: 0 } },
+            { id: 3, label: 'Anular', icon: 'fa-solid fa-ban', action: 'anular', permiso: 'vVentas:anular', ocultar: { estado: 0 } },
             // { id: 4, label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar' },
-            { id: 5, label: 'Control de despacho', icon: 'fa-solid fa-star', action: 'controlDespacho', permiso: 'vVentas_controlDespacho' },
+            { id: 5, label: 'Control de despacho', icon: 'fa-solid fa-star', action: 'controlDespacho', permiso: 'vVentas:controlDespacho' },
         ],
     }),
     async created() {
@@ -157,7 +157,7 @@ export default {
 
         if (this.vista.loaded) return
 
-        this.loadTransacciones()
+        if (this.useAuth.verifyPermiso('vVentas:listar') == true) this.loadTransacciones()
     },
     methods: {
         initFiltros() {

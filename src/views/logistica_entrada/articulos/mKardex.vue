@@ -117,7 +117,7 @@ export default {
             },
         ],
         tableRowOptions: [
-            { label: 'Eliminar', icon: 'fa-regular fa-trash-can', action: 'eliminar', permiso: 'vArticulos_kardex' },
+            { label: 'Eliminar', icon: 'fa-regular fa-trash-can', action: 'eliminar', permiso: 'vArticulos:kardex' },
         ],
     }),
     async created() {

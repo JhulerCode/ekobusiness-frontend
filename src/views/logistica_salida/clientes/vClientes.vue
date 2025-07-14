@@ -4,7 +4,7 @@
             <strong>Clientes</strong>
 
             <div class="buttons">
-                <JdButton text="Nuevo" @click="nuevo()" v-if="useAuth.verifyPermiso('vClientes_crear')" />
+                <JdButton text="Nuevo" @click="nuevo()" v-if="useAuth.verifyPermiso('vClientes:crear')" />
             </div>
         </div>
 
@@ -122,9 +122,9 @@ export default {
             { icon: 'fa-solid fa-trash-can', text: "Eliminar", action: "eliminarBulk" },
         ],
         tableRowOptions: [
-            { label: 'Ver', icon: 'fa-regular fa-folder-open', action: 'ver', permiso: 'vClientes_ver' },
-            { label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar', permiso: 'vClientes_editar' },
-            { label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar', permiso: 'vClientes_eliminar' },
+            { label: 'Ver', icon: 'fa-regular fa-folder-open', action: 'ver', permiso: 'vClientes:ver' },
+            { label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar', permiso: 'vClientes:editar' },
+            { label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar', permiso: 'vClientes:eliminar' },
         ],
     }),
     created() {
@@ -133,7 +133,7 @@ export default {
 
         if (this.vista.loaded) return
 
-        this.loadSocios()
+        if (this.useAuth.verifyPermiso('vClientes:listar') == true) this.loadSocios()
     },
     methods: {
         setQuery() {

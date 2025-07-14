@@ -5,7 +5,7 @@
 
             <div class="buttons">
                 <JdButton text="Nuevo" title="Crear nuevo" @click="nuevo()"
-                    v-if="useAuth.verifyPermiso('vInspecciones_crear')" />
+                    v-if="useAuth.verifyPermiso('vInspecciones:crear')" />
             </div>
         </div>
 
@@ -107,9 +107,9 @@ export default {
             // },
         ],
         tableRowOptions: [
-            { label: 'Ver', icon: 'fa-regular fa-folder-open', action: 'ver', permiso: 'vInspecciones_ver' },
-            { label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar', permiso: 'vInspecciones_editar' },
-            { label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar', permiso: 'vInspecciones_eliminar' },
+            { label: 'Ver', icon: 'fa-regular fa-folder-open', action: 'ver', permiso: 'vInspecciones:ver' },
+            { label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar', permiso: 'vInspecciones:editar' },
+            { label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar', permiso: 'vInspecciones:eliminar' },
         ],
     }),
     created() {
@@ -117,8 +117,7 @@ export default {
         this.useAuth.setColumns(this.tableName, this.columns)
 
         if (this.vista.loaded) return
-
-        this.loadInspecciones()
+        if (this.useAuth.verifyPermiso('vInspecciones:listar') == true) this.loadInspecciones()
     },
     methods: {
         setQuery() {

@@ -75,7 +75,7 @@ export default {
             },
         ],
         tableRowOptions: [
-            { id: 1, label: 'Ver', icon: 'fa-regular fa-folder-open', action: 'ver', permiso: 'vFormatosBpm' },
+            { id: 1, label: 'Ver', icon: 'fa-regular fa-folder-open', action: 'ver', permiso: 'vFormatosBpm:listar' },
         ],
 
         columns1: [],
@@ -90,7 +90,6 @@ export default {
         this.useAuth.setColumns(this.tableName, this.columns)
 
         if (this.vista.loaded) return
-
         this.loadFormatos()
     },
     beforeUnmount() {

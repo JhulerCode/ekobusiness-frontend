@@ -5,7 +5,7 @@
 
             <div class="buttons">
                 <JdButton text="Ver productos pedidos" @click="verPedidos"
-                    v-if="useAuth.verifyPermiso('vProgramaLuxury_verProductosPedidos')" />
+                    v-if="useAuth.verifyPermiso('vProgramaLuxury:verProductosPedidos')" />
             </div>
         </div>
 
@@ -32,7 +32,7 @@
                 </div>
 
                 <div class="right" @click="nuevo(a)" title="Agregar orden de producción"
-                    v-if="useAuth.verifyPermiso('vProgramaLuxury_crear') && this.vista.filtros.maquina == null">
+                    v-if="useAuth.verifyPermiso('vProgramaLuxury:crear') && this.vista.filtros.maquina == null">
                     <i class="fa-solid fa-plus"></i>
                 </div>
             </li>
@@ -155,11 +155,11 @@ export default {
             // }
         ],
         tableRowOptions: [
-            { id: 1, label: 'Ver', icon: 'fa-regular fa-eye', action: 'ver', permiso: 'vProgramaLuxury_ver' },
-            { id: 2, label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar', permiso: 'vProgramaLuxury_editar' },
-            { id: 3, label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar', permiso: 'vProgramaLuxury_eliminar', ocultar: { estado: 2 } },
-            { id: 4, label: 'Salida de insumos', icon: 'fa-regular fa-circle-down', action: 'salidaInsumos', permiso: 'vProgramaLuxury_salidaInsumos' },
-            { id: 5, label: 'Productos en cuarentena', icon: 'fa-solid fa-boxes-stacked', action: 'productosCuarentena', permiso: 'vProgramaLuxury_productosCuarentena' },
+            { id: 1, label: 'Ver', icon: 'fa-solid fa-folder-open', action: 'ver', permiso: 'vProgramaLuxury:ver' },
+            { id: 2, label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar', permiso: 'vProgramaLuxury:editar' },
+            { id: 3, label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar', permiso: 'vProgramaLuxury:eliminar', ocultar: { estado: 2 } },
+            { id: 4, label: 'Salida de insumos', icon: 'fa-regular fa-circle-down', action: 'salidaInsumos', permiso: 'vProgramaLuxury:salidaInsumos' },
+            { id: 5, label: 'Productos en cuarentena', icon: 'fa-solid fa-boxes-stacked', action: 'productosCuarentena', permiso: 'vProgramaLuxury:productosCuarentena' },
         ]
     }),
     async created() {
@@ -168,7 +168,7 @@ export default {
         if (this.vista.loaded) return
 
         await this.setMaquinas()
-        this.loadProduccionOrdenes()
+        if (this.useAuth.verifyPermiso('vProgramaLuxury:listar') == true) this.loadProduccionOrdenes()
     },
     methods: {
         async loadMaquinas() {
@@ -183,7 +183,6 @@ export default {
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
-
             this.vista.maquinas = res.data
         },
         async setMaquinas() {

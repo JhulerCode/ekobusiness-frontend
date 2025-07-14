@@ -8,7 +8,6 @@ export const useAuth = defineStore('auth', {
     state: () => ({
         token: null,
         usuario: {},
-        // permisos: [],
 
         menu: [
             {
@@ -67,81 +66,81 @@ export const useAuth = defineStore('auth', {
                 id: 'logistica_entrada', label: 'Logistica de entrada', vistas: [
                     {
                         id: 'vProveedores', label: 'Proveedores', permisos: [
-                            { id: 'vProveedores', label: 'Acceder' },
-                            { id: 'vProveedores_crear', label: 'Crear' },
-                            { id: 'vProveedores_ver', label: 'Ver' },
-                            { id: 'vProveedores_editar', label: 'Editar' },
-                            { id: 'vProveedores_eliminar', label: 'Eliminar' },
+                            { id: 'vProveedores:listar', label: 'Listar' },
+                            { id: 'vProveedores:crear', label: 'Crear' },
+                            { id: 'vProveedores:ver', label: 'Ver' },
+                            { id: 'vProveedores:editar', label: 'Editar' },
+                            { id: 'vProveedores:eliminar', label: 'Eliminar' },
 
-                            { id: 'vProveedores_editarBulk', label: 'Editar masivo' },
-                            { id: 'vProveedores_eliminarBulk', label: 'Eliminar masivo' },
+                            { id: 'vProveedores:editarBulk', label: 'Editar masivo' },
+                            { id: 'vProveedores:eliminarBulk', label: 'Eliminar masivo' },
                         ]
                     },
                     {
                         id: 'vArticuloCategorias', label: 'Categorías de artículos', permisos: [
-                            { id: 'vArticuloCategorias', label: 'Acceder' },
-                            { id: 'vArticuloCategorias_crear', label: 'Crear' },
-                            { id: 'vArticuloCategorias_editar', label: 'Editar' },
-                            { id: 'vArticuloCategorias_eliminar', label: 'Eliminar' },
+                            { id: 'vArticuloCategorias:listar', label: 'Listar' },
+                            { id: 'vArticuloCategorias:crear', label: 'Crear' },
+                            { id: 'vArticuloCategorias:editar', label: 'Editar' },
+                            { id: 'vArticuloCategorias:eliminar', label: 'Eliminar' },
                         ]
                     },
                     {
                         id: 'vArticulos', label: 'Artículos', permisos: [
-                            { id: 'vArticulos', label: 'Acceder' },
-                            { id: 'vArticulos_crear', label: 'Crear' },
-                            { id: 'vArticulos_editar', label: 'Editar' },
-                            { id: 'vArticulos_eliminar', label: 'Eliminar' },
+                            { id: 'vArticulos:listar', label: 'Listar' },
+                            { id: 'vArticulos:crear', label: 'Crear' },
+                            { id: 'vArticulos:editar', label: 'Editar' },
+                            { id: 'vArticulos:eliminar', label: 'Eliminar' },
 
-                            { id: 'vArticulos_clonar', label: 'Clonar' },
-                            { id: 'vArticulos_kardex', label: 'Ver kardex' },
-                            { id: 'vArticulos_ajusteStock', label: 'Ajuste stock' },
+                            { id: 'vArticulos:clonar', label: 'Clonar' },
+                            { id: 'vArticulos:kardex', label: 'Ver kardex' },
+                            { id: 'vArticulos:ajusteStock', label: 'Ajuste stock' },
 
-                            { id: 'vArticulos_importar', label: 'Importar' },
-                            { id: 'vArticulos_editarBulk', label: 'Editar masivo' },
-                            { id: 'vArticulos_eliminarBulk', label: 'Eliminar masivo' },
+                            { id: 'vArticulos:importar', label: 'Importar' },
+                            { id: 'vArticulos:editarBulk', label: 'Editar masivo' },
+                            { id: 'vArticulos:eliminarBulk', label: 'Eliminar masivo' },
                         ]
                     },
                     {
                         id: 'vPrecioListas', label: 'Listas de precios', permisos: [
-                            { id: 'vPrecioListas', label: 'Acceder' },
-                            { id: 'vPrecioListas_crear', label: 'Crear' },
-                            { id: 'vPrecioListas_editar', label: 'Editar' },
-                            { id: 'vPrecioListas_eliminar', label: 'Eliminar' },
+                            { id: 'vPrecioListas:listar', label: 'Listar' },
+                            { id: 'vPrecioListas:crear', label: 'Crear' },
+                            { id: 'vPrecioListas:editar', label: 'Editar' },
+                            { id: 'vPrecioListas:eliminar', label: 'Eliminar' },
                         ]
                     },
                     {
                         id: 'vPrecioListaItems', label: 'Items de lista de precios', permisos: [
-                            { id: 'vPrecioListaItems', label: 'Acceder' },
-                            { id: 'vPrecioListaItems_crear', label: 'Crear' },
-                            { id: 'vPrecioListaItems_editar', label: 'Editar' },
-                            { id: 'vPrecioListaItems_eliminar', label: 'Eliminar' },
+                            { id: 'vPrecioListaItems:listar', label: 'Listar' },
+                            { id: 'vPrecioListaItems:crear', label: 'Crear' },
+                            { id: 'vPrecioListaItems:editar', label: 'Editar' },
+                            { id: 'vPrecioListaItems:eliminar', label: 'Eliminar' },
                         ]
                     },
                     {
                         id: 'vCompraPedidos', label: 'Pedidos de compra', permisos: [
-                            { id: 'vCompraPedidos', label: 'Acceder' },
-                            { id: 'vCompraPedidos_crear', label: 'Crear' },
-                            { id: 'vCompraPedidos_ver', label: 'Ver' },
-                            { id: 'vCompraPedidos_editar', label: 'Editar' },
+                            { id: 'vCompraPedidos:listar', label: 'Listar' },
+                            { id: 'vCompraPedidos:crear', label: 'Crear' },
+                            { id: 'vCompraPedidos:ver', label: 'Ver' },
+                            { id: 'vCompraPedidos:editar', label: 'Editar' },
 
-                            { id: 'vCompraPedidos_anular', label: 'Anular' },
-                            { id: 'vCompraPedidos_generarPdf', label: 'Generar PDF' },
-                            { id: 'vCompraPedidos_ingresarMercaderia', label: 'Ingresar mercadería' },
+                            { id: 'vCompraPedidos:anular', label: 'Anular' },
+                            { id: 'vCompraPedidos:generarPdf', label: 'Generar PDF' },
+                            { id: 'vCompraPedidos:ingresarMercaderia', label: 'Ingresar mercadería' },
                         ]
                     },
                     {
                         id: 'vCompras', label: 'Compras', permisos: [
-                            { id: 'vCompras', label: 'Acceder' },
-                            { id: 'vCompras_crear', label: 'Crear' },
-                            { id: 'vCompras_ver', label: 'Ver' },
+                            { id: 'vCompras:listar', label: 'Listar' },
+                            { id: 'vCompras:crear', label: 'Crear' },
+                            { id: 'vCompras:ver', label: 'Ver' },
 
-                            { id: 'vCompras_anular', label: 'Anular' },
+                            { id: 'vCompras:anular', label: 'Anular' },
                         ]
                     },
                     {
                         id: 'vCompraItems', label: 'Compra detalle', permisos: [
-                            { id: 'vCompraItems', label: 'Acceder' },
-                            { id: 'vCompraItems_inspeccion', label: 'Inspeccionar' },
+                            { id: 'vCompraItems:listar', label: 'Listar' },
+                            { id: 'vCompraItems:inspeccion', label: 'Inspeccionar' },
                         ]
                     }
                 ]
@@ -150,72 +149,72 @@ export const useAuth = defineStore('auth', {
                 id: 'logistica_salida', label: 'Logistica de salida', vistas: [
                     {
                         id: 'vClientes', label: 'Clientes', permisos: [
-                            { id: 'vClientes', label: 'Acceder' },
-                            { id: 'vClientes_crear', label: 'Crear' },
-                            { id: 'vClientes_ver', label: 'Ver' },
-                            { id: 'vClientes_editar', label: 'Editar' },
-                            { id: 'vClientes_eliminar', label: 'Eliminar' },
+                            { id: 'vClientes:listar', label: 'Listar' },
+                            { id: 'vClientes:crear', label: 'Crear' },
+                            { id: 'vClientes:ver', label: 'Ver' },
+                            { id: 'vClientes:editar', label: 'Editar' },
+                            { id: 'vClientes:eliminar', label: 'Eliminar' },
                         ]
                     },
                     {
                         id: 'vProductoCategorias', label: 'Categorías de productos', permisos: [
-                            { id: 'vProductoCategorias', label: 'Acceder' },
-                            { id: 'vProductoCategorias_crear', label: 'Crear' },
-                            { id: 'vProductoCategorias_editar', label: 'Editar' },
-                            { id: 'vProductoCategorias_eliminar', label: 'Eliminar' },
+                            { id: 'vProductoCategorias:listar', label: 'Listar' },
+                            { id: 'vProductoCategorias:crear', label: 'Crear' },
+                            { id: 'vProductoCategorias:editar', label: 'Editar' },
+                            { id: 'vProductoCategorias:eliminar', label: 'Eliminar' },
                         ]
                     },
                     {
                         id: 'vProductosTerminados', label: 'Productos', permisos: [
-                            { id: 'vProductosTerminados', label: 'Acceder' },
-                            { id: 'vProductosTerminados_crear', label: 'Crear' },
-                            { id: 'vProductosTerminados_editar', label: 'Editar' },
-                            { id: 'vProductosTerminados_eliminar', label: 'Eliminar' },
+                            { id: 'vProductosTerminados:listar', label: 'Listar' },
+                            { id: 'vProductosTerminados:crear', label: 'Crear' },
+                            { id: 'vProductosTerminados:editar', label: 'Editar' },
+                            { id: 'vProductosTerminados:eliminar', label: 'Eliminar' },
 
-                            { id: 'vProductosTerminados_clonar', label: 'Clonar' },
-                            { id: 'vProductosTerminados_kardex', label: 'Ver kardex' },
-                            { id: 'vProductosTerminados_ajusteStock', label: 'Ajuste stock' },
+                            { id: 'vProductosTerminados:clonar', label: 'Clonar' },
+                            { id: 'vProductosTerminados:kardex', label: 'Ver kardex' },
+                            { id: 'vProductosTerminados:ajusteStock', label: 'Ajuste stock' },
 
-                            { id: 'vProductosTerminados_crearCombo', label: 'Crear combo' },
-                            { id: 'vProductosTerminados_importar', label: 'Importar' },
-                            { id: 'vProductosTerminados_editarBulk', label: 'Editar masivo' },
-                            { id: 'vProductosTerminados_eliminarBulk', label: 'Eliminar masivo' },
+                            { id: 'vProductosTerminados:crearCombo', label: 'Crear combo' },
+                            { id: 'vProductosTerminados:importar', label: 'Importar' },
+                            { id: 'vProductosTerminados:editarBulk', label: 'Editar masivo' },
+                            { id: 'vProductosTerminados:eliminarBulk', label: 'Eliminar masivo' },
                         ]
                     },
                     {
                         id: 'vReceta', label: 'Receta', permisos: [
-                            { id: 'vReceta', label: 'Acceder' },
-                            { id: 'vReceta_crear', label: 'Crear' },
-                            { id: 'vReceta_editar', label: 'Editar' },
-                            { id: 'vReceta_eliminar', label: 'Eliminar' },
+                            { id: 'vReceta:listar', label: 'Listar' },
+                            { id: 'vReceta:crear', label: 'Crear' },
+                            { id: 'vReceta:editar', label: 'Editar' },
+                            { id: 'vReceta:eliminar', label: 'Eliminar' },
                         ]
                     },
                     {
                         id: 'vPtsIngresos', label: 'Ingreso de productos', permisos: [
-                            { id: 'vPtsIngresos', label: 'Acceder' },
-                            { id: 'vPtsIngresos_verCuarentena', label: 'Ver cuarentena' },
-                            { id: 'vPtsIngresos_ingresarPts', label: 'Ingresar productos terminados' },
+                            { id: 'vPtsIngresos:listar', label: 'Listar' },
+                            { id: 'vPtsIngresos:verCuarentena', label: 'Ver cuarentena' },
+                            { id: 'vPtsIngresos:ingresarPts', label: 'Ingresar productos terminados' },
                         ]
                     },
                     {
                         id: 'vVentaPedidos', label: 'Pedidos de venta', permisos: [
-                            { id: 'vVentaPedidos', label: 'Acceder' },
-                            { id: 'vVentaPedidos_crear', label: 'Crear' },
-                            { id: 'vVentaPedidos_ver', label: 'Ver' },
-                            { id: 'vVentaPedidos_editar', label: 'Editar' },
+                            { id: 'vVentaPedidos:listar', label: 'Listar' },
+                            { id: 'vVentaPedidos:crear', label: 'Crear' },
+                            { id: 'vVentaPedidos:ver', label: 'Ver' },
+                            { id: 'vVentaPedidos:editar', label: 'Editar' },
 
-                            { id: 'vVentaPedidos_anular', label: 'Anular' },
-                            { id: 'vVentaPedidos_entregarMercaderia', label: 'Entregar mercadería' },
-                            { id: 'vVentaPedidos_verProductosPedidos', label: 'Ver productos pedidos' },
+                            { id: 'vVentaPedidos:anular', label: 'Anular' },
+                            { id: 'vVentaPedidos:entregarMercaderia', label: 'Entregar mercadería' },
+                            { id: 'vVentaPedidos:verProductosPedidos', label: 'Ver productos pedidos' },
                         ]
                     },
                     {
                         id: 'vVentas', label: 'Ventas', permisos: [
-                            { id: 'vVentas', label: 'Acceder' },
-                            { id: 'vVentas_crear', label: 'Crear' },
-                            { id: 'vVentas_ver', label: 'Ver' },
-                            { id: 'vVentas_anular', label: 'Anular' },
-                            { id: 'vVentas_controlDespacho', label: 'Control despacho' },
+                            { id: 'vVentas:listar', label: 'Listar' },
+                            { id: 'vVentas:crear', label: 'Crear' },
+                            { id: 'vVentas:ver', label: 'Ver' },
+                            { id: 'vVentas:anular', label: 'Anular' },
+                            { id: 'vVentas:controlDespacho', label: 'Control despacho' },
                         ]
                     },
                 ]
@@ -224,58 +223,58 @@ export const useAuth = defineStore('auth', {
                 id: 'produccion', label: 'Producción', vistas: [
                     {
                         id: 'vProgramaFiltrantes', label: 'Programa de filtrantes', permisos: [
-                            { id: 'vProgramaFiltrantes', label: 'Acceder' },
-                            { id: 'vProgramaFiltrantes_crear', label: 'Crear' },
-                            { id: 'vProgramaFiltrantes_ver', label: 'Ver' },
-                            { id: 'vProgramaFiltrantes_editar', label: 'Editar' },
-                            { id: 'vProgramaFiltrantes_eliminar', label: 'Eliminar' },
+                            { id: 'vProgramaFiltrantes:listar', label: 'Listar' },
+                            { id: 'vProgramaFiltrantes:crear', label: 'Crear' },
+                            { id: 'vProgramaFiltrantes:ver', label: 'Ver' },
+                            { id: 'vProgramaFiltrantes:editar', label: 'Editar' },
+                            { id: 'vProgramaFiltrantes:eliminar', label: 'Eliminar' },
 
-                            { id: 'vProgramaFiltrantes_salidaInsumos', label: 'Salida de insumos' },
-                            { id: 'vProgramaFiltrantes_productosCuarentena', label: 'Productos en cuarentena' },
-                            { id: 'vProgramaFiltrantes_verProductosPedidos', label: 'Ver productos pedidos' },
+                            { id: 'vProgramaFiltrantes:salidaInsumos', label: 'Salida de insumos' },
+                            { id: 'vProgramaFiltrantes:productosCuarentena', label: 'Productos en cuarentena' },
+                            { id: 'vProgramaFiltrantes:verProductosPedidos', label: 'Ver productos pedidos' },
                         ]
                     },
                     {
                         id: 'vProgramaGranel', label: 'Programa de granel', permisos: [
-                            { id: 'vProgramaGranel', label: 'Acceder' },
-                            { id: 'vProgramaGranel_crear', label: 'Crear' },
-                            { id: 'vProgramaGranel_ver', label: 'Ver' },
-                            { id: 'vProgramaGranel_editar', label: 'Editar' },
-                            { id: 'vProgramaGranel_eliminar', label: 'Eliminar' },
+                            { id: 'vProgramaGranel:listar', label: 'Listar' },
+                            { id: 'vProgramaGranel:crear', label: 'Crear' },
+                            { id: 'vProgramaGranel:ver', label: 'Ver' },
+                            { id: 'vProgramaGranel:editar', label: 'Editar' },
+                            { id: 'vProgramaGranel:eliminar', label: 'Eliminar' },
 
-                            { id: 'vProgramaGranel_salidaInsumos', label: 'Salida de insumos' },
-                            { id: 'vProgramaGranel_productosCuarentena', label: 'Productos en cuarentena' },
-                            { id: 'vProgramaGranel_verProductosPedidos', label: 'Ver productos pedidos' },
+                            { id: 'vProgramaGranel:salidaInsumos', label: 'Salida de insumos' },
+                            { id: 'vProgramaGranel:productosCuarentena', label: 'Productos en cuarentena' },
+                            { id: 'vProgramaGranel:verProductosPedidos', label: 'Ver productos pedidos' },
                         ]
                     },
                     {
                         id: 'vProgramaLuxury', label: 'Programa de luxury', permisos: [
-                            { id: 'vProgramaLuxury', label: 'Acceder' },
-                            { id: 'vProgramaLuxury_crear', label: 'Crear' },
-                            { id: 'vProgramaLuxury_ver', label: 'Ver' },
-                            { id: 'vProgramaLuxury_editar', label: 'Editar' },
-                            { id: 'vProgramaLuxury_eliminar', label: 'Eliminar' },
+                            { id: 'vProgramaLuxury:listar', label: 'Listar' },
+                            { id: 'vProgramaLuxury:crear', label: 'Crear' },
+                            { id: 'vProgramaLuxury:ver', label: 'Ver' },
+                            { id: 'vProgramaLuxury:editar', label: 'Editar' },
+                            { id: 'vProgramaLuxury:eliminar', label: 'Eliminar' },
 
-                            { id: 'vProgramaLuxury_salidaInsumos', label: 'Salida de insumos' },
-                            { id: 'vProgramaLuxury_productosCuarentena', label: 'Productos en cuarentena' },
-                            { id: 'vProgramaLuxury_verProductosPedidos', label: 'Ver productos pedidos' },
+                            { id: 'vProgramaLuxury:salidaInsumos', label: 'Salida de insumos' },
+                            { id: 'vProgramaLuxury:productosCuarentena', label: 'Productos en cuarentena' },
+                            { id: 'vProgramaLuxury:verProductosPedidos', label: 'Ver productos pedidos' },
                         ]
                     },
                     {
                         id: 'vProduccionHistorial', label: 'Órdenes de producción', permisos: [
-                            { id: 'vProduccionHistorial', label: 'Acceder' },
-                            { id: 'vProduccionHistorial_ver', label: 'Ver' },
+                            { id: 'vProduccionHistorial:listar', label: 'Listar' },
+                            { id: 'vProduccionHistorial:ver', label: 'Ver' },
 
-                            { id: 'vProduccionHistorial_salidaInsumos', label: 'Salida de insumos' },
-                            { id: 'vProduccionHistorial_controlPesos', label: 'Control de pesos' },
-                            { id: 'vProduccionHistorial_controlPpc', label: 'Control del PPC' },
-                            { id: 'vProduccionHistorial_productosCuarentena', label: 'Productos en cuarentena' },
-                            { id: 'vProduccionHistorial_productosTerminados', label: 'Productos terminados' },
+                            { id: 'vProduccionHistorial:salidaInsumos', label: 'Salida de insumos' },
+                            { id: 'vProduccionHistorial:controlPesos', label: 'Control de pesos' },
+                            { id: 'vProduccionHistorial:controlPpc', label: 'Control del PPC' },
+                            { id: 'vProduccionHistorial:productosCuarentena', label: 'Productos en cuarentena' },
+                            { id: 'vProduccionHistorial:productosTerminados', label: 'Productos terminados' },
                         ]
                     },
                     {
                         id: 'vProductosCuarentena', label: 'Productos en cuarentena', permisos: [
-                            { id: 'vProductosCuarentena', label: 'Acceder' },
+                            { id: 'vProductosCuarentena:listar', label: 'Listar' },
                             { id: 'vProductosCuarentena:crear', label: 'Crear' },
                             { id: 'vProductosCuarentena:editar', label: 'Editar' },
                             { id: 'vProductosCuarentena:eliminar', label: 'Eliminar' },
@@ -288,7 +287,7 @@ export const useAuth = defineStore('auth', {
                 id: 'calidad', label: 'Calidad', vistas: [
                     {
                         id: 'vFormatosBpm', label: 'Formatos BPM', permisos: [
-                            { id: 'vFormatosBpm', label: 'Acceder' },
+                            { id: 'vFormatosBpm:listar', label: 'Listar' },
                             { id: 'vFormatosBpm:crear', label: 'Crear' },
                             { id: 'vFormatosBpm:ver', label: 'Ver' },
                             { id: 'vFormatosBpm:editar', label: 'Editar' },
@@ -297,7 +296,7 @@ export const useAuth = defineStore('auth', {
                     },
                     {
                         id: 'vFormatosPhs', label: 'Formatos PHS', permisos: [
-                            { id: 'vFormatosPhs', label: 'Acceder' },
+                            { id: 'vFormatosPhs:listar', label: 'Listar' },
                             { id: 'vFormatosPhs:crear', label: 'Crear' },
                             { id: 'vFormatosPhs:ver', label: 'Ver' },
                             { id: 'vFormatosPhs:editar', label: 'Editar' },
@@ -306,7 +305,7 @@ export const useAuth = defineStore('auth', {
                     },
                     {
                         id: 'vFormatosHaccp', label: 'Formatos HACCP', permisos: [
-                            { id: 'vFormatosHaccp', label: 'Acceder' },
+                            { id: 'vFormatosHaccp:listar', label: 'Listar' },
                             { id: 'vFormatosHaccp:crear', label: 'Crear' },
                             { id: 'vFormatosHaccp:ver', label: 'Ver' },
                             { id: 'vFormatosHaccp:editar', label: 'Editar' },
@@ -315,19 +314,19 @@ export const useAuth = defineStore('auth', {
                     },
                     {
                         id: 'vRegistrosSanitarios', label: 'Registros sanitarios', permisos: [
-                            { id: 'vRegistrosSanitarios', label: 'Acceder' },
-                            { id: 'vRegistrosSanitarios_crear', label: 'Crear' },
-                            { id: 'vRegistrosSanitarios_editar', label: 'Editar' },
-                            { id: 'vRegistrosSanitarios_eliminar', label: 'Eliminar' },
+                            { id: 'vRegistrosSanitarios:listar', label: 'Listar' },
+                            { id: 'vRegistrosSanitarios:crear', label: 'Crear' },
+                            { id: 'vRegistrosSanitarios:editar', label: 'Editar' },
+                            { id: 'vRegistrosSanitarios:eliminar', label: 'Eliminar' },
                         ]
                     },
                     {
                         id: 'vInspecciones', label: 'Inspecciones', permisos: [
-                            { id: 'vInspecciones', label: 'Acceder' },
-                            { id: 'vInspecciones_crear', label: 'Crear' },
-                            { id: 'vInspecciones_ver', label: 'Ver' },
-                            { id: 'vInspecciones_editar', label: 'Editar' },
-                            { id: 'vInspecciones_eliminar', label: 'Eliminar' },
+                            { id: 'vInspecciones:listar', label: 'Listar' },
+                            { id: 'vInspecciones:crear', label: 'Crear' },
+                            { id: 'vInspecciones:ver', label: 'Ver' },
+                            { id: 'vInspecciones:editar', label: 'Editar' },
+                            { id: 'vInspecciones:eliminar', label: 'Eliminar' },
                         ]
                     },
                 ]
@@ -336,68 +335,68 @@ export const useAuth = defineStore('auth', {
                 id: 'operaciones', label: 'Operaciones', vistas: [
                     {
                         id: 'vDocumentos', label: 'Documentos', permisos: [
-                            { id: 'vDocumentos', label: 'Acceder' },
-                            { id: 'vDocumentos_crear', label: 'Crear' },
-                            { id: 'vDocumentos_editar', label: 'Editar' },
-                            { id: 'vDocumentos_eliminar', label: 'Eliminar' },
+                            { id: 'vDocumentos:listar', label: 'Listar' },
+                            { id: 'vDocumentos:crear', label: 'Crear' },
+                            { id: 'vDocumentos:editar', label: 'Editar' },
+                            { id: 'vDocumentos:eliminar', label: 'Eliminar' },
                         ]
                     },
                     {
                         id: 'vCajaAperturas', label: 'Caja', permisos: [
-                            { id: 'vCajaAperturas', label: 'Acceder' },
-                            { id: 'vCajaAperturas_aperturarCaja', label: 'Aperturar caja' },
-                            { id: 'vCajaAperturas_ver', label: 'Ver' },
-                            { id: 'vCajaAperturas_cerrarCaja', label: 'Cerrar caja' },
-                            { id: 'vCajaAperturas_eliminar', label: 'Eliminar' },
+                            { id: 'vCajaAperturas:listar', label: 'Listar' },
+                            { id: 'vCajaAperturas:aperturarCaja', label: 'Aperturar caja' },
+                            { id: 'vCajaAperturas:ver', label: 'Ver' },
+                            { id: 'vCajaAperturas:cerrarCaja', label: 'Cerrar caja' },
+                            { id: 'vCajaAperturas:eliminar', label: 'Eliminar' },
                         ]
                     },
                     {
                         id: 'vCajaMovimientos', label: 'Movimientos de caja', permisos: [
-                            { id: 'vCajaMovimientos', label: 'Acceder' },
-                            { id: 'vCajaMovimientos_crear', label: 'Crear' },
-                            { id: 'vCajaMovimientos_editar', label: 'Editar' },
-                            { id: 'vCajaMovimientos_eliminar', label: 'Eliminar' },
+                            { id: 'vCajaMovimientos:listar', label: 'Listar' },
+                            { id: 'vCajaMovimientos:crear', label: 'Crear' },
+                            { id: 'vCajaMovimientos:editar', label: 'Editar' },
+                            { id: 'vCajaMovimientos:eliminar', label: 'Eliminar' },
                         ]
                     },
                     {
                         id: 'vMonedas', label: 'Monedas', permisos: [
-                            { id: 'vMonedas', label: 'Acceder' },
-                            { id: 'vMonedas_crear', label: 'Crear' },
-                            { id: 'vMonedas_editar', label: 'Editar' },
-                            { id: 'vMonedas_eliminar', label: 'Eliminar' },
+                            { id: 'vMonedas:listar', label: 'Listar' },
+                            { id: 'vMonedas:crear', label: 'Crear' },
+                            { id: 'vMonedas:editar', label: 'Editar' },
+                            { id: 'vMonedas:eliminar', label: 'Eliminar' },
                         ]
                     },
                     {
                         id: 'vTipoCambios', label: 'Tipos de cambio', permisos: [
-                            { id: 'vTipoCambios', label: 'Acceder' },
-                            { id: 'vTipoCambios_crear', label: 'Crear' },
-                            { id: 'vTipoCambios_editar', label: 'Editar' },
-                            { id: 'vTipoCambios_eliminar', label: 'Eliminar' },
+                            { id: 'vTipoCambios:listar', label: 'Listar' },
+                            { id: 'vTipoCambios:crear', label: 'Crear' },
+                            { id: 'vTipoCambios:editar', label: 'Editar' },
+                            { id: 'vTipoCambios:eliminar', label: 'Eliminar' },
                         ]
                     },
                     {
                         id: 'vMaquinas', label: 'Máquinas', permisos: [
-                            { id: 'vMaquinas', label: 'Acceder' },
-                            { id: 'vMaquinas_crear', label: 'Crear' },
-                            { id: 'vMaquinas_editar', label: 'Editar' },
-                            { id: 'vMaquinas_eliminar', label: 'Eliminar' },
+                            { id: 'vMaquinas:listar', label: 'Listar' },
+                            { id: 'vMaquinas:crear', label: 'Crear' },
+                            { id: 'vMaquinas:editar', label: 'Editar' },
+                            { id: 'vMaquinas:eliminar', label: 'Eliminar' },
                         ]
                     },
                     {
                         id: 'vEquipos', label: 'Equipos', permisos: [
-                            { id: 'vEquipos', label: 'Acceder' },
-                            { id: 'vEquipos_crear', label: 'Crear' },
-                            { id: 'vEquipos_editar', label: 'Editar' },
-                            { id: 'vEquipos_eliminar', label: 'Eliminar' },
+                            { id: 'vEquipos:listar', label: 'Listar' },
+                            { id: 'vEquipos:crear', label: 'Crear' },
+                            { id: 'vEquipos:editar', label: 'Editar' },
+                            { id: 'vEquipos:eliminar', label: 'Eliminar' },
                         ]
                     },
                     {
                         id: 'vColaboradores', label: 'Colaboradores', permisos: [
-                            { id: 'vColaboradores', label: 'Acceder' },
-                            { id: 'vColaboradores_crear', label: 'Crear' },
-                            { id: 'vColaboradores_ver', label: 'Ver' },
-                            { id: 'vColaboradores_editar', label: 'Editar' },
-                            { id: 'vColaboradores_eliminar', label: 'Eliminar' },
+                            { id: 'vColaboradores:listar', label: 'Listar' },
+                            { id: 'vColaboradores:crear', label: 'Crear' },
+                            { id: 'vColaboradores:ver', label: 'Ver' },
+                            { id: 'vColaboradores:editar', label: 'Editar' },
+                            { id: 'vColaboradores:eliminar', label: 'Eliminar' },
                         ]
                     },
                 ]

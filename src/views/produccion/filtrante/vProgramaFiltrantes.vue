@@ -5,7 +5,7 @@
 
             <div class="buttons">
                 <JdButton text="Ver productos pedidos" @click="verPedidos"
-                    v-if="useAuth.verifyPermiso('vProgramaFiltrantes_verProductosPedidos')" />
+                    v-if="useAuth.verifyPermiso('vProgramaFiltrantes:verProductosPedidos')" />
             </div>
         </div>
 
@@ -32,7 +32,7 @@
                 </div>
 
                 <div class="right" @click="nuevo(a)" title="Agregar orden de producción"
-                    v-if="useAuth.verifyPermiso('vProgramaFiltrantes_crear') && this.vista.filtros.maquina == null">
+                    v-if="useAuth.verifyPermiso('vProgramaFiltrantes:crear') && this.vista.filtros.maquina == null">
                     <i class="fa-solid fa-plus"></i>
                 </div>
             </li>
@@ -155,11 +155,11 @@ export default {
             // }
         ],
         tableRowOptions: [
-            { id: 1, label: 'Ver', icon: 'fa-regular fa-eye', action: 'ver', permiso: 'vProgramaFiltrantes_ver' },
-            { id: 2, label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar', permiso: 'vProgramaFiltrantes_editar' },
-            { id: 3, label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar', permiso: 'vProgramaFiltrantes_eliminar', ocultar: { estado: 2 } },
-            { id: 4, label: 'Salida de insumos', icon: 'fa-regular fa-circle-down', action: 'salidaInsumos', permiso: 'vProgramaFiltrantes_salidaInsumos' },
-            { id: 5, label: 'Productos en cuarentena', icon: 'fa-solid fa-boxes-stacked', action: 'productosCuarentena', permiso: 'vProgramaFiltrantes_productosCuarentena' },
+            { label: 'Ver', icon: 'fa-solid fa-folder-open', action: 'ver', permiso: 'vProgramaFiltrantes:ver' },
+            { label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar', permiso: 'vProgramaFiltrantes:editar' },
+            { label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar', permiso: 'vProgramaFiltrantes:eliminar', ocultar: { estado: 2 } },
+            { label: 'Salida de insumos', icon: 'fa-regular fa-circle-down', action: 'salidaInsumos', permiso: 'vProgramaFiltrantes:salidaInsumos' },
+            { label: 'Productos en cuarentena', icon: 'fa-solid fa-boxes-stacked', action: 'productosCuarentena', permiso: 'vProgramaFiltrantes:productosCuarentena' },
         ]
     }),
     async created() {
@@ -168,7 +168,7 @@ export default {
         if (this.vista.loaded) return
 
         await this.setMaquinas()
-        this.loadProduccionOrdenes()
+        if (this.useAuth.verifyPermiso('vProgramaFiltrantes:listar') == true) this.loadProduccionOrdenes()
     },
     methods: {
         async loadMaquinas() {

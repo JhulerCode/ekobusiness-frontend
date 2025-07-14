@@ -104,7 +104,7 @@ export default {
         ],
 
         buttons: [
-            { text: 'Grabar', action: 'grabar', spin: false, show: true, permiso: 'vPtsIngresos_ingresarPts' },
+            { text: 'Grabar', action: 'grabar', spin: false, show: true, permiso: 'vPtsIngresos:ingresarPts' },
         ],
     }),
     created() {
@@ -142,7 +142,6 @@ export default {
 
             if (res.code != 0) return
 
-            // this.useVistas.addItem('vPtsIngresos', 'transacciones', res.data)
             this.useModals.show.mProductosCuarentena = false
         }
     }

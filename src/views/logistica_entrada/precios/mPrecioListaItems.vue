@@ -1,7 +1,7 @@
 <template>
     <JdModal modal="mPrecioListaItems">
         <div>
-            <div class="container-datos" v-if="this.useAuth.verifyPermiso('vPrecioListaItems_crear')">
+            <div class="container-datos" v-if="this.useAuth.verifyPermiso('vPrecioListaItems:crear')">
                 <JdSelectQuery label="Artículo" v-model="nuevo.articulo" :spin="spinArticulos" :lista="articulos"
                     @search="searchArticulos" style="grid-column: 1/5" />
 
@@ -12,11 +12,11 @@
 
             <JdTable :columns="columns" :datos="modal.precio_lista_items || []" maxHeight="29rem" :colAct="true"
                 :reload="loadPrecioListaItems" @onChange="(action, a) => this[action](a)"
-                :inputsDisabled="!this.useAuth.verifyPermiso('vPrecioListaItems_editar')">
+                :inputsDisabled="!this.useAuth.verifyPermiso('vPrecioListaItems:editar')">
 
                 <template v-slot:cAction="{ item }">
                     <JdButton icon="fa-solid fa-trash-can" title="Eliminar" tipo="2" :small="true"
-                        @click="eliminar(item)" v-if="this.useAuth.verifyPermiso('vPrecioListaItems_eliminar')" />
+                        @click="eliminar(item)" v-if="this.useAuth.verifyPermiso('vPrecioListaItems:eliminar')" />
                 </template>
             </JdTable>
         </div>

@@ -6,19 +6,19 @@
             <div class="buttons">
                 <JdButton text="Descargar plantilla" title="Para pedidos de venta" tipo="2"
                     @click="descargarPlantilla" />
-                    
+
                 <JdButton text="Ver productos pedidos" tipo="2" @click="verPedidos()"
-                    v-if="useAuth.verifyPermiso('vVentaPedidos_verProductosPedidos')" />
+                    v-if="useAuth.verifyPermiso('vVentaPedidos:verProductosPedidos')" />
 
                 <JdButton text="Recuperar guardado" tipo="2" @click="recuperarGuardado()"
-                    v-if="useAuth.avances.mVentaPedido && useAuth.verifyPermiso('vVentaPedidos_crear')" />
+                    v-if="useAuth.avances.mVentaPedido && useAuth.verifyPermiso('vVentaPedidos:crear')" />
 
-                <JdButton text="Nuevo" @click="nuevo()" v-if="useAuth.verifyPermiso('vVentaPedidos_crear')" />
+                <JdButton text="Nuevo" @click="nuevo()" v-if="useAuth.verifyPermiso('vVentaPedidos:crear')" />
             </div>
         </div>
 
         <JdTable :name="tableName" :columns="columns" :datos="vista.pedidos || []" :colAct="true"
-            :configFiltros="openConfigFiltros" :reload="loadPedidos" :rowOptions="tableRowOptionsFiltered"
+            :configFiltros="openConfigFiltros" :reload="loadPedidos" :rowOptions="tableRowOptions"
             @rowOptionSelected="runMethod">
         </JdTable>
     </div>
@@ -157,24 +157,13 @@ export default {
             },
         ],
         tableRowOptions: [
-            { id: 1, label: 'Ver', icon: 'fa-regular fa-folder-open', action: 'ver', permiso: 'vVentaPedidos_ver' },
-            { id: 2, label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar', permiso: 'vVentaPedidos_editar', ocultar: { estado: 0 } },
-            { id: 3, label: 'Anular', icon: 'fa-solid fa-ban', action: 'anular', permiso: 'vVentaPedidos_anular', ocultar: { estado: 0 } },
-            // { id: 4, label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar' },
-            { id: 5, label: 'Entregar mercadería', icon: 'fa-regular fa-circle-down', action: 'entregarMercaderia', permiso: 'vVentaPedidos_entregarMercaderia', ocultar: { estado: 0 } },
+            { label: 'Ver', icon: 'fa-regular fa-folder-open', action: 'ver', permiso: 'vVentaPedidos:ver' },
+            { label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar', permiso: 'vVentaPedidos:editar', ocultar: { estado: 0 } },
+            { label: 'Anular', icon: 'fa-solid fa-ban', action: 'anular', permiso: 'vVentaPedidos:anular', ocultar: { estado: 0 } },
+            // { label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar' },
+            { label: 'Entregar mercadería', icon: 'fa-regular fa-circle-down', action: 'entregarMercaderia', permiso: 'vVentaPedidos:entregarMercaderia', ocultar: { estado: 0 } },
         ]
     }),
-    computed: {
-        tableRowOptionsFiltered() {
-            let lista = this.tableRowOptions
-
-            // if (item.estado == 0) {
-            //     lista = lista.filter(a => a.id != 2 && a.id != 3 && a.id != 5)
-            // }
-
-            return lista
-        }
-    },
     async created() {
         this.vista = this.useVistas.vVentaPedidos
         this.initFiltros()
@@ -182,7 +171,7 @@ export default {
 
         if (this.vista.loaded) return
 
-        this.loadPedidos()
+        if (this.useAuth.verifyPermiso('vVentaPedidos:listar') == true) this.loadPedidos()
     },
     methods: {
         initFiltros() {
@@ -283,7 +272,7 @@ export default {
             const send = {
                 url: 'socio_pedidos',
                 item,
-                vista: 'vVentaPedidos',
+                vista: this.tableName,
                 array: 'pedidos',
             }
 

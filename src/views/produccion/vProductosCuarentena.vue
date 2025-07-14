@@ -135,8 +135,7 @@ export default {
         this.useAuth.setColumns(this.tableName, this.columns)
         
         if (this.vista.loaded) return
-
-        this.loadProductosCuarentena()
+        if (this.useAuth.verifyPermiso('vProductosCuarentena:listar') == true) this.loadProductosCuarentena()
     },
     methods: {
         initFiltros() {

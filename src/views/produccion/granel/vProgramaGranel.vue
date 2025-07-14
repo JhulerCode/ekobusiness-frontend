@@ -5,9 +5,9 @@
 
             <div class="buttons">
                 <JdButton text="Ver productos pedidos" tipo="2" @click="verPedidos"
-                    v-if="useAuth.verifyPermiso('vProgramaGranel_verProductosPedidos')" />
+                    v-if="useAuth.verifyPermiso('vProgramaGranel:verProductosPedidos')" />
 
-                <JdButton text="Nuevo" @click="nuevo" v-if="useAuth.verifyPermiso('vProgramaGranel_crear')" />
+                <JdButton text="Nuevo" @click="nuevo" v-if="useAuth.verifyPermiso('vProgramaGranel:crear')" />
             </div>
         </div>
 
@@ -106,19 +106,18 @@ export default {
             // }
         ],
         tableRowOptions: [
-            { id: 1, label: 'Ver', icon: 'fa-regular fa-eye', action: 'ver', permiso: 'vProgramaGranel_crear' },
-            { id: 2, label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar', permiso: 'vProgramaGranel_editar' },
-            { id: 3, label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar', permiso: 'vProgramaGranel_eliminar', ocultar: { estado: 2 } },
-            { id: 4, label: 'Salida de insumos', icon: 'fa-regular fa-circle-down', action: 'salidaInsumos', permiso: 'vProgramaGranel_salidaInsumos' },
-            { id: 5, label: 'Productos en cuarenta', icon: 'fa-solid fa-boxes-stacked', action: 'productosCuarentena', permiso: 'vProgramaGranel_productosCuarentena' },
+            { id: 1, label: 'Ver', icon: 'fa-solid fa-folder-open', action: 'ver', permiso: 'vProgramaGranel:crear' },
+            { id: 2, label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar', permiso: 'vProgramaGranel:editar' },
+            { id: 3, label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar', permiso: 'vProgramaGranel:eliminar', ocultar: { estado: 2 } },
+            { id: 4, label: 'Salida de insumos', icon: 'fa-regular fa-circle-down', action: 'salidaInsumos', permiso: 'vProgramaGranel:salidaInsumos' },
+            { id: 5, label: 'Productos en cuarenta', icon: 'fa-solid fa-boxes-stacked', action: 'productosCuarentena', permiso: 'vProgramaGranel:productosCuarentena' },
         ]
     }),
     created() {
         this.vista = this.useVistas.vProgramaGranel
 
         if (this.vista.loaded) return
-
-        this.loadProduccionOrdenes()
+        if (this.useAuth.verifyPermiso('vProgramaGranel:listar') == true) this.loadProduccionOrdenes()
     },
     methods: {
         setQuery() {

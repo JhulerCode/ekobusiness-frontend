@@ -7,10 +7,10 @@
                 <input type="file" ref="excel" accept=".xlsx, .xls, .csv" hidden @change="importar" />
 
                 <JdButton icon="fa-solid fa-file-excel" text="Importar" tipo="2" @click="this.$refs.excel.click()"
-                    v-if="useAuth.verifyPermiso('vArticulos_importar')" />
+                    v-if="useAuth.verifyPermiso('vArticulos:importar')" />
 
                 <JdButton text="Nuevo" title="Crear nuevo" @click="nuevo()"
-                    v-if="useAuth.permisos.includes('vArticulos_crear')" />
+                    v-if="useAuth.verifyPermiso('vArticulos:crear')" />
             </div>
         </div>
 
@@ -162,15 +162,15 @@ export default {
             },
         ],
         tableActions: [
-            { icon: 'fa-solid fa-pen-to-square', text: "Editar", action: "editarBulk", permiso: 'vArticulos_editarBulk' },
-            { icon: 'fa-solid fa-trash-can', text: "Eliminar", action: "eliminarBulk", permiso: 'vArticulos_eliminarBulk' },
+            { icon: 'fa-solid fa-pen-to-square', text: "Editar", action: "editarBulk", permiso: 'vArticulos:editarBulk' },
+            { icon: 'fa-solid fa-trash-can', text: "Eliminar", action: "eliminarBulk", permiso: 'vArticulos:eliminarBulk' },
         ],
         tableRowOptions: [
-            { label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar', permiso: 'vArticulos_editar' },
-            { label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar', permiso: 'vArticulos_eliminar' },
-            { label: 'Clonar', icon: 'fa-solid fa-copy', action: 'clonar', permiso: 'vArticulos_clonar' },
-            { label: 'Ver kardex', icon: 'fa-solid fa-table-list', action: 'verKardex', permiso: 'vArticulos_kardex' },
-            { label: 'Ajuste stock', icon: 'fa-solid fa-wrench', action: 'ajusteStock', permiso: 'vArticulos_ajusteStock' },
+            { label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar', permiso: 'vArticulos:editar' },
+            { label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar', permiso: 'vArticulos:eliminar' },
+            { label: 'Clonar', icon: 'fa-solid fa-copy', action: 'clonar', permiso: 'vArticulos:clonar' },
+            { label: 'Ver kardex', icon: 'fa-solid fa-table-list', action: 'verKardex', permiso: 'vArticulos:kardex' },
+            { label: 'Ajuste stock', icon: 'fa-solid fa-wrench', action: 'ajusteStock', permiso: 'vArticulos:ajusteStock' },
         ]
     }),
     async created() {
@@ -180,7 +180,7 @@ export default {
         this.verifyRowSelectIsActive()
 
         if (this.vista.loaded) return
-        this.loadArticulos()
+        if (this.useAuth.verifyPermiso('vArticulos:listar') == true) this.loadArticulos()
     },
     methods: {
         setQuery() {
@@ -192,7 +192,7 @@ export default {
         },
         async loadArticulos() {
             this.setQuery()
-
+            
             this.vista.articulos = []
             this.useAuth.setLoading(true, 'Cargando...')
             const res = await get(`${urls.articulos}?qry=${JSON.stringify(this.vista.qry)}`)

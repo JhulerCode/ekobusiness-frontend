@@ -4,7 +4,8 @@
             <strong>Colaboradores</strong>
 
             <div class="buttons">
-                <JdButton text="Nuevo" title="Crear nuevo" @click="nuevo()" v-if="useAuth.verifyPermiso('vColaboradores_crear')"/>
+                <JdButton text="Nuevo" title="Crear nuevo" @click="nuevo()"
+                    v-if="useAuth.verifyPermiso('vColaboradores:crear')" />
             </div>
         </div>
 
@@ -160,9 +161,9 @@ export default {
             },
         ],
         tableRowOptions: [
-            { label: 'Ver', icon: 'fa-regular fa-folder-open', action: 'ver', permiso: 'vColaboradores_ver' },
-            { label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar', permiso: 'vColaboradores_editar' },
-            { label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar', permiso: 'vColaboradores_eliminar' },
+            { label: 'Ver', icon: 'fa-regular fa-folder-open', action: 'ver', permiso: 'vColaboradores:ver' },
+            { label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar', permiso: 'vColaboradores:editar' },
+            { label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar', permiso: 'vColaboradores:eliminar' },
         ],
     }),
     created() {
@@ -171,7 +172,7 @@ export default {
 
         if (this.vista.loaded) return
 
-        this.loadColaboradores()
+        if (this.useAuth.verifyPermiso('vColaboradores:listar') == true) this.loadColaboradores()
     },
     methods: {
         setQuery() {

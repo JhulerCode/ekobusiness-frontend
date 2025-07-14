@@ -5,7 +5,7 @@
 
             <div class="buttons">
                 <JdButton text="Nuevo" title="Crear nuevo" @click="nuevo()"
-                    v-if="useAuth.verifyPermiso('vMonedas_crear')" />
+                    v-if="useAuth.verifyPermiso('vMonedas:crear')" />
             </div>
         </div>
 
@@ -94,9 +94,9 @@ export default {
             },
         ],
         tableRowOptions: [
-            { id: 1, label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar', permiso: 'vMonedas_editar' },
-            { id: 2, label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar', permiso: 'vMonedas_eliminar', ocultar: { estandar: true } },
-            { id: 3, label: 'Tipos de cambio', icon: 'fa-solid fa-dollar-sign', action: 'openTiposCambio', permiso: 'vTipoCambios', ocultar: { estandar: true } },
+            { id: 1, label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar', permiso: 'vMonedas:editar' },
+            { id: 2, label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar', permiso: 'vMonedas:eliminar', ocultar: { estandar: true } },
+            { id: 3, label: 'Tipos de cambio', icon: 'fa-solid fa-dollar-sign', action: 'openTiposCambio', permiso: 'vTipoCambios:listar', ocultar: { estandar: true } },
         ],
     }),
     created() {
@@ -105,7 +105,7 @@ export default {
 
         if (this.vista.loaded) return
 
-        this.loadMonedas()
+        if (this.useAuth.verifyPermiso('vMonedas:listar') == true) this.loadMonedas()
     },
     methods: {
         setQuery() {

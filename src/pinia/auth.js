@@ -499,7 +499,8 @@ export const useAuth = defineStore('auth', {
 
         //----- PREFERENCIAS ----- //
         setTheme(theme) {
-            console.log(theme)
+            if (!theme) return
+            
             this.usuario.theme = theme
             this.isDarkMode = theme == '2'
 

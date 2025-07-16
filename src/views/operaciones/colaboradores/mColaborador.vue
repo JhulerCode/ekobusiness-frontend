@@ -172,9 +172,6 @@ export default {
             if (this.checkDatos()) return
             // this.shapeDatos()
 
-            this.colaborador.color = '#2c47aa'
-            this.colaborador.format_date = 'DD-MM-YYYY'
-
             this.useAuth.setLoading(true, 'Creando...')
             const res = await post(urls.colaboradores, this.colaborador)
             this.useAuth.setLoading(false)

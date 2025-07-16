@@ -6,6 +6,9 @@
             <div class="buttons">
                 <JdButton text="Ver productos pedidos" @click="verPedidos"
                     v-if="useAuth.verifyPermiso('vProgramaFiltrantes:verProductosPedidos')" />
+
+                <JdSelect :lista="vista.maquinas || []" v-model="vista.maquina" @elegir="setMaquina"
+                    style="width: 8rem;" />
             </div>
         </div>
 
@@ -32,7 +35,7 @@
                 </div>
 
                 <div class="right" @click="nuevo(a)" title="Agregar orden de producción"
-                    v-if="useAuth.verifyPermiso('vProgramaFiltrantes:crear') && this.vista.filtros.maquina == null">
+                    v-if="useAuth.verifyPermiso('vProgramaFiltrantes:crear')">
                     <i class="fa-solid fa-plus"></i>
                 </div>
             </li>
@@ -55,6 +58,7 @@
 <script>
 import JdTable from '@/components/JdTable.vue'
 import JdButton from '@/components/inputs/JdButton.vue'
+import JdSelect from '@/components/inputs/JdSelect.vue'
 
 import mProduccionOrden from '@/views/produccion/historial/mProduccionOrden.vue'
 import mProduccionSalida from '@/views/produccion/historial/mProduccionSalida.vue'
@@ -74,6 +78,7 @@ export default {
     components: {
         JdTable,
         JdButton,
+        JdSelect,
 
         mProduccionOrden,
         mProduccionSalida,
@@ -164,6 +169,7 @@ export default {
     }),
     async created() {
         this.vista = this.useVistas.vProgramaFiltrantes
+        this.loadMaquina()
 
         if (this.vista.loaded) return
 
@@ -171,6 +177,21 @@ export default {
         if (this.useAuth.verifyPermiso('vProgramaFiltrantes:listar') == true) this.loadProduccionOrdenes()
     },
     methods: {
+        loadMaquina() {
+            const maq = localStorage.getItem('vProgramaFiltrantes_maquina')
+            if (maq != null) this.vista.maquina = maq
+        },
+        async setMaquina() {
+            if (this.vista.maquina == null) {
+                localStorage.removeItem('vProgramaFiltrantes_maquina')
+                return
+            }
+
+            localStorage.setItem('vProgramaFiltrantes_maquina', this.vista.maquina)
+
+            await this.setMaquinas()
+            this.loadProduccionOrdenes()
+        },
         async loadMaquinas() {
             const qry = {
                 fltr: { produccion_tipo: { op: 'Es', val: 1 } },
@@ -189,9 +210,9 @@ export default {
         async setMaquinas() {
             await this.loadMaquinas()
 
-            if (this.vista.filtros.maquina != null) {
+            if (this.vista.maquina != null) {
                 this.vista.maquinasConProduccion = this.vista.maquinas
-                    .filter(a => a.produccion_tipo == 1 && a.id == this.vista.filtros.maquina)
+                    .filter(a => a.produccion_tipo == 1 && a.id == this.vista.maquina)
                     .map(a => ({
                         ...a,
                         tiempo: 0,
@@ -219,6 +240,8 @@ export default {
                 fltr: { tipo: { op: 'Es', val: 1 }, estado: { op: 'Es', val: 1 } },
                 cols: ['orden', 'maquina', 'maquina_info', 'articulo', 'articulo_info', 'cantidad', 'estado']
             }
+
+            if (this.vista.maquina != null) this.vista.qry.fltr.maquina = { op: 'Es', val: this.vista.maquina }
         },
         async loadProduccionOrdenes() {
             this.vista.produccion_ordenes = []
@@ -275,7 +298,7 @@ export default {
 
             this.useModals.setModal('mProductosFaltantes', 'Productos pedidos', null, send, true)
         },
-        
+
         runMethod(method, item) {
             this[method](item)
         },

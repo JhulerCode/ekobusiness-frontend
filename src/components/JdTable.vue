@@ -158,6 +158,7 @@
                                             column.prop)).format(useAuth.usuario.format_date || 'DD-MM-YYYY') : '' }}
                                     </template>
                                     <template v-else>
+                                        {{ useAuth.usuario.format_date }}
                                         {{ a[column.id] ? dayjs(a[column.id]).format(useAuth.usuario.format_date ||
                                             'DD-MM-YYYY') : '' }}
                                     </template>

@@ -146,7 +146,7 @@ export default {
             { id: 1, label: 'Ver', icon: 'fa-regular fa-folder-open', action: 'ver', permiso: 'vVentas:ver' },
             // { id: 2, label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar' },
             { id: 3, label: 'Anular', icon: 'fa-solid fa-ban', action: 'anular', permiso: 'vVentas:anular', ocultar: { estado: 0 } },
-            // { id: 4, label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar' },
+            // { id: 4, label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar', permiso: 'vVentas:anular' },
             { id: 5, label: 'Control de despacho', icon: 'fa-solid fa-star', action: 'controlDespacho', permiso: 'vVentas:controlDespacho' },
         ],
     }),
@@ -336,7 +336,7 @@ export default {
                 this.useModals.setModal('mFormato', formato_id, 2, send, true)
             }
         },
-        setTransaccionDespachoRevisado(item){
+        setTransaccionDespachoRevisado(item) {
             const transaccion = this.vista.transacciones.find(a => a.id == item.transaccion)
             if (transaccion) transaccion.calidad_revisado_despacho = item.id
         },
@@ -382,5 +382,4 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

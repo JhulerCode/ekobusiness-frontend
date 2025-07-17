@@ -1,5 +1,5 @@
 {
-  "name": "asd",
+  "name": "ekobusiness-frontend",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -30,7 +30,7 @@
     "globals": "^16.2.0",
     "prettier": "3.5.3",
     "sass": "^1.89.2",
-    "vite": "7.0.4",
+    "vite": "^6.2.4",
     "vite-plugin-pwa": "^1.0.1",
     "vite-plugin-vue-devtools": "^7.7.7"
   },

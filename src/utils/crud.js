@@ -2,7 +2,7 @@ import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
 import { jmsg } from '@/utils/swal'
 
-const host = "http://ekobusiness-backend-epzslp-260d61-144-126-137-116.traefik.me"
+const host = "https://api.jenifernoemistudios.com"
 
 const urls = {
     signin: `${host}/signin`,

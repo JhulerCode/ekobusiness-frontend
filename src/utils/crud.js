@@ -2,8 +2,8 @@ import { useAuth } from "@/pinia/auth"
 import { useModals } from "@/pinia/modals"
 import { jmsg } from "@/utils/swal"
 
-const host = "http://localhost:4000"
-// const host = "https://ekobusiness-backend.onrender.com"
+// const host = "http://localhost:4000"
+const host = "https://ekobusiness-backend.onrender.com"
 const urls = {
     signin: `${host}/signin`,
 

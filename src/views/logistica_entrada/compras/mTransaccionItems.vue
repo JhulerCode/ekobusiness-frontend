@@ -315,7 +315,7 @@ export default {
                         has_fv: a.has_fv,
                     },
 
-                    cantidad: null,
+                    cantidad: a.cantidad,
                     entregado: a.entregado,
                     faltante: a.cantidad - a.entregado,
 

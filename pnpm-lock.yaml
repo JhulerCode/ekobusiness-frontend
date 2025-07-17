@@ -61,7 +61,7 @@ importers:
         specifier: ^1.89.2
         version: 1.89.2
       vite:
-        specifier: ^7.0.0
+        specifier: 7.0.4
         version: 7.0.4(sass@1.89.2)(terser@5.43.1)
       vite-plugin-pwa:
         specifier: ^1.0.1

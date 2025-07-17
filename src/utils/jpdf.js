@@ -4,6 +4,7 @@ import pdfFonts from 'pdfmake/build/vfs_fonts'
 import { getItemFromArray, redondear, numeroATexto } from './mine'
 import { urls, get } from '@/utils/crud'
 import { useAuth } from '@/pinia/auth'
+import { logoBase64 } from '@/assets/img/logo.js'
 
 pdfMake.vfs = pdfFonts
 
@@ -69,7 +70,7 @@ export const generarOcPDF = async (data) => {
                         width: 120,
                         stack: [
                             {
-                                image: require('@/assets/img/logo-sunka-black.png'),
+                                image: logoBase64,
                                 fit: [120, 73],
                                 alignment: 'center',
                             },

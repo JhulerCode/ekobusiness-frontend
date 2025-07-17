@@ -1,9 +1,9 @@
-import { useAuth } from "@/pinia/auth"
-import { useModals } from "@/pinia/modals"
-import { jmsg } from "@/utils/swal"
+import { useAuth } from '@/pinia/auth'
+import { useModals } from '@/pinia/modals'
+import { jmsg } from '@/utils/swal'
 
-// const host = "http://localhost:4000"
-const host = "https://ekobusiness-backend.onrender.com"
+const host = import.meta.env.VITE_API_HOST
+
 const urls = {
     signin: `${host}/signin`,
 
@@ -37,11 +37,10 @@ async function get(url) {
         query = await fetch(url, {
             method: 'GET',
             headers: {
-                'Authorization': `Bearer ${useAuth().token}`,
-            }
+                Authorization: `Bearer ${useAuth().token}`,
+            },
         })
-    }
-    catch (error) {
+    } catch (error) {
         jmsg('error', error)
         return { code: -2 }
     }
@@ -73,13 +72,12 @@ async function post(url, item, ms) {
         query = await fetch(url, {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${useAuth().token}`,
+                Authorization: `Bearer ${useAuth().token}`,
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(item)
+            body: JSON.stringify(item),
         })
-    }
-    catch (error) {
+    } catch (error) {
         jmsg('error', error)
         return { code: -2 }
     }
@@ -117,13 +115,12 @@ async function patch(url, item, ms) {
         query = await fetch(`${url}/${item.id}`, {
             method: 'PATCH',
             headers: {
-                'Authorization': `Bearer ${useAuth().token}`,
+                Authorization: `Bearer ${useAuth().token}`,
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(item)
+            body: JSON.stringify(item),
         })
-    }
-    catch (error) {
+    } catch (error) {
         jmsg('error', error)
         return { code: -2 }
     }
@@ -161,13 +158,12 @@ async function delet(url, item, ms) {
         query = await fetch(`${url}/${item.id}`, {
             method: 'DELETE',
             headers: {
-                'Authorization': `Bearer ${useAuth().token}`,
+                Authorization: `Bearer ${useAuth().token}`,
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(item)
+            body: JSON.stringify(item),
         })
-    }
-    catch (error) {
+    } catch (error) {
         jmsg('error', error)
         return { code: -2 }
     }
@@ -198,11 +194,4 @@ async function delet(url, item, ms) {
     return res
 }
 
-export {
-    host,
-    urls,
-    get,
-    post,
-    patch,
-    delet
-}
+export { host, urls, get, post, patch, delet }

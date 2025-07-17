@@ -455,7 +455,7 @@ export const useAuth = defineStore('auth', {
             if (vueRouter)
                 vueRouter.replace({ name: 'SignIn' })
 
-            location.reload()
+            // location.reload()
         },
         verifyPermiso(...permisos) {
             // return this.usuario?.permisos?.includes(permiso)
@@ -500,7 +500,7 @@ export const useAuth = defineStore('auth', {
         //----- PREFERENCIAS ----- //
         setTheme(theme) {
             if (!theme) return
-            
+
             this.usuario.theme = theme
             this.isDarkMode = theme == '2'
 

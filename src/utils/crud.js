@@ -2,7 +2,7 @@ import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
 import { jmsg } from '@/utils/swal'
 
-const host = "https://api.jenifernoemistudios.com"
+const host = 'https://api.sunka.com.pe'
 
 const urls = {
     signin: `${host}/signin`,

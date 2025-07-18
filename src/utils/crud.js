@@ -2,12 +2,15 @@ import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
 import { jmsg } from '@/utils/swal'
 
-const host = 'https://api.sunka.com.pe'
+// const host = 'https://api.sunka.com.pe'
+const host = 'http://localhost:4000'
 
 const urls = {
     signin: `${host}/signin`,
 
     sistema: `${host}/api/sistema`,
+
+    activity_logs: `${host}/api/activity_logs`,
     articulo_categorias: `${host}/api/articulo_categorias`,
     articulos: `${host}/api/articulos`,
     caja_aperturas: `${host}/api/caja_aperturas`,
@@ -24,6 +27,7 @@ const urls = {
     precio_lista_items: `${host}/api/precio_lista_items`,
     produccion_ordenes: `${host}/api/produccion_ordenes`,
     receta_insumos: `${host}/api/receta_insumos`,
+    sessions: `${host}/api/sessions`,
     socios: `${host}/api/socios`,
     socio_pedidos: `${host}/api/socio_pedidos`,
     tipo_cambios: `${host}/api/tipo_cambios`,
@@ -54,6 +58,11 @@ async function get(url) {
     if (query.status == 403) {
         jmsg('error', 'Acceso denegado: permisos insuficientes')
         return { code: 403 }
+    }
+
+    if (query.status == 404) {
+        jmsg('error', 'Recurso no encontrado')
+        return { code: 404 }
     }
 
     const res = await query.json()

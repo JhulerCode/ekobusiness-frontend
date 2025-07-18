@@ -22,6 +22,12 @@
                             {{ dayjs(inputModel).format(useAuth.usuario.format_date || 'DD-MM-YYYY') }}
                         </p>
                     </template>
+
+                    <template v-else-if="type == 'datetime-local'">
+                        <p :class="{ 'to-right-p': toRight }" v-if="inputModel">
+                            {{ dayjs(inputModel).format(`${useAuth.usuario.format_date || 'DD-MM-YYYY'} HH:mm:ss`) }}
+                        </p>
+                    </template>
                 </template>
             </template>
 

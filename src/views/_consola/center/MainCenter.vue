@@ -1,7 +1,7 @@
 <template>
     <section class="main-center">
         <!-- <PestanasOpen /> -->
-        
+
         <vProveedores v-if="useVistas.show.vProveedores" />
         <vArticuloCategorias v-if="useVistas.show.vArticuloCategorias" />
         <vArticulos v-if="useVistas.show.vArticulos" />
@@ -16,25 +16,27 @@
         <vPtsIngresos v-if="useVistas.show.vPtsIngresos" />
         <vVentaPedidos v-if="useVistas.show.vVentaPedidos" />
         <vVentas v-if="useVistas.show.vVentas" />
-        
+
         <vProgramaFiltrantes v-if="useVistas.show.vProgramaFiltrantes" />
         <vProgramaGranel v-if="useVistas.show.vProgramaGranel" />
         <vProgramaLuxury v-if="useVistas.show.vProgramaLuxury" />
         <vProduccionHistorial v-if="useVistas.show.vProduccionHistorial" />
         <vProductosCuarentena v-if="useVistas.show.vProductosCuarentena" />
-        
+
         <vFormatosBpm v-if="useVistas.show.vFormatosBpm" />
         <vFormatosPhs v-if="useVistas.show.vFormatosPhs" />
         <vFormatosHaccp v-if="useVistas.show.vFormatosHaccp" />
         <vRegistrosSanitarios v-if="useVistas.show.vRegistrosSanitarios" />
         <vInspecciones v-if="useVistas.show.vInspecciones" />
-        
+
         <vDocumentos v-if="useVistas.show.vDocumentos" />
         <vCajaAperturas v-if="useVistas.show.vCajaAperturas" />
         <vMonedas v-if="useVistas.show.vMonedas" />
         <vMaquinas v-if="useVistas.show.vMaquinas" />
         <vEquipos v-if="useVistas.show.vEquipos" />
         <vColaboradores v-if="useVistas.show.vColaboradores" />
+        <vSessions v-if="useVistas.show.vSessions" />
+        <vActivityLogs v-if="useVistas.show.vActivityLogs" />
     </section>
 </template>
 
@@ -81,6 +83,8 @@ import vMonedas from '@/views/operaciones/monedas/vMonedas.vue'
 import vMaquinas from '@/views/operaciones/maquinas/vMaquinas.vue'
 import vEquipos from '@/views/operaciones/equipos/vEquipos.vue'
 import vColaboradores from '@/views/operaciones/colaboradores/vColaboradores.vue'
+import vSessions from '@/views/operaciones/sessions/vSessions.vue'
+import vActivityLogs from '@/views/operaciones/activity_logs/vActivityLogs.vue'
 
 import { useVistas } from '@/pinia/vistas.js'
 
@@ -88,7 +92,7 @@ export default {
     components: {
         // PestanasOpen,
         // vHome,
-        
+
         vProveedores,
         vArticuloCategorias,
         vArticulos,
@@ -96,7 +100,7 @@ export default {
         vCompraPedidos,
         vCompras,
         vCompraItems,
-        
+
         vClientes,
         vProductoCategorias,
         vProductosTerminados,
@@ -115,13 +119,15 @@ export default {
         vFormatosHaccp,
         vRegistrosSanitarios,
         vInspecciones,
-        
+
         vDocumentos,
         vCajaAperturas,
         vMonedas,
-        vColaboradores,
         vMaquinas,
         vEquipos,
+        vColaboradores,
+        vSessions,
+        vActivityLogs,
     },
     data: () => ({
         useVistas: useVistas()
@@ -162,7 +168,7 @@ export default {
         }
     }
 
-    .vista-fill{
+    .vista-fill {
         height: 100%;
         display: flex;
         flex-direction: column;

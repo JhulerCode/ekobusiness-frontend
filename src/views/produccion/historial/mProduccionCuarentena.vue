@@ -75,6 +75,7 @@ export default {
             {
                 id: 'fv',
                 title: 'F. vencim.',
+                format: 'date',
                 width: '10rem',
                 show: true
             },

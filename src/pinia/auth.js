@@ -58,6 +58,8 @@ export const useAuth = defineStore('auth', {
                     { label: 'Máquinas', goto: 'vMaquinas' },
                     { label: 'Equipos', goto: 'vEquipos' },
                     { label: 'Colaboradores', goto: 'vColaboradores' },
+                    { label: 'Usuarios conectados', goto: 'vSessions' },
+                    { label: 'Activity logs', goto: 'vActivityLogs' },
                 ]
             }
         ],
@@ -397,6 +399,16 @@ export const useAuth = defineStore('auth', {
                             { id: 'vColaboradores:ver', label: 'Ver' },
                             { id: 'vColaboradores:editar', label: 'Editar' },
                             { id: 'vColaboradores:eliminar', label: 'Eliminar' },
+                        ]
+                    },
+                    {
+                        id: 'vSessions', label: 'Usuarios conectados', permisos: [
+                            { id: 'vSessions:listar', label: 'Listar' },
+                        ]
+                    },
+                    {
+                        id: 'vActivityLogs', label: 'Activity logs', permisos: [
+                            { id: 'vActivityLogs:listar', label: 'Listar' },
                         ]
                     },
                 ]

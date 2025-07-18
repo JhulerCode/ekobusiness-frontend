@@ -18,7 +18,7 @@
     </div>
 
     <mFormato v-if="useModals.show.mFormato" @created="setLoteAprobado" />
-    
+
     <mConfigFiltros v-if="useModals.show.mConfigFiltros" />
 </template>
 
@@ -70,6 +70,7 @@ export default {
                 width: '7rem',
                 show: true,
                 seek: true,
+                sort: true,
             },
             {
                 id: 'produccionOrden_tipo',
@@ -79,6 +80,7 @@ export default {
                 width: '8rem',
                 show: true,
                 seek: true,
+                sort: true,
             },
             {
                 id: 'produccionOrden_maquina',
@@ -88,6 +90,7 @@ export default {
                 width: '7rem',
                 show: true,
                 seek: true,
+                sort: true,
             },
             {
                 id: 'produccionOrden_articulo',
@@ -97,6 +100,7 @@ export default {
                 width: '25rem',
                 show: true,
                 seek: true,
+                sort: true,
             },
             {
                 id: 'lote',
@@ -105,6 +109,7 @@ export default {
                 width: '7rem',
                 show: true,
                 seek: true,
+                sort: true,
             },
             {
                 id: 'fv',
@@ -114,6 +119,7 @@ export default {
                 width: '7rem',
                 show: true,
                 seek: true,
+                sort: true,
             },
             {
                 id: 'cantidad',
@@ -122,7 +128,9 @@ export default {
                 format: 'number',
                 toRight: true,
                 width: '7rem',
-                show: true
+                show: true,
+                seek: true,
+                sort: true,
             },
         ],
         tableRowOptions: [
@@ -133,7 +141,7 @@ export default {
         this.vista = this.useVistas.vProductosCuarentena
         this.initFiltros()
         this.useAuth.setColumns(this.tableName, this.columns)
-        
+
         if (this.vista.loaded) return
         if (this.useAuth.verifyPermiso('vProductosCuarentena:listar') == true) this.loadProductosCuarentena()
     },

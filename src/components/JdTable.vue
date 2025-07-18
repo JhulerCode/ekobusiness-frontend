@@ -163,6 +163,18 @@
                                     </template>
                                 </template>
 
+                                <template v-if="column.format == 'datetime'">
+                                    <template v-if="column.prop">
+                                        {{ getNestedProp(a, column.prop) ? dayjs(getNestedProp(a,
+                                            column.prop)).format(`${useAuth.usuario.format_date || 'DD-MM-YYYY'} HH:mm:ss`)
+                                        : '' }}
+                                    </template>
+                                    <template v-else>
+                                        {{ a[column.id] ? dayjs(a[column.id]).format(`${useAuth.usuario.format_date ||
+                                        'DD-MM-YYYY'} HH:mm:ss`) : '' }}
+                                    </template>
+                                </template>
+
                                 <template v-if="column.format == 'number'">
                                     <template v-if="column.prop">
                                         {{ redondear(getNestedProp(a, column.prop), 0) }}

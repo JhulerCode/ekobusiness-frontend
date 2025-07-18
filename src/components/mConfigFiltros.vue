@@ -18,12 +18,20 @@
                 <JdSelect :lista="item.lista" :mostrar="item.mostrar || 'nombre'" v-model="item.val"
                     v-if="item.type == 'select' && operaciones[item.type].find(a => a.op == item.op)?.show" />
 
-                <div>
+                <div v-if="item.type === 'date'">
                     <JdInput type="date" v-model="item.val"
-                        v-if="item.type === 'date' && operaciones[item.type].find(a => a.op == item.op)?.show" />
+                        v-if="operaciones[item.type].find(a => a.op == item.op)?.show" />
 
                     <JdInput type="date" v-model="item.val1"
-                        v-if="item.type === 'date' && operaciones[item.type].find(a => a.op == item.op)?.show1" />
+                        v-if="operaciones[item.type].find(a => a.op == item.op)?.show1" />
+                </div>
+
+                <div v-if="item.type === 'datetime'">
+                    <JdInput type="datetime-local" v-model="item.val"
+                        v-if="operaciones[item.type].find(a => a.op == item.op)?.show" />
+
+                    <JdInput type="datetime-local" v-model="item.val1"
+                        v-if="operaciones[item.type].find(a => a.op == item.op)?.show1" />
                 </div>
             </template>
         </JdTable>
@@ -82,6 +90,16 @@ export default {
                 { op: 'No está vacío', show: false },
             ],
             date: [
+                { op: 'Es', show: true },
+                { op: 'Es anterior a', show: true },
+                { op: 'Es posterior a', show: true },
+                { op: 'Es igual o anterior a', show: true },
+                { op: 'Es igual o posterior a', show: true },
+                { op: 'Está dentro de', show: true, show1: true },
+                { op: 'Está vacío', show: false },
+                { op: 'No está vacío', show: false },
+            ],
+            datetime: [
                 { op: 'Es', show: true },
                 { op: 'Es anterior a', show: true },
                 { op: 'Es posterior a', show: true },
@@ -179,7 +197,6 @@ export default {
             //----- GUARDAR LAS COLUMNAS EN PINIA ----- //
             this.useAuth.saveTableColumns(this.modal.table, this.modal.cols1)
 
-            // this.$emit('updated')
             this.modal.reload()
             this.useModals.show.mConfigFiltros = false
         },

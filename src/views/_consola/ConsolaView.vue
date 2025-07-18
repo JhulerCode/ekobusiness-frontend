@@ -13,8 +13,6 @@
     <mUserPreferences v-if="useModals?.show?.mUserPreferences" />
 
     <mLogin v-if="useModals?.show?.mLogin" />
-
-    <LoadingSpin v-if="useAuth.loading.show" :text="useAuth.loading.text" scale="1.5" style="z-index: 3" />
 </template>
 
 <script>
@@ -22,7 +20,6 @@ import MainHead from '@/views/_consola/header/MainHead.vue'
 import SideBar from '@/views/_consola/sidebar/SideBar.vue'
 import MainCenter from '@/views/_consola/center/MainCenter.vue'
 import mLogin from '@/components/mLogin.vue'
-import LoadingSpin from '@/components/LoadingSpin.vue'
 
 import mUserMenu from './header/mUserMenu.vue'
 import mUserPreferences from './header/mUserPreferences.vue'
@@ -36,32 +33,17 @@ export default {
         MainHead,
         SideBar,
         MainCenter,
-        mLogin,
-        LoadingSpin,
 
         mUserMenu,
         mUserPreferences,
+
+        mLogin,
     },
     data: () => ({
         useAuth: useAuth(),
         useVistas: useVistas(),
         useModals: useModals(),
     }),
-    created() {
-        this.isLogged()
-    },
-    methods: {
-        async isLogged() {
-            const auth = await this.useAuth.login()
-            // console.log(this.useAuth.usuario)
-            if (!auth) {
-                this.$router.replace({ name: 'SignIn', query: { ruc: this.useAuth.ruc } })
-            }
-            else {
-                this.useVistas.showVista(this.useAuth.usuario.vista_inicial)
-            }
-        }
-    },
 }
 </script>
 

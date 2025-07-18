@@ -51,7 +51,7 @@ async function get(url) {
 
     if (query.status == 401) {
         jmsg('error', 'Acceso denegado: autenticación incorrecta')
-        useModals().setModal('mLogin', 'Sesión terminada', null, null)
+        // useModals().setModal('mLogin', 'Sesión terminada', null, null)
         return { code: 401 }
     }
 

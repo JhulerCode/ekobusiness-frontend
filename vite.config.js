@@ -22,7 +22,7 @@ export default defineConfig({
                 start_url: '/signin',
                 display: 'standalone',
                 background_color: '#ffffff',
-                theme_color: '#2c47aa',
+                theme_color: '#2492c2',
                 icons: [
                     {
                         src: 'pwa-192x192.png',

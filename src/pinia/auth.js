@@ -1,8 +1,8 @@
 import { defineStore } from "pinia"
 import { urls, get, post } from '@/utils/crud.js'
 import { deepCopy } from '@/utils/mine'
-// import { useVistas } from '@/pinia/vistas.js'
-// import { useModals } from '@/pinia/modals.js'
+import { useVistas } from '@/pinia/vistas.js'
+import { useModals } from '@/pinia/modals.js'
 
 export const useAuth = defineStore('auth', {
     state: () => ({
@@ -431,19 +431,13 @@ export const useAuth = defineStore('auth', {
 
         //----- LOGIN ----- //
         async login() {
-            if (this.token == null) {
-                this.logout()
-                return false
-            }
+            if (this.token == null) return false
 
             this.setLoading(true, 'Cargando cuenta...')
             const result = await get(`${urls.colaboradores}/login`)
             this.setLoading(false)
 
-            if (result.code != 0) {
-                this.logout()
-                return false
-            }
+            if (result.code != 0) return false
 
             this.usuario = deepCopy(result.data)
             this.permisos = this.usuario.permisos
@@ -460,14 +454,11 @@ export const useAuth = defineStore('auth', {
 
             if (result.code != 0) return
 
-            // this.initVars()
-            // useVistas().initVars()
-            // useModals().initVars()
+            if (vueRouter) vueRouter.replace({ name: 'SignIn' })
 
-            if (vueRouter)
-                vueRouter.replace({ name: 'SignIn' })
-
-            // location.reload()
+            this.initVars()
+            useVistas().initVars()
+            useModals().initVars()
         },
         verifyPermiso(...permisos) {
             // return this.usuario?.permisos?.includes(permiso)

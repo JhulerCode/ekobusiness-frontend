@@ -61,7 +61,7 @@
 
             <JdInput :nec="true" label="Usuario" v-model="usuario" height="3" class="mrg-btm1" />
             <JdInputPassword :nec="true" label="Contraseña" v-model="contrasena" height="3" class="mrg-btm2" />
-            <JdButton text="INGRESAR" :spin="spinBtnSignIn" @click="signin()" class="boton-ingresar" />
+            <JdButton text="INGRESAR" @click="signin()" class="boton-ingresar" />
         </div>
     </main>
 </template>
@@ -72,8 +72,9 @@ import JdInputPassword from '@/components/inputs/JdInputPassword.vue'
 import JdButton from '@/components/inputs/JdButton.vue'
 
 import { useAuth } from '@/pinia/auth'
+import { useVistas } from '@/pinia/vistas.js'
 
-import { host, urls, post } from '@/utils/crud'
+import { urls, post } from '@/utils/crud'
 import { jmsg } from '@/utils/swal'
 
 export default {
@@ -84,21 +85,10 @@ export default {
     },
     data: () => ({
         useAuth: useAuth(),
+        useVistas: useVistas(),
 
-        logo_uri: '',
-
-        spinBtnSignIn: false,
-
-        usuario: '', contrasena: '', token: '',
-        shown: false,
-
-        host,
+        usuario: '', contrasena: '',
     }),
-    created() {
-        if (this.useAuth.isDarkMode) {
-            document.body.classList.add('dark-mode')
-        }
-    },
     mounted() {
         this.generateParticles()
 
@@ -121,9 +111,9 @@ export default {
                 contrasena: this.contrasena,
             }
 
-            this.spinBtnSignIn = true
+            this.useAuth.setLoading(true, 'Ingresando...')
             const { code, token } = await post(urls.signin, auth, 'Acceso correcto')
-            this.spinBtnSignIn = false
+            this.useAuth.setLoading(false, '')
 
             if (code != 0) return
 
@@ -131,7 +121,9 @@ export default {
 
             localStorage.setItem('remember-usuario', this.usuario)
 
+            await this.useAuth.login()
             this.$router.replace({ name: 'ConsolaView' })
+            this.useVistas.showVista(this.useAuth.usuario.vista_inicial)
         },
         darkLigthMode() {
             document.body.classList.toggle('dark-mode')

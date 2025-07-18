@@ -476,9 +476,9 @@ export default {
             this.useModals.setModal('mArticulo', 'Nuevo articulo', 1, send)
         },
         async showReceta(item) {
-            this.useAuth.loading = { show: true, text: 'Cargando...' }
+            this.setLoading(true, 'Cargando...')
             const res = await get(`${urls.receta_insumos}/${item.id}`)
-            this.useAuth.loading = { show: false, text: '' }
+            this.setLoading(false, '')
 
             if (res.code != 0) return
 

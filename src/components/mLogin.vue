@@ -42,7 +42,7 @@ export default {
         this.modal = this.useModals.mEditar
         this.usuario = localStorage.getItem('remember-usuario')
         // this.contrasena = localStorage.getItem('remember-usuario')
-        if (this.usuario == 'jhuler' ) {
+        if (this.usuario == 'jhuler') {
             this.contrasena = '2801'
         }
         else {
@@ -74,7 +74,7 @@ export default {
             this.useModals.show.mLogin = false
         },
         cancelar() {
-            this.useAuth.logout(this.$router)
+            this.$router.replace({ name: 'SignIn' })
         }
     }
 }

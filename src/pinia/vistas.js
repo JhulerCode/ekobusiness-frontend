@@ -2,21 +2,15 @@ import { defineStore } from "pinia"
 
 export const useVistas = defineStore('vistas', {
     state: () => ({
-        show: {
-            vHome: true,
-        },
-
+        show: {},
         pestanas: [],
     }),
     actions: {
         initVars() {
-            this.show = {
-                vHome: true,
-            }
-            
+            this.show = {}
             this.pestanas = []
         },
-        
+
         async showVista(goto, label) {
             for (let a in this.show) this.show[a] = false
             this.addPestana(goto, label)

@@ -53,6 +53,7 @@ export default {
                 width: '7rem',
                 show: true,
                 seek: true,
+                sort: true,
             },
             {
                 id: 'tipo',
@@ -61,6 +62,7 @@ export default {
                 width: '8rem',
                 show: true,
                 seek: true,
+                sort: true,
             },
             {
                 id: 'maquina',
@@ -69,6 +71,7 @@ export default {
                 width: '7rem',
                 show: true,
                 seek: true,
+                sort: true,
             },
             {
                 id: 'articulo',
@@ -77,6 +80,7 @@ export default {
                 width: '25rem',
                 show: true,
                 seek: true,
+                sort: true,
             },
             {
                 id: 'lote',
@@ -84,6 +88,7 @@ export default {
                 width: '7rem',
                 show: true,
                 seek: true,
+                sort: true,
             },
             {
                 id: 'fv',
@@ -92,6 +97,7 @@ export default {
                 width: '7rem',
                 show: true,
                 seek: true,
+                sort: true,
             },
             {
                 id: 'cantidad',
@@ -99,7 +105,9 @@ export default {
                 slot: 'cCantidad',
                 toRight: true,
                 width: '7rem',
-                show: true
+                show: true,
+                seek: true,
+                sort: true,
             },
         ],
 

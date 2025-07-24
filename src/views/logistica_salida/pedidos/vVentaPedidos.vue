@@ -49,7 +49,7 @@ import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
 import { useModals } from '@/pinia/modals'
 
-import { urls, get, delet } from '@/utils/crud'
+import { urls, get, delet, patch } from '@/utils/crud'
 import { jqst } from '@/utils/swal'
 import { downloadExcel } from '@/utils/mine'
 
@@ -86,7 +86,7 @@ export default {
                 width: '10rem',
                 show: true,
                 seek: true,
-                sort: false,
+                sort: true,
             },
             {
                 id: 'codigo',
@@ -95,8 +95,7 @@ export default {
                 width: '12rem',
                 show: true,
                 seek: true,
-                sort: false,
-
+                sort: true,
             },
             {
                 id: 'socio',
@@ -107,7 +106,7 @@ export default {
                 width: '20rem',
                 show: true,
                 seek: true,
-                sort: false,
+                sort: true,
 
             },
             {
@@ -117,8 +116,8 @@ export default {
                 type: 'select',
                 width: '12rem',
                 show: true,
-                seek: false,
-                sort: false,
+                seek: true,
+                sort: true,
 
             },
             {
@@ -128,8 +127,8 @@ export default {
                 type: 'select',
                 width: '10rem',
                 show: true,
-                seek: false,
-                sort: false,
+                seek: true,
+                sort: true,
 
             },
             {
@@ -140,8 +139,8 @@ export default {
                 toRight: true,
                 width: '10rem',
                 show: true,
-                seek: false,
-                sort: false,
+                seek: true,
+                sort: true,
 
             },
             {
@@ -152,16 +151,17 @@ export default {
                 format: 'estado',
                 width: '10rem',
                 show: true,
-                seek: false,
-                sort: false,
+                seek: true,
+                sort: true,
             },
         ],
         tableRowOptions: [
             { label: 'Ver', icon: 'fa-regular fa-folder-open', action: 'ver', permiso: 'vVentaPedidos:ver' },
-            { label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar', permiso: 'vVentaPedidos:editar', ocultar: { estado: 0 } },
-            { label: 'Anular', icon: 'fa-solid fa-ban', action: 'anular', permiso: 'vVentaPedidos:anular', ocultar: { estado: 0 } },
+            { label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar', permiso: 'vVentaPedidos:editar', ocultar: { estado: ['0', '2'] } },
+            { label: 'Terminar', icon: 'fa-solid fa-check-double', action: 'terminar', permiso: 'vVentaPedidos:terminar', ocultar: { estado: ['0', '2'] } },
+            { label: 'Anular', icon: 'fa-solid fa-ban', action: 'anular', permiso: 'vVentaPedidos:anular', ocultar: { estado: ['0', '2'] } },
             // { label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar' },
-            { label: 'Entregar mercadería', icon: 'fa-regular fa-circle-down', action: 'entregarMercaderia', permiso: 'vVentaPedidos:entregarMercaderia', ocultar: { estado: 0 } },
+            { label: 'Entregar mercadería', icon: 'fa-regular fa-circle-down', action: 'entregarMercaderia', permiso: 'vVentaPedidos:entregarMercaderia', ocultar: { estado: ['0', '2'] } },
         ]
     }),
     async created() {
@@ -267,6 +267,18 @@ export default {
             this.useModals.mSocioPedido.socio = { ...res.data.socio1 }
             this.useModals.mSocioPedido.socios = [{ ...res.data.socio1 }]
             this.useModals.mSocioPedido.monedas = [{ ...res.data.moneda1 }]
+        },
+        async terminar(item) {
+            const resQst = await jqst('¿Está seguro de terminar el pedido?')
+            if (resQst.isConfirmed == false) return
+
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await patch(`${urls.socio_pedidos}/terminar`, item, 'Pedido terminado')
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            this.useVistas.updateItem('vVentaPedidos', 'pedidos', { ...item, estado: 2 })
         },
         anular(item) {
             const send = {

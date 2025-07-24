@@ -167,11 +167,11 @@
                                     <template v-if="column.prop">
                                         {{ getNestedProp(a, column.prop) ? dayjs(getNestedProp(a,
                                             column.prop)).format(`${useAuth.usuario.format_date || 'DD-MM-YYYY'} HH:mm:ss`)
-                                        : '' }}
+                                            : '' }}
                                     </template>
                                     <template v-else>
                                         {{ a[column.id] ? dayjs(a[column.id]).format(`${useAuth.usuario.format_date ||
-                                        'DD-MM-YYYY'} HH:mm:ss`) : '' }}
+                                            'DD-MM-YYYY'} HH:mm:ss`) : '' }}
                                     </template>
                                 </template>
 
@@ -559,20 +559,44 @@ export default {
             this.$emit('rowOptionSelected', a.action, this.optionsCaseItem)
             this.hide()
         },
-        verifyPermiso(a, b) {
-            if (b.ocultar == null && this.useAuth.verifyPermiso(b.permiso)) return true
+        // verifyPermiso(a, b) {
+        //     if (b.ocultar == null && this.useAuth.verifyPermiso(b.permiso)) return true
 
-            let asd = true
+        //     let perm = true
+        //     for (let prop in b.ocultar) {
+        //         if (b.ocultar[prop] == a[prop]) {
+        //             perm = false
+        //             break
+        //         }
+        //     }
+
+        //     if (perm == false) return false
+
+        //     if (perm == true && this.useAuth.verifyPermiso(b.permiso)) return true
+        // },
+        verifyPermiso(a, b) {
+            const tienePermiso = this.useAuth.verifyPermiso(b.permiso);
+
+            // Si no hay condición de ocultar, solo dependerá del permiso
+            if (!b.ocultar) return tienePermiso;
+
+            // Evaluar condiciones para ocultar
             for (let prop in b.ocultar) {
-                if (b.ocultar[prop] == a[prop]) {
-                    asd = false
-                    break
+                const valorOcultar = b.ocultar[prop];
+                const valorFila = a[prop];
+
+                if (valorFila === undefined) continue;
+
+                // Si el valor en ocultar es un array
+                if (Array.isArray(valorOcultar)) {
+                    if (valorOcultar.includes(valorFila)) return false; // se oculta
+                } else {
+                    if (valorOcultar == valorFila) return false; // se oculta
                 }
             }
 
-            if (asd == false) return false
-
-            if (asd == true && this.useAuth.verifyPermiso(b.permiso)) return true
+            // Si no debe ocultarse y tiene permiso, mostrar la opción
+            return tienePermiso;
         }
     }
 }

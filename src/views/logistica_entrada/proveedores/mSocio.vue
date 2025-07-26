@@ -155,7 +155,7 @@ export default {
         },
 
         async loadDatosSistema() {
-            const qry = ['documentos_identidad', 'monedas']
+            const qry = ['documentos_identidad', 'monedas', 'pago_condiciones']
             const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
 
             if (res.code != 0) return

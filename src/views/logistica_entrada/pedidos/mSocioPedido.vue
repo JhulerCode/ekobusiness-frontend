@@ -197,6 +197,7 @@ export default {
             this.modal.socio = { ...item }
 
             this.modal.item.contacto = this.modal.socio.contactos.find(a => a.principal == true)?.id
+            this.modal.item.pago_condicion = this.modal.socio.pago_condicion
 
             if (this.modal.item.tipo == 2) {
                 const direccion_principal = this.modal.socio.direcciones.find(a => a.principal == true)
@@ -207,8 +208,10 @@ export default {
 
         checkDatos() {
             const props = [
-                'tipo', 'fecha', 'socio', 'contacto', 'moneda', 'pago_condicion',
+                'tipo', 'fecha', 'socio', 'moneda', 'pago_condicion',
             ]
+
+            if (this.modal.item.tipo == 1) props.push('contacto')
 
             if (incompleteData(this.modal.item, props)) {
                 jmsg('warning', 'Ingrese los datos necesarios')
@@ -291,7 +294,7 @@ export default {
         async loadSocios() {
             const qry = {
                 fltr: { tipo: { op: 'Es', val: this.modal.item.tipo }, activo: { op: 'Es', val: true } },
-                cols: ['nombres', 'apellidos', 'nombres_apellidos', 'contactos', 'direcciones', 'precio_lista'],
+                cols: ['nombres', 'apellidos', 'nombres_apellidos', 'contactos', 'direcciones', 'precio_lista', 'pago_condicion'],
                 incl: ['precio_lista1'],
             }
 

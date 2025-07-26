@@ -71,6 +71,16 @@ export default {
                 seek: true,
                 sort: true
             },
+            {
+                id: 'fecha_compra',
+                title: 'Fecha de compra',
+                type: 'date',
+                format: 'date',
+                width: '8rem',
+                show: true,
+                seek: true,
+                sort: true
+            },
         ],
         tableRowOptions: [
             { id: 1, label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar', permiso: 'vEquipos:editar' },

@@ -3,6 +3,7 @@
         <div class="container-datos">
             <JdInput label="Código" :nec="true" v-model="maquina.codigo" v-if="maquina.tipo == 2" />
             <JdInput label="Nombre" :nec="true" v-model="maquina.nombre" />
+            <JdInput label="Fecha de compra" type="date" :nec="true" v-model="maquina.fecha_compra" />
 
             <template v-if="maquina.tipo == 1">
                 <JdSelect label="Tipo de producción" :nec="true" :lista="modal.produccion_tipos || []"

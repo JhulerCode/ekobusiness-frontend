@@ -5,8 +5,11 @@
                 :loaded="modal.precio_listasLoaded" @reload="loadPrecioLista()" :disabled="modal.mode == 3"
                 style="grid-column: 1/4;" v-if="this.socio.tipo == 1" />
 
-            <JdInput label="Límite crédito" type="number" v-model="socio.credito" :disabled="modal.mode == 3"
-                style="grid-column: 4/6;" />
+            <!-- <JdInput label="Condición de pago" type="number" v-model="socio.pago_condicion" :disabled="modal.mode == 3"
+                style="grid-column: 4/6;" /> -->
+
+            <JdSelect label="Condición de pago" :nec="true" v-model="socio.pago_condicion"
+                :lista="modal.pago_condiciones" :disabled="modal.mode == 3" style="grid-column: 1/4;" />
         </div>
 
         <span>- - - Bancos - - -</span>

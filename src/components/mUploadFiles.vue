@@ -6,21 +6,28 @@
             <JdButton text="Eliminar" icon="fa-solid fa-trash-can" @click="eliminar()"
                 v-if="modal.item.foto && files.length == 0" />
 
-            <JdButton text="Actualizar" backColor="primary-color" color="text-color3" @click="actualizar()"
-                v-if="files.length > 0" />
+            <JdButton text="Actualizar" backColor="primary-color" color="text-color3" @click="actualizar()" />
+            <!-- v-if="files.length > 0" -->
         </div>
 
-        <div class="container-foto" v-if="files.length == 0">
-            <!-- <img :src="`${host}/uploads/images/${modal.item.foto}`" v-if="modal.item.foto"> -->
+        <!-- <div class="container-foto" v-if="files.length == 0">
             <img
                 src="https://img.freepik.com/vector-premium/vector-icono-imagen-predeterminado-pagina-imagen-faltante-diseno-sitio-web-o-aplicacion-movil-no-hay-foto-disponible_87543-11093.jpg">
-        </div>
+        </div> -->
 
-        <ul class="files" v-else>
+        <ul class="files" v-if="files.length > 0">
             <li v-for="(a, i) in files" :key="i" class="container-foto">
-                <img :src="a.uri">
+                <template>
+                    <img :src="a.uri">
+                </template>
+
+                <template v-if="modal.accept = 'application/pdf'">
+                    {{ a.name }}
+                </template>
             </li>
         </ul>
+
+        {{ this.modal.formData }}
 
         <input type="file" hidden ref="inputFile" :multiple="modal.varios > 1" :accept="modal.accept"
             @change="onFileChange">
@@ -34,9 +41,9 @@ import JdButton from '@/components/inputs/JdButton.vue'
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
 
-import { loadFiles, genId } from '@/utils/mine'
-import { jmsg } from '@/utils/swal'
-import { host, urls, patch, delet } from '@/utils/crud'
+// import { loadFiles, genId } from '@/utils/mine'
+// import { jmsg } from '@/utils/swal'
+import { host, urls, delet } from '@/utils/crud'
 
 export default {
     components: {
@@ -55,51 +62,70 @@ export default {
         this.modal = this.useModals.mUploadFiles
     },
     methods: {
+        // async onFileChange(event) {
+        //     this.files.length = 0
+
+        //     const asd = event.target.files
+
+        //     let maximo = true
+
+        //     if (this.files.length == 0) {
+        //         if (asd.length && asd.length > this.modal.varios) maximo = false
+        //     }
+        //     else {
+        //         const falta = this.modal.varios - this.files.length
+        //         if (asd.length && asd.length > falta) maximo = false
+        //     }
+
+        //     if (maximo == false) {
+        //         return jmsg('warning', `Puedes subir ${this.modal.varios} modal.files como máximo`)
+        //     }
+
+        // const archivos = await loadFiles(event)
+
+        // for (const a of archivos) {
+        //     const id = genId(this.files)
+        //     this.files.push({ ...a, id })
+        // }
+        // },
         async onFileChange(event) {
-            this.files.length = 0
+            this.modal.formData = new FormData()
+            Array.from(event.target.files).forEach((archivo) => {
+                this.modal.formData.append('archivos', archivo);
+            });
 
-            const asd = event.target.files
-
-            let maximo = true
-
-            if (this.files.length == 0) {
-                if (asd.length && asd.length > this.modal.varios) maximo = false
-            }
-            else {
-                const falta = this.modal.varios - this.files.length
-                if (asd.length && asd.length > falta) maximo = false
-            }
-
-            if (maximo == false) {
-                return jmsg('warning', `Puedes subir ${this.modal.varios} modal.files como máximo`)
-            }
-
-            const archivos = await loadFiles(event)
-
-            for (const a of archivos) {
-                const id = genId(this.files)
-                this.files.push({ ...a, id })
-            }
-
-            // console.log(this.files)
+            console.log(this.modal.formData)
         },
 
         async actualizar() {
-            const uri = urls[this.modal.item.url] + this.modal.item.route
-            const send = {
-                id: this.modal.item.id,
-                files: this.files
-            }
+            const uri = `${urls[this.modal.item.url]}/upload/${this.modal.item.id}`
 
-            this.useAuth.setLoading(true, 'Subiendo...')
-            const res = await patch(uri, send)
-            this.useAuth.setLoading(false)
+            const res = await fetch(uri, {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${useAuth().token}`,
+                },
+                body: this.modal.formData,
+            });
 
-            if (res.code !== 0) return
-
-            this.$emit('uploaded', { id: send.id, documento: res.fileName })
-            this.useModals.show.mUploadFiles = false
+            console.log(res)
         },
+        // async actualizar() {
+        //     const uri = urls[this.modal.item.url] + this.modal.item.route
+        // const send = {
+        //     id: this.modal.item.id,
+        //     files: this.files
+        // }
+
+        // this.useAuth.setLoading(true, 'Subiendo...')
+        // const res = await patch(uri, send)
+        // this.useAuth.setLoading(false)
+
+        // if (res.code !== 0) return
+
+        // this.$emit('uploaded', { id: send.id, documento: res.fileName })
+        // this.useModals.show.mUploadFiles = false
+        // },
         async eliminar() {
             const uri = urls[this.modal.item.url] + this.modal.item.route
             const send = {

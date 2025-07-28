@@ -34,7 +34,7 @@ import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
 import { useModals } from '@/pinia/modals'
 
-import { urls, get, delet } from '@/utils/crud'
+import { urls, get, delet, getFile } from '@/utils/crud'
 import { jqst } from '@/utils/swal'
 
 export default {
@@ -107,9 +107,9 @@ export default {
             },
         ],
         tableRowOptions: [
-            { id: 1, label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar', permiso: 'vDocumentos:editar' },
-            // { id: 2, label: 'Subir documento', icon: 'fa-solid fa-pen-to-square', action: 'uploadFile', permiso: 'vDocumentos:editar' },
-            { id: 3, label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar', permiso: 'vDocumentos:eliminar' },
+            { label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar', permiso: 'vDocumentos:editar' },
+            { label: 'Ver pdf', icon: 'fa-regular fa-file-pdf', action: 'verFile', permiso: 'vRegistrosSanitarios:editar', ocultar: { file_name: null } },
+            { label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar', permiso: 'vDocumentos:eliminar' },
         ],
     }),
     created() {
@@ -148,14 +148,14 @@ export default {
         },
 
         async openConfigFiltros() {
-            // await this.loadDatosSistema()
+            await this.loadDatosSistema()
 
             const cols = this.columns
-            cols.find(a => a.id == 'estado').lista = this.vista.estados
+            cols.find(a => a.id == 'estado').lista = this.vista.documentos_estados
 
             const send = {
                 table: this.tableName,
-                cols,
+                cols: cols.filter(a => a.id !== 'estado'),
                 reload: this.loadDocumentos
             }
 
@@ -174,18 +174,8 @@ export default {
 
             this.useModals.setModal('mDocumento', 'Editar documento', 2, res.data)
         },
-        uploadFile(item) {
-            const send = {
-                item: {
-                    id: item.id,
-                    file: item.documento,
-                    url: 'documentos',
-                    route: '/uploadDoc',
-                },
-                varios: 1
-            }
-
-            this.useModals.setModal('mUploadFiles', 'Subir documento', null, send, true)
+        verFile(item) {
+            getFile(`${urls.documentos}/uploads/${item.file_name}`)
         },
         async eliminar(item) {
             const resQst = await jqst('¿Está seguro de eliminar?')

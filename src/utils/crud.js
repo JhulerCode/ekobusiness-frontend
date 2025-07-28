@@ -74,17 +74,38 @@ async function get(url) {
     return res
 }
 
+function setFormData(item) {
+    const formData = new FormData();
+
+    for (const key in item) {
+        const value = item[key];
+
+        formData.append(key, value);
+    }
+
+    return formData
+}
+
+function setHeaders(item) {
+    const headers = {
+        Authorization: `Bearer ${useAuth().token}`,
+    }
+
+    if (!item.formData) {
+        headers['Content-Type'] = 'application/json'
+    }
+
+    return headers
+}
+
 async function post(url, item, ms) {
     let query
 
     try {
         query = await fetch(url, {
             method: 'POST',
-            headers: {
-                Authorization: `Bearer ${useAuth().token}`,
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(item),
+            headers: setHeaders(item),
+            body: item.formData ? setFormData(item) : JSON.stringify(item),
         })
     } catch (error) {
         jmsg('error', error)
@@ -123,11 +144,8 @@ async function patch(url, item, ms) {
     try {
         query = await fetch(`${url}/${item.id}`, {
             method: 'PATCH',
-            headers: {
-                Authorization: `Bearer ${useAuth().token}`,
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(item),
+            headers: setHeaders(item),
+            body: item.formData ? setFormData(item) : JSON.stringify(item),
         })
     } catch (error) {
         jmsg('error', error)
@@ -203,4 +221,30 @@ async function delet(url, item, ms) {
     return res
 }
 
-export { host, urls, get, post, patch, delet }
+async function getFile(url) {
+    const response = await fetch(url, {
+        headers: {
+            Authorization: `Bearer ${useAuth().token}`,
+        }
+    })
+
+    if (!response.ok) {
+        jmsg('error', 'Archivo no encontrado')
+        return
+    }
+
+    const blob = await response.blob()
+    const newuri = window.URL.createObjectURL(blob)
+
+    window.open(newuri, '_blank')
+}
+
+export {
+    host,
+    urls,
+    get,
+    post,
+    patch,
+    delet,
+    getFile,
+}

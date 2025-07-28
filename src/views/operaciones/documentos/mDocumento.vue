@@ -15,7 +15,9 @@
             <JdInput label="Fecha de emisión" :nec="true" type="date" v-model="documento.fecha_emision" />
             <JdInput label="Fecha de vencimiento" :nec="true" type="date" v-model="documento.fecha_vencimiento" />
             <JdInput label="Recodar días antes" :nec="true" type="number" v-model="documento.recordar_dias" />
-            <!-- <JdInput label="Documento" v-model="documento.documento" /> -->
+
+            <JdInputFile label="Documento" accept="application/pdf" v-model="documento.file_name"
+                @handleFile="(file) => documento.archivo = file" @deleteFile="documento.archivo = null" />
         </div>
     </JdModal>
 </template>
@@ -24,6 +26,7 @@
 import JdModal from '@/components/JdModal.vue'
 import JdInput from '@/components/inputs/JdInput.vue'
 import JdTextArea from '@/components/inputs/JdTextArea.vue'
+import JdInputFile from '@/components/inputs/JdInputFile.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
@@ -38,6 +41,7 @@ export default {
         JdModal,
         JdInput,
         JdTextArea,
+        JdInputFile,
     },
     data: () => ({
         useAuth: useAuth(),
@@ -84,8 +88,12 @@ export default {
 
             return false
         },
+        shapeDatos() {
+            if (this.documento.archivo) this.documento.formData = true
+        },
         async crear() {
             if (this.checkDatos()) return
+            this.shapeDatos()
 
             this.useAuth.setLoading(true, 'Creando...')
             const res = await post(urls.documentos, this.documento)
@@ -94,12 +102,16 @@ export default {
             if (res.code != 0) return
 
             const vista = this.documento.tipo == 1 ? 'vDocumentos' : 'vRegistrosSanitarios'
-            console.log(vista)
             this.useVistas.addItem(vista, 'documentos', res.data)
             this.useModals.show.mDocumento = false
         },
+        // modificar1() {
+        //     if (this.checkDatos()) return
+        //     console.log(this.documento)
+        // },
         async modificar() {
             if (this.checkDatos()) return
+            this.shapeDatos()
 
             this.useAuth.setLoading(true, 'Actualizando...')
             const res = await patch(urls.documentos, this.documento)

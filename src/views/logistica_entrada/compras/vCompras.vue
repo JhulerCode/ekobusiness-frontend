@@ -264,7 +264,6 @@ export default {
                 socio: { ...res.data.socio1 },
                 socios: [{ ...res.data.socio1 }],
                 monedas: [{ ...res.data.moneda1 }],
-                // pedido: res.data.socio_pedido ? { ...res.data.socio_pedido1 } : null,
                 pedidos: res.data.socio_pedido ? [{ ...res.data.socio_pedido1 }] : []
             }
 

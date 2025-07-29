@@ -18,6 +18,7 @@
     </div>
 
     <mFormato v-if="useModals.show.mFormato" @created="setLoteAprobado" />
+    <mProduccionTrazabilidad v-if="useModals.show.mProduccionTrazabilidad" />
 
     <mConfigFiltros v-if="useModals.show.mConfigFiltros" />
 </template>
@@ -29,6 +30,7 @@ import JdTable from '@/components/JdTable.vue'
 import mConfigFiltros from '@/components/mConfigFiltros.vue'
 
 import mFormato from '../calidad/formatos/mFormato.vue'
+import mProduccionTrazabilidad from './historial/mProduccionTrazabilidad.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
@@ -49,6 +51,7 @@ export default {
         mConfigFiltros,
 
         mFormato,
+        mProduccionTrazabilidad,
     },
     data: () => ({
         useAuth: useAuth(),
@@ -146,6 +149,7 @@ export default {
         ],
         tableRowOptions: [
             { label: 'Liberación de lote', icon: 'fa-solid fa-star', action: 'liberarLote', permiso: 'vProductosCuarentena:liberar_lote' },
+            { label: 'Ver trazabilidad', icon: 'fa-solid fa-diagram-project', action: 'verTrazabilidad', permiso: 'vProductosCuarentena:trazabilidad' },
         ],
     }),
     created() {
@@ -256,9 +260,30 @@ export default {
                 this.useModals.setModal('mFormato', `${formato_id} ${formato_name}`, 2, send, true)
             }
         },
-        setLoteAprobado(item){
+        setLoteAprobado(item) {
             const cuanrentena_producto = this.vista.articulos.find(a => a.id == item.cuarentena_producto)
             cuanrentena_producto.cf_liberacion_lote = item.id
+        },
+        async verTrazabilidad(item) {
+            this.useAuth.setLoading(true, 'Cargando trazabilidad...')
+            const res = await get(`${urls.produccion_ordenes}/trazabilidad/${item.produccion_orden1.id}`)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            const send = {
+                produccion_orden: res.data,
+                articulos: [{
+                    id: res.data.articulo,
+                    ...res.data.articulo_info
+                }],
+                maquinas: [{
+                    id: res.data.maquina,
+                    ...res.data.maquina1
+                }]
+            }
+
+            this.useModals.setModal('mProduccionTrazabilidad', 'Trazabilidad', 3, send, true)
         },
 
         async loadDatosSistema() {

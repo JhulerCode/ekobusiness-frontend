@@ -286,6 +286,7 @@ export const useAuth = defineStore('auth', {
                             { id: 'vProductosCuarentena:editar', label: 'Editar' },
                             { id: 'vProductosCuarentena:eliminar', label: 'Eliminar' },
                             { id: 'vProductosCuarentena:liberar_lote', label: 'Liberar lote' },
+                            { id: 'vProductosCuarentena:trazabilidad', label: 'Ver trazabilidad' },
                         ]
                     }
                 ]

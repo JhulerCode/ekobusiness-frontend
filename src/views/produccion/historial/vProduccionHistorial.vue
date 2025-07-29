@@ -12,7 +12,7 @@
 
     <mProduccionOrden v-if="useModals.show.mProduccionOrden" />
     <mProduccionSalida v-if="useModals.show.mProduccionSalida" />
-    <mFormato v-if="useModals.show.mFormato" @created="setProduccionOrdenCalidadRevisado" />
+    <mFormato v-if="useModals.show.mFormato" @created="setFormatoCalidad" />
     <mProduccionCuarentena v-if="useModals.show.mProduccionCuarentena" />
     <mProduccionProductos v-if="useModals.show.mProduccionProductos" />
 
@@ -115,6 +115,37 @@ export default {
                 title: 'Estado',
                 prop: 'estado1.nombre',
                 type: 'select',
+                format: 'estado',
+                width: '10rem',
+                show: true,
+                seek: true,
+                sort: true,
+            },
+            {
+                id: 'productos_terminados',
+                title: 'Productos terminados',
+                type: 'number',
+                format: 'number',
+                toRight: true,
+                width: '8rem',
+                show: true,
+                seek: true,
+                sort: true,
+            },
+            {
+                id: 'estado_calidad_revisado',
+                title: 'Control de pesos',
+                prop: 'estado_calidad_revisado1.nombre',
+                format: 'estado',
+                width: '10rem',
+                show: true,
+                seek: true,
+                sort: true,
+            },
+            {
+                id: 'estado_cf_ppc',
+                title: 'Control del PPC',
+                prop: 'estado_cf_ppc1.nombre',
                 format: 'estado',
                 width: '10rem',
                 show: true,
@@ -304,7 +335,7 @@ export default {
             if (res.code != 0) return
 
             this.useAuth.setLoading(true, 'Cargando...')
-            const res1 = await get(`${urls.formato_values}/uno/${item.calidad_revisado}`)
+            const res1 = await get(`${urls.formato_values}/uno/${item.cf_ppc}`)
             this.useAuth.setLoading(false)
 
             if (res1.code != 0) return
@@ -341,9 +372,15 @@ export default {
                 this.useModals.setModal('mFormato', formato_id, 2, send, true)
             }
         },
-        setProduccionOrdenCalidadRevisado(item) {
+        setFormatoCalidad(item) {
             const produccion_orden = this.vista.produccion_ordenes.find(a => a.id == item.produccion_orden)
-            produccion_orden.calidad_revisado = item.id
+            if (item.codigo == 'RE-BPM-06' || item.codigo == 'RE-BPM-07' || item.codigo == 'RE-BPM-08') {
+                produccion_orden.calidad_revisado = item.id
+            }
+
+            if (item.codigo == 'RE-HACCP 03') {
+                produccion_orden.cf_ppc = item.id
+            }
         },
         async productosCuarentena(item) {
             const send = {

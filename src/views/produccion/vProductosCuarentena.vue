@@ -132,6 +132,17 @@ export default {
                 seek: true,
                 sort: true,
             },
+            {
+                id: 'estado',
+                title: 'Estado',
+                prop: 'estado1.nombre',
+                type: 'select',
+                format: 'estado',
+                width: '10rem',
+                show: true,
+                seek: true,
+                sort: true,
+            },
         ],
         tableRowOptions: [
             { label: 'Liberación de lote', icon: 'fa-solid fa-star', action: 'liberarLote', permiso: 'vProductosCuarentena:liberar_lote' },

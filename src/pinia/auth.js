@@ -233,6 +233,7 @@ export const useAuth = defineStore('auth', {
                             { id: 'vProgramaFiltrantes:editar', label: 'Editar' },
                             { id: 'vProgramaFiltrantes:eliminar', label: 'Eliminar' },
 
+                            { id: 'vProgramaFiltrantes:terminar', label: 'Terminar' },
                             { id: 'vProgramaFiltrantes:salidaInsumos', label: 'Salida de insumos' },
                             { id: 'vProgramaFiltrantes:productosCuarentena', label: 'Productos en cuarentena' },
                             { id: 'vProgramaFiltrantes:verProductosPedidos', label: 'Ver productos pedidos' },
@@ -246,6 +247,7 @@ export const useAuth = defineStore('auth', {
                             { id: 'vProgramaGranel:editar', label: 'Editar' },
                             { id: 'vProgramaGranel:eliminar', label: 'Eliminar' },
 
+                            { id: 'vProgramaGranel:terminar', label: 'Terminar' },
                             { id: 'vProgramaGranel:salidaInsumos', label: 'Salida de insumos' },
                             { id: 'vProgramaGranel:productosCuarentena', label: 'Productos en cuarentena' },
                             { id: 'vProgramaGranel:verProductosPedidos', label: 'Ver productos pedidos' },
@@ -259,6 +261,7 @@ export const useAuth = defineStore('auth', {
                             { id: 'vProgramaLuxury:editar', label: 'Editar' },
                             { id: 'vProgramaLuxury:eliminar', label: 'Eliminar' },
 
+                            { id: 'vProgramaLuxury:terminar', label: 'Terminar' },
                             { id: 'vProgramaLuxury:salidaInsumos', label: 'Salida de insumos' },
                             { id: 'vProgramaLuxury:productosCuarentena', label: 'Productos en cuarentena' },
                             { id: 'vProgramaLuxury:verProductosPedidos', label: 'Ver productos pedidos' },

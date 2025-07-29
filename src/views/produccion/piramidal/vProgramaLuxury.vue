@@ -65,7 +65,7 @@ import { useModals } from '@/pinia/modals'
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
 
-import { urls, get, delet } from '@/utils/crud'
+import { urls, get, delet, patch } from '@/utils/crud'
 import { jqst } from '@/utils/swal'
 
 import dayjs from 'dayjs'
@@ -155,11 +155,12 @@ export default {
             // }
         ],
         tableRowOptions: [
-            { id: 1, label: 'Ver', icon: 'fa-solid fa-folder-open', action: 'ver', permiso: 'vProgramaLuxury:ver' },
-            { id: 2, label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar', permiso: 'vProgramaLuxury:editar' },
-            { id: 3, label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar', permiso: 'vProgramaLuxury:eliminar', ocultar: { estado: 2 } },
-            { id: 4, label: 'Salida de insumos', icon: 'fa-regular fa-circle-down', action: 'salidaInsumos', permiso: 'vProgramaLuxury:salidaInsumos' },
-            { id: 5, label: 'Productos en cuarentena', icon: 'fa-solid fa-boxes-stacked', action: 'productosCuarentena', permiso: 'vProgramaLuxury:productosCuarentena' },
+            { label: 'Ver', icon: 'fa-solid fa-folder-open', action: 'ver', permiso: 'vProgramaLuxury:ver' },
+            { label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar', permiso: 'vProgramaLuxury:editar', ocultar: { estado: 2 } },
+            { label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar', permiso: 'vProgramaLuxury:eliminar', ocultar: { estado: 2 } },
+            { label: 'Terminar', icon: 'fa-solid fa-check-double', action: 'terminar', permiso: 'vProgramaLuxury:terminar', ocultar: { estado: 2 } },
+            { label: 'Salida de insumos', icon: 'fa-regular fa-circle-down', action: 'salidaInsumos', permiso: 'vProgramaLuxury:salidaInsumos' },
+            { label: 'Productos en cuarentena', icon: 'fa-solid fa-boxes-stacked', action: 'productosCuarentena', permiso: 'vProgramaLuxury:productosCuarentena' },
         ]
     }),
     async created() {
@@ -328,6 +329,18 @@ export default {
 
             this.useVistas.removeItem('vProgramaLuxury', 'produccion_ordenes', item)
             this.calcularHoras()
+        },
+        async terminar(item) {
+            const resQst = await jqst('¿Está seguro de terminar la orden de producción?')
+            if (resQst.isConfirmed == false) return
+
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await patch(`${urls.produccion_ordenes}/terminar`, item, 'Orden de producción terminada')
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            this.useVistas.updateItem('vProgramaLuxury', 'produccion_ordenes', { ...item, estado: 2 })
         },
         async salidaInsumos(item) {
             this.useAuth.setLoading(true, 'Cargando...')

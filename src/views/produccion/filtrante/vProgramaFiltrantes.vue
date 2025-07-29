@@ -69,7 +69,7 @@ import { useModals } from '@/pinia/modals'
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
 
-import { urls, get, delet } from '@/utils/crud'
+import { urls, get, delet, patch } from '@/utils/crud'
 import { jqst } from '@/utils/swal'
 
 import dayjs from 'dayjs'
@@ -150,19 +150,22 @@ export default {
                 sort: true,
             },
             // {
-            //     id: 'estado',
-            //     title: 'Estado',
-            //     prop: 'estado1.nombre',
-            //     width: '10rem',
+            //     id: 'productos_terminados',
+            //     title: 'Productos terminados',
+            //     type: 'number',
+            //     format: 'number',
+            //     toRight: true,
+            //     width: '8rem',
             //     show: true,
             //     seek: true,
             //     sort: true,
-            // }
+            // },
         ],
         tableRowOptions: [
             { label: 'Ver', icon: 'fa-solid fa-folder-open', action: 'ver', permiso: 'vProgramaFiltrantes:ver' },
-            { label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar', permiso: 'vProgramaFiltrantes:editar' },
+            { label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar', permiso: 'vProgramaFiltrantes:editar', ocultar: { estado: 2 } },
             { label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar', permiso: 'vProgramaFiltrantes:eliminar', ocultar: { estado: 2 } },
+            { label: 'Terminar', icon: 'fa-solid fa-check-double', action: 'terminar', permiso: 'vProgramaFiltrantes:terminar', ocultar: { estado: 2 } },
             { label: 'Salida de insumos', icon: 'fa-regular fa-circle-down', action: 'salidaInsumos', permiso: 'vProgramaFiltrantes:salidaInsumos' },
             { label: 'Productos en cuarentena', icon: 'fa-solid fa-boxes-stacked', action: 'productosCuarentena', permiso: 'vProgramaFiltrantes:productosCuarentena' },
         ]
@@ -184,10 +187,10 @@ export default {
         async setMaquina() {
             if (this.vista.maquina == null) {
                 localStorage.removeItem('vProgramaFiltrantes_maquina')
-                return
             }
-
-            localStorage.setItem('vProgramaFiltrantes_maquina', this.vista.maquina)
+            else {
+                localStorage.setItem('vProgramaFiltrantes_maquina', this.vista.maquina)
+            }
 
             await this.setMaquinas()
             this.loadProduccionOrdenes()
@@ -352,6 +355,18 @@ export default {
 
             this.useVistas.removeItem('vProgramaFiltrantes', 'produccion_ordenes', item)
             this.calcularHoras()
+        },
+        async terminar(item) {
+            const resQst = await jqst('¿Está seguro de terminar la orden de producción?')
+            if (resQst.isConfirmed == false) return
+
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await patch(`${urls.produccion_ordenes}/terminar`, item, 'Orden de producción terminada')
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            this.useVistas.updateItem('vProgramaFiltrantes', 'produccion_ordenes', { ...item, estado: 2 })
         },
         async salidaInsumos(item) {
             this.useAuth.setLoading(true, 'Cargando...')

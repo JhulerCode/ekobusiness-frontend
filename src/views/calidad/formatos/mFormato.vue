@@ -196,7 +196,6 @@ export default {
 
             this.$emit('updated', res.data)
             const vista = this.modal.formato.tipo == 'BPM' ? 'vFormatosBpm' : this.modal.formato.tipo == 'PHS' ? 'vFormatosPhs' : 'vFormatosHaccp'
-            console.log(vista)
             this.useVistas.updateItem(vista, 'formato_values', res.data)
             this.useModals.show.mFormato = false
         },

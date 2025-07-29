@@ -35,7 +35,7 @@ import { useModals } from '@/pinia/modals'
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
 
-import { urls, get, delet } from '@/utils/crud'
+import { urls, get, delet, patch } from '@/utils/crud'
 import { jqst } from '@/utils/swal'
 
 import dayjs from 'dayjs'
@@ -106,11 +106,12 @@ export default {
             // }
         ],
         tableRowOptions: [
-            { id: 1, label: 'Ver', icon: 'fa-solid fa-folder-open', action: 'ver', permiso: 'vProgramaGranel:crear' },
-            { id: 2, label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar', permiso: 'vProgramaGranel:editar' },
-            { id: 3, label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar', permiso: 'vProgramaGranel:eliminar', ocultar: { estado: 2 } },
-            { id: 4, label: 'Salida de insumos', icon: 'fa-regular fa-circle-down', action: 'salidaInsumos', permiso: 'vProgramaGranel:salidaInsumos' },
-            { id: 5, label: 'Productos en cuarenta', icon: 'fa-solid fa-boxes-stacked', action: 'productosCuarentena', permiso: 'vProgramaGranel:productosCuarentena' },
+            { label: 'Ver', icon: 'fa-solid fa-folder-open', action: 'ver', permiso: 'vProgramaGranel:crear' },
+            { label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar', permiso: 'vProgramaGranel:editar', ocultar: { estado: 2 } },
+            { label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar', permiso: 'vProgramaGranel:eliminar', ocultar: { estado: 2 } },
+            { label: 'Terminar', icon: 'fa-solid fa-check-double', action: 'terminar', permiso: 'vProgramaGranel:terminar', ocultar: { estado: 2 } },
+            { label: 'Salida de insumos', icon: 'fa-regular fa-circle-down', action: 'salidaInsumos', permiso: 'vProgramaGranel:salidaInsumos' },
+            { label: 'Productos en cuarenta', icon: 'fa-solid fa-boxes-stacked', action: 'productosCuarentena', permiso: 'vProgramaGranel:productosCuarentena' },
         ]
     }),
     created() {
@@ -212,6 +213,18 @@ export default {
             if (res.code != 0) return
 
             this.useVistas.removeItem('vProgramaGranel', 'produccion_ordenes', item)
+        },
+        async terminar(item) {
+            const resQst = await jqst('¿Está seguro de terminar la orden de producción?')
+            if (resQst.isConfirmed == false) return
+
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await patch(`${urls.produccion_ordenes}/terminar`, item, 'Orden de producción terminada')
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            this.useVistas.updateItem('vProgramaGranel', 'produccion_ordenes', { ...item, estado: 2 })
         },
         async salidaInsumos(item) {
             this.useAuth.setLoading(true, 'Cargando...')

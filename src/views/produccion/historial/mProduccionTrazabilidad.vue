@@ -4,82 +4,84 @@
         :buttons="buttons"
         @button-click="(action) => this[action]()"
     >
-        <div class="container-datos">
-            <p style="grid-column: 1/3">
-                <strong>--- Orden de producción ---</strong>
-            </p>
+        <div ref="elementoPdf" class="div1">
+            <div class="container-datos">
+                <p style="grid-column: 1/3">
+                    <strong>--- Orden de producción ---</strong>
+                </p>
 
-            <JdInput
-                type="date"
-                label="Fecha"
-                :nec="true"
-                v-model="modal.produccion_orden.fecha"
-                :disabled="modal.mode == 3"
-                style="grid-column: 1/3"
-            />
-
-            <template v-if="modal.produccion_orden.tipo != 2">
-                <JdSelect
-                    label="Máquina"
+                <JdInput
+                    type="date"
+                    label="Fecha"
                     :nec="true"
-                    v-model="modal.produccion_orden.maquina"
-                    :lista="
-                        modal.maquinas?.filter(
-                            (a) => a.produccion_tipo == modal.produccion_orden.tipo,
-                        ) || []
-                    "
+                    v-model="modal.produccion_orden.fecha"
                     :disabled="modal.mode == 3"
-                    style="grid-column: 3/5"
+                    style="grid-column: 1/3"
                 />
-            </template>
 
-            <JdSelectQuery
-                label="Producto"
-                :nec="true"
-                v-model="modal.produccion_orden.articulo"
-                :lista="modal.articulos"
-                :disabled="modal.mode == 3"
-                style="grid-column: 1/4"
-            />
+                <template v-if="modal.produccion_orden.tipo != 2">
+                    <JdSelect
+                        label="Máquina"
+                        :nec="true"
+                        v-model="modal.produccion_orden.maquina"
+                        :lista="
+                            modal.maquinas?.filter(
+                                (a) => a.produccion_tipo == modal.produccion_orden.tipo,
+                            ) || []
+                        "
+                        :disabled="modal.mode == 3"
+                        style="grid-column: 3/5"
+                    />
+                </template>
 
-            <JdInput
-                type="number"
-                label="Cantidad planificada"
-                :nec="true"
-                v-model="modal.produccion_orden.cantidad"
-                :disabled="modal.mode == 3"
-                style="grid-column: 1/3"
-            />
-        </div>
+                <JdSelectQuery
+                    label="Producto"
+                    :nec="true"
+                    v-model="modal.produccion_orden.articulo"
+                    :lista="modal.articulos"
+                    :disabled="modal.mode == 3"
+                    style="grid-column: 1/4"
+                />
 
-        <div class="mrg-btm2">
-            <p class="mrg-btm05">
-                <strong>--- Insumos ---</strong>
-            </p>
-            <JdTable
-                :columns="columns1"
-                :datos="modal.produccion_orden.insumos || []"
-                :seeker="false"
-                :download="false"
-            >
-                <!-- <template v-slot:cAction="{ item }">
+                <JdInput
+                    type="number"
+                    label="Cantidad planificada"
+                    :nec="true"
+                    v-model="modal.produccion_orden.cantidad"
+                    :disabled="modal.mode == 3"
+                    style="grid-column: 1/3"
+                />
+            </div>
+
+            <div class="mrg-btm2">
+                <p class="mrg-btm05">
+                    <strong>--- Insumos ---</strong>
+                </p>
+                <JdTable
+                    :columns="columns1"
+                    :datos="modal.produccion_orden.insumos || []"
+                    :seeker="false"
+                    :download="false"
+                >
+                    <!-- <template v-slot:cAction="{ item }">
                     <JdButton tipo="2" :small="true" icon="fa-regular fa-folder-open" :disabled="modal.mode == 3"
                         @click="verCompra(item)" />
                 </template> -->
-            </JdTable>
-        </div>
+                </JdTable>
+            </div>
 
-        <div>
-            <p class="mrg-btm05">
-                <strong>--- Productos terminados ---</strong>
-            </p>
-            <JdTable
-                :columns="columns2"
-                :datos="modal.produccion_orden.productos_terminados || []"
-                :seeker="false"
-                :download="false"
-            >
-            </JdTable>
+            <div>
+                <p class="mrg-btm05">
+                    <strong>--- Productos terminados ---</strong>
+                </p>
+                <JdTable
+                    :columns="columns2"
+                    :datos="modal.produccion_orden.productos_terminados || []"
+                    :seeker="false"
+                    :download="false"
+                >
+                </JdTable>
+            </div>
         </div>
     </JdModal>
 </template>
@@ -96,6 +98,8 @@ import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
 
 import { urls, get } from '@/utils/crud'
+
+import html2pdf from 'html2pdf.js'
 
 export default {
     components: {
@@ -189,7 +193,17 @@ export default {
             this.useModals.setModal('mTransaccion', 'Ver compra', 3, send, true)
         },
         imprimir() {
-            alert('impreso')
+            const element = this.$refs.elementoPdf
+
+            const opciones = {
+                margin: 0.5,
+                filename: 'trazabilidad.pdf',
+                image: { type: 'jpeg', quality: 1 },
+                html2canvas: { scale: 4 },
+                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' },
+            }
+
+            html2pdf().set(opciones).from(element).save()
         },
     },
 }
@@ -201,5 +215,20 @@ export default {
     grid-template-columns: repeat(4, 10rem);
     gap: 0.5rem;
     margin-bottom: 2rem;
+}
+
+@media print {
+    body * {
+        visibility: hidden;
+    }
+    .imprimir-solo,
+    .imprimir-solo * {
+        visibility: visible;
+    }
+    .imprimir-solo {
+        position: absolute;
+        left: 0;
+        top: 0;
+    }
 }
 </style>

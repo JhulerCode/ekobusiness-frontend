@@ -38,7 +38,7 @@ export const useAuth = defineStore('auth', {
                     { label: 'Programa granel', goto: 'vProgramaGranel' },
                     { label: 'Programa luxury', goto: 'vProgramaLuxury' },
                     { label: 'Órdenes de producción', goto: 'vProduccionHistorial' },
-                    { label: 'Productos en cuarentena', goto: 'vProductosCuarentena' },
+                    { label: 'Productos terminados', goto: 'vProductosCuarentena' },
                 ]
             },
             {
@@ -235,7 +235,7 @@ export const useAuth = defineStore('auth', {
 
                             { id: 'vProgramaFiltrantes:terminar', label: 'Terminar' },
                             { id: 'vProgramaFiltrantes:salidaInsumos', label: 'Salida de insumos' },
-                            { id: 'vProgramaFiltrantes:productosCuarentena', label: 'Productos en cuarentena' },
+                            { id: 'vProgramaFiltrantes:productosTerminados', label: 'Productos terminados' },
                             { id: 'vProgramaFiltrantes:verProductosPedidos', label: 'Ver productos pedidos' },
                         ]
                     },
@@ -249,7 +249,7 @@ export const useAuth = defineStore('auth', {
 
                             { id: 'vProgramaGranel:terminar', label: 'Terminar' },
                             { id: 'vProgramaGranel:salidaInsumos', label: 'Salida de insumos' },
-                            { id: 'vProgramaGranel:productosCuarentena', label: 'Productos en cuarentena' },
+                            { id: 'vProgramaGranel:productosTerminados', label: 'Productos terminados' },
                             { id: 'vProgramaGranel:verProductosPedidos', label: 'Ver productos pedidos' },
                         ]
                     },
@@ -263,7 +263,7 @@ export const useAuth = defineStore('auth', {
 
                             { id: 'vProgramaLuxury:terminar', label: 'Terminar' },
                             { id: 'vProgramaLuxury:salidaInsumos', label: 'Salida de insumos' },
-                            { id: 'vProgramaLuxury:productosCuarentena', label: 'Productos en cuarentena' },
+                            { id: 'vProgramaLuxury:productosTerminados', label: 'Productos terminados' },
                             { id: 'vProgramaLuxury:verProductosPedidos', label: 'Ver productos pedidos' },
                         ]
                     },
@@ -273,18 +273,15 @@ export const useAuth = defineStore('auth', {
                             { id: 'vProduccionHistorial:ver', label: 'Ver' },
 
                             { id: 'vProduccionHistorial:salidaInsumos', label: 'Salida de insumos' },
+                            { id: 'vProduccionHistorial:productosTerminados', label: 'Productos terminados' },
                             { id: 'vProduccionHistorial:controlPesos', label: 'Control de pesos' },
                             { id: 'vProduccionHistorial:controlPpc', label: 'Control del PPC' },
-                            { id: 'vProduccionHistorial:productosCuarentena', label: 'Productos en cuarentena' },
-                            { id: 'vProduccionHistorial:productosTerminados', label: 'Productos terminados' },
+                            { id: 'vProduccionHistorial:trazabilidad', label: 'Ver trazabilidad' },
                         ]
                     },
                     {
-                        id: 'vProductosCuarentena', label: 'Productos en cuarentena', permisos: [
+                        id: 'vProductosCuarentena', label: 'Productos terminados', permisos: [
                             { id: 'vProductosCuarentena:listar', label: 'Listar' },
-                            { id: 'vProductosCuarentena:crear', label: 'Crear' },
-                            { id: 'vProductosCuarentena:editar', label: 'Editar' },
-                            { id: 'vProductosCuarentena:eliminar', label: 'Eliminar' },
                             { id: 'vProductosCuarentena:liberar_lote', label: 'Liberar lote' },
                             { id: 'vProductosCuarentena:trazabilidad', label: 'Ver trazabilidad' },
                         ]
@@ -435,7 +432,7 @@ export const useAuth = defineStore('auth', {
             this.usuario = {}
         },
 
-        //----- LOGIN ----- //
+        // ----- LOGIN ----- //
         async login() {
             if (this.token == null) return false
 
@@ -471,7 +468,7 @@ export const useAuth = defineStore('auth', {
             return permisos.some(p => this.usuario?.permisos?.includes(p))
         },
 
-        //----- TABLES ----- //
+        // ----- TABLES ----- //
         updateQuery(columns, qry) {
             columns.filter(a => a.op).forEach(b => {
                 qry.fltr[b.id] = { op: b.op, val: b.val, val1: b.val1 }
@@ -498,7 +495,7 @@ export const useAuth = defineStore('auth', {
             })
         },
         setColumns(tableName, columns) {
-            //----- RECUPERA LAS COLUMNAS GUARDADAS ----- //
+            // ----- RECUPERA LAS COLUMNAS GUARDADAS ----- //
             if (this.tables[tableName]) {
                 for (const a of columns) {
                     Object.assign(a, this.tables[tableName].find(b => b.id === a.id))
@@ -506,7 +503,7 @@ export const useAuth = defineStore('auth', {
             }
         },
 
-        //----- PREFERENCIAS ----- //
+        // ----- PREFERENCIAS ----- //
         setTheme(theme) {
             if (!theme) return
 

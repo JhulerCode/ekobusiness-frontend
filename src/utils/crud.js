@@ -21,6 +21,7 @@ const urls = {
     formatos: `${host}/api/formatos`,
     formato_values: `${host}/api/formato_values`,
     inspecciones: `${host}/api/inspecciones`,
+    kardex: `${host}/api/kardex`,
     maquinas: `${host}/api/maquinas`,
     monedas: `${host}/api/monedas`,
     precio_listas: `${host}/api/precio_listas`,

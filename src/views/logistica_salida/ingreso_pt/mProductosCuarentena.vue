@@ -1,10 +1,23 @@
 <template>
-    <JdModal modal="mProductosCuarentena" :buttons="buttons" @button-click="(action) => this[action]()">
+    <JdModal
+        modal="mProductosCuarentena"
+        :buttons="buttons"
+        @button-click="(action) => this[action]()"
+    >
         <div class="container-datos">
-            <JdInput type="date" label="Fecha de ingreso" :nec="true" v-model="modal.transaccion.fecha" />
+            <JdInput
+                type="date"
+                label="Fecha de ingreso"
+                :nec="true"
+                v-model="modal.transaccion.fecha"
+            />
         </div>
 
-        <JdTable :columns="columns" :datos="modal.articulos || []" :reload="loadProductosCuarentena">
+        <JdTable
+            :columns="columns"
+            :datos="modal.produccion_productos || []"
+            :reload="loadProduccionProductos"
+        >
             <template v-slot:cCantidad="{ item }">
                 {{ redondear(item.cantidad, 0) }}
                 <JdInput type="number" v-model="item.cantidad_real" />
@@ -48,9 +61,9 @@ export default {
             {
                 id: 'fecha',
                 title: 'Fecha',
-                prop: 'produccion_orden1.fecha',
+                type: 'date',
                 format: 'date',
-                width: '7rem',
+                width: '8rem',
                 show: true,
                 seek: true,
                 sort: true,
@@ -58,8 +71,9 @@ export default {
             {
                 id: 'tipo',
                 title: 'Tipo',
+                type: 'select',
                 prop: 'produccion_orden1.tipo1.nombre',
-                width: '8rem',
+                width: '10rem',
                 show: true,
                 seek: true,
                 sort: true,
@@ -67,17 +81,30 @@ export default {
             {
                 id: 'maquina',
                 title: 'Máquina',
+                type: 'select',
                 prop: 'produccion_orden1.maquina1.nombre',
-                width: '7rem',
+                width: '8rem',
                 show: true,
                 seek: true,
                 sort: true,
             },
             {
                 id: 'articulo',
-                title: 'Articulo',
-                prop: 'produccion_orden1.articulo1.nombre',
+                title: 'Producto',
+                type: 'text',
+                prop: 'articulo1.nombre',
                 width: '25rem',
+                show: true,
+                seek: true,
+                sort: true,
+            },
+            {
+                id: 'unidad',
+                title: 'Unidad',
+                type: 'text',
+                prop: 'articulo1.unidad',
+                filtrable: false,
+                width: '5rem',
                 show: true,
                 seek: true,
                 sort: true,
@@ -85,6 +112,7 @@ export default {
             {
                 id: 'lote',
                 title: 'Lote',
+                type: 'text',
                 width: '7rem',
                 show: true,
                 seek: true,
@@ -93,8 +121,9 @@ export default {
             {
                 id: 'fv',
                 title: 'F. vencimiento',
+                type: 'date',
                 format: 'date',
-                width: '7rem',
+                width: '8rem',
                 show: true,
                 seek: true,
                 sort: true,
@@ -103,8 +132,10 @@ export default {
                 id: 'cantidad',
                 title: 'Cantidad',
                 slot: 'cCantidad',
+                // type: 'number',
+                // format: 'number',
                 toRight: true,
-                width: '7rem',
+                width: '8rem',
                 show: true,
                 seek: true,
                 sort: true,
@@ -112,30 +143,66 @@ export default {
         ],
 
         buttons: [
-            { text: 'Grabar', action: 'grabar', spin: false, show: true, permiso: 'vPtsIngresos:ingresarPts' },
+            {
+                text: 'Grabar',
+                action: 'grabar',
+                spin: false,
+                show: true,
+                permiso: 'vPtsIngresos:ingresarPts',
+            },
         ],
     }),
     created() {
         this.modal = this.useModals.mProductosCuarentena
-        this.loadProductosCuarentena()
+
+        this.initTransaccion()
+        this.loadProduccionProductos()
     },
     methods: {
-        async loadProductosCuarentena() {
-            const qry = {
-                fltr: { estado: { op: 'Es', val: 1 } },
-                cols: ['lote', 'fv', 'cantidad', 'produccion_orden'],
+        initTransaccion() {
+            this.modal.transaccion = {
+                fecha: dayjs().format('YYYY-MM-DD'),
             }
+        },
+        setQuery() {
+            this.modal.qry = {
+                fltr: { is_lote_padre: { op: 'Es', val: null } },
+                incl: ['articulo1', 'produccion_orden1'],
+            }
+            this.useAuth.updateQuery(this.columns, this.modal.qry)
+        },
+        async loadProduccionProductos() {
+            this.setQuery()
 
+            this.modal.produccion_productos = []
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.cuarentena_productos}?qry=${JSON.stringify(qry)}`)
+            const res = await get(
+                `${urls.kardex}/produccion-productos?qry=${JSON.stringify(this.modal.qry)}`,
+            )
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
 
-            this.modal.articulos = res.data
+            this.modal.produccion_productos = res.data
+        },
+        async grabar1() {
+            const send = this.modal.produccion_productos.filter(
+                (a) => a.cantidad_real != null && a.cantidad_real != '',
+            )
+
+            if (send.length == 0) {
+                jmsg('error', 'No se ha ingresado ninguna cantidad real')
+                return
+            }
+
+            this.modal.transaccion.transaccion_items = send
+
+            console.log(this.modal.transaccion)
         },
         async grabar() {
-            const send = this.modal.articulos.filter(a => a.cantidad_real != null && a.cantidad_real != '')
+            const send = this.modal.produccion_productos.filter(
+                (a) => a.cantidad_real != null && a.cantidad_real != '',
+            )
 
             if (send.length == 0) {
                 jmsg('error', 'No se ha ingresado ninguna cantidad real')
@@ -145,14 +212,17 @@ export default {
             this.modal.transaccion.transaccion_items = send
 
             this.useAuth.setLoading(true, 'Grabando...')
-            const res = await post(`${urls.transacciones}/productos-terminados`, this.modal.transaccion)
+            const res = await post(
+                `${urls.kardex}/produccion-productos-terminados`,
+                this.modal.transaccion,
+            )
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
 
             this.useModals.show.mProductosCuarentena = false
-        }
-    }
+        },
+    },
 }
 </script>
 

@@ -137,7 +137,7 @@ export default {
 
 
 
-        /////----- FORMATO VALUES ----- /////
+        ///// ----- FORMATO VALUES ----- /////
         async loadFormatoValues() {
             const qry = {
                 fltr: { codigo: { op: 'Es', val: this.vista.formato_id } },

@@ -1,19 +1,21 @@
 <template>
     <div class="vista vista-fill">
         <div class="head">
-            <strong>Productos en cuarentena</strong>
+            <strong>Productos terminados</strong>
 
-            <div class="buttons">
-            </div>
+            <div class="buttons"></div>
         </div>
 
-        <JdTable :name="tableName" :columns="columns" :datos="vista.articulos || []" :colAct="true"
-            :configFiltros="openConfigFiltros" :reload="loadProductosCuarentena" :rowOptions="tableRowOptions"
-            @rowOptionSelected="runMethod">
-            <!-- <template v-slot:cCantidad="{ item }">
-                {{ redondear(item.cantidad, 0) }}
-                <JdInput type="number" v-model="item.cantidad_real" />
-            </template> -->
+        <JdTable
+            :name="tableName"
+            :columns="columns"
+            :datos="vista.produccion_productos || []"
+            :colAct="true"
+            :configFiltros="openConfigFiltros"
+            :reload="loadProduccionProductos"
+            :rowOptions="tableRowOptions"
+            @rowOptionSelected="runMethod"
+        >
         </JdTable>
     </div>
 
@@ -24,22 +26,18 @@
 </template>
 
 <script>
-// import JdModal from '@/components/JdModal.vue'
-// import JdInput from '@/components/inputs/JdInput.vue'
 import JdTable from '@/components/JdTable.vue'
 import mConfigFiltros from '@/components/mConfigFiltros.vue'
 
-import mFormato from '../calidad/formatos/mFormato.vue'
-import mProduccionTrazabilidad from './historial/mProduccionTrazabilidad.vue'
+import mFormato from '@/views/calidad/formatos/mFormato.vue'
+import mProduccionTrazabilidad from '@/views/produccion/historial/mProduccionTrazabilidad.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
 import { useVistas } from '@/pinia/vistas'
 
 import { urls, get } from '@/utils/crud'
-// import { jmsg } from '@/utils/swal'
 import { redondear } from '@/utils/mine'
-// import { produccion_tipos, maquinas } from '@/data/sistema_listas'
 
 import dayjs from 'dayjs'
 
@@ -65,10 +63,9 @@ export default {
         tableName: 'vProduccionCuarentena',
         columns: [
             {
-                id: 'produccionOrden_fecha',
+                id: 'fecha',
                 title: 'Fecha',
                 type: 'date',
-                prop: 'produccion_orden1.fecha',
                 format: 'date',
                 width: '7rem',
                 show: true,
@@ -76,7 +73,7 @@ export default {
                 sort: true,
             },
             {
-                id: 'produccionOrden_tipo',
+                id: 'tipo',
                 title: 'Tipo',
                 type: 'select',
                 prop: 'produccion_orden1.tipo1.nombre',
@@ -86,7 +83,7 @@ export default {
                 sort: true,
             },
             {
-                id: 'produccionOrden_maquina',
+                id: 'maquina',
                 title: 'Máquina',
                 type: 'select',
                 prop: 'produccion_orden1.maquina1.nombre',
@@ -96,10 +93,10 @@ export default {
                 sort: true,
             },
             {
-                id: 'produccionOrden_articulo',
+                id: 'articulo',
                 title: 'Articulo',
                 type: 'text',
-                prop: 'produccion_orden1.articulo1.nombre',
+                prop: 'articulo1.nombre',
                 width: '25rem',
                 show: true,
                 seek: true,
@@ -108,7 +105,7 @@ export default {
             {
                 id: 'lote',
                 title: 'Lote',
-                tipe: 'text',
+                type: 'text',
                 width: '7rem',
                 show: true,
                 seek: true,
@@ -117,7 +114,7 @@ export default {
             {
                 id: 'fv',
                 title: 'F. vencimiento',
-                tipe: 'date',
+                type: 'date',
                 format: 'date',
                 width: '7rem',
                 show: true,
@@ -127,7 +124,7 @@ export default {
             {
                 id: 'cantidad',
                 title: 'Cantidad',
-                tipe: 'number',
+                type: 'number',
                 format: 'number',
                 toRight: true,
                 width: '7rem',
@@ -136,20 +133,30 @@ export default {
                 sort: true,
             },
             {
-                id: 'estado',
+                id: 'producto_estado',
                 title: 'Estado',
-                prop: 'estado1.nombre',
-                type: 'select',
+                prop: 'producto_estado1.nombre',
                 format: 'estado',
-                width: '10rem',
+                filtrable: false,
+                width: '8rem',
                 show: true,
                 seek: true,
                 sort: true,
             },
         ],
         tableRowOptions: [
-            { label: 'Liberación de lote', icon: 'fa-solid fa-star', action: 'liberarLote', permiso: 'vProductosCuarentena:liberar_lote' },
-            { label: 'Ver trazabilidad', icon: 'fa-solid fa-diagram-project', action: 'verTrazabilidad', permiso: 'vProductosCuarentena:trazabilidad' },
+            {
+                label: 'Liberación de lote',
+                icon: 'fa-solid fa-star',
+                action: 'liberarLote',
+                permiso: 'vProductosCuarentena:liberar_lote',
+            },
+            {
+                label: 'Ver trazabilidad',
+                icon: 'fa-solid fa-diagram-project',
+                action: 'verTrazabilidad',
+                permiso: 'vProductosCuarentena:trazabilidad',
+            },
         ],
     }),
     created() {
@@ -158,7 +165,8 @@ export default {
         this.useAuth.setColumns(this.tableName, this.columns)
 
         if (this.vista.loaded) return
-        if (this.useAuth.verifyPermiso('vProductosCuarentena:listar') == true) this.loadProductosCuarentena()
+        if (this.useAuth.verifyPermiso('vProductosCuarentena:listar') == true)
+            this.loadProduccionProductos()
     },
     methods: {
         initFiltros() {
@@ -168,41 +176,40 @@ export default {
         },
         setQuery() {
             this.vista.qry = {
-                fltr: {}
+                fltr: {},
+                incl: ['articulo1', 'produccion_orden1'],
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
         },
-        async loadProductosCuarentena() {
+        async loadProduccionProductos() {
             this.setQuery()
-            // const qry = {
-            //     fltr: {},
-            //     cols: ['lote', 'fv', 'cantidad', 'produccion_orden', 'cf_liberacion_lote'],
-            // }
 
-            this.vista.articulos = []
+            this.vista.produccion_productos = []
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.cuarentena_productos}?qry=${JSON.stringify(this.vista.qry)}`)
+            const res = await get(
+                `${urls.kardex}/produccion-productos?qry=${JSON.stringify(this.vista.qry)}`,
+            )
             this.useAuth.setLoading(false)
             this.vista.loaded = true
 
             if (res.code != 0) return
 
-            this.vista.articulos = res.data
+            this.vista.produccion_productos = res.data
         },
 
         async openConfigFiltros() {
-            // await this.loadDatosSistema()
-            // await this.loadMaquinas()
+            await this.loadDatosSistema()
+            await this.loadMaquinas()
 
-            const cols = this.columns
-            cols.find(a => a.id == 'produccionOrden_tipo').lista = this.vista.produccion_tipos
-            cols.find(a => a.id == 'produccionOrden_maquina').lista = this.vista.maquinas
+            const cols = this.columns.filter((a) => a.filtrable !== false)
+            cols.find((a) => a.id == 'tipo').lista = this.vista.produccion_tipos
+            cols.find((a) => a.id == 'maquina').lista = this.vista.maquinas
 
             const send = {
                 table: this.tableName,
                 cols,
-                reload: this.loadProductosCuarentena
+                reload: this.loadProduccionProductos,
             }
 
             this.useModals.setModal('mConfigFiltros', 'Filtros', null, send, true)
@@ -235,13 +242,12 @@ export default {
                     formato: {
                         codigo: res.data.id,
                         columns: res.data.columns,
-                        instructivo: res.data.instructivo
-                    }
+                        instructivo: res.data.instructivo,
+                    },
                 }
 
                 this.useModals.setModal('mFormato', `${formato_id} ${formato_name}`, 1, send, true)
-            }
-            else {
+            } else {
                 for (const a of res.data.columns) {
                     a.value = res1.data[a.id]
                 }
@@ -253,34 +259,42 @@ export default {
                         id: res1.data.id,
                         codigo: res.data.id,
                         columns: res.data.columns,
-                        instructivo: res.data.instructivo
-                    }
+                        instructivo: res.data.instructivo,
+                    },
                 }
 
                 this.useModals.setModal('mFormato', `${formato_id} ${formato_name}`, 2, send, true)
             }
         },
         setLoteAprobado(item) {
-            const cuanrentena_producto = this.vista.articulos.find(a => a.id == item.cuarentena_producto)
+            const cuanrentena_producto = this.vista.produccion_productos.find(
+                (a) => a.id == item.cuarentena_producto,
+            )
             cuanrentena_producto.cf_liberacion_lote = item.id
         },
         async verTrazabilidad(item) {
             this.useAuth.setLoading(true, 'Cargando trazabilidad...')
-            const res = await get(`${urls.produccion_ordenes}/trazabilidad/${item.produccion_orden1.id}`)
+            const res = await get(
+                `${urls.produccion_ordenes}/trazabilidad/${item.produccion_orden1.id}`,
+            )
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
 
             const send = {
                 produccion_orden: res.data,
-                articulos: [{
-                    id: res.data.articulo,
-                    ...res.data.articulo_info
-                }],
-                maquinas: [{
-                    id: res.data.maquina,
-                    ...res.data.maquina1
-                }]
+                articulos: [
+                    {
+                        id: res.data.articulo,
+                        ...res.data.articulo_info,
+                    },
+                ],
+                maquinas: [
+                    {
+                        id: res.data.maquina,
+                        ...res.data.maquina1,
+                    },
+                ],
             }
 
             this.useModals.setModal('mProduccionTrazabilidad', 'Trazabilidad', 3, send, true)
@@ -297,7 +311,7 @@ export default {
         async loadMaquinas() {
             const qry = {
                 fltr: {},
-                cols: ['codigo', 'nombre', 'produccion_tipo', 'velocidad', 'limpieza_tiempo'],
+                cols: ['codigo', 'nombre'],
             }
 
             this.vista.maquinas = []
@@ -309,7 +323,7 @@ export default {
 
             this.vista.maquinas = res.data
         },
-    }
+    },
 }
 </script>
 

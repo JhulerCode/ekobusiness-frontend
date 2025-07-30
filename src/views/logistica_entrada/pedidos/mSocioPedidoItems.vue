@@ -225,7 +225,7 @@ export default {
                     return jmsg('error', res.msg)
                 }
 
-                //----- BUSCA LOS ARTICULOS ----- //
+                // ----- BUSCA LOS ARTICULOS ----- //
                 const qry = {
                     fltr: {
                         tipo: { op: 'Es', val: 2 },

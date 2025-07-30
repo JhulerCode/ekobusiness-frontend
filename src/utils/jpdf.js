@@ -43,7 +43,7 @@ export const generarOcPDF = async (data) => {
     ])
 
     // const nombrePrueba = 'Nombre de un producto muy largo que debería truncarse siempre y cuando no seá bien'
-    //----- COMPLETAR FILAS VACÍAS ----- //
+    // ----- COMPLETAR FILAS VACÍAS ----- //
     const maxItems = 20
     if (dataRows.length < maxItems) {
         let emptyRows = Array.from({ length: maxItems - dataRows.length }, () => [

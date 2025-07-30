@@ -126,14 +126,14 @@ export default {
         async grabar() {
             if (this.checkDatos()) return
 
-            //----- ASIGNAR A COLS ORIGINIAL ----- //
+            // ----- ASIGNAR A COLS ORIGINIAL ----- //
             const cols1Map = this.modal.cols1.reduce((obj, a) => (obj[a.id] = a, obj), {})
 
             for (const a of this.modal.cols) {
                 Object.assign(a, cols1Map[a.id])
             }
 
-            //----- GUARDAR LAS COLUMNAS EN PINIA ----- //
+            // ----- GUARDAR LAS COLUMNAS EN PINIA ----- //
             this.useAuth.saveTableColumns(this.modal.table, this.modal.cols1)
 
             this.modal.reload()

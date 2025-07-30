@@ -1,12 +1,26 @@
 <template>
     <article class="jd-table" :style="{ height: height, maxHeight: maxHeight, width: width }">
-        <div class="container-top"
-            v-if="seeker || actions.length > 0 || reload || configRowSelect || configFiltros || configCols || download">
-
+        <div
+            class="container-top"
+            v-if="
+                seeker ||
+                actions.length > 0 ||
+                reload ||
+                configRowSelect ||
+                configFiltros ||
+                configCols ||
+                download
+            "
+        >
             <div class="left">
                 <div class="buscador" v-if="seeker">
-                    <JdInput icon="fa-solid fa-magnifying-glass" type="search" :placeholder="seekString"
-                        v-model="txtBuscar" :title="seekString" />
+                    <JdInput
+                        icon="fa-solid fa-magnifying-glass"
+                        type="search"
+                        :placeholder="seekString"
+                        v-model="txtBuscar"
+                        :title="seekString"
+                    />
                 </div>
 
                 <template v-if="rowSelectable1 && !rsUno">
@@ -14,45 +28,84 @@
                     <JdButton text="Ninguno" tipo="3" @click="selectNone" />
                 </template>
 
-                <div class="container-actions" v-if="datos.filter(a => a.selected == true).length">
+                <div
+                    class="container-actions"
+                    v-if="datos.filter((a) => a.selected == true).length"
+                >
                     <template v-for="(a, i) in actions" :key="i">
-                        <JdButton :icon="a.icon" :text="a.text" tipo="3" @click="$emit('actionClick', a.action)"
-                            v-if="useAuth.verifyPermiso(a.permiso)" />
+                        <JdButton
+                            :icon="a.icon"
+                            :text="a.text"
+                            tipo="3"
+                            @click="$emit('actionClick', a.action)"
+                            v-if="useAuth.verifyPermiso(a.permiso)"
+                        />
                     </template>
                 </div>
             </div>
 
             <div class="container-config">
-                <JdButton :icon="rowSelectable1 ? 'fa-solid fa-square-check' : 'fa-regular fa-square-check'" tipo="2"
-                    @click="toogleSelectItems()" v-if="configRowSelect" />
+                <JdButton
+                    :icon="
+                        rowSelectable1 ? 'fa-solid fa-square-check' : 'fa-regular fa-square-check'
+                    "
+                    tipo="2"
+                    @click="toogleSelectItems()"
+                    v-if="configRowSelect"
+                />
 
                 <template v-if="rowSelectable1 == false">
-                    <JdButton icon="fa-solid fa-file-excel" tipo="2" title="Descargar en excel" @click="downloadData"
-                        v-if="download && cantidadRegistros > 0" />
+                    <JdButton
+                        icon="fa-solid fa-file-excel"
+                        tipo="2"
+                        title="Descargar en excel"
+                        @click="downloadData"
+                        v-if="download && cantidadRegistros > 0"
+                    />
 
-                    <JdButton icon="fa-solid fa-gear" tipo="2" title="Configurar columnas" @click="openConfigCols"
-                        v-if="configCols" />
+                    <JdButton
+                        icon="fa-solid fa-gear"
+                        tipo="2"
+                        title="Configurar columnas"
+                        @click="openConfigCols"
+                        v-if="configCols"
+                    />
 
-                    <JdButton icon="fa-solid fa-filter" tipo="2" title="Filtros" @click="configFiltros"
-                        v-if="configFiltros" />
+                    <JdButton
+                        icon="fa-solid fa-filter"
+                        tipo="2"
+                        title="Filtros"
+                        @click="configFiltros"
+                        v-if="configFiltros"
+                    />
                 </template>
 
-                <JdButton icon="fa-solid fa-rotate-right" tipo="2" title="Recargar" @click="reloadAndSort"
-                    v-if="reload" />
+                <JdButton
+                    icon="fa-solid fa-rotate-right"
+                    tipo="2"
+                    title="Recargar"
+                    @click="reloadAndSort"
+                    v-if="reload"
+                />
             </div>
         </div>
 
         <div class="container-table" :style="{ minHeight: minHeight }">
             <table ref="jdtable" :class="{ 'table-cols-resizable': columnsResizable }">
                 <colgroup>
-                    <col v-if="colNro" style="width: 2rem">
+                    <col v-if="colNro" style="width: 2rem" />
 
-                    <col v-if="colAct && !rowSelectable1" style="width: 3rem">
+                    <col v-if="colAct && !rowSelectable1" style="width: 3rem" />
 
-                    <col v-for="a in columnsSorted" :key="a.id" :ref="`column-${a.id}`" :style="{ width: a.width }"
-                        v-show="a.show">
+                    <col
+                        v-for="a in columnsSorted"
+                        :key="a.id"
+                        :ref="`column-${a.id}`"
+                        :style="{ width: a.width }"
+                        v-show="a.show"
+                    />
 
-                    <col style="width: 100%">
+                    <col style="width: 100%" />
                 </colgroup>
 
                 <thead v-if="headless == false">
@@ -61,26 +114,46 @@
                             <div><span>#</span></div>
                         </th>
 
-                        <th v-if="colAct && !rowSelectable1">
-                        </th>
+                        <th v-if="colAct && !rowSelectable1"></th>
 
-                        <th v-for="a in columnsSorted" :key="a.id"
-                            :class="['th-vfor', { 'th-vfor-right': a.toRight, 'th-dragging-over': a.isDraggingOver }]"
-                            v-show="a.show">
+                        <th
+                            v-for="a in columnsSorted"
+                            :key="a.id"
+                            :class="[
+                                'th-vfor',
+                                {
+                                    'th-vfor-right': a.toRight,
+                                    'th-dragging-over': a.isDraggingOver,
+                                },
+                            ]"
+                            v-show="a.show"
+                        >
                             <!-- @dragover.prevent @dragenter="columnDragEnter(i)" @drop="columnDrop(i)"
                             :draggable="columnsSortable" @dragstart="columnDragStart(i, $event)"
                             @dragend="columnDragEnd" -->
 
-                            <div :class="['th-vfor-title', { 'th-vfor-sortable': a.sort }]" @click="sortData(a)">
-                                <i class="fa-solid fa-arrow-up" v-if="a.sortDirection == 'desc'"></i>
-                                <i class="fa-solid fa-arrow-down" v-if="a.sortDirection == 'asc'"></i>
+                            <div
+                                :class="['th-vfor-title', { 'th-vfor-sortable': a.sort }]"
+                                @click="sortData(a)"
+                            >
+                                <i
+                                    class="fa-solid fa-arrow-up"
+                                    v-if="a.sortDirection == 'desc'"
+                                ></i>
+                                <i
+                                    class="fa-solid fa-arrow-down"
+                                    v-if="a.sortDirection == 'asc'"
+                                ></i>
 
                                 <span>{{ a.title }}</span>
                             </div>
 
                             <!-- <span class="icon-resize" v-if="columnsResizable && !isDraggingTh" -->
-                            <span class="icon-resize" v-if="columnsResizable"
-                                @mousedown="columnResize($event, a.id)"></span>
+                            <span
+                                class="icon-resize"
+                                v-if="columnsResizable"
+                                @mousedown="columnResize($event, a.id)"
+                            ></span>
                         </th>
 
                         <th class="th-last"></th>
@@ -88,9 +161,12 @@
                 </thead>
 
                 <tbody>
-                    <tr v-for="(a, i) in datosFiltrados" :key="a.id"
-                        :class="{ 'row-selectable': rowSelectable1, 'row-selected': a.selected }" @click="selectRow(a)">
-
+                    <tr
+                        v-for="(a, i) in datosFiltrados"
+                        :key="a.id"
+                        :class="{ 'row-selectable': rowSelectable1, 'row-selected': a.selected }"
+                        @click="selectRow(a)"
+                    >
                         <td v-if="colNro" class="td-numero">
                             {{ i + 1 }}
                         </td>
@@ -98,13 +174,29 @@
                         <td v-if="colAct && !rowSelectable1" class="td-act">
                             <slot name="cAction" :item="{ ...a, i }"></slot>
 
-                            <JdButton icon="fa-solid fa-ellipsis" title="Acciones" tipo="2" :small="true"
-                                :id="'button-options-' + a.id" @click="openOptions(a)" v-if="rowOptions.length > 0" />
+                            <JdButton
+                                icon="fa-solid fa-ellipsis"
+                                title="Acciones"
+                                tipo="2"
+                                :small="true"
+                                :id="'button-options-' + a.id"
+                                @click="openOptions(a)"
+                                v-if="rowOptions.length > 0"
+                            />
                         </td>
 
-                        <td v-for="column in columnsSorted" :key="column.prop" v-show="column.show"
-                            :class="['td-vfor', { 'td-vfor-right': column.toRight, 'td-vfor-resizable': columnsResizable }]">
-
+                        <td
+                            v-for="column in columnsSorted"
+                            :key="column.prop"
+                            v-show="column.show"
+                            :class="[
+                                'td-vfor',
+                                {
+                                    'td-vfor-right': column.toRight,
+                                    'td-vfor-resizable': columnsResizable,
+                                },
+                            ]"
+                        >
                             <template v-if="column.slot">
                                 <slot :name="column.slot" :item="a"></slot>
                             </template>
@@ -115,63 +207,125 @@
                                 </template>
 
                                 <template v-if="column.type == 'number'">
-                                    <JdInput type="number" v-model="a[column.id]" :toRight="true"
+                                    <JdInput
+                                        type="number"
+                                        v-model="a[column.id]"
+                                        :toRight="true"
                                         :disabled="inputsDisabled"
-                                        @change="column.onchange ? $emit('onChange', column.onchange, a) : null"
-                                        @input="column.oninput ? $emit('onInput', column.oninput, a) : null" />
+                                        @change="
+                                            column.onchange
+                                                ? $emit('onChange', column.onchange, a)
+                                                : null
+                                        "
+                                        @input="
+                                            column.oninput
+                                                ? $emit('onInput', column.oninput, a)
+                                                : null
+                                        "
+                                    />
                                 </template>
 
                                 <template v-if="column.type == 'email'">
-                                    <JdInput type="email" v-model="a[column.id]" :disabled="inputsDisabled" />
+                                    <JdInput
+                                        type="email"
+                                        v-model="a[column.id]"
+                                        :disabled="inputsDisabled"
+                                    />
                                 </template>
 
                                 <template v-if="column.type == 'time'">
-                                    <JdInput type="time" v-model="a[column.id]" :disabled="inputsDisabled" />
+                                    <JdInput
+                                        type="time"
+                                        v-model="a[column.id]"
+                                        :disabled="inputsDisabled"
+                                    />
                                 </template>
 
                                 <template v-if="column.type == 'select'">
-                                    <JdSelect v-model="a[column.id]" :disabled="inputsDisabled" :lista="column.list"
-                                        @elegir="column.onchange ? $emit('onChange', column.onchange, a) : null" />
+                                    <JdSelect
+                                        v-model="a[column.id]"
+                                        :disabled="inputsDisabled"
+                                        :lista="column.list"
+                                        @elegir="
+                                            column.onchange
+                                                ? $emit('onChange', column.onchange, a)
+                                                : null
+                                        "
+                                    />
                                 </template>
 
                                 <template v-if="column.type == 'check'">
-                                    <JdCheckBox v-model="a[column.id]" :disabled="inputsDisabled"
-                                        @change="column.onchange ? $emit('onChange', column.onchange, a) : null" />
+                                    <JdCheckBox
+                                        v-model="a[column.id]"
+                                        :disabled="inputsDisabled"
+                                        @change="
+                                            column.onchange
+                                                ? $emit('onChange', column.onchange, a)
+                                                : null
+                                        "
+                                    />
                                 </template>
                             </template>
 
                             <template v-else-if="column.format">
-                                <div class="estado" :class="`${a[column.id] ? 'si' : 'no'}`"
-                                    v-if="column.format == 'yesno' && a[column.id] != null">
+                                <div
+                                    class="estado"
+                                    :class="`${a[column.id] ? 'si' : 'no'}`"
+                                    v-if="column.format == 'yesno' && a[column.id] != null"
+                                >
                                     {{ getNestedProp(a, column.prop) }}
                                 </div>
 
-                                <div class="estado"
+                                <div
+                                    class="estado"
                                     :class="`${a[column.id] < 1 ? 'anulado' : a[column.id] < 2 ? 'abierto' : 'cerrado'}`"
-                                    v-if="column.format == 'estado' && a[column.id] != null">
+                                    v-if="column.format == 'estado' && a[column.id] != null"
+                                >
                                     {{ getNestedProp(a, column.prop) }}
                                 </div>
 
                                 <template v-if="column.format == 'date'">
                                     <template v-if="column.prop">
-                                        {{ getNestedProp(a, column.prop) ? dayjs(getNestedProp(a,
-                                            column.prop)).format(useAuth.usuario.format_date || 'DD-MM-YYYY') : '' }}
+                                        {{
+                                            getNestedProp(a, column.prop)
+                                                ? dayjs(getNestedProp(a, column.prop)).format(
+                                                      useAuth.usuario.format_date || 'DD-MM-YYYY',
+                                                  )
+                                                : ''
+                                        }}
                                     </template>
                                     <template v-else>
-                                        {{ a[column.id] ? dayjs(a[column.id]).format(useAuth.usuario.format_date ||
-                                            'DD-MM-YYYY') : '' }}
+                                        {{
+                                            a[column.id]
+                                                ? dayjs(a[column.id]).format(
+                                                      useAuth.usuario.format_date || 'DD-MM-YYYY',
+                                                  )
+                                                : ''
+                                        }}
                                     </template>
                                 </template>
 
                                 <template v-if="column.format == 'datetime'">
                                     <template v-if="column.prop">
-                                        {{ getNestedProp(a, column.prop) ? dayjs(getNestedProp(a,
-                                            column.prop)).format(`${useAuth.usuario.format_date || 'DD-MM-YYYY'} HH:mm:ss`)
-                                            : '' }}
+                                        {{
+                                            getNestedProp(a, column.prop)
+                                                ? dayjs(getNestedProp(a, column.prop)).format(
+                                                      `${useAuth.usuario.format_date || 'DD-MM-YYYY'} HH:mm:ss`,
+                                                  )
+                                                : ''
+                                        }}
                                     </template>
                                     <template v-else>
-                                        {{ a[column.id] ? dayjs(a[column.id]).format(`${useAuth.usuario.format_date ||
-                                            'DD-MM-YYYY'} HH:mm:ss`) : '' }}
+                                        {{
+                                            a[column.id]
+                                                ? dayjs(a[column.id]).format(
+                                                      `${
+                                                          useAuth.usuario.format_date ||
+                                                          'DD-MM-YYYY'
+                                                      } HH:mm:ss`,
+                                                  )
+                                                : ''
+                                        }}
                                     </template>
                                 </template>
 
@@ -220,14 +374,17 @@
             </small>
             <template v-if="cantidadSeleccionados > 0">
                 <small>|</small>
-                <small>
-                    {{ cantidadSeleccionados }} {{ mensajeSeleccion }}
-                </small>
+                <small> {{ cantidadSeleccionados }} {{ mensajeSeleccion }} </small>
             </template>
         </div>
 
         <transition name="fade">
-            <ul class="row-options-case scroll-tiny" v-if="optionsCaseItem.id" @click.stop id="options-case">
+            <ul
+                class="row-options-case scroll-tiny"
+                v-if="optionsCaseItem.id"
+                @click.stop
+                id="options-case"
+            >
                 <template v-for="(b, i) in rowOptions" :key="i">
                     <li @click="selectOption(b)" v-if="verifyPermiso(optionsCaseItem, b)">
                         <i :class="b.icon"></i>
@@ -314,21 +471,19 @@ export default {
         datosFiltrados() {
             if (this.seeker == false) return this.datos
             const searchTermLowerCase = this.txtBuscar.toLowerCase()
-            return this.datos.filter(a => {
-                return this.seekProperties.some(b => {
+            return this.datos.filter((a) => {
+                return this.seekProperties.some((b) => {
                     const propertyValue = this.getNestedProp(a, b)
                     return propertyValue.toString().toLowerCase().includes(searchTermLowerCase)
                 })
             })
         },
         seekProperties() {
-            return this.columns
-                .filter(a => a.seek)
-                .map(b => b.prop || b.id)
+            return this.columns.filter((a) => a.seek).map((b) => b.prop || b.id)
         },
         seekString() {
-            const seekTitles = this.seekProperties.map(a => {
-                const col = this.columns.find(b => b.prop == a || b.id == a)
+            const seekTitles = this.seekProperties.map((a) => {
+                const col = this.columns.find((b) => b.prop == a || b.id == a)
                 return col ? col.title : ''
             })
             if (seekTitles.length > 1) {
@@ -347,20 +502,18 @@ export default {
             return this.cantidadRegistros == 1 ? 'registro' : 'registros'
         },
         cantidadSeleccionados() {
-            return this.datos.filter(a => a.selected == true).length
+            return this.datos.filter((a) => a.selected == true).length
         },
         mensajeSeleccion() {
             return this.cantidadSeleccionados == 1 ? 'seleccionado' : 'seleccionados'
-        }
+        },
     },
     created() {
         this.rowSelectable1 = this.rowSelectable
     },
     methods: {
         getNestedProp(obj, prop) {
-            const result = prop
-                .split('.')
-                .reduce((acc, part) => acc?.[part], obj)
+            const result = prop.split('.').reduce((acc, part) => acc?.[part], obj)
 
             return result === undefined || result === null ? '' : result
         },
@@ -369,12 +522,11 @@ export default {
 
             if (!sort) return
 
-            const col = this.columns.find(a => a.id == id)
+            const col = this.columns.find((a) => a.id == id)
 
             if (orden) {
                 col.sortDirection = orden
-            }
-            else {
+            } else {
                 col.sortDirection = col.sortDirection == 'asc' ? 'desc' : 'asc'
             }
 
@@ -410,8 +562,7 @@ export default {
 
                 if (newWidth <= 85) {
                     columnElement.style.width = `85px`
-                }
-                else {
+                } else {
                     columnElement.style.width = `${newWidth}px`
                 }
             }
@@ -420,7 +571,7 @@ export default {
                 window.removeEventListener('mousemove', handleMouseMove)
                 window.removeEventListener('mouseup', handleMouseUp)
 
-                this.columns.find(a => a.id == id).width = columnElement.offsetWidth + 'px'
+                this.columns.find((a) => a.id == id).width = columnElement.offsetWidth + 'px'
                 this.useAuth.saveTableColumns(this.name, this.columns)
             }
 
@@ -465,11 +616,9 @@ export default {
 
                 item.selected = !item.selected
                 this.$emit('rowSelected', item)
-            }
-            else {
+            } else {
                 item.selected = !item.selected
             }
-
         },
         selectAll() {
             for (const a of this.datos) a.selected = true
@@ -477,7 +626,6 @@ export default {
         selectNone() {
             for (const a of this.datos) a.selected = false
         },
-
 
         toogleSelectItems() {
             this.rowSelectable1 = !this.rowSelectable1
@@ -487,7 +635,10 @@ export default {
             }
         },
         downloadData() {
-            downloadExcel(this.columnsSorted.filter(a => a.show), this.datos)
+            downloadExcel(
+                this.columnsSorted.filter((a) => a.show),
+                this.datos,
+            )
         },
         openConfigCols() {
             const send = {
@@ -501,7 +652,7 @@ export default {
         async reloadAndSort() {
             await this.reload()
 
-            const column = this.columns.find(a => a.sortDirection != null)
+            const column = this.columns.find((a) => a.sortDirection != null)
             if (column) this.sortData(column, column.sortDirection)
         },
 
@@ -518,20 +669,20 @@ export default {
                 const el = document.getElementById(`options-case`)
 
                 setTimeout(() => {
-                    const rect = document.getElementById(`button-options-${item.id}`).getBoundingClientRect()
+                    const rect = document
+                        .getElementById(`button-options-${item.id}`)
+                        .getBoundingClientRect()
                     const rect2 = el.getBoundingClientRect()
 
-                    if (screenWidth < (rect.left + rect2.width)) {
-                        el.style.right = `${(screenWidth - rect.right) + window.scrollX}px`
-                    }
-                    else {
+                    if (screenWidth < rect.left + rect2.width) {
+                        el.style.right = `${screenWidth - rect.right + window.scrollX}px`
+                    } else {
                         el.style.left = `${rect.left + window.scrollX}px`
                     }
 
-                    if (screenHeight < (rect.bottom + rect2.height)) {
-                        el.style.bottom = `${(screenHeight - rect.top) + window.scrollY + 5}px`
-                    }
-                    else {
+                    if (screenHeight < rect.bottom + rect2.height) {
+                        el.style.bottom = `${screenHeight - rect.top + window.scrollY + 5}px`
+                    } else {
                         el.style.top = `${rect.bottom + window.scrollY + 5}px`
                     }
 
@@ -559,46 +710,31 @@ export default {
             this.$emit('rowOptionSelected', a.action, this.optionsCaseItem)
             this.hide()
         },
-        // verifyPermiso(a, b) {
-        //     if (b.ocultar == null && this.useAuth.verifyPermiso(b.permiso)) return true
-
-        //     let perm = true
-        //     for (let prop in b.ocultar) {
-        //         if (b.ocultar[prop] == a[prop]) {
-        //             perm = false
-        //             break
-        //         }
-        //     }
-
-        //     if (perm == false) return false
-
-        //     if (perm == true && this.useAuth.verifyPermiso(b.permiso)) return true
-        // },
         verifyPermiso(a, b) {
-            const tienePermiso = this.useAuth.verifyPermiso(b.permiso);
+            // Si existe 'ocultar', evaluar condiciones para ocultar
+            if (b.ocultar) {
+                for (const prop in b.ocultar) {
+                    const valorOcultar = b.ocultar[prop]
+                    const valorFila = a[prop]
 
-            // Si no hay condición de ocultar, solo dependerá del permiso
-            if (!b.ocultar) return tienePermiso;
+                    if (valorFila === undefined) continue
 
-            // Evaluar condiciones para ocultar
-            for (let prop in b.ocultar) {
-                const valorOcultar = b.ocultar[prop];
-                const valorFila = a[prop];
-
-                if (valorFila === undefined) continue;
-
-                // Si el valor en ocultar es un array
-                if (Array.isArray(valorOcultar)) {
-                    if (valorOcultar.includes(valorFila)) return false; // se oculta
-                } else {
-                    if (valorOcultar == valorFila) return false; // se oculta
+                    // Si el valor en ocultar es un array
+                    if (Array.isArray(valorOcultar)) {
+                        if (valorOcultar.includes(valorFila)) return false // se oculta
+                    } else {
+                        if (valorOcultar === valorFila) return false // se oculta
+                    }
                 }
             }
 
-            // Si no debe ocultarse y tiene permiso, mostrar la opción
-            return tienePermiso;
-        }
-    }
+            // Si no hay permiso definido, solo dependerá de 'ocultar'
+            if (!b.permiso) return true
+
+            // Evaluar permiso si existe
+            return this.useAuth.verifyPermiso(b.permiso)
+        },
+    },
 }
 </script>
 

@@ -1,33 +1,67 @@
 <template>
-    <JdModal modal="mProduccionTrazabilidad" :buttons="buttons" @button-click="(action) => this[action]()">
+    <JdModal
+        modal="mProduccionTrazabilidad"
+        :buttons="buttons"
+        @button-click="(action) => this[action]()"
+    >
         <div class="container-datos">
             <p style="grid-column: 1/3">
                 <strong>--- Orden de producción ---</strong>
             </p>
 
-            <JdInput type="date" label="Fecha" :nec="true" v-model="modal.produccion_orden.fecha"
-                :disabled="modal.mode == 3" style="grid-column: 1/3" />
+            <JdInput
+                type="date"
+                label="Fecha"
+                :nec="true"
+                v-model="modal.produccion_orden.fecha"
+                :disabled="modal.mode == 3"
+                style="grid-column: 1/3"
+            />
 
             <template v-if="modal.produccion_orden.tipo != 2">
-                <JdSelect label="Máquina" :nec="true" v-model="modal.produccion_orden.maquina"
-                    :lista="modal.maquinas?.filter(a => a.produccion_tipo == modal.produccion_orden.tipo) || []"
-                    :disabled="modal.mode == 3" style="grid-column: 3/5" />
+                <JdSelect
+                    label="Máquina"
+                    :nec="true"
+                    v-model="modal.produccion_orden.maquina"
+                    :lista="
+                        modal.maquinas?.filter(
+                            (a) => a.produccion_tipo == modal.produccion_orden.tipo,
+                        ) || []
+                    "
+                    :disabled="modal.mode == 3"
+                    style="grid-column: 3/5"
+                />
             </template>
 
-            <JdSelectQuery label="Producto" :nec="true" v-model="modal.produccion_orden.articulo"
-                :lista="modal.articulos" :disabled="modal.mode == 3" style="grid-column: 1/4" />
+            <JdSelectQuery
+                label="Producto"
+                :nec="true"
+                v-model="modal.produccion_orden.articulo"
+                :lista="modal.articulos"
+                :disabled="modal.mode == 3"
+                style="grid-column: 1/4"
+            />
 
-
-            <JdInput type="number" label="Cantidad planificada" :nec="true" v-model="modal.produccion_orden.cantidad"
-                :disabled="modal.mode == 3" style="grid-column: 1/3" />
+            <JdInput
+                type="number"
+                label="Cantidad planificada"
+                :nec="true"
+                v-model="modal.produccion_orden.cantidad"
+                :disabled="modal.mode == 3"
+                style="grid-column: 1/3"
+            />
         </div>
 
         <div class="mrg-btm2">
             <p class="mrg-btm05">
                 <strong>--- Insumos ---</strong>
             </p>
-            <JdTable :columns="columns1" :datos="modal.produccion_orden.insumos || []" :seeker="false"
-                :download="false">
+            <JdTable
+                :columns="columns1"
+                :datos="modal.produccion_orden.insumos || []"
+                :seeker="false"
+                :download="false"
+            >
                 <!-- <template v-slot:cAction="{ item }">
                     <JdButton tipo="2" :small="true" icon="fa-regular fa-folder-open" :disabled="modal.mode == 3"
                         @click="verCompra(item)" />
@@ -39,8 +73,12 @@
             <p class="mrg-btm05">
                 <strong>--- Productos terminados ---</strong>
             </p>
-            <JdTable :columns="columns2" :datos="modal.produccion_orden.productos_terminados || []" :seeker="false"
-                :download="false">
+            <JdTable
+                :columns="columns2"
+                :datos="modal.produccion_orden.productos_terminados || []"
+                :seeker="false"
+                :download="false"
+            >
             </JdTable>
         </div>
     </JdModal>
@@ -74,9 +112,7 @@ export default {
 
         modal: {},
 
-        buttons: [
-            { text: 'Imprimir', action: 'imprimir', show: true },
-        ],
+        buttons: [{ text: 'Imprimir', action: 'imprimir', show: true }],
 
         columns1: [
             {
@@ -147,7 +183,7 @@ export default {
                 socio: { ...res.data.socio1 },
                 socios: [{ ...res.data.socio1 }],
                 monedas: [{ ...res.data.moneda1 }],
-                pedidos: res.data.socio_pedido ? [{ ...res.data.socio_pedido1 }] : []
+                pedidos: res.data.socio_pedido ? [{ ...res.data.socio_pedido1 }] : [],
             }
 
             this.useModals.setModal('mTransaccion', 'Ver compra', 3, send, true)
@@ -156,7 +192,6 @@ export default {
             alert('impreso')
         },
     },
-
 }
 </script>
 

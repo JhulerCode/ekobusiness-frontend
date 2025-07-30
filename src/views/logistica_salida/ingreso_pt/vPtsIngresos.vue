@@ -4,13 +4,21 @@
             <strong>Ingreso de productos terminados</strong>
 
             <div class="buttons">
-                <JdButton text="Ver cuarentena" @click="verCuarentena()"
-                    v-if="useAuth.verifyPermiso('vPtsIngresos:verCuarentena')" />
+                <JdButton
+                    text="Ver cuarentena"
+                    @click="verCuarentena()"
+                    v-if="useAuth.verifyPermiso('vPtsIngresos:verCuarentena')"
+                />
             </div>
         </div>
 
-        <JdTable :name="tableName" :columns="columns" :datos="vista.transacciones || []" :configFiltros="openConfigFiltros"
-            :reload="loadTransacciones">
+        <JdTable
+            :name="tableName"
+            :columns="columns"
+            :datos="vista.produccion_productos || []"
+            :configFiltros="openConfigFiltros"
+            :reload="loadTransacciones"
+        >
         </JdTable>
     </div>
 
@@ -60,7 +68,6 @@ export default {
                 id: 'fecha',
                 title: 'Fecha',
                 type: 'date',
-                prop: 'transaccion1.fecha',
                 format: 'date',
                 width: '8rem',
                 show: true,
@@ -71,7 +78,7 @@ export default {
                 id: 'tipo',
                 title: 'Tipo',
                 type: 'select',
-                prop: 'transaccion1.produccion_orden1.tipo1.nombre',
+                prop: 'produccion_orden1.tipo1.nombre',
                 width: '10rem',
                 show: true,
                 seek: true,
@@ -81,7 +88,7 @@ export default {
                 id: 'maquina',
                 title: 'Máquina',
                 type: 'select',
-                prop: 'transaccion1.produccion_orden1.maquina1.nombre',
+                prop: 'produccion_orden1.maquina1.nombre',
                 width: '8rem',
                 show: true,
                 seek: true,
@@ -102,6 +109,7 @@ export default {
                 title: 'Unidad',
                 type: 'text',
                 prop: 'articulo1.unidad',
+                filtrable: false,
                 width: '5rem',
                 show: true,
                 seek: true,
@@ -156,8 +164,8 @@ export default {
         },
         setQuery() {
             this.vista.qry = {
-                // fltr: { tipo: { op: 'Es', val: 4 } },
-                fltr: {},
+                fltr: { is_lote_padre: { op: 'No es', val: null } },
+                incl: ['articulo1', 'produccion_orden1'],
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
@@ -165,41 +173,49 @@ export default {
         async loadTransacciones() {
             this.setQuery()
 
-            this.vista.transacciones = []
+            this.vista.produccion_productos = []
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.transacciones}/productos-terminados?qry=${JSON.stringify(this.vista.qry)}`)
+            const res = await get(
+                `${urls.kardex}/produccion-productos?qry=${JSON.stringify(this.vista.qry)}`,
+            )
             this.useAuth.setLoading(false)
             this.vista.loaded = true
 
             if (res.code != 0) return
 
-            this.vista.transacciones = res.data
+            this.vista.produccion_productos = res.data
         },
 
         async verCuarentena() {
-            const send = {
-                transaccion: {
-                    tipo: 4,
-                    fecha: dayjs().format('YYYY-MM-DD'),
-                    estado: 1,
-                }
-            }
+            // const send = {
+            //     transaccion: {
+            //         tipo: 4,
+            //         fecha: dayjs().format('YYYY-MM-DD'),
+            //         estado: 1,
+            //     },
+            // }
 
-            this.useModals.setModal('mProductosCuarentena', 'Productos en cuarentena', null, send, true)
+            this.useModals.setModal(
+                'mProductosCuarentena',
+                'Productos en cuarentena',
+                null,
+                null,
+                // true,
+            )
         },
 
         async openConfigFiltros() {
             await this.loadDatosSistema()
             await this.loadMaquinas()
 
-            const cols = this.columns
-            cols.find(a => a.id == 'tipo').lista = this.vista.produccion_tipos
-            cols.find(a => a.id == 'maquina').lista = this.vista.maquinas
+            const cols = this.columns.filter((a) => a.filtrable !== false)
+            cols.find((a) => a.id == 'tipo').lista = this.vista.produccion_tipos
+            cols.find((a) => a.id == 'maquina').lista = this.vista.maquinas
 
             const send = {
                 table: this.tableName,
                 cols,
-                reload: this.loadTransacciones
+                reload: this.loadTransacciones,
             }
 
             this.useModals.setModal('mConfigFiltros', 'Filtros', null, send, true)
@@ -215,7 +231,7 @@ export default {
         },
         async loadMaquinas() {
             const qry = {
-                fltr: {},
+                fltr: { tipo: { op: 'Es', val: 1 } },
                 cols: ['codigo', 'nombre', 'produccion_tipo', 'velocidad', 'limpieza_tiempo'],
             }
 
@@ -228,9 +244,8 @@ export default {
 
             this.vista.maquinas = res.data
         },
-    }
+    },
 }
 </script>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

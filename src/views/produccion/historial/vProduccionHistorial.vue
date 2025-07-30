@@ -1,20 +1,27 @@
 <template>
     <div class="vista vista-fill">
         <div class="head">
-            <strong>Historial de órdenes de producción</strong>
+            <strong>Órdenes de producción</strong>
         </div>
 
-        <JdTable :name="tableName" :columns="columns" :datos="vista.produccion_ordenes || []" :colAct="true"
-            :configFiltros="openConfigFiltros" :reload="loadProduccionOrdenes" :rowOptions="tableRowOptions"
-            @rowOptionSelected="runMethod">
+        <JdTable
+            :name="tableName"
+            :columns="columns"
+            :datos="vista.produccion_ordenes || []"
+            :colAct="true"
+            :configFiltros="openConfigFiltros"
+            :reload="loadProduccionOrdenes"
+            :rowOptions="tableRowOptions"
+            @rowOptionSelected="runMethod"
+        >
         </JdTable>
     </div>
 
     <mProduccionOrden v-if="useModals.show.mProduccionOrden" />
-    <mProduccionSalida v-if="useModals.show.mProduccionSalida" />
-    <mFormato v-if="useModals.show.mFormato" @created="setFormatoCalidad" />
-    <mProduccionCuarentena v-if="useModals.show.mProduccionCuarentena" />
+    <mProduccionInsumos v-if="useModals.show.mProduccionInsumos" />
     <mProduccionProductos v-if="useModals.show.mProduccionProductos" />
+    <mFormato v-if="useModals.show.mFormato" @created="setFormatoCalidad" />
+    <mProduccionTrazabilidad v-if="useModals.show.mProduccionTrazabilidad" />
 
     <mConfigFiltros v-if="useModals.show.mConfigFiltros" />
 </template>
@@ -24,10 +31,10 @@ import JdTable from '@/components/JdTable.vue'
 import mConfigFiltros from '@/components/mConfigFiltros.vue'
 
 import mProduccionOrden from '@/views/produccion/historial/mProduccionOrden.vue'
-import mProduccionSalida from '@/views/produccion/historial/mProduccionSalida.vue'
+import mProduccionInsumos from '@/views/produccion/historial/mProduccionInsumos.vue'
 import mFormato from '@/views/calidad/formatos/mFormato.vue'
-import mProduccionCuarentena from '@/views/produccion/historial/mProduccionCuarentena.vue'
 import mProduccionProductos from '@/views/produccion/historial/mProduccionProductos.vue'
+import mProduccionTrazabilidad from '@/views/produccion/historial/mProduccionTrazabilidad.vue'
 
 import { useModals } from '@/pinia/modals'
 import { useAuth } from '@/pinia/auth'
@@ -44,10 +51,10 @@ export default {
         mConfigFiltros,
 
         mProduccionOrden,
-        mProduccionSalida,
+        mProduccionInsumos,
         mFormato,
-        mProduccionCuarentena,
         mProduccionProductos,
+        mProduccionTrazabilidad,
     },
     data: () => ({
         useModals: useModals(),
@@ -101,7 +108,7 @@ export default {
             },
             {
                 id: 'cantidad',
-                title: 'Cantidad',
+                title: 'Cantidad planificada',
                 type: 'number',
                 format: 'number',
                 toRight: true,
@@ -116,7 +123,7 @@ export default {
                 prop: 'estado1.nombre',
                 type: 'select',
                 format: 'estado',
-                width: '10rem',
+                width: '8rem',
                 show: true,
                 seek: true,
                 sort: true,
@@ -126,6 +133,7 @@ export default {
                 title: 'Productos terminados',
                 type: 'number',
                 format: 'number',
+                filtrable: false,
                 toRight: true,
                 width: '8rem',
                 show: true,
@@ -137,6 +145,7 @@ export default {
                 title: 'Control de pesos',
                 prop: 'estado_calidad_revisado1.nombre',
                 format: 'estado',
+                filtrable: false,
                 width: '10rem',
                 show: true,
                 seek: true,
@@ -147,20 +156,51 @@ export default {
                 title: 'Control del PPC',
                 prop: 'estado_cf_ppc1.nombre',
                 format: 'estado',
+                filtrable: false,
                 width: '10rem',
                 show: true,
                 seek: true,
                 sort: true,
-            }
+            },
         ],
         tableRowOptions: [
-            { label: 'Ver', icon: 'fa-solid fa-folder-open', action: 'ver', permiso: 'vProduccionHistorial:ver' },
-            { label: 'Salida de insumos', icon: 'fa-regular fa-circle-down', action: 'salidaInsumos', permiso: 'vProduccionHistorial:salidaInsumos' },
-            { label: 'Control de pesos', icon: 'fa-solid fa-star', action: 'controlPesos', permiso: 'vProduccionHistorial:controlPesos' },
-            { label: 'Control del PPC', icon: 'fa-solid fa-star', action: 'crearPpc', permiso: 'vProduccionHistorial:controlPpc' },
-            { label: 'Productos en cuarentena', icon: 'fa-solid fa-boxes-stacked', action: 'productosCuarentena', permiso: 'vProduccionHistorial:productosCuarentena' },
-            { label: 'Productos terminados', icon: 'fa-solid fa-boxes-stacked', action: 'productosTerminados', permiso: 'vProduccionHistorial:productosTerminados' },
-        ]
+            {
+                label: 'Ver',
+                icon: 'fa-solid fa-folder-open',
+                action: 'ver',
+                permiso: 'vProduccionHistorial:ver',
+            },
+            {
+                label: 'Salida de insumos',
+                icon: 'fa-regular fa-circle-down',
+                action: 'salidaInsumos',
+                permiso: 'vProduccionHistorial:salidaInsumos',
+            },
+            {
+                label: 'Productos terminados',
+                icon: 'fa-solid fa-boxes-stacked',
+                action: 'productosTerminados',
+                permiso: 'vProduccionHistorial:productosTerminados',
+            },
+            {
+                label: 'Ver trazabilidad',
+                icon: 'fa-solid fa-diagram-project',
+                action: 'verTrazabilidad',
+                permiso: 'vProduccionHistorial:trazabilidad',
+            },
+            {
+                label: 'Control de pesos',
+                icon: 'fa-solid fa-star',
+                action: 'controlPesos',
+                permiso: 'vProduccionHistorial:controlPesos',
+            },
+            {
+                label: 'Control del PPC',
+                icon: 'fa-solid fa-star',
+                action: 'controlPpc',
+                permiso: 'vProduccionHistorial:controlPpc',
+            },
+        ],
     }),
     created() {
         this.vista = this.useVistas.vProduccionHistorial
@@ -168,7 +208,8 @@ export default {
         this.useAuth.setColumns(this.tableName, this.columns)
 
         if (this.vista.loaded) return
-        if (this.useAuth.verifyPermiso('vProduccionHistorial:listar') == true) this.loadProduccionOrdenes()
+        if (this.useAuth.verifyPermiso('vProduccionHistorial:listar') == true)
+            this.loadProduccionOrdenes()
     },
     methods: {
         initFiltros() {
@@ -178,7 +219,7 @@ export default {
         },
         setQuery() {
             this.vista.qry = {
-                fltr: {}
+                fltr: {},
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
@@ -188,7 +229,9 @@ export default {
 
             this.vista.produccion_ordenes = []
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.produccion_ordenes}?qry=${JSON.stringify(this.vista.qry)}`)
+            const res = await get(
+                `${urls.produccion_ordenes}?qry=${JSON.stringify(this.vista.qry)}`,
+            )
             this.useAuth.setLoading(false)
             this.vista.loaded = true
 
@@ -201,15 +244,15 @@ export default {
             await this.loadDatosSistema()
             await this.loadMaquinas()
 
-            const cols = this.columns
-            cols.find(a => a.id == 'tipo').lista = this.vista.produccion_tipos
-            cols.find(a => a.id == 'maquina').lista = this.vista.maquinas
-            cols.find(a => a.id == 'estado').lista = this.vista.produccion_orden_estados
+            const cols = this.columns.filter((a) => a.filtrable !== false)
+            cols.find((a) => a.id == 'tipo').lista = this.vista.produccion_tipos
+            cols.find((a) => a.id == 'maquina').lista = this.vista.maquinas
+            cols.find((a) => a.id == 'estado').lista = this.vista.produccion_orden_estados
 
             const send = {
                 table: this.tableName,
                 cols,
-                reload: this.loadProduccionOrdenes
+                reload: this.loadProduccionOrdenes,
             }
 
             this.useModals.setModal('mConfigFiltros', 'Filtros', null, send, true)
@@ -227,14 +270,18 @@ export default {
 
             const send = {
                 produccion_orden: res.data,
-                articulos: [{
-                    id: res.data.articulo,
-                    ...res.data.articulo_info
-                }],
-                maquinas: [{
-                    id: res.data.maquina,
-                    ...res.data.maquina1
-                }]
+                articulos: [
+                    {
+                        id: res.data.articulo,
+                        ...res.data.articulo_info,
+                    },
+                ],
+                maquinas: [
+                    {
+                        id: res.data.maquina,
+                        ...res.data.maquina1,
+                    },
+                ],
             }
 
             this.useModals.setModal('mProduccionOrden', 'Ver órden de producción', 3, send, true)
@@ -247,37 +294,56 @@ export default {
             if (res.code != 0) return
 
             const send = {
-                transaccion: {
-                    tipo: 2,
-                    fecha: dayjs().format('YYYY-MM-DD'),
-                    produccion_orden: item.id,
-                    estado: 1,
-                    transaccion_items: [],
-
-                    produccion_orden1: {
-                        fecha: res.data.fecha,
-                        // codigo: res.data.codigo,
-                        cantidad: res.data.cantidad,
-                        articulo_info: {
-                            nombre: res.data.articulo_info.nombre,
-                        },
-                        insumos: res.data.articulo_info.receta_insumos.map(({ articulo1, ...rest }) => ({
-                            ...rest,
-                            ...articulo1
-                        })),
-                    }
-                }
+                is_receta: true,
+                produccion_orden: JSON.parse(JSON.stringify(res.data)),
             }
 
-            this.useModals.setModal('mProduccionSalida', `Salida de insumos`, 1, send, true)
+            this.useModals.setModal('mProduccionInsumos', `Salida de insumos`, 1, send, true)
+        },
+        productosTerminados(item) {
+            const send = {
+                produccion_orden: { ...item },
+            }
+
+            this.useModals.setModal(
+                'mProduccionProductos',
+                `Productos terminados`,
+                null,
+                send,
+                true,
+            )
+        },
+        async verTrazabilidad(item) {
+            this.useAuth.setLoading(true, 'Cargando trazabilidad...')
+            const res = await get(`${urls.produccion_ordenes}/trazabilidad/${item.id}`)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            const send = {
+                produccion_orden: res.data,
+                articulos: [
+                    {
+                        id: res.data.articulo,
+                        ...res.data.articulo1,
+                    },
+                ],
+                maquinas: [
+                    {
+                        id: res.data.maquina,
+                        ...res.data.maquina1,
+                    },
+                ],
+            }
+
+            this.useModals.setModal('mProduccionTrazabilidad', 'Trazabilidad', 3, send, true)
         },
         async controlPesos(item) {
             let formato_id = 'RE-BPM-06'
 
             if (item.tipo == 2) {
                 formato_id = 'RE-BPM-08'
-            }
-            else if (item.tipo == 3) {
+            } else if (item.tipo == 3) {
                 formato_id = 'RE-BPM-07'
             }
 
@@ -300,13 +366,12 @@ export default {
                     formato: {
                         codigo: res.data.id,
                         columns: res.data.columns,
-                        instructivo: res.data.instructivo
-                    }
+                        instructivo: res.data.instructivo,
+                    },
                 }
 
                 this.useModals.setModal('mFormato', formato_id, 1, send, true)
-            }
-            else {
+            } else {
                 for (const a of res.data.columns) {
                     a.value = res1.data[a.id]
                 }
@@ -318,14 +383,14 @@ export default {
                         id: res1.data.id,
                         codigo: res.data.id,
                         columns: res.data.columns,
-                        instructivo: res.data.instructivo
-                    }
+                        instructivo: res.data.instructivo,
+                    },
                 }
 
                 this.useModals.setModal('mFormato', formato_id, 2, send, true)
             }
         },
-        async crearPpc(item) {
+        async controlPpc(item) {
             let formato_id = 'RE-HACCP 03'
 
             this.useAuth.setLoading(true, 'Cargando...')
@@ -347,13 +412,12 @@ export default {
                     formato: {
                         codigo: res.data.id,
                         columns: res.data.columns,
-                        instructivo: res.data.instructivo
-                    }
+                        instructivo: res.data.instructivo,
+                    },
                 }
 
                 this.useModals.setModal('mFormato', formato_id, 1, send, true)
-            }
-            else {
+            } else {
                 for (const a of res.data.columns) {
                     a.value = res1.data[a.id]
                 }
@@ -365,48 +429,28 @@ export default {
                         id: res1.data.id,
                         codigo: res.data.id,
                         columns: res.data.columns,
-                        instructivo: res.data.instructivo
-                    }
+                        instructivo: res.data.instructivo,
+                    },
                 }
 
                 this.useModals.setModal('mFormato', formato_id, 2, send, true)
             }
         },
         setFormatoCalidad(item) {
-            const produccion_orden = this.vista.produccion_ordenes.find(a => a.id == item.produccion_orden)
-            if (item.codigo == 'RE-BPM-06' || item.codigo == 'RE-BPM-07' || item.codigo == 'RE-BPM-08') {
+            const produccion_orden = this.vista.produccion_ordenes.find(
+                (a) => a.id == item.produccion_orden,
+            )
+            if (
+                item.codigo == 'RE-BPM-06' ||
+                item.codigo == 'RE-BPM-07' ||
+                item.codigo == 'RE-BPM-08'
+            ) {
                 produccion_orden.calidad_revisado = item.id
             }
 
             if (item.codigo == 'RE-HACCP 03') {
                 produccion_orden.cf_ppc = item.id
             }
-        },
-        async productosCuarentena(item) {
-            const send = {
-                produccion_orden: item.id,
-                produccion_orden1: { ...item }
-            }
-
-            let formato_id = 'RE-BPM-10'
-            const formato_nombre = 'Control de la producción'
-
-            if (item.tipo == 2) {
-                formato_id = 'RE-BPM-11'
-            }
-            else if (item.tipo == 3) {
-                formato_id = 'RE-BPM-12'
-            }
-
-            this.useModals.setModal('mProduccionCuarentena', `${formato_id} ${formato_nombre}`, null, send, true)
-        },
-        productosTerminados(item) {
-            const send = {
-                produccion_orden: item.id,
-                produccion_orden1: { ...item }
-            }
-
-            this.useModals.setModal('mProduccionProductos', `Productos terminados`, null, send, true)
         },
 
         async loadDatosSistema() {

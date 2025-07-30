@@ -16,12 +16,18 @@
             </div>
         </div>
 
-        <JdTable :columns="columns" :datos="modal.kardex || []" :reload="loadKardex" :colAct="true"
-            :rowOptions="tableRowOptions" @rowOptionSelected="runMethod">
-            <template v-slot:cTipo="{ item }">
+        <JdTable
+            :columns="columns"
+            :datos="modal.kardex || []"
+            :reload="loadKardex"
+            :colAct="true"
+            :rowOptions="tableRowOptions"
+            @rowOptionSelected="runMethod"
+        >
+            <!-- <template v-slot:cTipo="{ item }">
                 <i class="fa-solid fa-ban anulado" v-if="item.transaccion1.estado == 0"></i>
                 {{ item.transaccion1.tipo1.nombre }}
-            </template>
+            </template> -->
         </JdTable>
     </JdModal>
 </template>
@@ -60,7 +66,7 @@ export default {
             {
                 id: 'fecha',
                 title: 'Fecha',
-                prop: 'transaccion1.fecha',
+                prop: 'fecha',
                 format: 'date',
                 width: '8rem',
                 show: true,
@@ -69,8 +75,8 @@ export default {
             {
                 id: 'tipo',
                 title: 'Operación',
-                prop: 'transaccion1.tipo1.nombre',
-                slot: 'cTipo',
+                prop: 'tipo1.nombre',
+                // slot: 'cTipo',
                 width: '15rem',
                 show: true,
                 seek: true,
@@ -117,7 +123,12 @@ export default {
             },
         ],
         tableRowOptions: [
-            { label: 'Eliminar', icon: 'fa-regular fa-trash-can', action: 'eliminar', permiso: 'vArticulos:kardex' },
+            {
+                label: 'Eliminar',
+                icon: 'fa-regular fa-trash-can',
+                action: 'eliminar',
+                permiso: 'vArticulos:kardexDelete',
+            },
         ],
     }),
     async created() {
@@ -127,9 +138,30 @@ export default {
     },
     methods: {
         async loadKardex() {
+            const qry = {
+                fltr: {
+                    articulo: { op: 'Es', val: this.modal.articulo.id },
+                },
+                cols: [
+                    'fecha',
+                    'tipo',
+                    'cantidad',
+                    'moneda',
+                    'tipo_cambio',
+                    'pu',
+                    'igv_afectacion',
+                    'igv_porcentaje',
+                    'lote',
+                    'fv',
+                    'stock',
+                    'lote_padre',
+                    'is_lote_padre',
+                ],
+            }
+
             this.modal.kardex = []
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.transacciones}/kardex/${this.modal.articulo.id}`)
+            const res = await get(`${urls.kardex}?qry=${JSON.stringify(qry)}`)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
@@ -142,7 +174,8 @@ export default {
             this.modal.valor = 0
 
             for (const a of this.modal.kardex) {
-                if (a.is_lote_padre && a.transaccion1.estado != 0) {
+                // if (a.is_lote_padre && a.transaccion1.estado != 0) {
+                if (a.is_lote_padre) {
                     this.modal.stock += a.stock
                     this.modal.valor += a.stock * a.pu_real
                 }
@@ -155,23 +188,26 @@ export default {
         async eliminar(item) {
             const resQst = await jqst('¿Está seguro de eliminar?')
             if (resQst.isConfirmed == false) return
-            
+
             const send = {
-                id: item.transaccion1.id,
-                tipo: item.transaccion1.tipo,
-                estado: item.transaccion1.estado,
+                id: item.id,
+                tipo: item.tipo,
+                lote_padre: item.lote_padre,
+                cantidad: Math.abs(item.cantidad),
             }
 
             this.useAuth.setLoading(true, 'Eliminando...')
-            const res = await delet(urls.transacciones, send)
+            const res = await delet(urls.kardex, send)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
 
-            this.loadKardex()
-        }
+            const i = this.modal.kardex.findIndex((a) => a.id == item.id)
+            this.modal.kardex.splice(i, 1)
+            this.calculateStock()
+        },
     },
-};
+}
 </script>
 
 <style lang="scss" scoped>

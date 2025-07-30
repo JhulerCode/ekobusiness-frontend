@@ -1,36 +1,73 @@
 <template>
-    <JdModal modal="mProduccionProductos" :buttons="buttons" @button-click="(action) => this[action]()">
+    <JdModal modal="mProduccionProductos">
         <p class="mrg-btm1">
-            {{ modal.produccion_orden1.articulo1.nombre }}
+            <small>Producto:</small> {{ modal.produccion_orden.articulo1.nombre }}
+            <small>Cant. planificada:</small> {{ modal.produccion_orden.cantidad }}
         </p>
 
-        <JdTable :columns="columns" :datos="modal.transaccion_items || []" :seeker="false" :download="false"
-            :reload="loadTransaccionItems">
+        <div class="container-datos">
+            <JdInput label="Lote" :nec="true" v-model="modal.transaccion.lote" />
+
+            <JdInput
+                label="F. vencimiento"
+                type="Date"
+                :nec="true"
+                v-model="modal.transaccion.fv"
+            />
+
+            <JdInput
+                label="Cantidad"
+                type="number"
+                :nec="true"
+                v-model="modal.transaccion.cantidad"
+            />
+
+            <JdButton text="Grabar" tipo="2" @click="grabar" v-if="modal.transaccion.id == null" />
+
+            <JdButton
+                icon="fa-solid fa-pen-to-square"
+                text="Actualizar"
+                tipo="2"
+                @click="modificar"
+                v-if="modal.transaccion.id != null"
+            />
+        </div>
+
+        <JdTable
+            :columns="columns"
+            :datos="modal.produccion_productos || []"
+            :colAct="true"
+            :seeker="false"
+            :download="false"
+            :reload="loadProduccionProductos"
+            :rowOptions="tableRowOptions"
+            @rowOptionSelected="runMethod"
+        >
         </JdTable>
     </JdModal>
 </template>
 
 <script>
 import JdModal from '@/components/JdModal.vue'
-// import JdButton from '@/components/inputs/JdButton.vue'
-// import JdSelect from '@/components/inputs/JdSelect.vue'
+import JdButton from '@/components/inputs/JdButton.vue'
+import JdInput from '@/components/inputs/JdInput.vue'
 import JdTable from '@/components/JdTable.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
 import { useVistas } from '@/pinia/vistas'
 
-import { urls, get } from '@/utils/crud'
-// import { incompleteData, genId } from '@/utils/mine'
-// import { jmsg } from '@/utils/swal'
+import { urls, get, post, patch, delet } from '@/utils/crud'
+import { incompleteData } from '@/utils/mine'
+import { jmsg, jqst } from '@/utils/swal'
 
 import dayjs from 'dayjs'
 
 export default {
     components: {
         JdModal,
-        // JdButton,
-        // JdSelect,
+        JdButton,
+        JdInput,
         JdTable,
     },
     data: () => ({
@@ -38,6 +75,8 @@ export default {
         useModals: useModals(),
         useVistas: useVistas(),
         dayjs,
+
+        modal: {},
 
         columns: [
             {
@@ -48,7 +87,7 @@ export default {
             },
             {
                 id: 'fv',
-                title: 'F. vencimiento',
+                title: 'F. vencim.',
                 format: 'date',
                 width: '10rem',
                 show: true,
@@ -59,39 +98,148 @@ export default {
                 width: '8rem',
                 show: true,
             },
+            {
+                id: 'producto_estado',
+                title: 'Estado',
+                prop: 'producto_estado1.nombre',
+                format: 'estado',
+                width: '8rem',
+                show: true,
+            },
+        ],
+        tableRowOptions: [
+            {
+                label: 'Editar',
+                icon: 'fa-solid fa-pen-to-square',
+                action: 'edit',
+                ocultar: { producto_estado: 2 },
+            },
+            {
+                label: 'Eliminar',
+                icon: 'fa-solid fa-trash-can',
+                action: 'eliminar',
+                ocultar: { producto_estado: 2 },
+            },
         ],
     }),
     created() {
         this.modal = this.useModals.mProduccionProductos
 
-        this.loadTransaccionItems()
+        this.initTransaccion()
+        this.loadProduccionProductos()
     },
     methods: {
-        async loadTransaccionItems() {
+        initTransaccion() {
+            this.modal.transaccion = {
+                tipo: 4,
+                fecha: dayjs().format('YYYY-MM-DD'),
+                produccion_orden: this.modal.produccion_orden.id,
+                articulo: this.modal.produccion_orden.articulo,
+                lote: this.obtenerNumeroJuliano(this.modal.produccion_orden.fecha),
+            }
+        },
+
+        async loadProduccionProductos() {
+            this.modal.produccion_productos = []
+
             const qry = {
                 fltr: {
-                    transaccion_tipo: { op: 'Es', val: 4 },
-                    transaccion_produccion_orden: { op: 'Es', val: this.modal.produccion_orden }
-                }
+                    produccion_orden: { op: 'Es', val: this.modal.produccion_orden.id },
+                },
+                cols: ['lote', 'fv', 'cantidad', 'is_lote_padre'],
             }
 
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.transacciones}/items?qry=${JSON.stringify(qry)}`)
+            const res = await get(`${urls.kardex}/produccion-productos?qry=${JSON.stringify(qry)}`)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
 
-            this.modal.transaccion_items = res.data
-        }
-    }
+            this.modal.produccion_productos = res.data
+        },
+
+        obtenerNumeroJuliano(fechatexto) {
+            const fecha = fechatexto ? new Date(fechatexto) : new Date()
+            const inicioAnio = new Date(fecha.getFullYear(), 0, 0)
+            const diferencia = fecha - inicioAnio
+            const unDia = 1000 * 60 * 60 * 24
+            const diaDelAnio = Math.floor(diferencia / unDia)
+
+            const anio = fecha.getFullYear().toString().slice(-2)
+
+            return `${diaDelAnio.toString().padStart(3, '0')} ${anio}`
+        },
+
+        checkDatos() {
+            const props = ['lote', 'fv', 'cantidad']
+
+            if (incompleteData(this.modal.transaccion, props)) {
+                jmsg('warning', 'Ingrese los datos necesarios')
+                return true
+            }
+
+            return false
+        },
+        async grabar() {
+            if (this.checkDatos()) return
+
+            this.useAuth.setLoading(true, 'Grabando...')
+            const res = await post(`${urls.kardex}/produccion-productos`, this.modal.transaccion)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            this.modal.produccion_productos.unshift(res.data)
+            this.initTransaccion()
+        },
+        async modificar() {
+            if (this.checkDatos()) return
+
+            const send = {
+                id: this.modal.transaccion.id,
+                lote: this.modal.transaccion.lote,
+                fv: this.modal.transaccion.fv,
+                cantidad: this.modal.transaccion.cantidad,
+            }
+
+            this.useAuth.setLoading(true, 'Actualizando...')
+            const res = await patch(urls.kardex, send)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            const i = this.modal.produccion_productos.findIndex((a) => a.id == send.id)
+            this.modal.produccion_productos.splice(i, 1, this.modal.transaccion)
+            this.initTransaccion()
+        },
+
+        runMethod(method, item) {
+            this[method](item)
+        },
+        edit(item) {
+            this.modal.transaccion = JSON.parse(JSON.stringify(item))
+        },
+        async eliminar(item) {
+            const resQst = await jqst('¿Está seguro de eliminar?')
+            if (resQst.isConfirmed == false) return
+
+            this.useAuth.setLoading(true, 'Eliminando...')
+            const res = await delet(urls.kardex, item)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            const i = this.modal.produccion_productos.findIndex((a) => a.id == item.id)
+            this.modal.produccion_productos.splice(i, 1)
+        },
+    },
 }
 </script>
 
 <style lang="scss" scoped>
-.jd-table {
-    .fv_div {
-        display: grid;
-        grid-template-columns: 5.5rem 5rem 5rem;
-    }
+.container-datos {
+    display: grid;
+    grid-template-columns: repeat(2, 20rem);
+    gap: 0.5rem;
 }
 </style>

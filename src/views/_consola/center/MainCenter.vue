@@ -45,7 +45,7 @@
 
 // import vHome from '@/views/u/home/vHome.vue'
 
-//----- LOGISTICA ENTRADA ----- //
+// ----- LOGISTICA ENTRADA ----- //
 import vProveedores from '@/views/logistica_entrada/proveedores/vProveedores.vue'
 import vArticuloCategorias from '@/views/logistica_entrada/categorias/vArticuloCategorias.vue'
 import vArticulos from '@/views/logistica_entrada/articulos/vArticulos.vue'
@@ -54,7 +54,7 @@ import vCompraPedidos from '@/views/logistica_entrada/pedidos/vCompraPedidos.vue
 import vCompras from '@/views/logistica_entrada/compras/vCompras.vue'
 import vCompraItems from '@/views/logistica_entrada/compra_items/vCompraItems.vue'
 
-//----- LOGISTICA SALIDA ----- //
+// ----- LOGISTICA SALIDA ----- //
 import vClientes from '@/views/logistica_salida/clientes/vClientes.vue'
 import vProductoCategorias from '@/views/logistica_salida/categorias/vProductoCategorias.vue'
 import vProductosTerminados from '@/views/logistica_salida/articulos/vProductosTerminados.vue'
@@ -62,21 +62,21 @@ import vPtsIngresos from '@/views/logistica_salida/ingreso_pt/vPtsIngresos.vue'
 import vVentaPedidos from '@/views/logistica_salida/pedidos/vVentaPedidos.vue'
 import vVentas from '@/views/logistica_salida/ventas/vVentas.vue'
 
-//----- PRODUCCIÓN ----- //
+// ----- PRODUCCIÓN ----- //
 import vProgramaFiltrantes from '@/views/produccion/filtrante/vProgramaFiltrantes.vue'
 import vProgramaGranel from '@/views/produccion/granel/vProgramaGranel.vue'
 import vProgramaLuxury from '@/views/produccion/piramidal/vProgramaLuxury.vue'
 import vProduccionHistorial from '@/views/produccion/historial/vProduccionHistorial.vue'
 import vProductosCuarentena from '@/views/produccion/vProductosCuarentena.vue'
 
-//----- CALIDAD ----- //
+// ----- CALIDAD ----- //
 import vFormatosBpm from '@/views/calidad/formatos/vFormatosBpm.vue'
 import vFormatosPhs from '@/views/calidad/formatos/vFormatosPhs.vue'
 import vFormatosHaccp from '@/views/calidad/formatos/vFormatosHaccp.vue'
 import vRegistrosSanitarios from '@/views/calidad/documentos/vRegistrosSanitarios.vue'
 import vInspecciones from '@/views/calidad/inspecciones/vInspecciones.vue'
 
-//----- OPERACIONES ----- //
+// ----- OPERACIONES ----- //
 import vDocumentos from '@/views/operaciones/documentos/vDocumentos.vue'
 import vCajaAperturas from '@/views/operaciones/caja_chica/vCajaAperturas.vue'
 import vMonedas from '@/views/operaciones/monedas/vMonedas.vue'

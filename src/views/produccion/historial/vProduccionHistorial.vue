@@ -171,6 +171,12 @@ export default {
                 permiso: 'vProduccionHistorial:ver',
             },
             {
+                label: 'Editar',
+                icon: 'fa-solid fa-pen-to-square',
+                action: 'editar',
+                permiso: 'vProduccionHistorial:ver',
+            },
+            {
                 label: 'Salida de insumos',
                 icon: 'fa-regular fa-circle-down',
                 action: 'salidaInsumos',
@@ -285,6 +291,25 @@ export default {
             }
 
             this.useModals.setModal('mProduccionOrden', 'Ver órden de producción', 3, send, true)
+        },
+        async editar(item) {
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.produccion_ordenes}/uno/${item.id}`)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            const send = {
+                produccion_orden: res.data,
+                articulos: [
+                    {
+                        id: res.data.articulo,
+                        ...res.data.articulo_info,
+                    },
+                ],
+            }
+
+            this.useModals.setModal('mProduccionOrden', 'Editar órden de producción', 2, send, true)
         },
         async salidaInsumos(item) {
             this.useAuth.setLoading(true, 'Cargando...')

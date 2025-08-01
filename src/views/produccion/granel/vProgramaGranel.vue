@@ -34,7 +34,7 @@
     <mProduccionInsumos v-if="useModals.show.mProduccionInsumos" />
     <mProduccionProductos
         v-if="useModals.show.mProduccionProductos"
-        @calcularTiempo="calcularHoras"
+        @productosCargados="setProduccionProductos"
     />
     <mProductosFaltantes v-if="useModals.show.mProductosFaltantes" />
 </template>
@@ -330,6 +330,10 @@ export default {
                 send,
                 true,
             )
+        },
+        setProduccionProductos(item) {
+            const pr = this.vista.produccion_ordenes.find((a) => a.id == item.id)
+            pr.productos_terminados = item.productos_terminados
         },
     },
 }

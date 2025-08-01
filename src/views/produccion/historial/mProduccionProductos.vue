@@ -132,7 +132,7 @@ export default {
         initTransaccion() {
             this.modal.transaccion = {
                 tipo: 4,
-                fecha: dayjs().format('YYYY-MM-DD'),
+                fecha: this.modal.produccion_orden.fecha,
                 produccion_orden: this.modal.produccion_orden.id,
                 articulo: this.modal.produccion_orden.articulo,
                 lote: this.obtenerNumeroJuliano(this.modal.produccion_orden.fecha),
@@ -163,7 +163,7 @@ export default {
             const inicioAnio = new Date(fecha.getFullYear(), 0, 0)
             const diferencia = fecha - inicioAnio
             const unDia = 1000 * 60 * 60 * 24
-            const diaDelAnio = Math.floor(diferencia / unDia)
+            const diaDelAnio = Math.floor(diferencia / unDia) + 1
 
             const anio = fecha.getFullYear().toString().slice(-2)
 
@@ -191,12 +191,14 @@ export default {
 
             this.modal.produccion_productos.unshift(res.data)
             this.initTransaccion()
+            this.$emit('productosCargados', this.sumarProductos())
         },
         async modificar() {
             if (this.checkDatos()) return
 
             const send = {
                 id: this.modal.transaccion.id,
+                articulo: this.modal.produccion_orden.articulo,
                 lote: this.modal.transaccion.lote,
                 fv: this.modal.transaccion.fv,
                 cantidad: this.modal.transaccion.cantidad,
@@ -211,6 +213,7 @@ export default {
             const i = this.modal.produccion_productos.findIndex((a) => a.id == send.id)
             this.modal.produccion_productos.splice(i, 1, this.modal.transaccion)
             this.initTransaccion()
+            this.$emit('productosCargados', this.sumarProductos())
         },
 
         runMethod(method, item) {
@@ -231,6 +234,18 @@ export default {
 
             const i = this.modal.produccion_productos.findIndex((a) => a.id == item.id)
             this.modal.produccion_productos.splice(i, 1)
+            this.$emit('productosCargados', this.sumarProductos())
+        },
+        sumarProductos() {
+            let total = 0
+            for (const a of this.modal.produccion_productos) {
+                total += a.cantidad
+            }
+
+            return {
+                id: this.modal.produccion_orden.id,
+                productos_terminados: total,
+            }
         },
     },
 }

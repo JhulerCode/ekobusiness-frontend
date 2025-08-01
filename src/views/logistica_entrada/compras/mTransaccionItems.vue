@@ -184,7 +184,7 @@ export default {
         async loadLotes(item) {
             item.lotesLoades = false
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.transacciones}/lotes/${item.articulo}`)
+            const res = await get(`${urls.kardex}/lotes/${item.articulo}`)
             this.useAuth.setLoading(false)
             item.lotesLoades = true
 

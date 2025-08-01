@@ -2,8 +2,6 @@ import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
 import { jmsg } from '@/utils/swal'
 
-// const host = 'https://api.sunka.com.pe'
-// const host = 'http://localhost:4000'
 const host = import.meta.env.VITE_API_HOST
 
 const urls = {
@@ -53,7 +51,7 @@ async function get(url) {
 
     if (query.status == 401) {
         jmsg('error', 'Acceso denegado: autenticación incorrecta')
-        // useModals().setModal('mLogin', 'Sesión terminada', null, null)
+        useModals().setModal('mLogin', 'Sesión terminada', null, null)
         return { code: 401 }
     }
 

@@ -96,7 +96,7 @@ export default {
             this.modal.lotes = []
 
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.transacciones}/lotes/${this.modal.articulo.id}`)
+            const res = await get(`${urls.kardex}/lotes/${this.modal.articulo.id}`)
             this.useAuth.setLoading(false)
 
             if (res.code !== 0) return
@@ -131,7 +131,7 @@ export default {
                     jmsg('warning', 'Stock insuficiente')
                     return true
                 }
-            } 
+            }
 
             return false
         },

@@ -62,7 +62,7 @@ export default {
                 title: 'Fecha apertura',
                 type: 'date',
                 format: 'date',
-                width: '15rem',
+                width: '12rem',
                 show: true,
                 seek: true,
                 sort: true
@@ -72,7 +72,7 @@ export default {
                 title: 'Monto apertura',
                 type: 'number',
                 format: 'decimal',
-                width: '15rem',
+                width: '12rem',
                 show: true,
                 seek: false,
                 sort: false
@@ -82,7 +82,7 @@ export default {
                 title: 'Fecha cierre',
                 type: 'date',
                 format: 'date',
-                width: '15rem',
+                width: '12rem',
                 show: true,
                 seek: true,
                 sort: true
@@ -92,7 +92,7 @@ export default {
                 title: 'Monto cierre',
                 type: 'number',
                 format: 'decimal',
-                width: '15rem',
+                width: '12rem',
                 show: true,
                 seek: false,
                 sort: false
@@ -103,7 +103,7 @@ export default {
                 type: 'select',
                 prop: 'estado1.nombre',
                 format: 'estado',
-                width: '15rem',
+                width: '10rem',
                 show: true,
                 seek: false,
                 sort: false

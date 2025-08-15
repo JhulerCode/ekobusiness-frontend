@@ -112,7 +112,7 @@ export default {
         this.modal = this.useModals.mArticuloReceta
         this.receta = this.useModals.mArticuloReceta.item
 
-        this.loadDatosSistema()
+        // this.loadDatosSistema()
 
         if (this.useAuth.verifyPermiso('vReceta:editar') == false) this.columns[0].show = false
     },
@@ -201,14 +201,14 @@ export default {
             this.receta.receta_insumos.sort((a, b) => a.orden - b.orden)
         },
 
-        async loadDatosSistema() {
-            const qry = ['unidades']
-            const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
+        // async loadDatosSistema() {
+        //     const qry = ['unidades']
+        //     const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
 
-            if (res.code != 0) return
+        //     if (res.code != 0) return
 
-            Object.assign(this.modal, res.data)
-        },
+        //     Object.assign(this.modal, res.data)
+        // },
     }
 }
 </script>

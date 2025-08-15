@@ -1,31 +1,86 @@
 <template>
     <JdModal modal="mArticulo" :buttons="buttons" @button-click="(action) => this[action]()">
         <div class="container-datos">
-            <JdSelect label="Tipo de producción" :nec="true" v-model="articulo.produccion_tipo"
-                :lista="modal.produccion_tipos" v-if="articulo.tipo == 2" style="grid-column: 1/3" />
+            <JdSelect
+                label="Tipo de producción"
+                :nec="true"
+                v-model="articulo.produccion_tipo"
+                :lista="modal.produccion_tipos"
+                v-if="articulo.tipo == 2"
+                style="grid-column: 1/3"
+            />
 
-            <JdInput label="Sobres en caja" type="number" :nec="true" v-model="articulo.filtrantes"
-                v-if="articulo.tipo == 2 && [1, 3].includes(articulo.produccion_tipo)" style="grid-column: 3/5;" />
+            <JdInput
+                label="Sobres en caja"
+                type="number"
+                :nec="true"
+                v-model="articulo.filtrantes"
+                v-if="articulo.tipo == 2 && [1, 3, '1', '3'].includes(articulo.produccion_tipo)"
+                style="grid-column: 3/5"
+            />
 
-            <JdSelect label="Categoria" :nec="true" :lista="modal.articulo_categorias || []"
-                v-model="articulo.categoria" style="grid-column: 1/4;" />
+            <JdSelect
+                label="Categoria"
+                :nec="true"
+                :lista="modal.articulo_categorias || []"
+                v-model="articulo.categoria"
+                style="grid-column: 1/4"
+            />
 
-            <JdInput label="EAN" :nec="true" v-model="articulo.codigo_barra" style="grid-column: 1/4;"
-                v-if="articulo.tipo == 2" />
+            <JdInput
+                label="EAN"
+                :nec="true"
+                v-model="articulo.codigo_barra"
+                style="grid-column: 1/4"
+                v-if="articulo.tipo == 2"
+            />
 
-            <JdInput label="Nombre" :nec="true" v-model="articulo.nombre" style="grid-column: 1/5;" />
+            <JdInput
+                label="Nombre"
+                :nec="true"
+                v-model="articulo.nombre"
+                style="grid-column: 1/5"
+            />
 
-            <JdSelect label="Unidad" :nec="true" v-model="articulo.unidad" :lista="modal.unidades"
-                mostrar="nombre_completo" style="grid-column: 1/3;" />
+            <JdSelect
+                label="Unidad"
+                :nec="true"
+                v-model="articulo.unidad"
+                :lista="modal.unidades"
+                mostrar="nombre_completo"
+                style="grid-column: 1/3"
+            />
 
-            <JdInput label="Marca" v-model="articulo.marca" v-if="articulo.tipo == 2" style="grid-column: 3/5;" />
+            <JdInput
+                label="Contenido neto"
+                type="number"
+                v-model="articulo.contenido_neto"
+                v-if="articulo.tipo == 2"
+                style="grid-column: 3/5"
+            />
 
-            <JdSelect label="Tributo" :nec="true" v-model="articulo.igv_afectacion"
-                :lista="modal.igv_afectaciones || []" style="grid-column: 1/4;" />
+            <JdInput
+                label="Marca"
+                v-model="articulo.marca"
+                v-if="articulo.tipo == 2"
+                style="grid-column: 1/3"
+            />
 
-            <JdSwitch label="Tiene fecha de vencimiento?" v-model="articulo.has_fv" style="grid-column: 1/3;" />
+            <JdSelect
+                label="Tributo"
+                :nec="true"
+                v-model="articulo.igv_afectacion"
+                :lista="modal.igv_afectaciones || []"
+                style="grid-column: 1/4"
+            />
+
+            <JdSwitch
+                label="Tiene fecha de vencimiento?"
+                v-model="articulo.has_fv"
+                style="grid-column: 1/3"
+            />
             <!-- <JdSwitch label="Se vende?" v-model="articulo.vende" style="grid-column: 1/3;" v-if="articulo.tipo == 1" /> -->
-            <JdSwitch label="Activo?" v-model="articulo.activo" style="grid-column: 1/3;" />
+            <JdSwitch label="Activo?" v-model="articulo.activo" style="grid-column: 1/3" />
         </div>
     </JdModal>
 </template>
@@ -77,15 +132,17 @@ export default {
         showButtons() {
             if (this.useModals.mArticulo.mode == 1) {
                 this.buttons[0].show = true
-            }
-            else {
+            } else {
                 this.buttons[1].show = true
             }
         },
 
         async loadCategorias() {
             const qry = {
-                fltr: { tipo: { op: 'Es', val: this.articulo.tipo }, activo: { op: 'Es', val: true } },
+                fltr: {
+                    tipo: { op: 'Es', val: this.articulo.tipo },
+                    activo: { op: 'Es', val: true },
+                },
             }
 
             this.modal.articulo_categorias = []
@@ -111,13 +168,13 @@ export default {
 
             if (this.articulo.tipo == 2) props.push('codigo_barra', 'produccion_tipo')
 
-            if (this.articulo.tipo == 2 && this.articulo.produccion_tipo != 2) props.push('filtrantes')
+            if (this.articulo.tipo == 2 && this.articulo.produccion_tipo != 2)
+                props.push('filtrantes')
 
             if (incompleteData(this.articulo, props)) {
                 jmsg('warning', 'Ingrese los datos necesarios')
                 return true
             }
-
 
             // SHAPE DATOS
             if (this.articulo.tipo == 1) {
@@ -141,7 +198,11 @@ export default {
 
             if (res.code != 0) return
 
-            this.useVistas.addItem(this.articulo.tipo == 1 ? 'vArticulos' : 'vProductosTerminados', 'articulos', res.data)
+            this.useVistas.addItem(
+                this.articulo.tipo == 1 ? 'vArticulos' : 'vProductosTerminados',
+                'articulos',
+                res.data,
+            )
             this.useModals.show.mArticulo = false
         },
         async modificar() {
@@ -153,10 +214,14 @@ export default {
 
             if (res.code != 0) return
 
-            this.useVistas.updateItem(this.articulo.tipo == 1 ? 'vArticulos' : 'vProductosTerminados', 'articulos', res.data)
+            this.useVistas.updateItem(
+                this.articulo.tipo == 1 ? 'vArticulos' : 'vProductosTerminados',
+                'articulos',
+                res.data,
+            )
             this.useModals.show.mArticulo = false
         },
-    }
+    },
 }
 </script>
 
@@ -171,7 +236,7 @@ export default {
     .container-datos {
         grid-template-columns: minmax(100%, 33.5rem) !important;
 
-        >* {
+        > * {
             grid-column: 1/2 !important;
         }
     }

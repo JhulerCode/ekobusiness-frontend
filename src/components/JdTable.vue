@@ -723,7 +723,7 @@ export default {
                     if (Array.isArray(valorOcultar)) {
                         if (valorOcultar.includes(valorFila)) return false // se oculta
                     } else {
-                        if (valorOcultar === valorFila) return false // se oculta
+                        if (valorOcultar == valorFila) return false // se oculta
                     }
                 }
             }

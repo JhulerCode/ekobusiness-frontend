@@ -154,11 +154,22 @@ export default {
                 prop: 'activo1.nombre',
                 type: 'select',
                 format: 'yesno',
-                width: '15rem',
+                width: '5rem',
                 show: true,
                 seek: false,
-                sort: false
+                sort: true
             },
+            {
+                id: 'has_signin',
+                title: 'Tiene usuario?',
+                prop: 'has_signin1.nombre',
+                type: 'select',
+                format: 'yesno',
+                width: '5rem',
+                show: true,
+                seek: false,
+                sort: true
+            }
         ],
         tableRowOptions: [
             { label: 'Ver', icon: 'fa-regular fa-folder-open', action: 'ver', permiso: 'vColaboradores:ver' },

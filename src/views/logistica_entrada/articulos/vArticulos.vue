@@ -4,20 +4,46 @@
             <strong>Artículos</strong>
 
             <div class="buttons">
-                <input type="file" ref="excel" accept=".xlsx, .xls, .csv" hidden @change="importar" />
+                <input
+                    type="file"
+                    ref="excel"
+                    accept=".xlsx, .xls, .csv"
+                    hidden
+                    @change="importar"
+                />
 
-                <JdButton icon="fa-solid fa-file-excel" text="Importar" tipo="2" @click="this.$refs.excel.click()"
-                    v-if="useAuth.verifyPermiso('vArticulos:importar')" />
+                <JdButton
+                    icon="fa-solid fa-file-excel"
+                    text="Importar"
+                    tipo="2"
+                    @click="this.$refs.excel.click()"
+                    v-if="useAuth.verifyPermiso('vArticulos:importar')"
+                />
 
-                <JdButton text="Nuevo" title="Crear nuevo" @click="nuevo()"
-                    v-if="useAuth.verifyPermiso('vArticulos:crear')" />
+                <JdButton
+                    text="Nuevo"
+                    title="Crear nuevo"
+                    @click="nuevo()"
+                    v-if="useAuth.verifyPermiso('vArticulos:crear')"
+                />
             </div>
         </div>
 
-        <JdTable :name="tableName" :columns="columns" :datos="vista.articulos || []" :colAct="true"
-            :configRowSelect="true" :configCols="true" :configFiltros="openConfigFiltros" :reload="loadArticulos"
-            :actions="tableActions" @actionClick="runMethod" :rowOptions="tableRowOptions"
-            @rowOptionSelected="runMethod" ref="jdtable">
+        <JdTable
+            :name="tableName"
+            :columns="columns"
+            :datos="vista.articulos || []"
+            :colAct="true"
+            :configRowSelect="true"
+            :configCols="true"
+            :configFiltros="openConfigFiltros"
+            :reload="loadArticulos"
+            :actions="tableActions"
+            @actionClick="runMethod"
+            :rowOptions="tableRowOptions"
+            @rowOptionSelected="runMethod"
+            ref="jdtable"
+        >
         </JdTable>
     </div>
 
@@ -76,6 +102,15 @@ export default {
         tableName: 'articulos',
         columns: [
             {
+                id: 'id',
+                title: 'id',
+                type: 'text',
+                width: '5rem',
+                show: false,
+                seek: false,
+                sort: false,
+            },
+            {
                 id: 'nombre',
                 title: 'Nombre',
                 type: 'text',
@@ -89,19 +124,7 @@ export default {
                 title: 'Unidad',
                 type: 'select',
                 editable: true,
-                width: '6rem',
-                show: true,
-                seek: false,
-                sort: true,
-            },
-            {
-                id: 'has_fv',
-                title: 'Tiene fecha de vencimiento?',
-                prop: 'has_fv1.nombre',
-                type: 'select',
-                editable: true,
-                format: 'yesno',
-                width: '8rem',
+                width: '5rem',
                 show: true,
                 seek: false,
                 sort: true,
@@ -114,17 +137,6 @@ export default {
                 editable: true,
                 format: 'yesno',
                 width: '8rem',
-                show: true,
-                seek: false,
-                sort: true,
-            },
-            {
-                id: 'igv_afectacion',
-                title: 'Tributo',
-                prop: 'igv_afectacion1.nombre',
-                type: 'select',
-                editable: true,
-                width: '10rem',
                 show: true,
                 seek: false,
                 sort: true,
@@ -160,18 +172,76 @@ export default {
                 seek: true,
                 sort: true,
             },
+            {
+                id: 'has_fv',
+                title: 'Tiene fecha de vencimiento?',
+                prop: 'has_fv1.nombre',
+                type: 'select',
+                editable: true,
+                format: 'yesno',
+                width: '8rem',
+                show: true,
+                seek: false,
+                sort: true,
+            },
+            {
+                id: 'igv_afectacion',
+                title: 'Tributo',
+                prop: 'igv_afectacion1.nombre',
+                type: 'select',
+                editable: true,
+                width: '10rem',
+                show: true,
+                seek: false,
+                sort: true,
+            },
         ],
         tableActions: [
-            { icon: 'fa-solid fa-pen-to-square', text: "Editar", action: "editarBulk", permiso: 'vArticulos:editarBulk' },
-            { icon: 'fa-solid fa-trash-can', text: "Eliminar", action: "eliminarBulk", permiso: 'vArticulos:eliminarBulk' },
+            {
+                icon: 'fa-solid fa-pen-to-square',
+                text: 'Editar',
+                action: 'editarBulk',
+                permiso: 'vArticulos:editarBulk',
+            },
+            {
+                icon: 'fa-solid fa-trash-can',
+                text: 'Eliminar',
+                action: 'eliminarBulk',
+                permiso: 'vArticulos:eliminarBulk',
+            },
         ],
         tableRowOptions: [
-            { label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar', permiso: 'vArticulos:editar' },
-            { label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar', permiso: 'vArticulos:eliminar' },
-            { label: 'Clonar', icon: 'fa-solid fa-copy', action: 'clonar', permiso: 'vArticulos:clonar' },
-            { label: 'Ver kardex', icon: 'fa-solid fa-table-list', action: 'verKardex', permiso: 'vArticulos:kardex' },
-            { label: 'Ajuste stock', icon: 'fa-solid fa-wrench', action: 'ajusteStock', permiso: 'vArticulos:ajusteStock' },
-        ]
+            {
+                label: 'Editar',
+                icon: 'fa-solid fa-pen-to-square',
+                action: 'editar',
+                permiso: 'vArticulos:editar',
+            },
+            {
+                label: 'Eliminar',
+                icon: 'fa-solid fa-trash-can',
+                action: 'eliminar',
+                permiso: 'vArticulos:eliminar',
+            },
+            {
+                label: 'Clonar',
+                icon: 'fa-solid fa-copy',
+                action: 'clonar',
+                permiso: 'vArticulos:clonar',
+            },
+            {
+                label: 'Ver kardex',
+                icon: 'fa-solid fa-table-list',
+                action: 'verKardex',
+                permiso: 'vArticulos:kardex',
+            },
+            {
+                label: 'Ajuste stock',
+                icon: 'fa-solid fa-wrench',
+                action: 'ajusteStock',
+                permiso: 'vArticulos:ajusteStock',
+            },
+        ],
     }),
     async created() {
         this.vista = this.useVistas.vArticulos
@@ -192,7 +262,7 @@ export default {
         },
         async loadArticulos() {
             this.setQuery()
-            
+
             this.vista.articulos = []
             this.useAuth.setLoading(true, 'Cargando...')
             const res = await get(`${urls.articulos}?qry=${JSON.stringify(this.vista.qry)}`)
@@ -204,7 +274,7 @@ export default {
             this.vista.articulos = res.data
         },
         verifyRowSelectIsActive() {
-            if (this.vista.articulos && this.vista.articulos.some(a => a.selected)) {
+            if (this.vista.articulos && this.vista.articulos.some((a) => a.selected)) {
                 setTimeout(() => {
                     this.$refs['jdtable'].toogleSelectItems()
                 }, 0)
@@ -232,12 +302,7 @@ export default {
             const reader = new FileReader()
 
             reader.onload = async () => {
-                const headers = [
-                    'Nombre',
-                    'Categoria',
-                    'Unidad',
-                    'Tributo'
-                ]
+                const headers = ['Nombre', 'Categoria', 'Unidad', 'Tributo']
                 const res = await tryOficialExcel(this.$refs.excel, file, reader, headers)
 
                 if (res.code != 0) {
@@ -246,25 +311,29 @@ export default {
                 }
 
                 await this.loadDatosSistema()
-                const igv_afectacionesMap = this.vista.igv_afectaciones.reduce((obj, a) => (obj[a.id] = a, obj), {})
+                const igv_afectacionesMap = this.vista.igv_afectaciones.reduce(
+                    (obj, a) => ((obj[a.id] = a), obj),
+                    {},
+                )
 
                 await this.loadCategorias()
-                const categoriasMap = this.vista.articulo_categorias.reduce((obj, a) => (obj[a.nombre] = a, obj), {})
+                const categoriasMap = this.vista.articulo_categorias.reduce(
+                    (obj, a) => ((obj[a.nombre] = a), obj),
+                    {},
+                )
 
                 for (const a of res.data) {
                     if (categoriasMap[a.Categoria]) {
                         a.Categoria1 = categoriasMap[a.Categoria]
                         a.Categoria = categoriasMap[a.Categoria].id
-                    }
-                    else {
+                    } else {
                         a.Categoria = null
                     }
 
                     if (igv_afectacionesMap[a.Tributo]) {
                         a.Tributo = igv_afectacionesMap[a.Tributo].id
                         a.Tributo1 = { ...igv_afectacionesMap[a.Tributo] }
-                    }
-                    else {
+                    } else {
                         a.Tributo = null
                     }
                 }
@@ -275,7 +344,13 @@ export default {
                     tipo: 1,
                     articulos: res.data,
                 }
-                this.useModals.setModal('mImportarArticulos', 'Importar artículos', null, send, true)
+                this.useModals.setModal(
+                    'mImportarArticulos',
+                    'Importar artículos',
+                    null,
+                    send,
+                    true,
+                )
             }
             reader.readAsArrayBuffer(file)
         },
@@ -284,17 +359,17 @@ export default {
             await this.loadDatosSistema()
             await this.loadCategorias()
 
-            const cols = this.columns.filter(a => a.id != 'stock')
-            cols.find(a => a.id == 'unidad').lista = this.vista.unidades
-            cols.find(a => a.id == 'has_fv').lista = this.vista.estados
-            cols.find(a => a.id == 'activo').lista = this.vista.estados
-            cols.find(a => a.id == 'igv_afectacion').lista = this.vista.igv_afectaciones
-            cols.find(a => a.id == 'categoria').lista = this.vista.articulo_categorias
+            const cols = this.columns.filter((a) => a.id != 'stock')
+            cols.find((a) => a.id == 'unidad').lista = this.vista.unidades
+            cols.find((a) => a.id == 'has_fv').lista = this.vista.estados
+            cols.find((a) => a.id == 'activo').lista = this.vista.estados
+            cols.find((a) => a.id == 'igv_afectacion').lista = this.vista.igv_afectaciones
+            cols.find((a) => a.id == 'categoria').lista = this.vista.articulo_categorias
 
             const send = {
                 table: this.tableName,
                 cols,
-                reload: this.loadArticulos
+                reload: this.loadArticulos,
             }
 
             this.useModals.setModal('mConfigFiltros', 'Filtros', null, send, true)
@@ -304,7 +379,7 @@ export default {
             this[method](item)
         },
         async eliminarBulk() {
-            const ids = this.vista.articulos.filter(a => a.selected).map(b => b.id)
+            const ids = this.vista.articulos.filter((a) => a.selected).map((b) => b.id)
 
             const resQst = await jqst(`¿Está seguro de eliminar ${ids.length} registros?`)
             if (resQst.isConfirmed == false) return
@@ -316,21 +391,21 @@ export default {
 
             if (res.code != 0) return
 
-            this.vista.articulos = this.vista.articulos.filter(a => !a.selected)
+            this.vista.articulos = this.vista.articulos.filter((a) => !a.selected)
             this.$refs['jdtable'].toogleSelectItems()
         },
         async editarBulk() {
             await this.loadDatosSistema()
             await this.loadCategorias()
 
-            const cols = this.columns.filter(a => a.editable == true)
-            cols.find(a => a.id == 'unidad').lista = this.vista.unidades
-            cols.find(a => a.id == 'has_fv').lista = this.vista.estados
-            cols.find(a => a.id == 'activo').lista = this.vista.estados
-            cols.find(a => a.id == 'igv_afectacion').lista = this.vista.igv_afectaciones
-            cols.find(a => a.id == 'categoria').lista = this.vista.articulo_categorias
+            const cols = this.columns.filter((a) => a.editable == true)
+            cols.find((a) => a.id == 'unidad').lista = this.vista.unidades
+            cols.find((a) => a.id == 'has_fv').lista = this.vista.estados
+            cols.find((a) => a.id == 'activo').lista = this.vista.estados
+            cols.find((a) => a.id == 'igv_afectacion').lista = this.vista.igv_afectaciones
+            cols.find((a) => a.id == 'categoria').lista = this.vista.articulo_categorias
 
-            const ids = this.vista.articulos.filter(a => a.selected).map(b => b.id)
+            const ids = this.vista.articulos.filter((a) => a.selected).map((b) => b.id)
 
             const send = {
                 uri: 'articulos',
@@ -404,7 +479,7 @@ export default {
                 articulo: item,
                 transaccion: {
                     estado: 2,
-                }
+                },
             }
 
             this.useModals.setModal('mAjusteStock', 'Ajuste de stock', null, send, true)

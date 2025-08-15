@@ -22,8 +22,13 @@
             :reload="loadKardex"
             :colAct="true"
             :rowOptions="tableRowOptions"
+            maxHeight="80vh"
             @rowOptionSelected="runMethod"
         >
+            <template v-slot:cMoreInfo="{ item }">
+                {{ item.transaccion1?.socio1?.nombres }}
+            </template>
+
             <!-- <template v-slot:cTipo="{ item }">
                 <i class="fa-solid fa-ban anulado" v-if="item.transaccion1.estado == 0"></i>
                 {{ item.transaccion1.tipo1.nombre }}
@@ -118,6 +123,14 @@ export default {
                 format: 'decimal',
                 toRight: true,
                 width: '8rem',
+                show: true,
+                seek: true,
+            },
+            {
+                id: 'more_info',
+                title: '...',
+                slot: 'cMoreInfo',
+                width: '20rem',
                 show: true,
                 seek: true,
             },

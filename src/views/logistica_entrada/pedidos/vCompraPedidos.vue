@@ -151,7 +151,7 @@ export default {
             { label: 'Ver', icon: 'fa-regular fa-folder-open', action: 'ver', permiso: 'vCompraPedidos:ver' },
             { label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar', permiso: 'vCompraPedidos:editar', ocultar: { estado: ['0', '2'] } },
             { label: 'Terminar', icon: 'fa-solid fa-check-double', action: 'terminar', permiso: 'vCompraPedidos:terminar', ocultar: { estado: ['0', '2'] } },
-            { label: 'Anular', icon: 'fa-solid fa-ban', action: 'anular', permiso: 'vCompraPedidos:anular', ocultar: { estado: ['0', '2'] } },
+            // { label: 'Anular', icon: 'fa-solid fa-ban', action: 'anular', permiso: 'vCompraPedidos:anular', ocultar: { estado: ['0', '2'] } },
             // { label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar', permiso: 'vCompraPedidos:anular' },
             { label: 'Exportar en PDF', icon: 'fa-regular fa-file-pdf', action: 'generarPdf', permiso: 'vCompraPedidos:generarPdf' },
             { label: 'Ingresar mercadería', icon: 'fa-regular fa-circle-up', action: 'ingresarMercaderia', permiso: 'vCompraPedidos:ingresarMercaderia', ocultar: { estado: ['0', '2'] } },

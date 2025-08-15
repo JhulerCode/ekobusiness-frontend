@@ -2,33 +2,74 @@
     <JdModal modal="mSocioPedido" :buttons="buttons" @button-click="(action) => this[action]()">
         <div class="container-datos">
             <div class="left">
-                <JdInput type="date" label="Fecha" :nec="true" v-model="modal.item.fecha" :disabled="modal.mode == 3"
-                    style="grid-column: 1/3" />
+                <JdInput
+                    type="date"
+                    label="Fecha"
+                    :nec="true"
+                    v-model="modal.item.fecha"
+                    :disabled="modal.mode == 3"
+                    style="grid-column: 1/3"
+                />
 
-                <JdSelect :label="modal.item.tipo == 1 ? 'Proveedor' : 'Cliente'" :nec="true" v-model="modal.item.socio"
-                    :lista="modal.socios || []" mostrar="nombres_apellidos" @elegir="setSocio"
-                    :loaded="modal.sociosLoaded" @reload="loadSocios()"
-                    :disabled="modal.mode == 3 || modal.socio?.id != null" style="grid-column: 1/5;" />
+                <JdSelect
+                    :label="modal.item.tipo == 1 ? 'Proveedor' : 'Cliente'"
+                    :nec="true"
+                    v-model="modal.item.socio"
+                    :lista="modal.socios || []"
+                    mostrar="nombres_apellidos"
+                    @elegir="setSocio"
+                    :loaded="modal.sociosLoaded"
+                    @reload="loadSocios()"
+                    :disabled="modal.mode == 3 || modal.socio?.id != null"
+                    style="grid-column: 1/5"
+                />
 
-                <JdSelect label="Contacto" :nec="modal.item.tipo == 1" v-model="modal.item.contacto"
-                    :lista="modal.socio?.contactos || []" :disabled="modal.mode == 3" style="grid-column: 1/5;" />
+                <JdSelect
+                    label="Contacto"
+                    :nec="modal.item.tipo == 1"
+                    v-model="modal.item.contacto"
+                    :lista="modal.socio?.contactos || []"
+                    :disabled="modal.mode == 3"
+                    style="grid-column: 1/5"
+                />
 
-                <JdInput label="Nro pedido" v-model="modal.item.codigo" :disabled="modal.mode == 3"
-                    style="grid-column: 1/4" />
+                <JdInput
+                    label="Nro pedido"
+                    v-model="modal.item.codigo"
+                    :disabled="modal.mode == 3"
+                    style="grid-column: 1/4"
+                />
             </div>
 
             <div class="right">
-                <JdSelect label="Estado" v-model="modal.item.estado" :lista="modal.pedido_estados || []"
-                    :disabled="true" style="grid-column: 1/3;" />
+                <JdSelect
+                    label="Estado"
+                    v-model="modal.item.estado"
+                    :lista="modal.pedido_estados || []"
+                    :disabled="true"
+                    style="grid-column: 1/3"
+                />
 
-                <JdSelect label="Moneda" :nec="true" v-model="modal.item.moneda" :lista="modal.monedas || []"
-                    @elegir="setTipoCambio" :disabled="modal.mode == 3 || modal.item.moneda != null"
-                    style="grid-column: 1/4;" />
+                <JdSelect
+                    label="Moneda"
+                    :nec="true"
+                    v-model="modal.item.moneda"
+                    :lista="modal.monedas || []"
+                    @elegir="setTipoCambio"
+                    :disabled="modal.mode == 3 || modal.item.moneda != null"
+                    style="grid-column: 1/4"
+                />
 
                 <!-- <small v-if="modal.item.moneda">TC: {{ modal.item.tipo_cambio }}</small> -->
 
-                <JdSelect label="Condición de pago" :nec="true" v-model="modal.item.pago_condicion"
-                    :lista="modal.pago_condiciones || []" :disabled="modal.mode == 3" style="grid-column: 1/5;" />
+                <JdSelect
+                    label="Condición de pago"
+                    :nec="true"
+                    v-model="modal.item.pago_condicion"
+                    :lista="modal.pago_condiciones || []"
+                    :disabled="modal.mode == 3"
+                    style="grid-column: 1/5"
+                />
             </div>
         </div>
 
@@ -36,12 +77,25 @@
 
         <div class="botom">
             <div class="left">
-                <JdSelect label="Direcciones" :nec="true" v-model="modal.direccion_entrega"
-                    :lista="(modal.item.tipo == 1 ? modal.empresa?.direcciones : modal.socio?.direcciones) || []"
-                    :disabled="modal.mode == 3" @elegir="setDireccionEntrega" v-if="modal.mode != 3" />
+                <JdSelect
+                    label="Direcciones"
+                    :nec="true"
+                    v-model="modal.direccion_entrega"
+                    :lista="
+                        (modal.item.tipo == 1
+                            ? modal.empresa?.direcciones
+                            : modal.socio?.direcciones) || []
+                    "
+                    :disabled="modal.mode == 3"
+                    @elegir="setDireccionEntrega"
+                    v-if="modal.mode != 3"
+                />
 
-                <JdTextArea label="Dirección de entrega" v-model="modal.item.direccion_entrega"
-                    :disabled="modal.mode == 3" />
+                <JdTextArea
+                    label="Dirección de entrega"
+                    v-model="modal.item.direccion_entrega"
+                    :disabled="modal.mode == 3"
+                />
             </div>
 
             <div class="totales">
@@ -129,8 +183,7 @@ export default {
             if (this.modal.mode == 1) {
                 this.buttons[0].show = true
                 this.buttons[2].show = true
-            }
-            else if (this.modal.mode == 2) {
+            } else if (this.modal.mode == 2) {
                 this.buttons[3].show = true
             }
         },
@@ -139,7 +192,9 @@ export default {
             if (this.modal.mode == 1) {
                 if (this.modal.item.tipo == 1) {
                     if (this.modal.item.direccion_entrega) return
-                    const direccion_principal = this.modal.empresa.direcciones.find(a => a.principal == true)
+                    const direccion_principal = this.modal.empresa.direcciones.find(
+                        (a) => a.principal == true,
+                    )
                     this.modal.direccion_entrega = direccion_principal.id
                     this.modal.item.direccion_entrega = direccion_principal.direccion
                 }
@@ -150,8 +205,7 @@ export default {
 
             if (this.modal.item.tipo == 1) {
                 this.modal.item.direccion_entrega = item.direccion
-            }
-            else if (this.modal.item.tipo == 2) {
+            } else if (this.modal.item.tipo == 2) {
                 this.modal.item.direccion_entrega = item.direccion
             }
         },
@@ -180,8 +234,7 @@ export default {
         async nuevo() {
             if (this.modal.mode == 3 || this.modal.item.socio_pedido_items.length == 0) {
                 this.initPedido()
-            }
-            else {
+            } else {
                 const resQst = await jqst('¿Está seguro de generar un nuevo pedido?')
                 if (resQst.isConfirmed) this.initPedido()
             }
@@ -196,38 +249,51 @@ export default {
         setSocio(item) {
             this.modal.socio = { ...item }
 
-            this.modal.item.contacto = this.modal.socio.contactos.find(a => a.principal == true)?.id
+            this.modal.item.contacto = this.modal.socio.contactos.find(
+                (a) => a.principal == true,
+            )?.id
             this.modal.item.pago_condicion = this.modal.socio.pago_condicion
 
             if (this.modal.item.tipo == 2) {
-                const direccion_principal = this.modal.socio.direcciones.find(a => a.principal == true)
+                const direccion_principal = this.modal.socio.direcciones.find(
+                    (a) => a.principal == true,
+                )
                 this.modal.direccion_entrega = direccion_principal.id
                 this.modal.item.direccion_entrega = direccion_principal.direccion
             }
         },
 
         checkDatos() {
-            const props = [
-                'tipo', 'fecha', 'socio', 'moneda', 'pago_condicion',
-            ]
+            const props = ['tipo', 'fecha', 'socio', 'moneda', 'pago_condicion']
 
-            if (this.modal.item.tipo == 1) props.push('contacto')
+            if (this.modal.item.tipo == 1) {
+                props.push('contacto')
+
+                const contacto_datos = this.modal.socio.contactos.find(
+                    (a) => a.id == this.modal.item.contacto,
+                )
+
+                if (contacto_datos == undefined) {
+                    jmsg('warning', 'Seleccione un contacto')
+                    return true
+                }
+            }
 
             if (incompleteData(this.modal.item, props)) {
                 jmsg('warning', 'Ingrese los datos necesarios')
                 return true
             }
 
-            const contacto_datos = this.modal.socio.contactos.find(a => a.id == this.modal.item.contacto)
-            if (contacto_datos == undefined) {
-                jmsg('warning', 'Seleccione un contacto')
-                return true
-            }
-
             for (const a of this.modal.item.socio_pedido_items) {
                 const props1 = [
-                    'articulo', 'nombre', 'unidad', 'has_fv', 'cantidad',
-                    'pu', 'igv_afectacion', 'igv_porcentaje',
+                    'articulo',
+                    'nombre',
+                    'unidad',
+                    'has_fv',
+                    'cantidad',
+                    'pu',
+                    'igv_afectacion',
+                    'igv_porcentaje',
                 ]
                 // console.log(a.nombre)
                 if (incompleteData(a, props1)) {
@@ -250,7 +316,9 @@ export default {
                 nombres: this.modal.socio.nombres,
             }
 
-            this.modal.item.contacto_datos = this.modal.socio.contactos.find(a => a.id == this.modal.item.contacto)
+            this.modal.item.contacto_datos = this.modal.socio.contactos.find(
+                (a) => a.id == this.modal.item.contacto,
+            )
 
             this.modal.item.monto = this.modal.mtoImpVenta.toFixed(2)
             this.setTipoCambio()
@@ -293,8 +361,19 @@ export default {
 
         async loadSocios() {
             const qry = {
-                fltr: { tipo: { op: 'Es', val: this.modal.item.tipo }, activo: { op: 'Es', val: true } },
-                cols: ['nombres', 'apellidos', 'nombres_apellidos', 'contactos', 'direcciones', 'precio_lista', 'pago_condicion'],
+                fltr: {
+                    tipo: { op: 'Es', val: this.modal.item.tipo },
+                    activo: { op: 'Es', val: true },
+                },
+                cols: [
+                    'nombres',
+                    'apellidos',
+                    'nombres_apellidos',
+                    'contactos',
+                    'direcciones',
+                    'precio_lista',
+                    'pago_condicion',
+                ],
                 incl: ['precio_lista1'],
             }
 
@@ -309,7 +388,7 @@ export default {
 
             this.modal.socios = res.data
             if (this.modal.item.socio) {
-                this.modal.socio = this.modal.socios.find(a => a.id == this.modal.item.socio)
+                this.modal.socio = this.modal.socios.find((a) => a.id == this.modal.item.socio)
             }
         },
         async loadMonedas() {
@@ -335,7 +414,7 @@ export default {
             Object.assign(this.modal, res.data)
         },
     },
-};
+}
 </script>
 
 <style lang="scss" scoped>

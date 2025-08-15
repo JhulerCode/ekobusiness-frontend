@@ -145,7 +145,7 @@ export default {
         tableRowOptions: [
             { id: 1, label: 'Ver', icon: 'fa-regular fa-folder-open', action: 'ver', permiso: 'vVentas:ver' },
             // { id: 2, label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar' },
-            { id: 3, label: 'Anular', icon: 'fa-solid fa-ban', action: 'anular', permiso: 'vVentas:anular', ocultar: { estado: 0 } },
+            // { id: 3, label: 'Anular', icon: 'fa-solid fa-ban', action: 'anular', permiso: 'vVentas:anular', ocultar: { estado: 0 } },
             // { id: 4, label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar', permiso: 'vVentas:anular' },
             { id: 5, label: 'Control de despacho', icon: 'fa-solid fa-star', action: 'controlDespacho', permiso: 'vVentas:controlDespacho' },
         ],
@@ -262,8 +262,7 @@ export default {
                 // pedido: res.data.socio_pedido ? { ...res.data.socio_pedido1 } : null,
                 pedidos: res.data.socio_pedido ? [{ ...res.data.socio_pedido1 }] : []
             }
-
-            console.log(send)
+            // console.log(send)
 
             this.useModals.setModal('mTransaccion', 'Ver venta', 3, send, true)
         },

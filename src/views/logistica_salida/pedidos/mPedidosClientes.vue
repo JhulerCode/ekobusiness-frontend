@@ -1,8 +1,14 @@
 <template>
     <JdModal modal="mPedidosClientes">
         <div class="contairner-datos">
-            <JdSelect label="Cliente" v-model="modal.socio" :lista="modal.clientes || []" mostrar="nombres_apellidos"
-                :loaded="modal.clientesLoaded" @reload="loadClientes" />
+            <JdSelect
+                label="Cliente"
+                v-model="modal.socio"
+                :lista="modal.clientes || []"
+                mostrar="nombres_apellidos"
+                :loaded="modal.clientesLoaded"
+                @reload="loadClientes"
+            />
 
             <JdButton text="Buscar" tipo="2" @click="loadPedidos" />
         </div>
@@ -13,8 +19,8 @@
             </template>
 
             <template v-slot:cFaltante="{ item }">
-                <span :class="{ 'negativo': (item.stock - (item.cantidad - item.entregado)) < 0 }">
-                    {{ redondear(item.stock - (item.cantidad - item.entregado), 0) }}
+                <span class="negativo" v-if="item.stock < item.cantidad - item.entregado">
+                    {{ redondear(item.cantidad - item.entregado - item.stock, 0) }}
                 </span>
             </template>
         </JdTable>
@@ -56,7 +62,7 @@ export default {
                 width: '25rem',
                 show: true,
                 seek: true,
-                sort: true
+                sort: true,
             },
             {
                 id: 'stock',
@@ -72,7 +78,7 @@ export default {
                 slot: 'cCantidad',
                 toRight: true,
                 width: '7rem',
-                show: true
+                show: true,
             },
             {
                 id: 'faltante',
@@ -80,9 +86,9 @@ export default {
                 slot: 'cFaltante',
                 toRight: true,
                 width: '7rem',
-                show: true
-            }
-        ]
+                show: true,
+            },
+        ],
     }),
     created() {
         this.modal = this.useModals.mPedidosClientes
@@ -93,7 +99,7 @@ export default {
         async loadClientes() {
             const qry = {
                 fltr: { tipo: { op: 'Es', val: 2 }, activo: { op: 'Es', val: true } },
-                cols: ['nombres', 'apellidos', 'nombres_apellidos']
+                cols: ['nombres', 'apellidos', 'nombres_apellidos'],
             }
 
             this.modal.clientesLoaded = false
@@ -108,7 +114,7 @@ export default {
         },
         async loadPedidos() {
             const qry = {
-                socio: this.modal.socio
+                socio: this.modal.socio,
             }
 
             this.modal.articulos = []
@@ -120,7 +126,7 @@ export default {
 
             this.modal.articulos = res.data
         },
-    }
+    },
 }
 </script>
 
@@ -133,6 +139,6 @@ export default {
 }
 
 .negativo {
-    color: var(--rojo)
+    color: var(--rojo);
 }
 </style>

@@ -151,7 +151,7 @@ export default {
         tableRowOptions: [
             { label: 'Ver', icon: 'fa-regular fa-folder-open', action: 'ver', permiso: 'vCompras:ver' },
             // { label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar', permiso: 'vCompras:ver' },
-            { label: 'Anular', icon: 'fa-solid fa-ban', action: 'anular', permiso: 'vCompras:anular', ocultar: { estado: 0 } },
+            // { label: 'Anular', icon: 'fa-solid fa-ban', action: 'anular', permiso: 'vCompras:anular', ocultar: { estado: 0 } },
             // { label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar', permiso: 'vCompras:anular' },
         ],
     }),

@@ -54,6 +54,7 @@ export default {
                 toRight: true,
                 width: '7rem',
                 show: true,
+                sort: true
             },
             {
                 id: 'pedido',
@@ -61,7 +62,8 @@ export default {
                 slot: 'cCantidad',
                 toRight: true,
                 width: '7rem',
-                show: true
+                show: true,
+                sort: true
             },
             {
                 id: 'faltante',
@@ -69,7 +71,8 @@ export default {
                 slot: 'cFaltante',
                 toRight: true,
                 width: '7rem',
-                show: true
+                show: true,
+                sort: true
             }
         ]
     }),

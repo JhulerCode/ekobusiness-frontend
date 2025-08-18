@@ -6,13 +6,21 @@
             <div class="buttons">
                 <JdButton
                     text="Ver productos pedidos"
+                    tipo="2"
                     @click="verPedidos"
                     v-if="useAuth.verifyPermiso('vProgramaFiltrantes:verProductosPedidos')"
                 />
 
+                <JdInput
+                    v-model="columns[0].val"
+                    type="date"
+                    @change="setFecha"
+                    style="width: 10rem"
+                />
+
                 <JdSelect
                     :lista="vista.maquinas || []"
-                    v-model="vista.maquina"
+                    v-model="columns[1].val"
                     @elegir="setMaquina"
                     style="width: 8rem"
                 />
@@ -81,6 +89,7 @@
 import JdTable from '@/components/JdTable.vue'
 import JdButton from '@/components/inputs/JdButton.vue'
 import JdSelect from '@/components/inputs/JdSelect.vue'
+import JdInput from '@/components/inputs/JdInput.vue'
 
 import mProduccionOrden from '@/views/produccion/historial/mProduccionOrden.vue'
 import mProduccionInsumos from '@/views/produccion/historial/mProduccionInsumos.vue'
@@ -101,6 +110,7 @@ export default {
         JdTable,
         JdButton,
         JdSelect,
+        JdInput,
 
         mProduccionOrden,
         mProduccionInsumos,
@@ -115,6 +125,7 @@ export default {
 
         vista: {},
 
+        tableName: 'vProgramaFiltrantes',
         columns: [
             {
                 id: 'fecha',
@@ -165,7 +176,6 @@ export default {
                 id: 'tiempo',
                 title: 'Tiempo',
                 slot: 'cTiempo',
-                // toRight: true,
                 width: '8rem',
                 show: true,
                 seek: true,
@@ -221,7 +231,8 @@ export default {
     }),
     async created() {
         this.vista = this.useVistas.vProgramaFiltrantes
-        this.loadMaquina()
+        // this.loadMaquina()
+        this.useAuth.setColumns(this.tableName, this.columns)
 
         if (this.vista.loaded) return
 
@@ -230,17 +241,28 @@ export default {
             this.loadProduccionOrdenes()
     },
     methods: {
-        loadMaquina() {
-            const maq = localStorage.getItem('vProgramaFiltrantes_maquina')
-            if (maq != null) this.vista.maquina = maq
-        },
-        async setMaquina() {
-            if (this.vista.maquina == null) {
-                localStorage.removeItem('vProgramaFiltrantes_maquina')
+        // loadMaquina() {
+        //     const maq = localStorage.getItem('vProgramaFiltrantes_maquina')
+        //     if (maq != null) this.vista.maquina = maq
+        // },
+        async setFecha() {
+            if (this.columns[0].val == null) {
+                delete this.columns[1].op
             } else {
-                localStorage.setItem('vProgramaFiltrantes_maquina', this.vista.maquina)
+                this.columns[0].op = 'Es'
             }
 
+            this.useAuth.saveTableColumns(this.tableName, this.columns)
+            this.loadProduccionOrdenes()
+        },
+        async setMaquina() {
+            if (this.columns[1].val == null) {
+                delete this.columns[1].op
+            } else {
+                this.columns[1].op = 'Es'
+            }
+
+            this.useAuth.saveTableColumns(this.tableName, this.columns)
             await this.setMaquinas()
             this.loadProduccionOrdenes()
         },
@@ -262,9 +284,9 @@ export default {
         async setMaquinas() {
             await this.loadMaquinas()
 
-            if (this.vista.maquina != null) {
+            if (this.columns[1].val != null) {
                 this.vista.maquinasConProduccion = this.vista.maquinas
-                    .filter((a) => a.produccion_tipo == 1 && a.id == this.vista.maquina)
+                    .filter((a) => a.produccion_tipo == 1 && a.id == this.columns[1].val)
                     .map((a) => ({
                         ...a,
                         tiempo: 0,
@@ -289,25 +311,27 @@ export default {
         setQuery() {
             this.vista.qry = {
                 fltr: { tipo: { op: 'Es', val: 1 }, estado: { op: 'Es', val: 1 } },
-                cols: [
-                    'fecha',
-                    'orden',
-                    'maquina',
-                    'maquina_info',
-                    'articulo',
-                    'articulo_info',
-                    'cantidad',
-                    'estado',
-                ],
+                // cols: [
+                    // 'fecha',
+                    // 'orden',
+                    // 'maquina',
+                    // 'maquina_info',
+                    // 'articulo',
+                    // 'articulo_info',
+                    // 'cantidad',
+                    // 'estado',
+                // ],
             }
 
-            if (this.vista.maquina != null)
-                this.vista.qry.fltr.maquina = { op: 'Es', val: this.vista.maquina }
+            // if (this.vista.maquina != null)
+            //     this.vista.qry.fltr.maquina = { op: 'Es', val: this.vista.maquina }
+            this.useAuth.updateQuery(this.columns, this.vista.qry)
+            this.vista.qry.cols.push('maquina_info', 'articulo_info')
         },
         async loadProduccionOrdenes() {
-            this.vista.produccion_ordenes = []
             this.setQuery()
 
+            this.vista.produccion_ordenes = []
             this.useAuth.setLoading(true, 'Cargando...')
             const res = await get(
                 `${urls.produccion_ordenes}?qry=${JSON.stringify(this.vista.qry)}`,

@@ -131,7 +131,7 @@ export default {
 
         this.showButtons()
         this.loadDatosSistema()
-        
+
         if (this.modal.mode != 3) {
             this.loadMaquinas()
         }

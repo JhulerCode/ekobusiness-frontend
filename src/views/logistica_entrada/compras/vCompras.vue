@@ -4,16 +4,31 @@
             <strong>Compras</strong>
 
             <div class="buttons">
-                <JdButton text="Recuperar guardado" tipo="2" @click="recuperarGuardado()"
-                    v-if="useAuth.avances.mCompra && useAuth.verifyPermiso('vCompras:crear')" />
+                <JdButton
+                    text="Recuperar guardado"
+                    tipo="2"
+                    @click="recuperarGuardado()"
+                    v-if="useAuth.avances.mCompra && useAuth.verifyPermiso('vCompras:crear')"
+                />
 
-                <JdButton text="Nuevo" @click="nuevo()" v-if="useAuth.verifyPermiso('vCompras:crear')" />
+                <JdButton
+                    text="Nuevo"
+                    @click="nuevo()"
+                    v-if="useAuth.verifyPermiso('vCompras:crear')"
+                />
             </div>
         </div>
 
-        <JdTable :name="tableName" :columns="columns" :datos="vista.transacciones || []" :colAct="true"
-            :configFiltros="openConfigFiltros" :reload="loadTransacciones" :rowOptions="tableRowOptions"
-            @rowOptionSelected="runMethod">
+        <JdTable
+            :name="tableName"
+            :columns="columns"
+            :datos="vista.transacciones || []"
+            :colAct="true"
+            :configFiltros="openConfigFiltros"
+            :reload="loadTransacciones"
+            :rowOptions="tableRowOptions"
+            @rowOptionSelected="runMethod"
+        >
         </JdTable>
     </div>
 
@@ -66,7 +81,6 @@ export default {
         tableName: 'vCompras',
         columns: [
             {
-
                 id: 'fecha',
                 title: 'Fecha',
                 type: 'date',
@@ -149,7 +163,12 @@ export default {
             },
         ],
         tableRowOptions: [
-            { label: 'Ver', icon: 'fa-regular fa-folder-open', action: 'ver', permiso: 'vCompras:ver' },
+            {
+                label: 'Ver',
+                icon: 'fa-regular fa-folder-open',
+                action: 'ver',
+                permiso: 'vCompras:ver',
+            },
             // { label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar', permiso: 'vCompras:ver' },
             // { label: 'Anular', icon: 'fa-solid fa-ban', action: 'anular', permiso: 'vCompras:anular', ocultar: { estado: 0 } },
             // { label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar', permiso: 'vCompras:anular' },
@@ -198,7 +217,7 @@ export default {
                     fecha: dayjs().format('YYYY-MM-DD'),
                     estado: 1,
                     transaccion_items: [],
-                }
+                },
             }
 
             this.useModals.setModal('mTransaccion', 'Nueva compra', 1, send, true)
@@ -210,7 +229,9 @@ export default {
 
             if (this.useAuth.avances.mCompra.socio_pedido) {
                 this.useAuth.setLoading(true, 'Cargando...')
-                const res = await get(`${urls.socio_pedidos}/uno/${this.useAuth.avances.mCompra.socio_pedido}`)
+                const res = await get(
+                    `${urls.socio_pedidos}/uno/${this.useAuth.avances.mCompra.socio_pedido}`,
+                )
                 this.useAuth.setLoading(false)
 
                 if (res.code != 0) return
@@ -220,10 +241,12 @@ export default {
                 //     id: res.data.id,
                 //     codigo: res.data.codigo,
                 // }
-                send.pedidos = [{
-                    id: res.data.id,
-                    codigo: res.data.codigo,
-                }]
+                send.pedidos = [
+                    {
+                        id: res.data.id,
+                        codigo: res.data.codigo,
+                    },
+                ]
             }
 
             this.useModals.setModal('mTransaccion', 'Nueva compra', 1, send, true)
@@ -235,15 +258,15 @@ export default {
             await this.loadMonedas()
 
             const cols = this.columns
-            cols.find(a => a.id == 'socio').lista = this.vista.socios
-            cols.find(a => a.id == 'pago_condicion').lista = this.vista.pago_condiciones
-            cols.find(a => a.id == 'moneda').lista = this.vista.monedas
-            cols.find(a => a.id == 'estado').lista = this.vista.transaccion_estados
+            cols.find((a) => a.id == 'socio').lista = this.vista.socios
+            cols.find((a) => a.id == 'pago_condicion').lista = this.vista.pago_condiciones
+            cols.find((a) => a.id == 'moneda').lista = this.vista.monedas
+            cols.find((a) => a.id == 'estado').lista = this.vista.transaccion_estados
 
             const send = {
                 table: this.tableName,
                 cols,
-                reload: this.loadTransacciones
+                reload: this.loadTransacciones,
             }
 
             this.useModals.setModal('mConfigFiltros', 'Filtros', null, send, true)
@@ -264,7 +287,7 @@ export default {
                 socio: { ...res.data.socio1 },
                 socios: [{ ...res.data.socio1 }],
                 monedas: [{ ...res.data.moneda1 }],
-                pedidos: res.data.socio_pedido ? [{ ...res.data.socio_pedido1 }] : []
+                pedidos: res.data.socio_pedido ? [{ ...res.data.socio_pedido1 }] : [],
             }
 
             this.useModals.setModal('mTransaccion', 'Ver compra', 3, send, true)
@@ -295,7 +318,7 @@ export default {
         async loadSocios() {
             const qry = {
                 fltr: { tipo: { op: 'Es', val: 1 }, activo: { op: 'Es', val: true } },
-                cols: ['nombres', 'apellidos', 'nombres_apellidos']
+                cols: ['nombres', 'apellidos', 'nombres_apellidos'],
             }
 
             this.vista.socios = []

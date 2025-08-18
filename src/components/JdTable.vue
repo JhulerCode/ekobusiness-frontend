@@ -180,7 +180,7 @@
                                 tipo="2"
                                 :small="true"
                                 :id="'button-options-' + a.id"
-                                @click="openOptions(a)"
+                                @click="toogleRowOptions({ ...a, i })"
                                 v-if="rowOptions.length > 0"
                             />
                         </td>
@@ -381,9 +381,9 @@
         <transition name="fade">
             <ul
                 class="row-options-case scroll-tiny"
-                v-if="optionsCaseItem.id"
+                v-if="optionsCaseItem.i >= 0"
                 @click.stop
-                id="options-case"
+                :id="'options-case-' + this.name"
             >
                 <template v-for="(b, i) in rowOptions" :key="i">
                     <li @click="selectOption(b)" v-if="verifyPermiso(optionsCaseItem, b)">
@@ -656,17 +656,17 @@ export default {
             if (column) this.sortData(column, column.sortDirection)
         },
 
-        openOptions(item) {
+        toogleRowOptions(item) {
             const previousItem = this.optionsCaseItem
             this.hide()
-            if (previousItem.id == item.id) return
+            if (previousItem.i == item.i) return
 
             this.optionsCaseItem = item
             const screenWidth = window.innerWidth
             const screenHeight = window.innerHeight
 
             this.$nextTick(() => {
-                const el = document.getElementById(`options-case`)
+                const el = document.getElementById('options-case-' + this.name)
 
                 setTimeout(() => {
                     const rect = document
@@ -695,7 +695,7 @@ export default {
         },
         closeOnOutside(event) {
             // this.$nextTick(() => {
-            const el = document.getElementById(`options-case`)
+            const el = document.getElementById('options-case-' + this.name)
 
             if (el && !el.contains(event.target)) {
                 this.hide()

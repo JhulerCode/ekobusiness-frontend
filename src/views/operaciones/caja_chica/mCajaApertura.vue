@@ -1,17 +1,37 @@
 <template>
     <JdModal modal="mCajaApertura" :buttons="buttons" @button-click="(action) => this[action]()">
         <div class="container-datos">
-            <JdInput label="Fecha apertura" :nec="true" type="date" v-model="caja_apertura.fecha_apertura"
-                :disabled="modal.mode != 1" />
-            <JdInput label="Monto apertura" :nec="true" type="number" v-model="caja_apertura.monto_apertura"
-                :disabled="modal.mode != 1" />
+            <JdInput
+                label="Fecha apertura"
+                :nec="true"
+                type="date"
+                v-model="caja_apertura.fecha_apertura"
+                :disabled="modal.mode != 1"
+            />
+            <JdInput
+                label="Monto apertura"
+                :nec="true"
+                type="number"
+                v-model="caja_apertura.monto_apertura"
+                :disabled="modal.mode != 1"
+            />
         </div>
 
         <div class="container-datos mrg-top1" v-if="[2, 3].includes(modal.mode)">
-            <JdInput label="Fecha cierre" :nec="true" type="date" v-model="caja_apertura.fecha_cierre"
-                :disabled="modal.mode != 2" />
-            <JdInput label="Monto cierre" :nec="true" type="number" v-model="caja_apertura.monto_cierre"
-                :disabled="modal.mode != 2" />
+            <JdInput
+                label="Fecha cierre"
+                :nec="true"
+                type="date"
+                v-model="caja_apertura.fecha_cierre"
+                :disabled="modal.mode != 2"
+            />
+            <JdInput
+                label="Monto cierre"
+                :nec="true"
+                type="number"
+                v-model="caja_apertura.monto_cierre"
+                :disabled="modal.mode != 2"
+            />
         </div>
 
         <div class="container-resumen" v-if="modal.mode != 1">
@@ -26,31 +46,61 @@
             </div>
         </div>
 
-
-
         <div class="container-movimientos" v-if="[3, 4].includes(modal.mode)">
             <p class="mrg-btm1">
                 <strong>--- Movimientos ---</strong>
             </p>
 
-            <div class="container-agregar"
-                v-if="modal.mode == 4 && useAuth.verifyPermiso('vCajaMovimientos:crear', 'vCajaMovimientos:editar')">
+            <div
+                class="container-agregar"
+                v-if="
+                    modal.mode == 4 &&
+                    useAuth.verifyPermiso('vCajaMovimientos:crear', 'vCajaMovimientos:editar')
+                "
+            >
                 <div class="container-nuevo">
                     <JdInput label="Fecha" :nec="true" type="date" v-model="modal.nuevo.fecha" />
-                    <JdInput label="Detalle" :nec="true" type="text" v-model="modal.nuevo.detalle" />
+                    <JdInput
+                        label="Detalle"
+                        :nec="true"
+                        type="text"
+                        v-model="modal.nuevo.detalle"
+                    />
                     <JdInput label="Monto" :nec="true" type="number" v-model="modal.nuevo.monto" />
 
-                    <JdButton text="Grabar" tipo="2" @click="addMovimiento"
-                        v-if="useAuth.verifyPermiso('vCajaMovimientos:crear') && modal.nuevo?.id == null" />
+                    <JdButton
+                        text="Grabar"
+                        tipo="2"
+                        @click="addMovimiento"
+                        v-if="
+                            useAuth.verifyPermiso('vCajaMovimientos:crear') &&
+                            modal.nuevo?.id == null
+                        "
+                    />
 
-                    <JdButton icon="fa-solid fa-pen-to-square" text="Actualizar" tipo="2" @click="editarMovimiento"
-                        v-if="useAuth.verifyPermiso('vCajaMovimientos:editar') && modal.nuevo?.id != null" />
+                    <JdButton
+                        icon="fa-solid fa-pen-to-square"
+                        text="Actualizar"
+                        tipo="2"
+                        @click="editarMovimiento"
+                        v-if="
+                            useAuth.verifyPermiso('vCajaMovimientos:editar') &&
+                            modal.nuevo?.id != null
+                        "
+                    />
                 </div>
             </div>
 
-            <JdTable :columns="columns" :datos="caja_apertura?.caja_movimientos || []" maxHeight="30rem"
-                :colAct="modal.mode != 3" :reload="loadCajaMovimientos" :rowOptions="tableRowOptions"
-                @rowOptionSelected="runMethod" ref="jdtable">
+            <JdTable
+                :columns="columns"
+                :datos="caja_apertura?.caja_movimientos || []"
+                maxHeight="30rem"
+                :colAct="modal.mode != 3"
+                :reload="loadCajaMovimientos"
+                :rowOptions="tableRowOptions"
+                @rowOptionSelected="runMethod"
+                ref="jdtable"
+            >
             </JdTable>
         </div>
     </JdModal>
@@ -81,8 +131,11 @@ export default {
         egresos() {
             // Suma todos los montos de los movimientos
             if (!this.caja_apertura || !this.caja_apertura.caja_movimientos) return 0
-            return this.caja_apertura.caja_movimientos.reduce((acc, mov) => acc + (mov.monto || 0), 0)
-        }
+            return this.caja_apertura.caja_movimientos.reduce(
+                (acc, mov) => acc + (mov.monto || 0),
+                0,
+            )
+        },
     },
     data: () => ({
         useAuth: useAuth(),
@@ -106,7 +159,7 @@ export default {
                 width: '8rem',
                 show: true,
                 seek: true,
-                sort: true
+                sort: true,
             },
             {
                 id: 'detalle',
@@ -122,11 +175,24 @@ export default {
                 width: '10rem',
                 show: true,
                 seek: true,
-            }
+            },
         ],
         tableRowOptions: [
-            { id: 1, label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editMovimiento', permiso: 'vCajaMovimientos:editar' },
-            { id: 2, label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'deleteMovimiento', permiso: 'vCajaMovimientos:eliminar', ocultar: { estado: 2 } },
+            {
+                id: 1,
+                label: 'Editar',
+                icon: 'fa-solid fa-pen-to-square',
+                action: 'editMovimiento',
+                permiso: 'vCajaMovimientos:editar',
+            },
+            {
+                id: 2,
+                label: 'Eliminar',
+                icon: 'fa-solid fa-trash-can',
+                action: 'deleteMovimiento',
+                permiso: 'vCajaMovimientos:eliminar',
+                ocultar: { estado: 2 },
+            },
         ],
     }),
     created() {
@@ -146,8 +212,7 @@ export default {
         showButtons() {
             if (this.modal.mode == 1) {
                 this.buttons[0].show = true
-            }
-            else if (this.modal.mode == 2) {
+            } else if (this.modal.mode == 2) {
                 this.buttons[1].show = true
             }
         },
@@ -157,8 +222,7 @@ export default {
 
             if (this.modal.mode == 1) {
                 props = ['fecha_apertura', 'monto_apertura']
-            }
-            else if (this.modal.mode == 2) {
+            } else if (this.modal.mode == 2) {
                 props = ['fecha_cierre', 'monto_cierre']
             }
 
@@ -213,7 +277,7 @@ export default {
             const send = {
                 ...this.modal.nuevo,
                 tipo: 2,
-                caja_apertura: this.caja_apertura.id
+                caja_apertura: this.caja_apertura.id,
             }
 
             this.useAuth.setLoading(true, 'Grabando...')
@@ -257,7 +321,9 @@ export default {
             if (res.code != 0) return
 
             this.useVistas.removeItem('vCaja', 'articulo_categorias', item)
-            this.caja_apertura.caja_movimientos = this.caja_apertura.caja_movimientos.filter(a => a.id != item.id)
+            this.caja_apertura.caja_movimientos = this.caja_apertura.caja_movimientos.filter(
+                (a) => a.id != item.id,
+            )
         },
 
         async loadCajaMovimientos() {
@@ -278,7 +344,7 @@ export default {
 
             this.caja_apertura.caja_movimientos = res.data
         },
-    }
+    },
 }
 </script>
 

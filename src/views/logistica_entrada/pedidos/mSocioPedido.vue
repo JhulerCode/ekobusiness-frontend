@@ -104,6 +104,12 @@
                     v-model="modal.item.direccion_entrega"
                     :disabled="modal.mode == 3"
                 />
+
+                <JdTextArea
+                    label="Observaciones"
+                    v-model="modal.item.observacion"
+                    :disabled="modal.mode == 3"
+                />
             </div>
 
             <div class="totales">

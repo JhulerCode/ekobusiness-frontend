@@ -46,14 +46,28 @@
             minHeight="10rem"
             maxHeight="30rem"
             width="60rem"
-            :rowOptions="tableRowOptions"
-            @rowOptionSelected="runMethod"
             :inputsDisabled="modal.mode == 3"
             @onInput="(action, a) => this[action](a)"
+            class="jdTable"
         >
-            <!-- <template v-slot:cAction="{ item }">
-                <JdButton :small="true" tipo="2" icon="fa-solid fa-trash-can" title="Eliminar" @click="quitar(item)" />
-            </template> -->
+            <!-- :rowOptions="tableRowOptions"
+            @rowOptionSelected="runMethod" -->
+            <template v-slot:cAction="{ item }">
+                <JdButton
+                    :small="true"
+                    tipo="2"
+                    icon="fa-solid fa-copy"
+                    title="Duplicar"
+                    @click="duplicar(item)"
+                />
+                <JdButton
+                    :small="true"
+                    tipo="2"
+                    icon="fa-solid fa-trash-can"
+                    title="Eliminar"
+                    @click="quitar(item)"
+                />
+            </template>
 
             <template v-slot:cFv="{ item }">
                 <JdInput
@@ -206,19 +220,19 @@ export default {
                 toRight: true,
             },
         ],
-        tableRowOptions: [
-            {
-                label: 'Duplicar',
-                icon: 'fa-solid fa-copy',
-                action: 'duplicar',
-            },
-            {
-                label: 'Quitar',
-                icon: 'fa-solid fa-trash-can',
-                action: 'quitar',
-                permiso: 'vVentas:crear',
-            },
-        ],
+        // tableRowOptions: [
+        //     {
+        //         label: 'Duplicar',
+        //         icon: 'fa-solid fa-copy',
+        //         action: 'duplicar',
+        //     },
+        //     {
+        //         label: 'Quitar',
+        //         icon: 'fa-solid fa-trash-can',
+        //         action: 'quitar',
+        //         permiso: 'vVentas:crear',
+        //     },
+        // ],
     }),
     created() {
         this.modal = this.useModals.mTransaccion

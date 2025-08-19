@@ -370,7 +370,9 @@
         <div class="resumen">
             <small>
                 <template v-if="txtBuscar">{{ datosFiltrados.length }} de</template>
-                {{ cantidadRegistros }} {{ mensajeRegistros }}
+                <template v-if="showResumen"
+                    >{{ cantidadRegistros }} {{ mensajeRegistros }}</template
+                >
             </small>
             <template v-if="cantidadSeleccionados > 0">
                 <small>|</small>
@@ -445,6 +447,7 @@ export default {
 
         inputsDisabled: { type: Boolean, default: false },
         rowOptions: { type: Array, default: () => [] },
+        showResumen: { type: Boolean, default: true },
     },
     data: () => ({
         useAuth: useAuth(),

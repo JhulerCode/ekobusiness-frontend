@@ -4,20 +4,39 @@
             <strong>Pedidos de compra</strong>
 
             <div class="buttons">
-                <JdButton text="Recuperar guardado" tipo="2" @click="recuperarGuardado()"
-                    v-if="useAuth.avances.mCompraPedido && useAuth.verifyPermiso('vCompraPedidos:crear')" />
+                <JdButton
+                    text="Recuperar guardado"
+                    tipo="2"
+                    @click="recuperarGuardado()"
+                    v-if="
+                        useAuth.avances.mCompraPedido &&
+                        useAuth.verifyPermiso('vCompraPedidos:crear')
+                    "
+                />
 
-                <JdButton text="Nuevo" @click="nuevo()" v-if="useAuth.verifyPermiso('vCompraPedidos:crear')" />
+                <JdButton
+                    text="Nuevo"
+                    @click="nuevo()"
+                    v-if="useAuth.verifyPermiso('vCompraPedidos:crear')"
+                />
             </div>
         </div>
 
-        <JdTable :name="tableName" :columns="columns" :datos="vista.pedidos || []" :colAct="true"
-            :configFiltros="openConfigFiltros" :reload="loadPedidos" :rowOptions="tableRowOptions"
-            @rowOptionSelected="runMethod">
+        <JdTable
+            :name="tableName"
+            :columns="columns"
+            :datos="vista.pedidos || []"
+            :colAct="true"
+            :configFiltros="openConfigFiltros"
+            :reload="loadPedidos"
+            :rowOptions="tableRowOptions"
+            @rowOptionSelected="runMethod"
+        >
         </JdTable>
     </div>
 
     <mSocioPedido v-if="useModals.show.mSocioPedido" />
+    <mSocioPedidoPdf v-if="useModals.show.mSocioPedidoPdf" />
     <mTransaccion v-if="useModals.show.mTransaccion" />
 
     <mConfigCols v-if="useModals.show.mConfigCols" />
@@ -32,9 +51,11 @@ import JdTable from '@/components/JdTable.vue'
 import mAnular from '@/components/mAnular.vue'
 
 import mConfigCols from '@/components/mConfigCols.vue'
+
 import mConfigFiltros from '@/components/mConfigFiltros.vue'
 
 import mSocioPedido from '@/views/logistica_entrada/pedidos/mSocioPedido.vue'
+import mSocioPedidoPdf from '@/views/logistica_entrada/pedidos/mSocioPedidoPdf.vue'
 import mTransaccion from '@/views/logistica_entrada/compras/mTransaccion.vue'
 
 import { useAuth } from '@/pinia/auth'
@@ -43,7 +64,7 @@ import { useModals } from '@/pinia/modals'
 
 import { urls, get, delet, patch } from '@/utils/crud'
 import { jqst } from '@/utils/swal'
-import { generarOcPDF } from '@/utils/jpdf'
+// import { generarOcPDF } from '@/utils/jpdf'
 
 import dayjs from 'dayjs'
 
@@ -57,6 +78,7 @@ export default {
         mConfigFiltros,
 
         mSocioPedido,
+        mSocioPedidoPdf,
         mTransaccion,
     },
     data: () => ({
@@ -87,7 +109,6 @@ export default {
                 show: true,
                 seek: true,
                 sort: true,
-
             },
             {
                 id: 'socio',
@@ -99,7 +120,6 @@ export default {
                 show: true,
                 seek: true,
                 sort: true,
-
             },
             {
                 id: 'pago_condicion',
@@ -110,7 +130,6 @@ export default {
                 show: true,
                 seek: true,
                 sort: true,
-
             },
             {
                 id: 'moneda',
@@ -121,7 +140,6 @@ export default {
                 show: true,
                 seek: true,
                 sort: true,
-
             },
             {
                 id: 'monto',
@@ -133,7 +151,6 @@ export default {
                 show: true,
                 seek: true,
                 sort: true,
-
             },
             {
                 id: 'estado',
@@ -148,13 +165,46 @@ export default {
             },
         ],
         tableRowOptions: [
-            { label: 'Ver', icon: 'fa-regular fa-folder-open', action: 'ver', permiso: 'vCompraPedidos:ver' },
-            { label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar', permiso: 'vCompraPedidos:editar', ocultar: { estado: ['0', '2'] } },
-            { label: 'Terminar', icon: 'fa-solid fa-check-double', action: 'terminar', permiso: 'vCompraPedidos:terminar', ocultar: { estado: ['0', '2'] } },
+            {
+                label: 'Ver',
+                icon: 'fa-regular fa-folder-open',
+                action: 'ver',
+                permiso: 'vCompraPedidos:ver',
+            },
+            {
+                label: 'Editar',
+                icon: 'fa-solid fa-pen-to-square',
+                action: 'editar',
+                permiso: 'vCompraPedidos:editar',
+                ocultar: { estado: ['0', '2'] },
+            },
+            {
+                label: 'Terminar',
+                icon: 'fa-solid fa-check-double',
+                action: 'terminar',
+                permiso: 'vCompraPedidos:terminar',
+                ocultar: { estado: ['0', '2'] },
+            },
             // { label: 'Anular', icon: 'fa-solid fa-ban', action: 'anular', permiso: 'vCompraPedidos:anular', ocultar: { estado: ['0', '2'] } },
-            { label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar', permiso: 'vCompraPedidos:eliminar' },
-            { label: 'Exportar en PDF', icon: 'fa-regular fa-file-pdf', action: 'generarPdf', permiso: 'vCompraPedidos:generarPdf' },
-            { label: 'Ingresar mercadería', icon: 'fa-regular fa-circle-up', action: 'ingresarMercaderia', permiso: 'vCompraPedidos:ingresarMercaderia', ocultar: { estado: ['0', '2'] } },
+            {
+                label: 'Eliminar',
+                icon: 'fa-solid fa-trash-can',
+                action: 'eliminar',
+                permiso: 'vCompraPedidos:eliminar',
+            },
+            {
+                label: 'Exportar en PDF',
+                icon: 'fa-regular fa-file-pdf',
+                action: 'generarPdf',
+                permiso: 'vCompraPedidos:generarPdf',
+            },
+            {
+                label: 'Ingresar mercadería',
+                icon: 'fa-regular fa-circle-up',
+                action: 'ingresarMercaderia',
+                permiso: 'vCompraPedidos:ingresarMercaderia',
+                ocultar: { estado: ['0', '2'] },
+            },
         ],
     }),
     async created() {
@@ -204,7 +254,12 @@ export default {
             this.useModals.setModal('mSocioPedido', 'Nuevo pedido de compra', 1, send)
         },
         recuperarGuardado() {
-            this.useModals.setModal('mSocioPedido', 'Nuevo pedido de compra', 1, this.useAuth.avances.mCompraPedido)
+            this.useModals.setModal(
+                'mSocioPedido',
+                'Nuevo pedido de compra',
+                1,
+                this.useAuth.avances.mCompraPedido,
+            )
         },
 
         async openConfigFiltros() {
@@ -213,15 +268,15 @@ export default {
             await this.loadMonedas()
 
             const cols = this.columns
-            cols.find(a => a.id == 'socio').lista = this.vista.socios
-            cols.find(a => a.id == 'pago_condicion').lista = this.vista.pago_condiciones
-            cols.find(a => a.id == 'moneda').lista = this.vista.monedas
-            cols.find(a => a.id == 'estado').lista = this.vista.pedido_estados
+            cols.find((a) => a.id == 'socio').lista = this.vista.socios
+            cols.find((a) => a.id == 'pago_condicion').lista = this.vista.pago_condiciones
+            cols.find((a) => a.id == 'moneda').lista = this.vista.monedas
+            cols.find((a) => a.id == 'estado').lista = this.vista.pedido_estados
 
             const send = {
                 table: this.tableName,
                 cols,
-                reload: this.loadPedidos
+                reload: this.loadPedidos,
             }
 
             this.useModals.setModal('mConfigFiltros', 'Filtros', null, send, true)
@@ -295,9 +350,9 @@ export default {
 
             if (res.code != 0) return
 
-            // this.useModals.setModal('mSocioPedido', 'Orden de compra', null, res.data)
-            const asd = await generarOcPDF(res.data)
-            asd.download(`OC_${res.data.codigo}.pdf`)
+            this.useModals.setModal('mSocioPedidoPdf', 'Orden de compra', null, res.data)
+            // const asd = await generarOcPDF(res.data)
+            // asd.download(`OC_${res.data.codigo}.pdf`)
         },
         async ingresarMercaderia(item) {
             this.useAuth.setLoading(true, 'Cargando...')
@@ -325,10 +380,12 @@ export default {
                     id: res.data.id,
                     codigo: res.data.codigo,
                 },
-                pedidos: [{
-                    id: res.data.id,
-                    codigo: res.data.codigo,
-                }]
+                pedidos: [
+                    {
+                        id: res.data.id,
+                        codigo: res.data.codigo,
+                    },
+                ],
             }
 
             this.useModals.setModal('mTransaccion', 'Nueva compra', 1, send, true)
@@ -337,7 +394,7 @@ export default {
         async loadSocios() {
             const qry = {
                 fltr: { tipo: { op: 'Es', val: 1 }, activo: { op: 'Es', val: true } },
-                cols: ['nombres', 'apellidos', 'nombres_apellidos']
+                cols: ['nombres', 'apellidos', 'nombres_apellidos'],
             }
 
             this.vista.socios = []

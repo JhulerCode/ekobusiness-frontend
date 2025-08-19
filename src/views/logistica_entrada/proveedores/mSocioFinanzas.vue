@@ -15,7 +15,7 @@
         <span>- - - Bancos - - -</span>
         <div class="bancos">
             <div class="container-datos">
-                <JdInput label="Nombre" :nec="true" v-model="nuevo.nombre" :disabled="modal.mode == 3" />
+                <JdInput label="Banco" :nec="true" v-model="nuevo.nombre" :disabled="modal.mode == 3" />
 
                 <JdSelect label="Moneda" :nec="true" v-model="nuevo.moneda" :lista="modal.monedas"
                     :disabled="modal.mode == 3" />

@@ -1,24 +1,58 @@
 <template>
     <div class="pedido-items">
-        <div class="agregar" v-if="modal.mode != 3 && modal.socio?.id != null && modal.item.moneda != null">
-            <JdSelectQuery label="🔍︎" placeholder="Busca artículos" v-model="nuevo" :spin="spinArticulos"
-                :lista="modal.articulos" @search="searchArticulos" @elegir="addArticulo" />
+        <div
+            class="agregar"
+            v-if="modal.mode != 3 && modal.socio?.id != null && modal.item.moneda != null"
+        >
+            <JdSelectQuery
+                label="🔍︎"
+                placeholder="Busca artículos"
+                v-model="nuevo"
+                :spin="spinArticulos"
+                :lista="modal.articulos"
+                @search="searchArticulos"
+                @elegir="addArticulo"
+            />
 
-            <JdButton icon="fa-solid fa-tags" text="Lista de precios" tipo="3" @click="openPreciosLista()"
-                v-if="modal.socio.precio_lista" />
+            <JdButton
+                icon="fa-solid fa-tags"
+                text="Lista de precios"
+                tipo="3"
+                @click="openPreciosLista()"
+                v-if="modal.socio.precio_lista"
+            />
 
-            <JdButton icon="fa-solid fa-file-excel" text="Importar" tipo="3" @click="this.$refs.excel.click()"
-                v-if="modal.item.tipo == 2" />
+            <JdButton
+                icon="fa-solid fa-file-excel"
+                text="Importar"
+                tipo="3"
+                @click="this.$refs.excel.click()"
+                v-if="modal.item.tipo == 2"
+            />
 
             <input type="file" ref="excel" accept=".xlsx, .xls" hidden @change="importar" />
         </div>
 
-        <JdTable :columns="columns" :datos="modal.item.socio_pedido_items || []" :colAct="modal.mode != 3"
-            :download="false" :seeker="false" minHeight="10rem" maxHeight="30rem" width="60rem"
-            :inputsDisabled="modal.mode == 3" @onInput="(action, a) => this[action](a)">
-
+        <JdTable
+            :columns="columns"
+            :datos="modal.item.socio_pedido_items || []"
+            :colAct="modal.mode != 3"
+            :download="false"
+            :seeker="false"
+            minHeight="10rem"
+            maxHeight="30rem"
+            width="60rem"
+            :inputsDisabled="modal.mode == 3"
+            @onInput="(action, a) => this[action](a)"
+        >
             <template v-slot:cAction="{ item }">
-                <JdButton :small="true" tipo="2" icon="fa-solid fa-trash-can" title="Eliminar" @click="quitar(item)" />
+                <JdButton
+                    :small="true"
+                    tipo="2"
+                    icon="fa-solid fa-trash-can"
+                    title="Eliminar"
+                    @click="quitar(item)"
+                />
             </template>
         </JdTable>
     </div>
@@ -81,7 +115,7 @@ export default {
             },
             {
                 id: 'pu',
-                title: 'Precio uni.',
+                title: 'Valor unitario',
                 type: 'number',
                 input: true,
                 width: '6rem',
@@ -132,7 +166,7 @@ export default {
                     activo: { op: 'Es', val: true },
                     nombre: { op: 'Contiene', val: txtBuscar },
                 },
-                cols: ['unidad', 'igv_afectacion', 'has_fv']
+                cols: ['unidad', 'igv_afectacion', 'has_fv'],
             }
 
             this.spinArticulos = true
@@ -148,7 +182,7 @@ export default {
             this.nuevo = null
             this.modal.articulos = []
 
-            const i = this.modal.item.socio_pedido_items.findIndex(a => a.articulo == item.id)
+            const i = this.modal.item.socio_pedido_items.findIndex((a) => a.articulo == item.id)
             if (i !== -1) return jmsg('warning', 'El artículo ya está agregado')
 
             this.modal.item.socio_pedido_items.push({
@@ -171,7 +205,10 @@ export default {
 
         async openPreciosLista() {
             if (this.modal.socio.precio_lista1.moneda != this.modal.item.moneda) {
-                jmsg('warning', 'La moneda de la lista de precios no es igual a la moneda del pedido')
+                jmsg(
+                    'warning',
+                    'La moneda de la lista de precios no es igual a la moneda del pedido',
+                )
                 return
             }
 
@@ -179,14 +216,19 @@ export default {
                 precio_lista: {
                     id: this.modal.socio.precio_lista,
                     ...this.modal.socio.precio_lista1,
-                    moneda: getItemFromArray(this.modal.socio.precio_lista1.moneda, this.modal.monedas),
-                }
+                    moneda: getItemFromArray(
+                        this.modal.socio.precio_lista1.moneda,
+                        this.modal.monedas,
+                    ),
+                },
             }
             this.useModals.setModal('mPreciosLista', 'Lista de precios', null, send, true)
         },
         agregarArticulos(items) {
             for (const a of items) {
-                const i = this.modal.item.socio_pedido_items.findIndex(b => b.articulo == a.articulo)
+                const i = this.modal.item.socio_pedido_items.findIndex(
+                    (b) => b.articulo == a.articulo,
+                )
                 if (i !== -1) continue
 
                 this.modal.item.socio_pedido_items.push({
@@ -199,7 +241,8 @@ export default {
 
                     pu: a.precio,
                     igv_afectacion: a.articulo1.igv_afectacion,
-                    igv_porcentaje: a.articulo1.igv_afectacion == '10' ? this.modal.empresa.igv_porcentaje : 0,
+                    igv_porcentaje:
+                        a.articulo1.igv_afectacion == '10' ? this.modal.empresa.igv_porcentaje : 0,
 
                     mtoValorVenta: 0,
                     igv: 0,
@@ -230,9 +273,9 @@ export default {
                     fltr: {
                         tipo: { op: 'Es', val: 2 },
                         activo: { op: 'Es', val: true },
-                        codigo_barra: { op: 'Son', val: res.data.map(a => a.EAN) },
+                        codigo_barra: { op: 'Son', val: res.data.map((a) => a.EAN) },
                     },
-                    cols: ['unidad', 'codigo_barra', 'has_fv', 'igv_afectacion']
+                    cols: ['unidad', 'codigo_barra', 'has_fv', 'igv_afectacion'],
                 }
 
                 this.useAuth.setLoading(true, 'Cargando productos...')
@@ -241,10 +284,13 @@ export default {
 
                 if (res2.code != 0) return
 
-                const articulosMap = res2.data.reduce((obj, a) => (obj[a.codigo_barra] = a, obj), {})
+                const articulosMap = res2.data.reduce(
+                    (obj, a) => ((obj[a.codigo_barra] = a), obj),
+                    {},
+                )
                 // return sistemaData[array].reduce((obj, a) => (obj[a.id] = a, obj), {})
 
-                this.modal.item.socio_pedido_items = res.data.map(a => {
+                this.modal.item.socio_pedido_items = res.data.map((a) => {
                     const matchedItem = articulosMap[a.EAN] || {}
                     return {
                         articulo: matchedItem?.id,
@@ -257,7 +303,10 @@ export default {
 
                         pu: a['Precio unitario'],
                         igv_afectacion: matchedItem?.igv_afectacion,
-                        igv_porcentaje: matchedItem?.igv_afectacion == '10' ? this.modal.empresa.igv_porcentaje : 0,
+                        igv_porcentaje:
+                            matchedItem?.igv_afectacion == '10'
+                                ? this.modal.empresa.igv_porcentaje
+                                : 0,
                     }
                 })
 
@@ -267,10 +316,12 @@ export default {
         },
 
         calcularUno(item) {
-            item.vu = item.igv_afectacion == '10' ? item.pu / (1 + (item.igv_porcentaje / 100)) : item.pu
+            item.vu =
+                item.igv_afectacion == '10' ? item.pu * (1 + item.igv_porcentaje / 100) : item.pu
 
-            item.mtoValorVenta = item.cantidad * item.vu
-            item.igv = item.igv_afectacion == '10' ? item.mtoValorVenta * (item.igv_porcentaje / 100) : 0
+            item.mtoValorVenta = item.cantidad * item.pu
+            item.igv =
+                item.igv_afectacion == '10' ? item.mtoValorVenta * (item.igv_porcentaje / 100) : 0
             item.total = item.mtoValorVenta + item.igv
         },
         calcularTotales() {
@@ -283,18 +334,48 @@ export default {
                 if (a.igv_afectacion == '10') {
                     this.modal.mtoOperGravadas += a.mtoValorVenta
                     this.modal.mtoIGV += a.igv
-                }
-                else if (a.igv_afectacion == '20') {
+                } else if (a.igv_afectacion == '20') {
                     this.modal.mtoOperExoneradas += a.mtoValorVenta
-                }
-                else if (a.igv_afectacion == '30') {
+                } else if (a.igv_afectacion == '30') {
                     this.modal.mtoOperInafectas += a.mtoValorVenta
                 }
             }
 
-            this.modal.valorVenta = this.modal.mtoOperGravadas + this.modal.mtoOperExoneradas + this.modal.mtoOperInafectas
+            this.modal.valorVenta =
+                this.modal.mtoOperGravadas +
+                this.modal.mtoOperExoneradas +
+                this.modal.mtoOperInafectas
             this.modal.mtoImpVenta = this.modal.valorVenta + this.modal.mtoIGV
         },
+        // calcularUno(item) {
+        //     item.vu = item.igv_afectacion == '10' ? item.pu / (1 + (item.igv_porcentaje / 100)) : item.pu
+
+        //     item.mtoValorVenta = item.cantidad * item.vu
+        //     item.igv = item.igv_afectacion == '10' ? item.mtoValorVenta * (item.igv_porcentaje / 100) : 0
+        //     item.total = item.mtoValorVenta + item.igv
+        // },
+        // calcularTotales() {
+        //     this.modal.mtoOperGravadas = 0
+        //     this.modal.mtoOperExoneradas = 0
+        //     this.modal.mtoOperInafectas = 0
+        //     this.modal.mtoIGV = 0
+
+        //     for (const a of this.modal.item.socio_pedido_items) {
+        //         if (a.igv_afectacion == '10') {
+        //             this.modal.mtoOperGravadas += a.mtoValorVenta
+        //             this.modal.mtoIGV += a.igv
+        //         }
+        //         else if (a.igv_afectacion == '20') {
+        //             this.modal.mtoOperExoneradas += a.mtoValorVenta
+        //         }
+        //         else if (a.igv_afectacion == '30') {
+        //             this.modal.mtoOperInafectas += a.mtoValorVenta
+        //         }
+        //     }
+
+        //     this.modal.valorVenta = this.modal.mtoOperGravadas + this.modal.mtoOperExoneradas + this.modal.mtoOperInafectas
+        //     this.modal.mtoImpVenta = this.modal.valorVenta + this.modal.mtoIGV
+        // },
         sumarUno(item) {
             this.calcularUno(item)
 
@@ -308,13 +389,15 @@ export default {
         quitar(item) {
             if (item.entregado > 0) return jmsg('error', 'El artículo ya tiene ingresos')
 
-            const i = this.modal.item.socio_pedido_items.findIndex(a => a.articulo == item.articulo)
+            const i = this.modal.item.socio_pedido_items.findIndex(
+                (a) => a.articulo == item.articulo,
+            )
             this.modal.item.socio_pedido_items.splice(i, 1)
 
             this.calcularTotales()
         },
     },
-};
+}
 </script>
 
 <style scoped>

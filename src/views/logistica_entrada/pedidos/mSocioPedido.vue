@@ -50,6 +50,14 @@
                     style="grid-column: 1/3"
                 />
 
+                <JdInput
+                    type="date"
+                    label="Fecha de entrega"
+                    v-model="modal.item.fecha_entrega"
+                    :disabled="modal.mode == 3"
+                    style="grid-column: 1/5"
+                />
+
                 <JdSelect
                     label="Moneda"
                     :nec="true"

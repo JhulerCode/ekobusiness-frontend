@@ -1,86 +1,35 @@
 <template>
     <JdModal
-        modal="mProduccionTrazabilidad"
+        modal="mSocioPedidoPdf"
         :buttons="buttons"
         @button-click="(action) => this[action]()"
     >
         <div ref="elementoPdf" class="div1">
-            <div class="container-datos">
-                <p style="grid-column: 1/3">
-                    <strong>--- Orden de producción ---</strong>
-                </p>
+            <div class="pdf-head">
+                <div class="left">
+                    <img src="@/assets/img/logo-sunka-black.webp">
+                </div>
 
-                <JdInput
-                    type="date"
-                    label="Fecha"
-                    :nec="true"
-                    v-model="modal.produccion_orden.fecha"
-                    :disabled="modal.mode == 3"
-                    style="grid-column: 1/3"
-                />
+                <div class="center">
+                    <strong>EKO BUSINESS S.A.C.</strong>
+                    <p>Calle 7 Mz 5 Urb Los Productores</p>
+                    <p>Tel: 01 432 865</p>
+                    <p>Correo: comercial@sunka.com</p>
+                </div>
 
-                <template v-if="modal.produccion_orden.tipo != 2">
-                    <JdSelect
-                        label="Máquina"
-                        :nec="true"
-                        v-model="modal.produccion_orden.maquina"
-                        :lista="
-                            modal.maquinas?.filter(
-                                (a) => a.produccion_tipo == modal.produccion_orden.tipo,
-                            ) || []
-                        "
-                        :disabled="modal.mode == 3"
-                        style="grid-column: 3/5"
-                    />
-                </template>
+                <div class="right">
 
-                <JdSelectQuery
-                    label="Producto"
-                    :nec="true"
-                    v-model="modal.produccion_orden.articulo"
-                    :lista="modal.articulos"
-                    :disabled="modal.mode == 3"
-                    style="grid-column: 1/4"
-                />
-
-                <JdInput
-                    type="number"
-                    label="Cantidad planificada"
-                    :nec="true"
-                    v-model="modal.produccion_orden.cantidad"
-                    :disabled="modal.mode == 3"
-                    style="grid-column: 1/3"
-                />
-            </div>
-
-            <div class="mrg-btm2">
-                <p class="mrg-btm05">
-                    <strong>--- Insumos ---</strong>
-                </p>
-                <JdTable
-                    :columns="columns1"
-                    :datos="modal.produccion_orden.insumos || []"
-                    :seeker="false"
-                    :download="false"
-                >
-                    <!-- <template v-slot:cAction="{ item }">
-                    <JdButton tipo="2" :small="true" icon="fa-regular fa-folder-open" :disabled="modal.mode == 3"
-                        @click="verCompra(item)" />
-                </template> -->
-                </JdTable>
+                </div>
             </div>
 
             <div>
-                <p class="mrg-btm05">
-                    <strong>--- Productos terminados ---</strong>
-                </p>
-                <JdTable
+                <!-- <JdTable
                     :columns="columns2"
                     :datos="modal.produccion_orden.productos_terminados || []"
                     :seeker="false"
                     :download="false"
                 >
-                </JdTable>
+                </JdTable> -->
             </div>
         </div>
     </JdModal>
@@ -88,11 +37,6 @@
 
 <script>
 import JdModal from '@/components/JdModal.vue'
-import JdInput from '@/components/inputs/JdInput.vue'
-import JdSelectQuery from '@/components/inputs/JdSelectQuery.vue'
-import JdSelect from '@/components/inputs/JdSelect.vue'
-import JdTable from '@/components/JdTable.vue'
-// import JdButton from '@/components/inputs/JdButton.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
@@ -104,11 +48,6 @@ import html2pdf from 'html2pdf.js'
 export default {
     components: {
         JdModal,
-        JdInput,
-        JdSelectQuery,
-        JdSelect,
-        JdTable,
-        // JdButton,
     },
     data: () => ({
         useAuth: useAuth(),
@@ -172,7 +111,7 @@ export default {
         ],
     }),
     created() {
-        this.modal = this.useModals.mProduccionTrazabilidad
+        this.modal = this.useModals.mSocioPedidoPdf
     },
     methods: {
         async verCompra(item) {

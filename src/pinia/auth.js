@@ -95,6 +95,7 @@ export const useAuth = defineStore('auth', {
 
                             { id: 'vArticulos:clonar', label: 'Clonar' },
                             { id: 'vArticulos:kardex', label: 'Ver kardex' },
+                            { id: 'vArticulos:kardexDelete', label: 'Eliminar movimiento kardex' },
                             { id: 'vArticulos:ajusteStock', label: 'Ajuste stock' },
 
                             { id: 'vArticulos:importar', label: 'Importar' },

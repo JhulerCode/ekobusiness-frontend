@@ -145,8 +145,8 @@ export default {
                 type: 'text',
                 width: '10rem',
                 show: true,
-                seek: false,
-                sort: false
+                seek: true,
+                sort: true
             },
             {
                 id: 'activo',

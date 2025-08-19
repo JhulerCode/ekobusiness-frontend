@@ -222,6 +222,12 @@ export default {
                 ocultar: { estado: 2 },
             },
             {
+                label: 'Salida de insumos',
+                icon: 'fa-regular fa-circle-down',
+                action: 'salidaInsumos',
+                permiso: 'vProgramaFiltrantes:salidaInsumos',
+            },
+            {
                 label: 'Productos terminados',
                 icon: 'fa-solid fa-boxes-stacked',
                 action: 'productosTerminados',
@@ -467,40 +473,42 @@ export default {
                 estado: 2,
             })
         },
-        // async salidaInsumos(item) {
-        //     this.useAuth.setLoading(true, 'Cargando...')
-        //     const res = await get(`${urls.produccion_ordenes}/uno/${item.id}`)
-        //     this.useAuth.setLoading(false)
+        async salidaInsumos(item) {
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.produccion_ordenes}/uno/${item.id}`)
+            this.useAuth.setLoading(false)
 
-        //     if (res.code != 0) return
+            if (res.code != 0) return
 
-        //     const send = {
-        //         transaccion: {
-        //             tipo: 2,
-        //             fecha: dayjs().format('YYYY-MM-DD'),
-        //             produccion_orden: item.id,
-        //             estado: 1,
-        //             transaccion_items: [],
+            const send = {
+                is_receta: true,
+                produccion_orden: JSON.parse(JSON.stringify(res.data)),
+                // transaccion: {
+                //     tipo: 2,
+                //     fecha: dayjs().format('YYYY-MM-DD'),
+                //     produccion_orden: item.id,
+                //     estado: 1,
+                //     transaccion_items: [],
 
-        //             produccion_orden1: {
-        //                 fecha: res.data.fecha,
-        //                 // codigo: res.data.codigo,
-        //                 cantidad: res.data.cantidad,
-        //                 articulo_info: {
-        //                     nombre: res.data.articulo_info.nombre,
-        //                 },
-        //                 insumos: res.data.articulo_info.receta_insumos.map(
-        //                     ({ articulo1, ...rest }) => ({
-        //                         ...rest,
-        //                         ...articulo1,
-        //                     }),
-        //                 ),
-        //             },
-        //         },
-        //     }
+                //     produccion_orden1: {
+                //         fecha: res.data.fecha,
+                //         // codigo: res.data.codigo,
+                //         cantidad: res.data.cantidad,
+                //         articulo_info: {
+                //             nombre: res.data.articulo_info.nombre,
+                //         },
+                //         insumos: res.data.articulo_info.receta_insumos.map(
+                //             ({ articulo1, ...rest }) => ({
+                //                 ...rest,
+                //                 ...articulo1,
+                //             }),
+                //         ),
+                //     },
+                // },
+            }
 
-        //     this.useModals.setModal('mProduccionInsumos', `Salida de insumos`, 1, send, true)
-        // },
+            this.useModals.setModal('mProduccionInsumos', `Salida de insumos`, 1, send, true)
+        },
         productosTerminados(item) {
             const send = {
                 produccion_orden: { ...item },

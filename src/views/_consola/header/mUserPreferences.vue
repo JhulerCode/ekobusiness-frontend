@@ -2,9 +2,30 @@
     <JdModal modal="mUserPreferences" :buttons="buttons" @button-click="(action) => this[action]()">
         <div class="container-datos">
             <JdSelect label="Tema" :nec="true" v-model="modal.usuario.theme" :lista="themes" />
-            <JdInput label="Color principal" :nec="true" type="color" v-model="modal.usuario.color" />
-            <JdSelect label="Formato fecha" :nec="true" v-model="modal.usuario.format_date" :lista="fecha_formatos"
-                mostrar="id" />
+
+            <JdInput
+                label="Color principal"
+                :nec="true"
+                type="color"
+                v-model="modal.usuario.color"
+            />
+
+            <JdSelect
+                label="Formato fecha"
+                :nec="true"
+                v-model="modal.usuario.format_date"
+                :lista="fecha_formatos"
+                mostrar="id"
+            />
+
+            <JdSelect
+                label="Menú visible"
+                :nec="true"
+                v-model="modal.usuario.menu_visible"
+                :lista="yesno"
+            />
+
+            {{ useAuth.usuario }}
         </div>
     </JdModal>
 </template>
@@ -24,7 +45,7 @@ export default {
     components: {
         JdModal,
         JdInput,
-        JdSelect
+        JdSelect,
     },
     data: () => ({
         useAuth: useAuth(),
@@ -52,9 +73,12 @@ export default {
             { id: '2', nombre: 'Oscuro' },
         ],
 
-        buttons: [
-            { text: 'Actualizar', action: 'modificar', show: true },
+        yesno: [
+            { id: true, nombre: 'Si' },
+            { id: false, nombre: 'No' },
         ],
+
+        buttons: [{ text: 'Actualizar', action: 'modificar', show: true }],
     }),
     created() {
         this.modal = this.useModals.mUserPreferences
@@ -66,7 +90,8 @@ export default {
                 id: this.modal.usuario.colaborador,
                 theme: this.modal.usuario.theme,
                 color: this.modal.usuario.color,
-                format_date: this.modal.usuario.format_date
+                format_date: this.modal.usuario.format_date,
+                menu_visible: this.modal.usuario.menu_visible,
             }
 
             this.useAuth.setLoading(true, 'Actualizando...')
@@ -77,12 +102,12 @@ export default {
 
             this.useAuth.setTheme(this.modal.usuario.theme)
             this.useAuth.setPrimaryColor(this.modal.usuario.color)
-
             this.useAuth.usuario.format_date = this.modal.usuario.format_date
+            this.useAuth.usuario.menu_visible = this.modal.usuario.menu_visible
 
             this.useModals.show.mUserPreferences = false
-        }
-    }
+        },
+    },
 }
 </script>
 
@@ -90,6 +115,6 @@ export default {
 .container-datos {
     display: grid;
     grid-template-columns: 20rem;
-    gap: 0.5rem
+    gap: 0.5rem;
 }
 </style>

@@ -72,7 +72,7 @@
 <script>
 export default {
     props: {
-        modelValue: [String, Number],
+        modelValue: [String, Number, Boolean],
 
         label: String,
         icon: String,

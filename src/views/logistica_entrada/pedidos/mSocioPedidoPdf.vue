@@ -65,7 +65,7 @@
                 <li>
                     <strong>Tiempo de entrega</strong>
                     <span>:</span>
-                    <span>7 a 10 días</span>
+                    <span>7 a 10 días hábiles</span>
                 </li>
 
                 <li>

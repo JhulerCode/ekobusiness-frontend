@@ -451,6 +451,8 @@ export const useAuth = defineStore('auth', {
 
             this.setTheme(this.usuario.theme)
             this.setPrimaryColor(this.usuario.color)
+            // Formato de fecha
+            this.showNavbar = this.usuario.menu_visible
 
             return true
         },

@@ -6,8 +6,8 @@
             </template>
 
             <template v-slot:cFaltante="{ item }">
-                <span :class="{ 'negativo': (item.stock - (item.cantidad - item.entregado)) < 0 }">
-                    {{ redondear(item.stock - (item.cantidad - item.entregado), 0) }}
+                <span class="negativo" v-if="item.stock < item.cantidad - item.entregado">
+                    {{ redondear(item.cantidad - item.entregado - item.stock, 0) }}
                 </span>
             </template>
         </JdTable>
@@ -45,7 +45,7 @@ export default {
                 width: '25rem',
                 show: true,
                 seek: true,
-                sort: true
+                sort: true,
             },
             {
                 id: 'stock',
@@ -54,7 +54,7 @@ export default {
                 toRight: true,
                 width: '7rem',
                 show: true,
-                sort: true
+                sort: true,
             },
             {
                 id: 'pedido',
@@ -63,7 +63,7 @@ export default {
                 toRight: true,
                 width: '7rem',
                 show: true,
-                sort: true
+                sort: true,
             },
             {
                 id: 'faltante',
@@ -72,9 +72,9 @@ export default {
                 toRight: true,
                 width: '7rem',
                 show: true,
-                sort: true
-            }
-        ]
+                sort: true,
+            },
+        ],
     }),
     created() {
         this.modal = this.useModals.mProductosFaltantes
@@ -84,7 +84,7 @@ export default {
     methods: {
         async loadPedidos() {
             const qry = {
-                produccion_tipo: this.modal.produccion_tipo
+                produccion_tipo: this.modal.produccion_tipo,
             }
 
             this.useAuth.setLoading(true, 'Cargando...')
@@ -94,13 +94,13 @@ export default {
             if (res.code != 0) return
 
             this.modal.articulos = res.data
-        }
-    }
+        },
+    },
 }
 </script>
 
 <style lang="scss" scoped>
 .negativo {
-    color: var(--rojo)
+    color: var(--rojo);
 }
 </style>

@@ -11,6 +11,13 @@
                     v-if="useAuth.verifyPermiso('vProgramaFiltrantes:verProductosPedidos')"
                 />
 
+                <JdButton
+                    text="Salida de insumos"
+                    tipo="2"
+                    @click="salidaInsumos2"
+                    v-if="useAuth.verifyPermiso('vProgramaFiltrantes:salidaInsumosCompartidos')"
+                />
+
                 <JdInput
                     v-model="columns[0].val"
                     type="date"
@@ -83,6 +90,7 @@
         @productosCargados="setProduccionProductos"
     />
     <mProductosFaltantes v-if="useModals.show.mProductosFaltantes" />
+    <mSalidaInsumos v-if="useModals.show.mSalidaInsumos" />
 </template>
 
 <script>
@@ -95,6 +103,7 @@ import mProduccionOrden from '@/views/produccion/historial/mProduccionOrden.vue'
 import mProduccionInsumos from '@/views/produccion/historial/mProduccionInsumos.vue'
 import mProduccionProductos from '@/views/produccion/historial/mProduccionProductos.vue'
 import mProductosFaltantes from '@/views/produccion/filtrante/mProductosFaltantes.vue'
+import mSalidaInsumos from '@/views/produccion/historial/mSalidaInsumos.vue'
 
 import { useModals } from '@/pinia/modals'
 import { useAuth } from '@/pinia/auth'
@@ -116,6 +125,7 @@ export default {
         mProduccionInsumos,
         mProduccionProductos,
         mProductosFaltantes,
+        mSalidaInsumos,
     },
     data: () => ({
         useModals: useModals(),
@@ -237,7 +247,6 @@ export default {
     }),
     async created() {
         this.vista = this.useVistas.vProgramaFiltrantes
-        // this.loadMaquina()
         this.useAuth.setColumns(this.tableName, this.columns)
 
         if (this.vista.loaded) return
@@ -318,14 +327,14 @@ export default {
             this.vista.qry = {
                 fltr: { tipo: { op: 'Es', val: 1 }, estado: { op: 'Es', val: 1 } },
                 // cols: [
-                    // 'fecha',
-                    // 'orden',
-                    // 'maquina',
-                    // 'maquina_info',
-                    // 'articulo',
-                    // 'articulo_info',
-                    // 'cantidad',
-                    // 'estado',
+                // 'fecha',
+                // 'orden',
+                // 'maquina',
+                // 'maquina_info',
+                // 'articulo',
+                // 'articulo_info',
+                // 'cantidad',
+                // 'estado',
                 // ],
             }
 
@@ -483,31 +492,19 @@ export default {
             const send = {
                 is_receta: true,
                 produccion_orden: JSON.parse(JSON.stringify(res.data)),
-                // transaccion: {
-                //     tipo: 2,
-                //     fecha: dayjs().format('YYYY-MM-DD'),
-                //     produccion_orden: item.id,
-                //     estado: 1,
-                //     transaccion_items: [],
-
-                //     produccion_orden1: {
-                //         fecha: res.data.fecha,
-                //         // codigo: res.data.codigo,
-                //         cantidad: res.data.cantidad,
-                //         articulo_info: {
-                //             nombre: res.data.articulo_info.nombre,
-                //         },
-                //         insumos: res.data.articulo_info.receta_insumos.map(
-                //             ({ articulo1, ...rest }) => ({
-                //                 ...rest,
-                //                 ...articulo1,
-                //             }),
-                //         ),
-                //     },
-                // },
             }
 
             this.useModals.setModal('mProduccionInsumos', `Salida de insumos`, 1, send, true)
+        },
+        salidaInsumos2() {
+            const send = {
+                transaccion: {
+                    tipo: 2,
+                    fecha: this.columns[0].val,
+                    maquina: this.columns[1].val,
+                },
+            }
+            this.useModals.setModal('mSalidaInsumos', `Salida de insumos`, null, send, true)
         },
         productosTerminados(item) {
             const send = {

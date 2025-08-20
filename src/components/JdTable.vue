@@ -95,7 +95,7 @@
                 <colgroup>
                     <col v-if="colNro" style="width: 2rem" />
 
-                    <col v-if="colAct && !rowSelectable1" style="width: 3rem" />
+                    <col v-if="colAct && !rowSelectable1" :style="`width: ${colActWidth}`" />
 
                     <col
                         v-for="a in columnsSorted"
@@ -172,7 +172,9 @@
                         </td>
 
                         <td v-if="colAct && !rowSelectable1" class="td-act">
-                            <slot name="cAction" :item="{ ...a, i }"></slot>
+                            <div class="acts">
+                                <slot name="cAction" :item="{ ...a, i }"></slot>
+                            </div>
 
                             <JdButton
                                 icon="fa-solid fa-ellipsis"
@@ -289,7 +291,7 @@
                                         {{
                                             getNestedProp(a, column.prop)
                                                 ? dayjs(getNestedProp(a, column.prop)).format(
-                                                      useAuth.usuario.format_date || 'DD-MM-YYYY',
+                                                      useAuth.usuario.format_date,
                                                   )
                                                 : ''
                                         }}
@@ -298,7 +300,7 @@
                                         {{
                                             a[column.id]
                                                 ? dayjs(a[column.id]).format(
-                                                      useAuth.usuario.format_date || 'DD-MM-YYYY',
+                                                      useAuth.usuario.format_date,
                                                   )
                                                 : ''
                                         }}
@@ -310,7 +312,7 @@
                                         {{
                                             getNestedProp(a, column.prop)
                                                 ? dayjs(getNestedProp(a, column.prop)).format(
-                                                      `${useAuth.usuario.format_date || 'DD-MM-YYYY'} HH:mm:ss`,
+                                                      `${useAuth.usuario.format_date} HH:mm:ss`,
                                                   )
                                                 : ''
                                         }}
@@ -319,10 +321,7 @@
                                         {{
                                             a[column.id]
                                                 ? dayjs(a[column.id]).format(
-                                                      `${
-                                                          useAuth.usuario.format_date ||
-                                                          'DD-MM-YYYY'
-                                                      } HH:mm:ss`,
+                                                      `${useAuth.usuario.format_date} HH:mm:ss`,
                                                   )
                                                 : ''
                                         }}
@@ -439,6 +438,7 @@ export default {
 
         colNro: { type: Boolean, default: true },
         colAct: { type: Boolean, default: false },
+        colActWidth: { type: String, default: '2.5rem' },
 
         // columnsSortable: { type: Boolean, default: false },
         columnsResizable: { type: Boolean, default: true },
@@ -911,8 +911,12 @@ export default {
                     font-size: 0.85rem;
                 }
 
-                // .td-act {
-                // }
+                .td-act {
+                    .acts {
+                        display: flex;
+                        gap: 0.3rem;
+                    }
+                }
 
                 .td-vfor {
                     .estado {

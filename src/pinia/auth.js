@@ -239,6 +239,7 @@ export const useAuth = defineStore('auth', {
 
                             { id: 'vProgramaFiltrantes:terminar', label: 'Terminar' },
                             { id: 'vProgramaFiltrantes:salidaInsumos', label: 'Salida de insumos' },
+                            { id: 'vProgramaFiltrantes:salidaInsumosCompartidos', label: 'Salida de insumos compartidos' },
                             { id: 'vProgramaFiltrantes:productosTerminados', label: 'Productos terminados' },
                             { id: 'vProgramaFiltrantes:verProductosPedidos', label: 'Ver productos pedidos' },
                         ]
@@ -434,6 +435,7 @@ export const useAuth = defineStore('auth', {
             this.token = null
             this.permisos = []
             this.usuario = {}
+            this.tables = {}
         },
 
         // ----- LOGIN ----- //

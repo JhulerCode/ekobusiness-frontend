@@ -6,6 +6,7 @@
             <div class="buttons">
                 <JdButton
                     text="Ver productos pedidos"
+                    tipo="2"
                     @click="verPedidos"
                     v-if="useAuth.verifyPermiso('vProgramaLuxury:verProductosPedidos')"
                 />

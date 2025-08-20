@@ -464,10 +464,11 @@ export default {
 
     .left {
         .totalletras {
+            margin-bottom: 1rem;
+
             * {
                 font-size: 0.8rem;
             }
-            margin-bottom: 1rem;
         }
 
         .observaciones {

@@ -150,7 +150,7 @@ export default {
 
 .small {
     .btn {
-        padding: calc(0.3rem - 2px) 0.5rem !important;
+        padding: calc(0.3rem - 2px) 0.35rem !important;
         border-radius: 0.3rem;
 
         * {

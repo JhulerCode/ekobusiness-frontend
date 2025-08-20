@@ -49,6 +49,7 @@
             :inputsDisabled="modal.mode == 3"
             @onInput="(action, a) => this[action](a)"
             class="jdTable"
+            colActWidth="4.5rem"
         >
             <!-- :rowOptions="tableRowOptions"
             @rowOptionSelected="runMethod" -->
@@ -189,7 +190,7 @@ export default {
             // },
             {
                 id: 'pu',
-                title: 'Precio uni.',
+                title: 'Valor unitario',
                 type: 'number',
                 input: true,
                 width: '6rem',

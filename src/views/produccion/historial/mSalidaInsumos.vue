@@ -1,10 +1,5 @@
 <template>
-    <JdModal modal="mProduccionInsumos">
-        <p class="mrg-btm1">
-            <small>Producto:</small> {{ modal.produccion_orden.articulo1.nombre }}
-            <small>Cant. planificada:</small> {{ modal.produccion_orden.cantidad }}
-        </p>
-
+    <JdModal modal="mSalidaInsumos">
         <div class="container-agregar">
             <JdInput
                 type="date"
@@ -12,6 +7,16 @@
                 :nec="true"
                 v-model="modal.transaccion.fecha"
                 style="grid-column: 1/2"
+                :disabled="true"
+            />
+
+            <JdSelect
+                label="Máquina"
+                :nec="true"
+                v-model="modal.transaccion.maquina"
+                :lista="modal.maquinas || []"
+                style="grid-column: 1/3"
+                :disabled="true"
             />
 
             <JdSelect
@@ -19,29 +24,9 @@
                 :nec="true"
                 v-model="modal.transaccion.articulo"
                 id="articulo"
-                :lista="modal.produccion_orden.articulo_info.receta_insumos || []"
-                mostrar="articulo1.nombre"
+                :lista="articulos_compartidos"
                 @elegir="loadLotes"
-                v-if="modal.is_receta"
                 style="grid-column: 1/3"
-            />
-
-            <JdSelectQuery
-                label="Artículo"
-                :nec="true"
-                v-model="modal.transaccion.articulo"
-                :spin="modal.spinArticulos"
-                :lista="modal.articulos"
-                @search="searchArticulos"
-                @elegir="loadLotes"
-                v-else
-                style="grid-column: 1/3"
-            />
-
-            <JdCheckBox
-                label="Ver artículos de receta"
-                v-model="modal.is_receta"
-                @change="initTransaccion"
             />
 
             <JdSelect
@@ -122,9 +107,7 @@
 <script>
 import JdModal from '@/components/JdModal.vue'
 import JdInput from '@/components/inputs/JdInput.vue'
-import JdCheckBox from '@/components/inputs/JdCheckBox.vue'
 import JdSelect from '@/components/inputs/JdSelect.vue'
-import JdSelectQuery from '@/components/inputs/JdSelectQuery.vue'
 import JdButton from '@/components/inputs/JdButton.vue'
 import JdTable from '@/components/JdTable.vue'
 import mProduccionInsumosDevolucion from '@/views/produccion/historial/mProduccionInsumosDevolucion.vue'
@@ -143,9 +126,7 @@ export default {
     components: {
         JdModal,
         JdInput,
-        JdCheckBox,
         JdSelect,
-        JdSelectQuery,
         JdButton,
         JdTable,
         mProduccionInsumosDevolucion,
@@ -158,6 +139,15 @@ export default {
         dayjs,
 
         modal: {},
+
+        articulos_compartidos: [
+            { articulo: 'da249f8d-c28e-4eda-a3f9-3ea9659b2f1a', nombre: 'GOMA PURYCOL 1990 GA' },
+            {
+                articulo: '7068389c-14b4-4a81-a91a-475086719b47',
+                nombre: 'HILO 100% ALGODÓN ESPECIAL',
+            },
+            { articulo: '5daf8437-e0fe-4c6c-95ef-664288365036', nombre: 'PAPEL FILTRO' },
+        ],
 
         columns: [
             {
@@ -214,32 +204,32 @@ export default {
             },
         ],
     }),
-    created() {
-        this.modal = this.useModals.mProduccionInsumos
+    async created() {
+        this.modal = this.useModals.mSalidaInsumos
 
-        this.initTransaccion()
-        this.loadProduccionInsumos()
+        await this.loadMaquinas()
+        await this.loadProduccionInsumos()
     },
     methods: {
         initTransaccion() {
             this.modal.transaccion = {
                 tipo: 2,
-                fecha: dayjs().format('YYYY-MM-DD'),
-                produccion_orden: this.modal.produccion_orden.id,
+                fecha: this.modal.transaccion.fecha,
+                maquina: this.modal.transaccion.maquina,
             }
 
             this.modal.lotes = []
             this.modal.lotesLoaded = false
         },
         async loadProduccionInsumos() {
-            this.modal.produccion_insumos = []
-
             const qry = {
                 fltr: {
-                    produccion_orden: { op: 'Es', val: this.modal.produccion_orden.id },
+                    fecha: { op: 'Es', val: this.modal.transaccion.fecha },
+                    maquina: { op: 'Es', val: this.modal.transaccion.maquina },
                 },
             }
 
+            this.modal.produccion_insumos = []
             this.useAuth.setLoading(true, 'Cargando...')
             const res = await get(`${urls.kardex}/produccion-insumos?qry=${JSON.stringify(qry)}`)
             this.useAuth.setLoading(false)
@@ -247,29 +237,6 @@ export default {
             if (res.code !== 0) return
 
             this.modal.produccion_insumos = res.data
-        },
-        async searchArticulos(txtBuscar) {
-            if (!txtBuscar) {
-                this.modal.articulos.length = 0
-                return
-            }
-
-            const qry = {
-                fltr: {
-                    tipo: { op: 'Es', val: 1 },
-                    activo: { op: 'Es', val: true },
-                    nombre: { op: 'Contiene', val: txtBuscar },
-                },
-                cols: ['unidad', 'igv_afectacion', 'has_fv'],
-            }
-
-            this.modal.spinArticulos = true
-            const res = await get(`${urls.articulos}?qry=${JSON.stringify(qry)}`)
-            this.modal.spinArticulos = false
-
-            if (res.code !== 0) return
-
-            this.modal.articulos = JSON.parse(JSON.stringify(res.data))
         },
 
         async loadLotes() {
@@ -294,7 +261,7 @@ export default {
         },
 
         checkDatos() {
-            const props = ['fecha', 'articulo', 'cantidad', 'lote_padre']
+            const props = ['fecha', 'maquina', 'articulo', 'cantidad', 'lote_padre']
 
             if (incompleteData(this.modal.transaccion, props)) {
                 jmsg('warning', 'Completa los campos requeridos')
@@ -350,7 +317,7 @@ export default {
                 transaccion: {
                     tipo: 3,
                     fecha: dayjs().format('YYYY-MM-DD'),
-                    produccion_orden: this.modal.produccion_orden.id,
+                    maquina: this.modal.transaccion.maquina,
                     articulo: item.articulo,
                     lote_padre: item.lote_padre,
                 },
@@ -361,6 +328,22 @@ export default {
         },
         devuelto(item) {
             this.modal.produccion_insumos.unshift(item)
+        },
+
+        async loadMaquinas() {
+            const qry = {
+                fltr: { tipo: { op: 'Es', val: 1 } },
+                cols: ['codigo', 'nombre', 'produccion_tipo', 'velocidad', 'limpieza_tiempo'],
+            }
+
+            this.modal.maquinas = []
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.maquinas}?qry=${JSON.stringify(qry)}`)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            this.modal.maquinas = res.data
         },
     },
 }

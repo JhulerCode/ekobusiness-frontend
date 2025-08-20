@@ -24,8 +24,6 @@
                 v-model="modal.usuario.menu_visible"
                 :lista="yesno"
             />
-
-            {{ useAuth.usuario }}
         </div>
     </JdModal>
 </template>

@@ -97,6 +97,7 @@ export default {
                 title: 'Artículo',
                 width: '23rem',
                 show: true,
+                sort: true,
             },
             {
                 id: 'unidad',
@@ -307,6 +308,10 @@ export default {
                             matchedItem?.igv_afectacion == '10'
                                 ? this.modal.empresa.igv_porcentaje
                                 : 0,
+
+                        mtoValorVenta: 0,
+                        igv: 0,
+                        total: 0,
                     }
                 })
 

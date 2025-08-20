@@ -179,6 +179,16 @@ export default {
                 seek: true,
                 sort: true,
             },
+            {
+                id: 'createdBy',
+                title: 'Creado por',
+                prop: 'createdBy1.nombres_apellidos',
+                filtrable: false,
+                width: '10rem',
+                show: true,
+                seek: true,
+                sort: true,
+            }
         ],
         tableRowOptions: [
             {

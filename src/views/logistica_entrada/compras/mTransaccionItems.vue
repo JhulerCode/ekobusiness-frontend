@@ -142,6 +142,7 @@ export default {
                 prop: 'articulo1.nombre',
                 width: '23rem',
                 show: true,
+                sort: true,
             },
             {
                 id: 'unidad',
@@ -408,6 +409,8 @@ export default {
                     total: 0,
                 })
             }
+
+            this.sumarItems()
         },
 
         calcularUno(item) {
@@ -420,9 +423,9 @@ export default {
             }
 
             item.vu =
-                item.igv_afectacion == '10' ? item.pu / (1 + item.igv_porcentaje / 100) : item.pu
+                item.igv_afectacion == '10' ? item.pu * (1 + item.igv_porcentaje / 100) : item.pu
 
-            item.mtoValorVenta = item.cantidad * item.vu
+            item.mtoValorVenta = item.cantidad * item.pu
             item.igv =
                 item.igv_afectacion == '10' ? item.mtoValorVenta * (item.igv_porcentaje / 100) : 0
             item.total = item.mtoValorVenta + item.igv

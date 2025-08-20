@@ -97,13 +97,13 @@
                         <li>
                             <strong>Contacto</strong>
                             <span>:</span>
-                            <span>{{ modal.item.contacto_datos.nombre }}</span>
+                            <span>{{ modal.item.contacto_datos?.nombre }}</span>
                         </li>
 
                         <li>
                             <strong>Teléfono</strong>
                             <span>:</span>
-                            <span>{{ modal.item.contacto_datos.telefono }}</span>
+                            <span>{{ modal.item.contacto_datos?.telefono }}</span>
                         </li>
                     </ul>
                 </div>

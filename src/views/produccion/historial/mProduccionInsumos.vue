@@ -237,11 +237,14 @@ export default {
             const qry = {
                 fltr: {
                     produccion_orden: { op: 'Es', val: this.modal.produccion_orden.id },
+                    tipo: { op: 'Es', val: [2, 3] },
                 },
+                cols: ['tipo', 'fecha', 'articulo', 'lote_padre', 'cantidad'],
+                incl: ['lote_padre1', 'articulo1'],
             }
 
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.kardex}/produccion-insumos?qry=${JSON.stringify(qry)}`)
+            const res = await get(`${urls.kardex}?qry=${JSON.stringify(qry)}`)
             this.useAuth.setLoading(false)
 
             if (res.code !== 0) return
@@ -349,7 +352,7 @@ export default {
             const send = {
                 transaccion: {
                     tipo: 3,
-                    fecha: dayjs().format('YYYY-MM-DD'),
+                    fecha: item.fecha,
                     produccion_orden: this.modal.produccion_orden.id,
                     articulo: item.articulo,
                     lote_padre: item.lote_padre,

@@ -75,7 +75,7 @@ export default {
                 sort: true,
             },
             {
-                id: 'tipo',
+                id: 'produccion_orden_tipo',
                 title: 'Tipo',
                 type: 'select',
                 prop: 'produccion_orden1.tipo1.nombre',
@@ -85,7 +85,7 @@ export default {
                 sort: true,
             },
             {
-                id: 'maquina',
+                id: 'produccion_orden_maquina',
                 title: 'Máquina',
                 type: 'select',
                 prop: 'produccion_orden1.maquina1.nombre',
@@ -95,22 +95,11 @@ export default {
                 sort: true,
             },
             {
-                id: 'articulo',
+                id: 'articulo_nombre',
                 title: 'Producto',
                 type: 'text',
                 prop: 'articulo1.nombre',
                 width: '25rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'unidad',
-                title: 'Unidad',
-                type: 'text',
-                prop: 'articulo1.unidad',
-                filtrable: false,
-                width: '5rem',
                 show: true,
                 seek: true,
                 sort: true,
@@ -164,20 +153,22 @@ export default {
         },
         setQuery() {
             this.vista.qry = {
-                fltr: { is_lote_padre: { op: 'No es', val: null } },
+                fltr: {
+                    tipo: { op: 'Es', val: 4 },
+                    is_lote_padre: { op: 'No es', val: null },
+                },
                 incl: ['articulo1', 'produccion_orden1'],
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
         },
         async loadTransacciones() {
+            this.vista.produccion_productos = []
+
             this.setQuery()
 
-            this.vista.produccion_productos = []
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(
-                `${urls.kardex}/produccion-productos?qry=${JSON.stringify(this.vista.qry)}`,
-            )
+            const res = await get(`${urls.kardex}?qry=${JSON.stringify(this.vista.qry)}`)
             this.useAuth.setLoading(false)
             this.vista.loaded = true
 
@@ -209,8 +200,8 @@ export default {
             await this.loadMaquinas()
 
             const cols = this.columns.filter((a) => a.filtrable !== false)
-            cols.find((a) => a.id == 'tipo').lista = this.vista.produccion_tipos
-            cols.find((a) => a.id == 'maquina').lista = this.vista.maquinas
+            cols.find((a) => a.id == 'produccion_orden_tipo').lista = this.vista.produccion_tipos
+            cols.find((a) => a.id == 'produccion_orden_maquina').lista = this.vista.maquinas
 
             const send = {
                 table: this.tableName,

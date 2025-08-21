@@ -144,13 +144,14 @@ export default {
 
             const qry = {
                 fltr: {
+                    tipo: { op: 'Es', val: 4 },
                     produccion_orden: { op: 'Es', val: this.modal.produccion_orden.id },
                 },
                 cols: ['lote', 'fv', 'cantidad', 'is_lote_padre'],
             }
 
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.kardex}/produccion-productos?qry=${JSON.stringify(qry)}`)
+            const res = await get(`${urls.kardex}?qry=${JSON.stringify(qry)}`)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return

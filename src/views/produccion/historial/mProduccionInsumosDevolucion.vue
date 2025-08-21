@@ -56,15 +56,6 @@ export default {
                 jmsg('warning', 'Completa los campos requeridos')
                 return true
             }
-            // if (!this.modal.transaccion.fecha || !this.modal.transaccion.fecha.match(/^\d{4}-\d{2}-\d{2}$/)) {
-            //     jmsg('error', 'Ingrese la fecha')
-            //     return true
-            // }
-
-            // if (this.modal.transaccion.cantidad == null) {
-            //     jmsg('error', 'Ingrese la cantidad')
-            //     return true
-            // }
 
             return false
         },

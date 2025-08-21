@@ -69,7 +69,7 @@ export default {
                 sort: true,
             },
             {
-                id: 'tipo',
+                id: 'produccion_orden_tipo',
                 title: 'Tipo',
                 type: 'select',
                 prop: 'produccion_orden1.tipo1.nombre',
@@ -79,7 +79,7 @@ export default {
                 sort: true,
             },
             {
-                id: 'maquina',
+                id: 'produccion_orden_maquina',
                 title: 'Máquina',
                 type: 'select',
                 prop: 'produccion_orden1.maquina1.nombre',
@@ -89,22 +89,11 @@ export default {
                 sort: true,
             },
             {
-                id: 'articulo',
+                id: 'articulo_nombre',
                 title: 'Producto',
                 type: 'text',
                 prop: 'articulo1.nombre',
                 width: '25rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'unidad',
-                title: 'Unidad',
-                type: 'text',
-                prop: 'articulo1.unidad',
-                filtrable: false,
-                width: '5rem',
                 show: true,
                 seek: true,
                 sort: true,
@@ -132,8 +121,6 @@ export default {
                 id: 'cantidad',
                 title: 'Cantidad',
                 slot: 'cCantidad',
-                // type: 'number',
-                // format: 'number',
                 toRight: true,
                 width: '8rem',
                 show: true,
@@ -166,19 +153,22 @@ export default {
         },
         setQuery() {
             this.modal.qry = {
-                fltr: { is_lote_padre: { op: 'Es', val: null } },
+                fltr: {
+                    tipo: { op: 'Es', val: 4 },
+                    is_lote_padre: { op: 'Es', val: null },
+                },
                 incl: ['articulo1', 'produccion_orden1'],
             }
+
             this.useAuth.updateQuery(this.columns, this.modal.qry)
         },
         async loadProduccionProductos() {
+            this.modal.produccion_productos = []
+
             this.setQuery()
 
-            this.modal.produccion_productos = []
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(
-                `${urls.kardex}/produccion-productos?qry=${JSON.stringify(this.modal.qry)}`,
-            )
+            const res = await get(`${urls.kardex}?qry=${JSON.stringify(this.modal.qry)}`)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return

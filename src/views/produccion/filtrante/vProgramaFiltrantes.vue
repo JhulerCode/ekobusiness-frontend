@@ -90,7 +90,7 @@
         @productosCargados="setProduccionProductos"
     />
     <mProductosFaltantes v-if="useModals.show.mProductosFaltantes" />
-    <mSalidaInsumos v-if="useModals.show.mSalidaInsumos" />
+    <mProduccionInsumosCompartidos v-if="useModals.show.mProduccionInsumosCompartidos" />
 </template>
 
 <script>
@@ -103,7 +103,7 @@ import mProduccionOrden from '@/views/produccion/historial/mProduccionOrden.vue'
 import mProduccionInsumos from '@/views/produccion/historial/mProduccionInsumos.vue'
 import mProduccionProductos from '@/views/produccion/historial/mProduccionProductos.vue'
 import mProductosFaltantes from '@/views/produccion/filtrante/mProductosFaltantes.vue'
-import mSalidaInsumos from '@/views/produccion/historial/mSalidaInsumos.vue'
+import mProduccionInsumosCompartidos from '@/views/produccion/historial/mProduccionInsumosCompartidos.vue'
 
 import { useModals } from '@/pinia/modals'
 import { useAuth } from '@/pinia/auth'
@@ -125,7 +125,7 @@ export default {
         mProduccionInsumos,
         mProduccionProductos,
         mProductosFaltantes,
-        mSalidaInsumos,
+        mProduccionInsumosCompartidos,
     },
     data: () => ({
         useModals: useModals(),
@@ -504,7 +504,7 @@ export default {
                     maquina: this.columns[1].val,
                 },
             }
-            this.useModals.setModal('mSalidaInsumos', `Salida de insumos`, null, send, true)
+            this.useModals.setModal('mProduccionInsumosCompartidos', `Salida de insumos`, null, send, true)
         },
         productosTerminados(item) {
             const send = {

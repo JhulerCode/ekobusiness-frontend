@@ -160,21 +160,22 @@ export default {
                 id: 'tiempo',
                 title: 'Tiempo',
                 slot: 'cTiempo',
-                // toRight: true,
                 width: '8rem',
                 show: true,
                 seek: true,
                 sort: true,
             },
-            // {
-            //     id: 'estado',
-            //     title: 'Estado',
-            //     prop: 'estado1.nombre',
-            //     width: '10rem',
-            //     show: true,
-            //     seek: true,
-            //     sort: true,
-            // }
+            {
+                id: 'productos_terminados',
+                title: 'Productos terminados',
+                type: 'number',
+                format: 'number',
+                toRight: true,
+                width: '8rem',
+                show: true,
+                seek: true,
+                sort: true,
+            },
         ],
         tableRowOptions: [
             {

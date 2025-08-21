@@ -1,5 +1,5 @@
 <template>
-    <JdModal modal="mSalidaInsumos">
+    <JdModal modal="mProduccionInsumosCompartidos">
         <div class="container-agregar">
             <JdInput
                 type="date"
@@ -10,24 +10,39 @@
                 :disabled="true"
             />
 
-            <JdSelect
-                label="Máquina"
-                :nec="true"
-                v-model="modal.transaccion.maquina"
-                :lista="modal.maquinas || []"
-                style="grid-column: 1/3"
-                :disabled="true"
-            />
+            <template v-if="modal.transaccion.maquina">
+                <JdSelect
+                    label="Máquina"
+                    :nec="true"
+                    v-model="modal.transaccion.maquina"
+                    :lista="modal.maquinas || []"
+                    style="grid-column: 2/3"
+                    :disabled="true"
+                />
 
-            <JdSelect
-                label="Insumo"
-                :nec="true"
-                v-model="modal.transaccion.articulo"
-                id="articulo"
-                :lista="articulos_compartidos"
-                @elegir="loadLotes"
-                style="grid-column: 1/3"
-            />
+                <JdSelect
+                    label="Insumo"
+                    :nec="true"
+                    v-model="modal.transaccion.articulo"
+                    id="articulo"
+                    :lista="articulos_compartidos"
+                    @elegir="loadLotes"
+                    style="grid-column: 1/3"
+                />
+            </template>
+
+            <template v-else>
+                <JdSelectQuery
+                    label="Artículo"
+                    :nec="true"
+                    v-model="modal.transaccion.articulo"
+                    :spin="modal.spinArticulos"
+                    :lista="modal.articulos"
+                    @search="searchArticulos"
+                    @elegir="loadLotes"
+                    style="grid-column: 1/3"
+                />
+            </template>
 
             <JdSelect
                 label="Lote"
@@ -108,6 +123,7 @@
 import JdModal from '@/components/JdModal.vue'
 import JdInput from '@/components/inputs/JdInput.vue'
 import JdSelect from '@/components/inputs/JdSelect.vue'
+import JdSelectQuery from '@/components/inputs/JdSelectQuery.vue'
 import JdButton from '@/components/inputs/JdButton.vue'
 import JdTable from '@/components/JdTable.vue'
 import mProduccionInsumosDevolucion from '@/views/produccion/historial/mProduccionInsumosDevolucion.vue'
@@ -127,6 +143,7 @@ export default {
         JdModal,
         JdInput,
         JdSelect,
+        JdSelectQuery,
         JdButton,
         JdTable,
         mProduccionInsumosDevolucion,
@@ -205,7 +222,7 @@ export default {
         ],
     }),
     async created() {
-        this.modal = this.useModals.mSalidaInsumos
+        this.modal = this.useModals.mProduccionInsumosCompartidos
 
         await this.loadMaquinas()
         await this.loadProduccionInsumos()
@@ -222,21 +239,51 @@ export default {
             this.modal.lotesLoaded = false
         },
         async loadProduccionInsumos() {
+            this.modal.produccion_insumos = []
+
             const qry = {
                 fltr: {
                     fecha: { op: 'Es', val: this.modal.transaccion.fecha },
-                    maquina: { op: 'Es', val: this.modal.transaccion.maquina },
+                    tipo: { op: 'Es', val: [2, 3] },
                 },
+                cols: ['tipo', 'fecha', 'articulo', 'lote_padre', 'cantidad'],
+                incl: ['lote_padre1', 'articulo1'],
             }
 
-            this.modal.produccion_insumos = []
+            if (this.modal.transaccion.maquina != null) {
+                qry.fltr.maquina = { op: 'Es', val: this.modal.transaccion.maquina }
+            }
+
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.kardex}/produccion-insumos?qry=${JSON.stringify(qry)}`)
+            const res = await get(`${urls.kardex}?qry=${JSON.stringify(qry)}`)
             this.useAuth.setLoading(false)
 
             if (res.code !== 0) return
 
             this.modal.produccion_insumos = res.data
+        },
+        async searchArticulos(txtBuscar) {
+            if (!txtBuscar) {
+                this.modal.articulos.length = 0
+                return
+            }
+
+            const qry = {
+                fltr: {
+                    tipo: { op: 'Es', val: 1 },
+                    activo: { op: 'Es', val: true },
+                    nombre: { op: 'Contiene', val: txtBuscar },
+                },
+                cols: ['unidad', 'igv_afectacion', 'has_fv'],
+            }
+
+            this.modal.spinArticulos = true
+            const res = await get(`${urls.articulos}?qry=${JSON.stringify(qry)}`)
+            this.modal.spinArticulos = false
+
+            if (res.code !== 0) return
+
+            this.modal.articulos = JSON.parse(JSON.stringify(res.data))
         },
 
         async loadLotes() {
@@ -261,7 +308,7 @@ export default {
         },
 
         checkDatos() {
-            const props = ['fecha', 'maquina', 'articulo', 'cantidad', 'lote_padre']
+            const props = ['fecha', 'articulo', 'cantidad', 'lote_padre']
 
             if (incompleteData(this.modal.transaccion, props)) {
                 jmsg('warning', 'Completa los campos requeridos')
@@ -316,7 +363,7 @@ export default {
             const send = {
                 transaccion: {
                     tipo: 3,
-                    fecha: dayjs().format('YYYY-MM-DD'),
+                    fecha: item.fecha,
                     maquina: this.modal.transaccion.maquina,
                     articulo: item.articulo,
                     lote_padre: item.lote_padre,

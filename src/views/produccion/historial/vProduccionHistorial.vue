@@ -2,6 +2,15 @@
     <div class="vista vista-fill">
         <div class="head">
             <strong>Órdenes de producción</strong>
+
+            <div class="buttons">
+                <JdButton
+                    text="Salida de insumos"
+                    tipo="2"
+                    @click="salidaInsumos2"
+                    v-if="useAuth.verifyPermiso('vProduccionHistorial:salidaInsumos')"
+                />
+            </div>
         </div>
 
         <JdTable
@@ -22,12 +31,14 @@
     <mProduccionProductos v-if="useModals.show.mProduccionProductos" />
     <mFormato v-if="useModals.show.mFormato" @created="setFormatoCalidad" />
     <mProduccionTrazabilidad v-if="useModals.show.mProduccionTrazabilidad" />
+    <mProduccionInsumosCompartidos v-if="useModals.show.mProduccionInsumosCompartidos" />
 
     <mConfigFiltros v-if="useModals.show.mConfigFiltros" />
 </template>
 
 <script>
 import JdTable from '@/components/JdTable.vue'
+import JdButton from '@/components/inputs/JdButton.vue'
 import mConfigFiltros from '@/components/mConfigFiltros.vue'
 
 import mProduccionOrden from '@/views/produccion/historial/mProduccionOrden.vue'
@@ -35,6 +46,7 @@ import mProduccionInsumos from '@/views/produccion/historial/mProduccionInsumos.
 import mFormato from '@/views/calidad/formatos/mFormato.vue'
 import mProduccionProductos from '@/views/produccion/historial/mProduccionProductos.vue'
 import mProduccionTrazabilidad from '@/views/produccion/historial/mProduccionTrazabilidad.vue'
+import mProduccionInsumosCompartidos from '@/views/produccion/historial/mProduccionInsumosCompartidos.vue'
 
 import { useModals } from '@/pinia/modals'
 import { useAuth } from '@/pinia/auth'
@@ -47,6 +59,7 @@ import dayjs from 'dayjs'
 export default {
     components: {
         JdTable,
+        JdButton,
 
         mConfigFiltros,
 
@@ -55,6 +68,7 @@ export default {
         mFormato,
         mProduccionProductos,
         mProduccionTrazabilidad,
+        mProduccionInsumosCompartidos,
     },
     data: () => ({
         useModals: useModals(),
@@ -324,6 +338,15 @@ export default {
             }
 
             this.useModals.setModal('mProduccionInsumos', `Salida de insumos`, 1, send, true)
+        },
+        salidaInsumos2() {
+            const send = {
+                transaccion: {
+                    tipo: 2,
+                    fecha: dayjs().format('YYYY-MM-DD'),
+                },
+            }
+            this.useModals.setModal('mProduccionInsumosCompartidos', `Salida de insumos`, null, send, true)
         },
         productosTerminados(item) {
             const send = {

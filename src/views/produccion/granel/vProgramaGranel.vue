@@ -30,7 +30,7 @@
         </JdTable>
     </div>
 
-    <mProduccionOrden v-if="useModals.show.mProduccionOrden" @calcularTiempo="calcularHoras" />
+    <mProduccionOrden v-if="useModals.show.mProduccionOrden" />
     <mProduccionInsumos v-if="useModals.show.mProduccionInsumos" />
     <mProduccionProductos
         v-if="useModals.show.mProduccionProductos"
@@ -105,6 +105,17 @@ export default {
             {
                 id: 'cantidad',
                 title: 'Cantidad',
+                format: 'number',
+                toRight: true,
+                width: '8rem',
+                show: true,
+                seek: true,
+                sort: true,
+            },
+            {
+                id: 'productos_terminados',
+                title: 'Productos terminados',
+                type: 'number',
                 format: 'number',
                 toRight: true,
                 width: '8rem',

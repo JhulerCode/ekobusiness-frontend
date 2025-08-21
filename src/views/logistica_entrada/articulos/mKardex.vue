@@ -27,12 +27,9 @@
         >
             <template v-slot:cMoreInfo="{ item }">
                 {{ item.transaccion1?.socio1?.nombres }}
+                {{ item.produccion_orden1?.maquina1?.nombre }}
+                {{ item.maquina1?.nombre }}
             </template>
-
-            <!-- <template v-slot:cTipo="{ item }">
-                <i class="fa-solid fa-ban anulado" v-if="item.transaccion1.estado == 0"></i>
-                {{ item.transaccion1.tipo1.nombre }}
-            </template> -->
         </JdTable>
     </JdModal>
 </template>
@@ -76,6 +73,7 @@ export default {
                 width: '8rem',
                 show: true,
                 seek: true,
+                sort: true,
             },
             {
                 id: 'tipo',
@@ -85,6 +83,7 @@ export default {
                 width: '15rem',
                 show: true,
                 seek: true,
+                sort: true,
             },
             {
                 id: 'lote',
@@ -92,6 +91,7 @@ export default {
                 width: '8rem',
                 show: true,
                 seek: true,
+                sort: true,
             },
             {
                 id: 'fv',
@@ -100,6 +100,7 @@ export default {
                 width: '8rem',
                 show: true,
                 seek: true,
+                sort: true,
             },
             {
                 id: 'pu_real',
@@ -108,6 +109,7 @@ export default {
                 width: '8rem',
                 show: true,
                 seek: true,
+                sort: true,
             },
             {
                 id: 'pu_igv',
@@ -116,6 +118,7 @@ export default {
                 width: '8rem',
                 show: true,
                 seek: true,
+                sort: true,
             },
             {
                 id: 'cantidad',
@@ -125,6 +128,7 @@ export default {
                 width: '8rem',
                 show: true,
                 seek: true,
+                sort: true,
             },
             {
                 id: 'more_info',
@@ -133,6 +137,7 @@ export default {
                 width: '20rem',
                 show: true,
                 seek: true,
+                sort: true,
             },
         ],
         tableRowOptions: [
@@ -170,6 +175,7 @@ export default {
                     'lote_padre',
                     'is_lote_padre',
                 ],
+                incl: ['lote_padre1', 'transaccion1', 'produccion_orden1', 'maquina1'],
             }
 
             this.modal.kardex = []

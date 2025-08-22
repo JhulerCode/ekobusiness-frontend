@@ -511,7 +511,7 @@ export default {
         },
         async loadMaquinas() {
             const qry = {
-                fltr: {},
+                fltr: { tipo: { op: 'Es', val: 1 } },
                 cols: ['codigo', 'nombre', 'produccion_tipo', 'velocidad', 'limpieza_tiempo'],
             }
 

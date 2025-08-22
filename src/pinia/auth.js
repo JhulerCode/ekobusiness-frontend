@@ -238,10 +238,9 @@ export const useAuth = defineStore('auth', {
                             { id: 'vProgramaFiltrantes:eliminar', label: 'Eliminar' },
 
                             { id: 'vProgramaFiltrantes:terminar', label: 'Terminar' },
-                            { id: 'vProgramaFiltrantes:salidaInsumos', label: 'Salida de insumos' },
-                            { id: 'vProgramaFiltrantes:salidaInsumosCompartidos', label: 'Salida de insumos compartidos' },
                             { id: 'vProgramaFiltrantes:productosTerminados', label: 'Productos terminados' },
                             { id: 'vProgramaFiltrantes:verProductosPedidos', label: 'Ver productos pedidos' },
+                            { id: 'vProgramaFiltrantes:salidaInsumosCompartidos', label: 'Salida de insumos compartidos' },
                         ]
                     },
                     {
@@ -253,7 +252,6 @@ export const useAuth = defineStore('auth', {
                             { id: 'vProgramaGranel:eliminar', label: 'Eliminar' },
 
                             { id: 'vProgramaGranel:terminar', label: 'Terminar' },
-                            { id: 'vProgramaGranel:salidaInsumos', label: 'Salida de insumos' },
                             { id: 'vProgramaGranel:productosTerminados', label: 'Productos terminados' },
                             { id: 'vProgramaGranel:verProductosPedidos', label: 'Ver productos pedidos' },
                         ]
@@ -267,7 +265,6 @@ export const useAuth = defineStore('auth', {
                             { id: 'vProgramaLuxury:eliminar', label: 'Eliminar' },
 
                             { id: 'vProgramaLuxury:terminar', label: 'Terminar' },
-                            { id: 'vProgramaLuxury:salidaInsumos', label: 'Salida de insumos' },
                             { id: 'vProgramaLuxury:productosTerminados', label: 'Productos terminados' },
                             { id: 'vProgramaLuxury:verProductosPedidos', label: 'Ver productos pedidos' },
                         ]

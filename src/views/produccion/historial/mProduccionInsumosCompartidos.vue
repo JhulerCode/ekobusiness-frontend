@@ -288,6 +288,8 @@ export default {
 
         async loadLotes() {
             this.modal.lotes = []
+            this.modal.transaccion.lote_padre = null
+            this.modal.lotesLoaded = false
 
             if (this.modal.transaccion.articulo == null) return
 
@@ -330,7 +332,7 @@ export default {
             if (this.checkDatos()) return
 
             this.useAuth.setLoading(true, 'Grabando...')
-            const res = await post(`${urls.kardex}/produccion-insumos`, this.modal.transaccion)
+            const res = await post(urls.kardex, this.modal.transaccion)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return

@@ -217,11 +217,11 @@ export default {
 
             return false
         },
-        async crear1() {
-            if (this.checkDatos()) return
+        // async crear1() {
+        //     if (this.checkDatos()) return
 
-            console.log(this.modal.produccion_orden)
-        },
+        //     console.log(this.modal.produccion_orden)
+        // },
         async crear() {
             if (this.checkDatos()) return
 

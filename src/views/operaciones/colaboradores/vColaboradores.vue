@@ -71,8 +71,8 @@ export default {
                 type: 'text',
                 width: '10rem',
                 show: true,
-                seek: false,
-                sort: false
+                seek: true,
+                sort: true
             },
             {
                 id: 'doc_tipo',
@@ -81,8 +81,8 @@ export default {
                 type: 'select',
                 width: '10rem',
                 show: true,
-                seek: false,
-                sort: false
+                seek: true,
+                sort: true
             },
             {
                 id: 'doc_numero',
@@ -90,8 +90,8 @@ export default {
                 type: 'text',
                 width: '10rem',
                 show: true,
-                seek: false,
-                sort: false
+                seek: true,
+                sort: true
             },
             {
                 id: 'fecha_nacimiento',
@@ -99,8 +99,8 @@ export default {
                 type: 'date',
                 width: '8rem',
                 show: true,
-                seek: false,
-                sort: false
+                seek: true,
+                sort: true
             },
             {
                 id: 'sexo',
@@ -109,8 +109,8 @@ export default {
                 type: 'select',
                 width: '8rem',
                 show: true,
-                seek: false,
-                sort: false
+                seek: true,
+                sort: true
             },
             {
                 id: 'correo',
@@ -118,8 +118,8 @@ export default {
                 type: 'text',
                 width: '10rem',
                 show: true,
-                seek: false,
-                sort: false
+                seek: true,
+                sort: true
             },
             {
                 id: 'telefono',
@@ -127,8 +127,8 @@ export default {
                 type: 'text',
                 width: '10rem',
                 show: true,
-                seek: false,
-                sort: false
+                seek: true,
+                sort: true
             },
             {
                 id: 'direccion',
@@ -136,8 +136,8 @@ export default {
                 type: 'text',
                 width: '10rem',
                 show: true,
-                seek: false,
-                sort: false
+                seek: true,
+                sort: true
             },
             {
                 id: 'cargo',
@@ -156,7 +156,7 @@ export default {
                 format: 'yesno',
                 width: '5rem',
                 show: true,
-                seek: false,
+                seek: true,
                 sort: true
             },
             {
@@ -167,7 +167,7 @@ export default {
                 format: 'yesno',
                 width: '5rem',
                 show: true,
-                seek: false,
+                seek: true,
                 sort: true
             }
         ],

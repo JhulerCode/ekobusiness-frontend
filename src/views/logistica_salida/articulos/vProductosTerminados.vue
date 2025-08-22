@@ -87,6 +87,7 @@ import { useModals } from '@/pinia/modals'
 import { urls, get, delet } from '@/utils/crud'
 import { tryOficialExcel } from '@/utils/mine'
 import { jqst, jmsg } from '@/utils/swal'
+import dayjs from 'dayjs'
 
 export default {
     components: {
@@ -601,10 +602,17 @@ export default {
         },
         ajusteStock(item) {
             const send = {
-                articulo: item,
                 transaccion: {
-                    estado: 2,
+                    fecha: dayjs().format('YYYY-MM-DD'),
+                    articulo: item.id,
                 },
+                articulo1: {
+                    igv_afectacion: item.igv_afectacion,
+                    has_fv: item.has_fv,
+                },
+                articulos: [{ id: item.id, nombre: item.nombre }],
+                articulo_tipo: 1,
+                is_nuevo_lote: false,
             }
 
             this.useModals.setModal('mAjusteStock', 'Ajuste de stock', null, send, true)

@@ -15,7 +15,7 @@
                     text="Salida de insumos"
                     tipo="2"
                     @click="salidaInsumos2"
-                    v-if="useAuth.verifyPermiso('vProgramaFiltrantes:salidaInsumosCompartidos')"
+                    v-if="useAuth.verifyPermiso('vProgramaFiltrantes:salidaInsumosCompartidos') && vista.qry?.fltr?.fecha?.op == 'Es'"
                 />
 
                 <JdInput
@@ -28,6 +28,8 @@
                 <JdSelect
                     :lista="vista.maquinas || []"
                     v-model="columns[1].val"
+                    :loaded="vista.maquinasLoaded"
+                    @reload="loadMaquinas"
                     @elegir="setMaquina"
                     style="width: 8rem"
                 />
@@ -232,12 +234,6 @@ export default {
                 ocultar: { estado: 2 },
             },
             {
-                label: 'Salida de insumos',
-                icon: 'fa-regular fa-circle-down',
-                action: 'salidaInsumos',
-                permiso: 'vProgramaFiltrantes:salidaInsumos',
-            },
-            {
                 label: 'Productos terminados',
                 icon: 'fa-solid fa-boxes-stacked',
                 action: 'productosTerminados',
@@ -289,7 +285,9 @@ export default {
 
             this.vista.maquinas = []
             this.useAuth.setLoading(true, 'Cargando...')
+            this.vista.maquinasLoaded = false
             const res = await get(`${urls.maquinas}?qry=${JSON.stringify(qry)}`)
+            this.vista.maquinasLoaded = true
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return

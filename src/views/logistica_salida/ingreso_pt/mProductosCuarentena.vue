@@ -175,20 +175,20 @@ export default {
 
             this.modal.produccion_productos = res.data
         },
-        async grabar1() {
-            const send = this.modal.produccion_productos.filter(
-                (a) => a.cantidad_real != null && a.cantidad_real != '',
-            )
+        // async grabar1() {
+        //     const send = this.modal.produccion_productos.filter(
+        //         (a) => a.cantidad_real != null && a.cantidad_real != '',
+        //     )
 
-            if (send.length == 0) {
-                jmsg('error', 'No se ha ingresado ninguna cantidad real')
-                return
-            }
+        //     if (send.length == 0) {
+        //         jmsg('error', 'No se ha ingresado ninguna cantidad real')
+        //         return
+        //     }
 
-            this.modal.transaccion.transaccion_items = send
+        //     this.modal.transaccion.transaccion_items = send
 
-            console.log(this.modal.transaccion)
-        },
+        //     console.log(this.modal.transaccion)
+        // },
         async grabar() {
             const send = this.modal.produccion_productos.filter(
                 (a) => a.cantidad_real != null && a.cantidad_real != '',

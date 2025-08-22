@@ -1,12 +1,28 @@
 <template>
     <JdModal modal="mPrecioLista" :buttons="buttons" @button-click="(action) => this[action]()">
         <div class="container-datos">
-            <JdInput label="Nombre" :nec="true" v-model="precio_lista.nombre" style="grid-column: 1/4" />
+            <JdInput
+                label="Nombre"
+                :nec="true"
+                v-model="precio_lista.nombre"
+                style="grid-column: 1/4"
+            />
 
-            <JdInput label="Descripción" v-model="precio_lista.descripcion" style="grid-column: 1/5" />
+            <JdInput
+                label="Descripción"
+                v-model="precio_lista.descripcion"
+                style="grid-column: 1/5"
+            />
 
-            <JdSelect label="Moneda" :nec="true" v-model="precio_lista.moneda" :lista="modal.monedas"
-                style="grid-column: 1/4" :loaded="modal.monedasLoaded" @reload="loadMonedas" />
+            <JdSelect
+                label="Moneda"
+                :nec="true"
+                v-model="precio_lista.moneda"
+                :lista="modal.monedas"
+                style="grid-column: 1/4"
+                :loaded="modal.monedasLoaded"
+                @reload="loadMonedas"
+            />
 
             <JdSwitch label="Activo" v-model="precio_lista.activo" style="grid-column: 1/4" />
         </div>
@@ -58,8 +74,7 @@ export default {
         showButtons() {
             if (this.useModals.mPrecioLista.mode == 1) {
                 this.buttons[0].show = true
-            }
-            else {
+            } else {
                 this.buttons[1].show = true
             }
         },
@@ -113,7 +128,7 @@ export default {
 
             this.modal.monedas = res.data
         },
-    }
+    },
 }
 </script>
 

@@ -129,7 +129,7 @@ export default {
                 label: 'Ver',
                 icon: 'fa-solid fa-folder-open',
                 action: 'ver',
-                permiso: 'vProgramaGranel:crear',
+                permiso: 'vProgramaGranel:ver',
             },
             {
                 label: 'Editar',

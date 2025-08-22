@@ -1,30 +1,57 @@
 <template>
     <div class="finanzas">
         <div class="container-datos1">
-            <JdSelect label="Lista de precios" v-model="socio.precio_lista" :lista="modal.precio_listas"
-                :loaded="modal.precio_listasLoaded" @reload="loadPrecioLista()" :disabled="modal.mode == 3"
-                style="grid-column: 1/4;" v-if="this.socio.tipo == 1" />
+            <JdSelect
+                label="Lista de precios"
+                v-model="socio.precio_lista"
+                :lista="modal.precio_listas"
+                :loaded="modal.precio_listasLoaded"
+                @reload="loadPrecioLista()"
+                :disabled="modal.mode == 3"
+                style="grid-column: 1/4"
+                v-if="this.socio.tipo == 1"
+            />
 
             <!-- <JdInput label="Condición de pago" type="number" v-model="socio.pago_condicion" :disabled="modal.mode == 3"
                 style="grid-column: 4/6;" /> -->
 
-            <JdSelect label="Condición de pago" :nec="true" v-model="socio.pago_condicion"
-                :lista="modal.pago_condiciones" :disabled="modal.mode == 3" style="grid-column: 1/4;" />
+            <JdSelect
+                label="Condición de pago"
+                :nec="true"
+                v-model="socio.pago_condicion"
+                :lista="modal.pago_condiciones"
+                :disabled="modal.mode == 3"
+                style="grid-column: 1/4"
+            />
         </div>
 
         <span>- - - Bancos - - -</span>
         <div class="bancos">
             <div class="container-datos">
-                <JdInput label="Banco" :nec="true" v-model="nuevo.nombre" :disabled="modal.mode == 3" />
+                <JdInput
+                    label="Banco"
+                    :nec="true"
+                    v-model="nuevo.nombre"
+                    :disabled="modal.mode == 3"
+                />
 
-                <JdSelect label="Moneda" :nec="true" v-model="nuevo.moneda" :lista="modal.monedas"
-                    :disabled="modal.mode == 3" />
+                <JdSelect
+                    label="Moneda"
+                    :nec="true"
+                    v-model="nuevo.moneda"
+                    :lista="modal.monedas"
+                    :disabled="modal.mode == 3"
+                />
 
                 <JdInput label="NC" :nec="true" v-model="nuevo.nc" :disabled="modal.mode == 3" />
 
                 <JdInput label="CCI" :nec="true" v-model="nuevo.cci" :disabled="modal.mode == 3" />
 
-                <JdSwitch label="Principal?" v-model="nuevo.principal" :disabled="modal.mode == 3" />
+                <JdSwitch
+                    label="Principal?"
+                    v-model="nuevo.principal"
+                    :disabled="modal.mode == 3"
+                />
 
                 <div class="botones" v-if="modal.mode != 3">
                     <JdButton text="Agregar" tipo="3" @click="agregar()" v-if="!this.nuevo.id" />
@@ -34,9 +61,16 @@
                 </div>
             </div>
 
-            <JdTable :columns="columns" :datos="socio.bancos || []" height="13rem" :seeker="false" :rowSelectable="true"
-                :download="false" :rsUno="true" @rowSelected="setExistente">
-
+            <JdTable
+                :columns="columns"
+                :datos="socio.bancos || []"
+                height="13rem"
+                :seeker="false"
+                :rowSelectable="true"
+                :download="false"
+                :rsUno="true"
+                @rowSelected="setExistente"
+            >
                 <template v-slot:cNombre="{ item }">
                     <i class="fa-regular fa-star" v-if="item.principal"></i>
                     {{ item.nombre }}
@@ -79,7 +113,14 @@ export default {
         nuevo: { principal: false },
 
         columns: [
-            { id: 'nombre', title: 'Nombre', slot: 'cNombre', width: '15rem', show: true, sort: true },
+            {
+                id: 'nombre',
+                title: 'Nombre',
+                slot: 'cNombre',
+                width: '15rem',
+                show: true,
+                sort: true,
+            },
         ],
     }),
     created() {
@@ -118,8 +159,7 @@ export default {
         setExistente(item) {
             if (item.selected == false) {
                 this.nuevo = {}
-            }
-            else {
+            } else {
                 this.nuevo = { ...item }
             }
         },
@@ -131,14 +171,18 @@ export default {
                 return true
             }
 
-            const i = this.socio.bancos.findIndex(a => a.nombre == this.nuevo.nombre && a.id != this.nuevo.id)
+            const i = this.socio.bancos.findIndex(
+                (a) => a.nombre == this.nuevo.nombre && a.id != this.nuevo.id,
+            )
             if (i !== -1) {
                 jmsg('error', 'El nombre del banco ya existe')
                 return true
             }
 
             if (this.nuevo.principal == true) {
-                const j = this.socio.bancos.some(a => a.principal == true && a.id != this.nuevo.id)
+                const j = this.socio.bancos.some(
+                    (a) => a.principal == true && a.id != this.nuevo.id,
+                )
                 if (j == true) {
                     jmsg('error', 'Ya existe un banco principal')
                     return true
@@ -158,13 +202,13 @@ export default {
 
             this.socio.bancos.push({
                 id: genId(),
-                ...this.nuevo
+                ...this.nuevo,
             })
 
             this.setNuevo()
         },
         eliminar() {
-            const i = this.socio.bancos.findIndex(a => a.id == this.nuevo.id)
+            const i = this.socio.bancos.findIndex((a) => a.id == this.nuevo.id)
             this.socio.bancos.splice(i, 1)
 
             this.setNuevo()
@@ -173,12 +217,12 @@ export default {
             if (this.checkDatos()) return
             this.shapeDatos()
 
-            const i = this.socio.bancos.findIndex(a => a.id == this.nuevo.id)
+            const i = this.socio.bancos.findIndex((a) => a.id == this.nuevo.id)
             this.socio.bancos.splice(i, 1, this.nuevo)
 
             this.setNuevo()
         },
-    }
+    },
 }
 </script>
 

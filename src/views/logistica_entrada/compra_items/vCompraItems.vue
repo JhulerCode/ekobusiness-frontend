@@ -4,9 +4,16 @@
             <strong>Artículos comprados</strong>
         </div>
 
-        <JdTable :name="tableName" :columns="columns" :datos="vista.transaccion_items || []" :colAct="true"
-            :configFiltros="openConfigFiltros" :reload="loadTransaccionItems" :rowOptions="tableRowOptions"
-            @rowOptionSelected="runMethod">
+        <JdTable
+            :name="tableName"
+            :columns="columns"
+            :datos="vista.transaccion_items || []"
+            :colAct="true"
+            :configFiltros="openConfigFiltros"
+            :reload="loadTransaccionItems"
+            :rowOptions="tableRowOptions"
+            @rowOptionSelected="runMethod"
+        >
         </JdTable>
     </div>
 
@@ -48,10 +55,10 @@ export default {
         tableName: 'vCompraItems',
         columns: [
             {
-                id: 'transaccion_fecha',
+                id: 'fecha',
                 title: 'Fecha',
                 type: 'date',
-                prop: 'transaccion1.fecha',
+                prop: 'fecha',
                 format: 'date',
                 width: '8rem',
                 show: true,
@@ -90,7 +97,7 @@ export default {
                 sort: true,
             },
             {
-                id: 'articulo',
+                id: 'articulo_nombre',
                 title: 'Artículo',
                 type: 'text',
                 prop: 'articulo1.nombre',
@@ -129,7 +136,13 @@ export default {
             },
         ],
         tableRowOptions: [
-            { id: 1, label: 'Inspeccionar', icon: 'fa-solid fa-star', action: 'crearFormatoValue', permiso: 'vCompraItems:inspeccion' },
+            {
+                id: 1,
+                label: 'Inspeccionar',
+                icon: 'fa-solid fa-star',
+                action: 'crearFormatoValue',
+                permiso: 'vCompraItems:inspeccion',
+            },
         ],
     }),
     async created() {
@@ -149,17 +162,19 @@ export default {
         },
         setQuery() {
             this.vista.qry = {
-                fltr: { transaccion_tipo: { op: 'Es', val: 1 } },
+                fltr: { tipo: { op: 'Es', val: 1 } },
+                incl: ['transaccion1', 'articulo1'],
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
+            this.vista.qry.cols.push('calidad_revisado')
         },
         async loadTransaccionItems() {
             this.setQuery()
 
             this.vista.transaccion_items = []
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.transacciones}/items?qry=${JSON.stringify(this.vista.qry)}`)
+            const res = await get(`${urls.kardex}?qry=${JSON.stringify(this.vista.qry)}`)
             this.useAuth.setLoading(false)
             this.vista.loaded = true
 
@@ -172,12 +187,12 @@ export default {
             await this.loadSocios()
 
             const cols = this.columns
-            cols.find(a => a.id == 'transaccion_socio').lista = this.vista.socios
+            cols.find((a) => a.id == 'transaccion_socio').lista = this.vista.socios
 
             const send = {
                 table: this.tableName,
                 cols,
-                reload: this.loadTransaccionItems
+                reload: this.loadTransaccionItems,
             }
 
             this.useModals.setModal('mConfigFiltros', 'Filtros', null, send, true)
@@ -208,13 +223,12 @@ export default {
                     formato: {
                         codigo: res.data.id,
                         columns: res.data.columns,
-                        instructivo: res.data.instructivo
-                    }
+                        instructivo: res.data.instructivo,
+                    },
                 }
 
                 this.useModals.setModal('mFormato', formato_id, 1, send, true)
-            }
-            else {
+            } else {
                 for (const a of res.data.columns) {
                     a.value = res1.data[a.id]
                 }
@@ -226,8 +240,8 @@ export default {
                         id: res1.data.id,
                         codigo: res.data.id,
                         columns: res.data.columns,
-                        instructivo: res.data.instructivo
-                    }
+                        instructivo: res.data.instructivo,
+                    },
                 }
 
                 this.useModals.setModal('mFormato', formato_id, 2, send, true)
@@ -235,14 +249,16 @@ export default {
         },
         setTransaccionItemCalidadRevisado(item) {
             // console.log(item)
-            const transaccion_item = this.vista.transaccion_items.find(a => a.id == item.transaccion_item)
+            const transaccion_item = this.vista.transaccion_items.find(
+                (a) => a.id == item.transaccion_item,
+            )
             if (transaccion_item) transaccion_item.calidad_revisado = item.id
         },
 
         async loadSocios() {
             const qry = {
                 fltr: { tipo: { op: 'Es', val: 1 }, activo: { op: 'Es', val: true } },
-                cols: ['nombres', 'apellidos', 'nombres_apellidos']
+                cols: ['nombres', 'apellidos', 'nombres_apellidos'],
             }
 
             this.vista.socios = []

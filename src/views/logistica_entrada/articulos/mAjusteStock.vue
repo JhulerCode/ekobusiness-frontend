@@ -1,19 +1,95 @@
 <template>
     <JdModal modal="mAjusteStock" :buttons="buttons" @button-click="(action) => this[action]()">
-        <p class="mrg-btm1">
-            {{ modal.articulo.nombre }}
-        </p>
-
         <div class="container-agregar">
-            <!-- <JdInput type="date" label="Fecha" :nec="true" v-model="modal.transaccion.fecha" :disabled="true" /> -->
-            <JdSelect label="Tipo" :nec="true" v-model="modal.transaccion.tipo"
-                :lista="modal.transaccion_tipos?.filter(a => a.id == 6 || a.id == 7) || []" />
+            <JdInput
+                type="date"
+                label="Fecha"
+                :nec="true"
+                v-model="modal.transaccion.fecha"
+                :disabled="true"
+                style="grid-column: 1/3"
+            />
 
-            <JdTable :columns="columnsLotes" :datos="modal.lotes || []" :seeker="false" :colNro="false"
-                :rowSelectable="true" :rsUno="true" :reload="loadLotes" maxHeight="15rem">
-            </JdTable>
+            <JdSelect
+                label="Tipo"
+                :nec="true"
+                v-model="modal.transaccion.tipo"
+                :lista="modal.transaccion_tipos?.filter((a) => a.id == 6 || a.id == 7) || []"
+                style="grid-column: 1/3"
+                @elegir="modal.is_nuevo_lote = false"
+            />
 
-            <JdInput type="number" label="Cantidad" :nec="true" v-model="nuevo.cantidad" class="mrg-top1" />
+            <JdCheckBox
+                label="Nuevo lote"
+                v-model="modal.is_nuevo_lote"
+                v-if="modal.transaccion.tipo == 6"
+            />
+
+            <JdSelectQuery
+                label="Artículo"
+                :nec="true"
+                v-model="modal.transaccion.articulo"
+                :spin="modal.spinArticulos"
+                :lista="modal.articulos"
+                @search="searchArticulos"
+                @elegir="setArticulo"
+                style="grid-column: 1/4"
+            />
+
+            <JdSelect
+                label="Lote"
+                :nec="true"
+                v-model="modal.transaccion.lote_padre"
+                :lista="modal.lotes || []"
+                mostrar="lote_fv_stock"
+                :loaded="modal.lotesLoaded"
+                @reload="loadLotes"
+                style="grid-column: 1/4"
+                v-if="modal.is_nuevo_lote == false"
+            />
+
+            <template v-else>
+                <JdInput
+                    label="Lote"
+                    :nec="true"
+                    v-model="modal.transaccion.lote"
+                    style="grid-column: 1/3"
+                />
+
+                <JdInput
+                    label="F. venc."
+                    :nec="modal.articulo1.has_fv"
+                    type="date"
+                    v-model="modal.transaccion.fv"
+                    style="grid-column: 3/5"
+                />
+
+                <JdSelect
+                    label="Moneda"
+                    :nec="true"
+                    v-model="modal.transaccion.moneda"
+                    :lista="modal.monedas || []"
+                    :loaded="modal.monedasLoaded"
+                    @reload="loadMonedas"
+                    style="grid-column: 1/3"
+                />
+
+                <JdInput
+                    type="number"
+                    label="Valor unitario"
+                    :nec="true"
+                    v-model="modal.transaccion.pu"
+                    style="grid-column: 3/5"
+                />
+            </template>
+
+            <JdInput
+                type="number"
+                label="Cantidad"
+                :nec="true"
+                v-model="modal.transaccion.cantidad"
+                style="grid-column: 1/3"
+            />
         </div>
     </JdModal>
 </template>
@@ -22,14 +98,15 @@
 import JdModal from '@/components/JdModal.vue'
 import JdInput from '@/components/inputs/JdInput.vue'
 import JdSelect from '@/components/inputs/JdSelect.vue'
-import JdTable from '@/components/JdTable.vue'
+import JdSelectQuery from '@/components/inputs/JdSelectQuery.vue'
+import JdCheckBox from '@/components/inputs/JdCheckBox.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
 import { useVistas } from '@/pinia/vistas'
 
 import { urls, get, post } from '@/utils/crud'
-import { redondear } from '@/utils/mine'
+import { redondear, incompleteData } from '@/utils/mine'
 import { jmsg } from '@/utils/swal'
 
 import dayjs from 'dayjs'
@@ -39,7 +116,8 @@ export default {
         JdModal,
         JdInput,
         JdSelect,
-        JdTable,
+        JdSelectQuery,
+        JdCheckBox,
     },
     data: () => ({
         useAuth: useAuth(),
@@ -81,27 +159,68 @@ export default {
             },
         ],
 
-        buttons: [
-            { text: 'Grabar', action: 'grabar', show: true },
-        ],
+        buttons: [{ text: 'Grabar', action: 'grabar', show: true }],
     }),
     created() {
         this.modal = this.useModals.mAjusteStock
-        this.modal.transaccion.fecha = dayjs().format('YYYY-MM-DD')
+
         this.loadDatosSistema()
+        this.loadMonedas()
         this.loadLotes()
     },
     methods: {
+        initTransaccion() {
+            this.modal.transaccion = {
+                fecha: dayjs().format('YYYY-MM-DD'),
+            }
+
+            this.modal.lotes = []
+            this.modal.lotesLoaded = false
+        },
+        async searchArticulos(txtBuscar) {
+            if (!txtBuscar) {
+                this.modal.articulos.length = 0
+                return
+            }
+
+            const qry = {
+                fltr: {
+                    tipo: { op: 'Es', val: this.modal.articulo_tipo },
+                    activo: { op: 'Es', val: true },
+                    nombre: { op: 'Contiene', val: txtBuscar },
+                },
+                cols: ['unidad', 'igv_afectacion', 'has_fv'],
+            }
+
+            this.modal.spinArticulos = true
+            const res = await get(`${urls.articulos}?qry=${JSON.stringify(qry)}`)
+            this.modal.spinArticulos = false
+
+            if (res.code !== 0) return
+
+            this.modal.articulos = JSON.parse(JSON.stringify(res.data))
+        },
+        setArticulo(item) {
+            this.modal.articulo1 = item
+
+            this.loadLotes()
+        },
         async loadLotes() {
             this.modal.lotes = []
+            this.modal.transaccion.lote_padre = null
+            this.modal.lotesLoaded = false
+
+            if (this.modal.transaccion.articulo == null) return
 
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.kardex}/lotes/${this.modal.articulo.id}`)
+            this.modal.lotesLoaded = false
+            const res = await get(`${urls.kardex}/lotes/${this.modal.transaccion.articulo}`)
+            this.modal.lotesLoaded = true
             this.useAuth.setLoading(false)
 
             if (res.code !== 0) return
 
-            this.modal.lotes = res.data
+            this.modal.lotes = JSON.parse(JSON.stringify(res.data))
         },
         selectLote(item) {
             for (const a of this.lotes) a.selected = false
@@ -110,82 +229,92 @@ export default {
         },
 
         checkDatos() {
-            if (this.modal.transaccion.tipo == null) {
-                jmsg('warning', 'Selecciona el tipo de ajuste')
-                return true
+            const props = ['fecha', 'tipo', 'articulo', 'cantidad']
+
+            if (this.modal.is_nuevo_lote) {
+                props.push('moneda', 'pu', 'lote', 'fv')
+            } else {
+                props.push('lote_padre')
             }
 
-            if (this.nuevo.cantidad == null) {
-                jmsg('warning', 'Ingrese la cantidad')
+            if (incompleteData(this.modal.transaccion, props)) {
+                jmsg('warning', 'Completa los campos requeridos')
                 return true
-            }
-
-            this.modal.lote = this.modal.lotes.find(a => a.selected == true)
-            if (this.modal.lote == undefined) {
-                jmsg('warning', 'Selecciona el lote')
-                return true
-            }
-
-            if (this.modal.transaccion.tipo == 7) {
-                if (this.modal.lote.stock < this.nuevo.cantidad) {
-                    jmsg('warning', 'Stock insuficiente')
-                    return true
-                }
             }
 
             return false
         },
         shapeDatos() {
-            this.modal.transaccion.transaccion_items = [{
-                articulo: this.modal.articulo.id,
-                cantidad: this.nuevo.cantidad,
-                lote_padre: this.modal.lote.id,
-            }]
-        },
-        async grabar1() {
-            if (this.checkDatos()) return
-            this.shapeDatos()
+            if (this.modal.is_nuevo_lote) {
+                delete this.modal.transaccion.lote_padre
 
-            console.log(this.modal.transaccion)
+                this.modal.transaccion.igv_afectacion = this.modal.articulo1.igv_afectacion
+                this.modal.transaccion.igv_porcentaje = this.modal.empresa.igv_porcentaje
+                this.modal.transaccion.is_lote_padre = true
+                this.modal.transaccion.stock = this.modal.transaccion.cantidad
+            } else {
+                delete this.modal.transaccion.pu
+                delete this.modal.transaccion.igv_afectacion
+                delete this.modal.transaccion.igv_porcentaje
+                delete this.modal.transaccion.moneda
+                delete this.modal.transaccion.lote
+                delete this.modal.transaccion.fv
+                delete this.modal.transaccion.is_lote_padre
+                delete this.modal.transaccion.stock
+            }
         },
+        // async grabar1() {
+        //     if (this.checkDatos()) return
+        //     this.shapeDatos()
+
+        //     console.log(this.modal.transaccion)
+        // },
         async grabar() {
             if (this.checkDatos()) return
             this.shapeDatos()
 
             this.useAuth.setLoading(true, 'Grabando...')
-            const res = await post(`${urls.kardex}/ajuste`, this.modal.transaccion)
+            const res = await post(urls.kardex, this.modal.transaccion)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
 
-            this.useModals.show.mAjusteStock = false
+            this.initTransaccion()
+            // this.useModals.show.mAjusteStock = false
         },
 
         async loadDatosSistema() {
-            const qry = ['transaccion_tipos']
+            const qry = ['transaccion_tipos', 'empresa']
             const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
 
             if (res.code != 0) return
 
             Object.assign(this.modal, res.data)
         },
-    }
+        async loadMonedas() {
+            const qry = {
+                fltr: {},
+                cols: ['id', 'nombre', 'simbolo', 'estandar'],
+            }
+
+            this.useAuth.setLoading(true, 'Cargando...')
+            this.modal.monedasLoaded = false
+            const res = await get(`${urls.monedas}?qry=${JSON.stringify(qry)}`)
+            this.modal.monedasLoaded = true
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            this.modal.monedas = res.data
+        },
+    },
 }
 </script>
 
 <style lang="scss" scoped>
 .container-agregar {
     display: grid;
-    grid-template-columns: 30rem;
+    grid-template-columns: repeat(4, 8rem);
     gap: 0.5rem;
-    // margin-bottom: 2rem;
-    // align-items: start;
-
-    // .left {
-    //     display: grid;
-    //     // grid-template-columns: 20rem;
-    //     gap: 0.5rem;
-    //     height: fit-content;
-    // }
 }
 </style>

@@ -147,7 +147,7 @@ export default {
                     tipo: { op: 'Es', val: 4 },
                     produccion_orden: { op: 'Es', val: this.modal.produccion_orden.id },
                 },
-                cols: ['lote', 'fv', 'cantidad', 'is_lote_padre'],
+                cols: ['lote', 'fv', 'cantidad', 'is_lote_padre', 'producto_estado'],
             }
 
             this.useAuth.setLoading(true, 'Cargando...')
@@ -185,7 +185,7 @@ export default {
             if (this.checkDatos()) return
 
             this.useAuth.setLoading(true, 'Grabando...')
-            const res = await post(`${urls.kardex}/produccion-productos`, this.modal.transaccion)
+            const res = await post(urls.kardex, this.modal.transaccion)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return

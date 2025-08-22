@@ -2,38 +2,91 @@
     <JdModal modal="mTransaccion" :buttons="buttons" @button-click="(action) => this[action]()">
         <div class="container-datos">
             <div class="left">
-                <JdInput type="date" label="Fecha" :nec="true" v-model="modal.transaccion.fecha" @change="changeDate"
-                    :disabled="modal.mode == 3" style="grid-column: 1/3" />
+                <JdInput
+                    type="date"
+                    label="Fecha"
+                    :nec="true"
+                    v-model="modal.transaccion.fecha"
+                    @change="changeDate"
+                    :disabled="modal.mode == 3"
+                    style="grid-column: 1/3"
+                />
 
-                <JdSelect :nec="true" :label="modal.transaccion.tipo == 1 ? 'Proveedor' : 'Cliente'"
-                    v-model="modal.transaccion.socio" :lista="modal.socios || []" mostrar="nombres_apellidos"
-                    :loaded="modal.sociosLoaded" @reload="loadSocios()" @elegir="setSocio"
-                    :disabled="modal.mode == 3 || modal.transaccion.socio != null" style="grid-column: 1/5;" />
+                <JdSelect
+                    :nec="true"
+                    :label="modal.transaccion.tipo == 1 ? 'Proveedor' : 'Cliente'"
+                    v-model="modal.transaccion.socio"
+                    :lista="modal.socios || []"
+                    mostrar="nombres_apellidos"
+                    :loaded="modal.sociosLoaded"
+                    @reload="loadSocios()"
+                    @elegir="setSocio"
+                    :disabled="modal.mode == 3 || modal.transaccion.socio != null"
+                    style="grid-column: 1/5"
+                />
 
-                <JdSelect label="Nro pedido" :nec="true" v-model="modal.transaccion.socio_pedido"
-                    :lista="modal.pedidos || []" mostrar="codigo" :disabled="true" v-if="modal.transaccion.socio_pedido"
-                    style="grid-column: 1/4" />
+                <JdSelect
+                    label="Nro pedido"
+                    :nec="true"
+                    v-model="modal.transaccion.socio_pedido"
+                    :lista="modal.pedidos || []"
+                    mostrar="codigo"
+                    :disabled="true"
+                    v-if="modal.transaccion.socio_pedido"
+                    style="grid-column: 1/4"
+                />
 
-                <JdInput label="Guía de remisión" :nec="true" v-model="modal.transaccion.guia"
-                    :disabled="modal.mode == 3" style="grid-column: 1/4" />
+                <JdInput
+                    label="Guía de remisión"
+                    :nec="true"
+                    v-model="modal.transaccion.guia"
+                    :disabled="modal.mode == 3"
+                    style="grid-column: 1/4"
+                />
 
-                <JdInput label="Factura" v-model="modal.transaccion.factura" style="grid-column: 1/4" />
+                <JdInput
+                    label="Factura"
+                    v-model="modal.transaccion.factura"
+                    style="grid-column: 1/4"
+                />
             </div>
 
             <div class="right">
-                <JdSelect label="Estado" v-model="modal.transaccion.estado" :lista="modal.transaccion_estados || []"
-                    :disabled="true" style="grid-column: 1/3;" />
+                <JdSelect
+                    label="Estado"
+                    v-model="modal.transaccion.estado"
+                    :lista="modal.transaccion_estados || []"
+                    :disabled="true"
+                    style="grid-column: 1/3"
+                />
 
-                <JdSelect label="Moneda" :nec="true" v-model="modal.transaccion.moneda" :lista="modal.monedas || []"
-                    @elegir="setTipoCambio" :disabled="modal.mode == 3 || modal.transaccion.moneda != null"
-                    style="grid-column: 1/4;" />
+                <JdSelect
+                    label="Moneda"
+                    :nec="true"
+                    v-model="modal.transaccion.moneda"
+                    :lista="modal.monedas || []"
+                    @elegir="setTipoCambio"
+                    :disabled="modal.mode == 3 || modal.transaccion.moneda != null"
+                    style="grid-column: 1/4"
+                />
 
                 <small
-                    v-if="modal.transaccion.moneda && modal.monedas?.find(a => a.id == modal.transaccion.moneda)?.estandar == false">TC:
-                    {{ modal.transaccion.tipo_cambio }}</small>
+                    v-if="
+                        modal.transaccion.moneda &&
+                        modal.monedas?.find((a) => a.id == modal.transaccion.moneda)?.estandar ==
+                            false
+                    "
+                    >TC: {{ modal.transaccion.tipo_cambio }}</small
+                >
 
-                <JdSelect label="Condición de pago" :nec="true" v-model="modal.transaccion.pago_condicion"
-                    :lista="modal.pago_condiciones || []" :disabled="modal.mode == 3" style="grid-column: 1/5;" />
+                <JdSelect
+                    label="Condición de pago"
+                    :nec="true"
+                    v-model="modal.transaccion.pago_condicion"
+                    :lista="modal.pago_condiciones || []"
+                    :disabled="modal.mode == 3"
+                    style="grid-column: 1/5"
+                />
             </div>
         </div>
 
@@ -41,10 +94,18 @@
 
         <div class="botom">
             <div class="left">
-                <JdTextArea label="Observación" v-model="modal.transaccion.observacion" :disabled="modal.mode == 3" />
+                <JdTextArea
+                    label="Observación"
+                    v-model="modal.transaccion.observacion"
+                    :disabled="modal.mode == 3"
+                />
 
-                <JdTextArea label="Motivo de anulación" v-model="modal.transaccion.anulado_motivo" :disabled="true"
-                    v-if="modal.transaccion.anulado_motivo" />
+                <JdTextArea
+                    label="Motivo de anulación"
+                    v-model="modal.transaccion.anulado_motivo"
+                    :disabled="true"
+                    v-if="modal.transaccion.anulado_motivo"
+                />
             </div>
 
             <div class="totales">
@@ -137,12 +198,18 @@ export default {
             if (this.modal.mode == 1) {
                 this.buttons[0].show = true
                 this.buttons[2].show = true
-            }
-            else {
+            } else {
                 this.buttons[3].show = true
             }
 
-            if (this.useAuth.verifyPermiso('vCompras:crear', 'vCompras:ver', 'vVentas:crear', 'vVentas:ver')) {
+            if (
+                this.useAuth.verifyPermiso(
+                    'vCompras:crear',
+                    'vCompras:ver',
+                    'vVentas:crear',
+                    'vVentas:ver',
+                )
+            ) {
                 this.buttons[1].show = true
             }
         },
@@ -174,8 +241,7 @@ export default {
 
             if (this.modal.mode == 3 || this.modal.transaccion.transaccion_items.length == 0) {
                 this.initPedido()
-            }
-            else {
+            } else {
                 const resQst = await jqst('¿Está seguro de generar un nuevo pedido?')
                 if (resQst.isConfirmed) this.initPedido()
             }
@@ -192,7 +258,7 @@ export default {
 
         async setTipoCambio() {
             // this.modal.transaccion.tipo_cambio = getItemFromArray(this.modal.transaccion.moneda, this.modal.monedas, 'tipo_cambio')
-            const money = this.modal.monedas.find(a => a.id == this.modal.transaccion.moneda)
+            const money = this.modal.monedas.find((a) => a.id == this.modal.transaccion.moneda)
             if (money.estandar == true) {
                 this.modal.transaccion.tipo_cambio = 1
                 return
@@ -220,9 +286,7 @@ export default {
         },
 
         checkDatos() {
-            const props = [
-                'tipo', 'fecha', 'socio', 'moneda', 'pago_condicion', 'guia',
-            ]
+            const props = ['tipo', 'fecha', 'socio', 'moneda', 'pago_condicion', 'guia']
 
             // if (this.modal.transaccion.has_pedido) props.push('socio_pedido')
 
@@ -237,15 +301,11 @@ export default {
             }
 
             for (const a of this.modal.transaccion.transaccion_items) {
-                const props1 = [
-                    'articulo', 'cantidad',
-                    'pu', 'igv_afectacion', 'igv_porcentaje',
-                ]
+                const props1 = ['articulo', 'cantidad', 'pu', 'igv_afectacion', 'igv_porcentaje']
 
                 if (this.modal.transaccion.tipo == 1) {
                     if (a.articulo1.has_fv) props1.push('fv')
-                }
-                else if (this.modal.transaccion.tipo == 5) {
+                } else if (this.modal.transaccion.tipo == 5) {
                     props1.push('lote_padre')
                 }
 
@@ -267,11 +327,11 @@ export default {
                 }
             }
         },
-        async grabar1() {
-            if (this.checkDatos()) return
-            this.shapeDatos()
-            console.log(this.modal.transaccion)
-        },
+        // async grabar1() {
+        //     if (this.checkDatos()) return
+        //     this.shapeDatos()
+        //     console.log(this.modal.transaccion)
+        // },
         async grabar() {
             if (this.checkDatos()) return
             this.shapeDatos()
@@ -293,7 +353,6 @@ export default {
                 this.useAuth.avances[card] = this.modal.transaccion
                 this.useModals.show.mTransaccion = false
             }
-
         },
         async modificar() {
             this.useAuth.setLoading(true, 'Modificando...')
@@ -311,9 +370,16 @@ export default {
             const qry = {
                 fltr: {
                     tipo: { op: 'Es', val: this.modal.transaccion.tipo == 1 ? 1 : 2 },
-                    activo: { op: 'Es', val: true }
+                    activo: { op: 'Es', val: true },
                 },
-                cols: ['nombres', 'apellidos', 'nombres_apellidos', 'contactos', 'direcciones', 'precio_lista'],
+                cols: [
+                    'nombres',
+                    'apellidos',
+                    'nombres_apellidos',
+                    'contactos',
+                    'direcciones',
+                    'precio_lista',
+                ],
             }
 
             this.modal.socios = []
@@ -328,7 +394,9 @@ export default {
             this.modal.socios = res.data
 
             if (this.modal.transaccion.socio) {
-                this.modal.socio = this.modal.socios.find(a => a.id == this.modal.transaccion.socio)
+                this.modal.socio = this.modal.socios.find(
+                    (a) => a.id == this.modal.transaccion.socio,
+                )
             }
         },
         async loadMonedas() {
@@ -353,7 +421,7 @@ export default {
 
             Object.assign(this.modal, res.data)
         },
-    }
+    },
 }
 </script>
 

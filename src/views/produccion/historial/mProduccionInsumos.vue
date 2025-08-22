@@ -22,8 +22,8 @@
                 :lista="modal.produccion_orden.articulo_info.receta_insumos || []"
                 mostrar="articulo1.nombre"
                 @elegir="loadLotes"
-                v-if="modal.is_receta"
                 style="grid-column: 1/3"
+                v-if="modal.is_receta"
             />
 
             <JdSelectQuery
@@ -34,8 +34,8 @@
                 :lista="modal.articulos"
                 @search="searchArticulos"
                 @elegir="loadLotes"
-                v-else
                 style="grid-column: 1/3"
+                v-else
             />
 
             <JdCheckBox
@@ -274,9 +274,10 @@ export default {
 
             this.modal.articulos = JSON.parse(JSON.stringify(res.data))
         },
-
         async loadLotes() {
             this.modal.lotes = []
+            this.modal.transaccion.lote_padre = null
+            this.modal.lotesLoaded = false
 
             if (this.modal.transaccion.articulo == null) return
 
@@ -319,7 +320,7 @@ export default {
             if (this.checkDatos()) return
 
             this.useAuth.setLoading(true, 'Grabando...')
-            const res = await post(`${urls.kardex}/produccion-insumos`, this.modal.transaccion)
+            const res = await post(urls.kardex, this.modal.transaccion)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
@@ -371,10 +372,8 @@ export default {
 
 <style lang="scss" scoped>
 .container-agregar {
-    // margin-bottom: 2rem;
     display: grid;
     grid-template-columns: repeat(3, 15rem);
     gap: 0.5rem;
-    height: fit-content;
 }
 </style>

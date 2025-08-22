@@ -44,6 +44,20 @@ export default {
         useVistas: useVistas(),
         useModals: useModals(),
     }),
+    mounted() {
+        window.addEventListener('keydown', this.shortCuts)
+    },
+    unmounted() {
+        window.removeEventListener('keydown', this.shortCuts)
+    },
+    methods: {
+        shortCuts(event) {
+            if (event.ctrlKey && event.key.toLowerCase() === 'b') {
+                event.preventDefault()
+                this.useAuth.showNavbar = !this.useAuth.showNavbar
+            }
+        },
+    },
 }
 </script>
 
@@ -79,4 +93,5 @@ main {
 //         grid-template-columns: auto 100% !important;
 //         // overflow-x: hidden;
 //     }
-// }</style>
+// }
+</style>

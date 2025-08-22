@@ -1,7 +1,12 @@
 <template>
     <router-view />
 
-    <LoadingSpin v-if="useAuth.loading.show" :text="useAuth.loading.text" scale="1.5" style="z-index: 3" />
+    <LoadingSpin
+        v-if="useAuth.loading.show"
+        :text="useAuth.loading.text"
+        scale="1.5"
+        style="z-index: 3"
+    />
 </template>
 
 <script>
@@ -38,14 +43,14 @@ export default {
                     this.useVistas.initVars()
                     this.useModals.initVars()
                 }
-            }
-            else {
+            } else {
                 if (this.$route.name != 'ConsolaView') {
                     this.$router.replace({ name: 'ConsolaView' })
                 }
                 this.useVistas.showVista(this.useAuth.usuario.vista_inicial)
             }
-        }
+        },
+
     },
 }
 </script>

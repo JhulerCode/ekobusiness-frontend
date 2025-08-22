@@ -11,28 +11,44 @@
                 <ul class="areas">
                     <li>
                         <span class="icon">🚚</span>
-                        <span><strong>Logística de Entrada</strong><br><small>Recepción y control eficiente de insumos y
-                                materiales.</small></span>
+                        <span
+                            ><strong>Logística de Entrada</strong><br /><small
+                                >Recepción y control eficiente de insumos y materiales.</small
+                            ></span
+                        >
                     </li>
                     <li>
                         <span class="icon">🏭</span>
-                        <span><strong>Producción</strong><br><small>Planificación, seguimiento y control de
-                                procesos productivos.</small></span>
+                        <span
+                            ><strong>Producción</strong><br /><small
+                                >Planificación, seguimiento y control de procesos
+                                productivos.</small
+                            ></span
+                        >
                     </li>
                     <li>
                         <span class="icon">⚙️</span>
-                        <span><strong>Operaciones</strong><br><small>Gestión centralizada de recursos y actividades
-                                diarias.</small></span>
+                        <span
+                            ><strong>Operaciones</strong><br /><small
+                                >Gestión centralizada de recursos y actividades diarias.</small
+                            ></span
+                        >
                     </li>
                     <li>
                         <span class="icon">🧪</span>
-                        <span><strong>Calidad</strong><br><small>Control y aseguramiento de la calidad en cada
-                                etapa.</small></span>
+                        <span
+                            ><strong>Calidad</strong><br /><small
+                                >Control y aseguramiento de la calidad en cada etapa.</small
+                            ></span
+                        >
                     </li>
                     <li>
                         <span class="icon">🚚</span>
-                        <span><strong>Logística de Salida</strong><br><small>Despacho y distribución eficiente de
-                                productos terminados.</small></span>
+                        <span
+                            ><strong>Logística de Salida</strong><br /><small
+                                >Despacho y distribución eficiente de productos terminados.</small
+                            ></span
+                        >
                     </li>
                 </ul>
                 <!-- <div class="frase-final">
@@ -43,15 +59,23 @@
 
         <div class="card">
             <div class="actions">
-                <div class="btn" @click="darkLigthMode" :title="`Modo ${!useAuth.isDarkMode ? 'oscuro' : 'claro'}`">
+                <div
+                    class="btn"
+                    @click="darkLigthMode"
+                    :title="`Modo ${!useAuth.isDarkMode ? 'oscuro' : 'claro'}`"
+                >
                     <i class="fa-regular fa-moon" v-if="!useAuth.isDarkMode"></i>
                     <i class="fa-regular fa-sun" v-else></i>
+                </div>
+
+                <div class="btn" @click="reloadWindow">
+                    <i class="fa-solid fa-rotate-left"></i>
                 </div>
             </div>
 
             <div class="container-logo">
-                <img src="@/assets/img/logo-sunka-black.webp" v-if="!useAuth.isDarkMode">
-                <img src="@/assets/img/logo-sunka-white.webp" v-else>
+                <img src="@/assets/img/logo-sunka-black.webp" v-if="!useAuth.isDarkMode" />
+                <img src="@/assets/img/logo-sunka-white.webp" v-else />
             </div>
 
             <div class="info">
@@ -60,7 +84,13 @@
             </div>
 
             <JdInput :nec="true" label="Usuario" v-model="usuario" height="3" class="mrg-btm1" />
-            <JdInputPassword :nec="true" label="Contraseña" v-model="contrasena" height="3" class="mrg-btm2" />
+            <JdInputPassword
+                :nec="true"
+                label="Contraseña"
+                v-model="contrasena"
+                height="3"
+                class="mrg-btm2"
+            />
             <JdButton text="INGRESAR" @click="signin()" class="boton-ingresar" />
         </div>
     </main>
@@ -81,13 +111,14 @@ export default {
     components: {
         JdInput,
         JdInputPassword,
-        JdButton
+        JdButton,
     },
     data: () => ({
         useAuth: useAuth(),
         useVistas: useVistas(),
 
-        usuario: '', contrasena: '',
+        usuario: '',
+        contrasena: '',
     }),
     mounted() {
         this.generateParticles()
@@ -129,35 +160,38 @@ export default {
             document.body.classList.toggle('dark-mode')
             this.useAuth.isDarkMode = document.body.classList.contains('dark-mode')
         },
+        reloadWindow() {
+            window.location.reload()
+        },
         generateParticles() {
-            const particleContainer = this.$el.querySelector(".particles");
+            const particleContainer = this.$el.querySelector('.particles')
 
             const createParticle = () => {
-                const particle = document.createElement("div");
-                particle.className = "particle";
+                const particle = document.createElement('div')
+                particle.className = 'particle'
 
-                const randomX = Math.random() * 100; // % de ancho
-                const randomY = Math.random() * 100; // % de altura
-                const randomDX = (Math.random() - 0.5) * 2; // Desplazamiento horizontal
-                const randomDY = (Math.random() - 0.5) * 2; // Desplazamiento vertical
-                const duration = Math.random() * 3 + 3; // Entre 3s y 6s
+                const randomX = Math.random() * 100 // % de ancho
+                const randomY = Math.random() * 100 // % de altura
+                const randomDX = (Math.random() - 0.5) * 2 // Desplazamiento horizontal
+                const randomDY = (Math.random() - 0.5) * 2 // Desplazamiento vertical
+                const duration = Math.random() * 3 + 3 // Entre 3s y 6s
 
-                particle.style.left = `${randomX}%`;
-                particle.style.top = `${randomY}%`;
-                particle.style.setProperty("--dx", randomDX);
-                particle.style.setProperty("--dy", randomDY);
-                particle.style.animationDuration = `${duration}s`;
+                particle.style.left = `${randomX}%`
+                particle.style.top = `${randomY}%`
+                particle.style.setProperty('--dx', randomDX)
+                particle.style.setProperty('--dy', randomDY)
+                particle.style.animationDuration = `${duration}s`
 
-                particleContainer.appendChild(particle);
+                particleContainer.appendChild(particle)
 
                 setTimeout(() => {
-                    particle.remove();
-                }, duration * 1000);
-            };
+                    particle.remove()
+                }, duration * 1000)
+            }
 
-            setInterval(createParticle, 300);
-        }
-    }
+            setInterval(createParticle, 300)
+        },
+    },
 }
 </script>
 
@@ -196,7 +230,7 @@ export default {
             background-color: var(--primary-color);
             border-radius: 50%;
             opacity: 0.8;
-            animation: particleAnimation 6s linear infinite,
+            animation: particleAnimation 6s linear infinite;
         }
     }
 
@@ -363,7 +397,6 @@ export default {
         transform: scale(1.5) translate3d(5rem, 10rem, 0);
     }
 }
-
 
 @media (max-width: 900px) {
     .degradado {

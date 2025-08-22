@@ -11,6 +11,7 @@ export default defineConfig({
         vueDevTools(),
         VitePWA({
             registerType: 'autoUpdate',
+            // registerType: 'prompt',
             workbox: {
                 maximumFileSizeToCacheInBytes: 5 * 1024 * 1024
             },

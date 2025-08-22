@@ -1,8 +1,12 @@
 <template>
     <JdModal modal="mPedidoItems" :buttons="buttons" @button-click="(action) => this[action]()">
-        <JdTable :columns="columns" :datos="modal.articulos || []" :rowSelectable="true" :download="false"
-            maxHeight="30rem">
-
+        <JdTable
+            :columns="columns"
+            :datos="modal.articulos || []"
+            :rowSelectable="true"
+            :download="false"
+            maxHeight="30rem"
+        >
         </JdTable>
     </JdModal>
 </template>
@@ -29,9 +33,7 @@ export default {
 
         modal: {},
 
-        buttons: [
-            { text: 'Agregar articulos', action: 'sendItems', spin: false, show: true },
-        ],
+        buttons: [{ text: 'Agregar articulos', action: 'sendItems', spin: false, show: true }],
 
         columns: [
             {
@@ -52,7 +54,7 @@ export default {
             },
             {
                 id: 'pu',
-                title: 'Precio',
+                title: 'Valor unitario',
                 toRight: true,
                 width: '7rem',
                 show: true,
@@ -97,7 +99,7 @@ export default {
         //     }
         // },
         sendItems() {
-            const items = this.modal.articulos.filter(a => a.selected == true)
+            const items = this.modal.articulos.filter((a) => a.selected == true)
 
             if (items.length == 0) return jmsg('warning', 'Selecciona al menos un artículo')
 
@@ -108,8 +110,8 @@ export default {
             }
 
             this.useModals.show.mPedidoItems = false
-        }
-    }
+        },
+    },
 }
 </script>
 

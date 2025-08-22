@@ -259,7 +259,7 @@ export default {
             const reader = new FileReader()
 
             reader.onload = async () => {
-                const headers = ['EAN', 'Nombre', 'Cantidad', 'Precio unitario']
+                const headers = ['EAN', 'Nombre', 'Cantidad', 'Valor unitario']
 
                 const res = await tryOficialExcel(this.$refs.excel, file, reader, headers)
                 // console.log(res)
@@ -302,7 +302,7 @@ export default {
 
                         cantidad: a.Cantidad,
 
-                        pu: a['Precio unitario'],
+                        pu: a['Valor unitario'],
                         igv_afectacion: matchedItem?.igv_afectacion,
                         igv_porcentaje:
                             matchedItem?.igv_afectacion == '10'

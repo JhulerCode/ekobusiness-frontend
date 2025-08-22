@@ -128,37 +128,6 @@ export default {
         modal: {},
         nuevo: { is_receta: true },
 
-        columnsLotes: [
-            {
-                id: 'lote',
-                title: 'Lote',
-                width: '7rem',
-                show: true,
-            },
-            {
-                id: 'stock',
-                title: 'Stock',
-                format: 'decimal',
-                toRight: true,
-                width: '6rem',
-                show: true,
-            },
-            {
-                id: 'pu_real',
-                title: 'Precio u.',
-                toRight: true,
-                width: '6rem',
-                show: true,
-            },
-            {
-                id: 'fv',
-                title: 'F. Vencim.',
-                format: 'date',
-                width: '7rem',
-                show: true,
-            },
-        ],
-
         buttons: [{ text: 'Grabar', action: 'grabar', show: true }],
     }),
     created() {
@@ -246,19 +215,23 @@ export default {
         },
         shapeDatos() {
             if (this.modal.is_nuevo_lote) {
-                delete this.modal.transaccion.lote_padre
-
                 this.modal.transaccion.igv_afectacion = this.modal.articulo1.igv_afectacion
                 this.modal.transaccion.igv_porcentaje = this.modal.empresa.igv_porcentaje
+                this.modal.transaccion.tipo_cambio = this.modal.transaccion.moneda == 1 ? 1 : 3.5
+
                 this.modal.transaccion.is_lote_padre = true
                 this.modal.transaccion.stock = this.modal.transaccion.cantidad
+                delete this.modal.transaccion.lote_padre
             } else {
                 delete this.modal.transaccion.pu
                 delete this.modal.transaccion.igv_afectacion
                 delete this.modal.transaccion.igv_porcentaje
                 delete this.modal.transaccion.moneda
+                delete this.modal.transaccion.tipo_cambio
+
                 delete this.modal.transaccion.lote
                 delete this.modal.transaccion.fv
+
                 delete this.modal.transaccion.is_lote_padre
                 delete this.modal.transaccion.stock
             }

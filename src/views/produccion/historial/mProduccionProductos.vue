@@ -136,6 +136,12 @@ export default {
                 produccion_orden: this.modal.produccion_orden.id,
                 articulo: this.modal.produccion_orden.articulo,
                 lote: this.obtenerNumeroJuliano(this.modal.produccion_orden.fecha),
+
+                pu: 1, // FALTA CALCULAR EL COSTO UNITARIO
+                igv_afectacion: 10, // FALTA QUE LO OBTENGA DEL PRODUCTO
+                igv_porcentaje: 18, // FALTA QUE TRAIGA DE LA EMPRESA
+                moneda: 1,
+                tipo_cambio: 1,
             }
         },
 

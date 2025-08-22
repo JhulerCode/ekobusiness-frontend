@@ -56,7 +56,7 @@ export default {
             },
             {
                 id: 'precio',
-                title: 'Precio',
+                title: 'Valor unitario',
                 toRight: true,
                 width: '7rem',
                 show: true,

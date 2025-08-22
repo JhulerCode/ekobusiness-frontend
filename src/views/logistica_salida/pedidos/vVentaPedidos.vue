@@ -295,7 +295,7 @@ export default {
                 { title: 'EAN' },
                 { title: 'Nombre' },
                 { title: 'Cantidad' },
-                { title: 'Precio unitario' },
+                { title: 'Valor unitario' },
             ]
             downloadExcel(columns, [], 'plantilla_pedidos.xlsx')
         },

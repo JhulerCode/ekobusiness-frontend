@@ -109,7 +109,17 @@ export default {
             {
                 id: 'cantidad',
                 title: 'Cantidad',
-                type: 'select',
+                type: 'number',
+                format: 'decimal',
+                width: '8rem',
+                show: true,
+                seek: true,
+                sort: true,
+            },
+            {
+                id: 'pu',
+                title: 'Valor unitario',
+                type: 'number',
                 format: 'decimal',
                 width: '8rem',
                 show: true,

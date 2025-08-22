@@ -103,8 +103,8 @@ export default {
                 sort: true,
             },
             {
-                id: 'pu_real',
-                title: 'Pu',
+                id: 'vu_real',
+                title: 'Valor unitario',
                 toRight: true,
                 width: '8rem',
                 show: true,
@@ -112,8 +112,8 @@ export default {
                 sort: true,
             },
             {
-                id: 'pu_igv',
-                title: 'Vu',
+                id: 'pu',
+                title: 'Precio unitario',
                 toRight: true,
                 width: '8rem',
                 show: true,
@@ -196,7 +196,7 @@ export default {
                 // if (a.is_lote_padre && a.transaccion1.estado != 0) {
                 if (a.is_lote_padre) {
                     this.modal.stock += a.stock
-                    this.modal.valor += a.stock * a.pu_real
+                    this.modal.valor += a.stock * a.vu_real
                 }
             }
         },

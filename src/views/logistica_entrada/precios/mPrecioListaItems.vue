@@ -5,7 +5,7 @@
                 <JdSelectQuery label="Artículo" v-model="nuevo.articulo" :spin="spinArticulos" :lista="articulos"
                     @search="searchArticulos" style="grid-column: 1/5" />
 
-                <JdInput label="Precio" type="number" :nec="true" v-model="nuevo.precio" style="grid-column: 1/3" />
+                <JdInput label="Valor unitario" type="number" :nec="true" v-model="nuevo.precio" style="grid-column: 1/3" />
 
                 <JdButton text="Agregar" @click="crear()" />
             </div>
@@ -78,7 +78,7 @@ export default {
             },
             {
                 id: 'precio',
-                title: 'Precio',
+                title: 'Valor unitario',
                 prop: 'precio',
                 input: true,
                 type: 'number',

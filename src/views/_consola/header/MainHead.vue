@@ -11,6 +11,10 @@
 
         <div class="right">
             <div class="actions">
+                <div class="btn" @click="reloadWindow">
+                    <i class="fa-solid fa-rotate-left"></i>
+                </div>
+
                 <div class="btn" @click="darkLigthMode" :title="`Modo ${!useAuth.isDarkMode ? 'oscuro' : 'claro'}`">
                     <i class="fa-regular fa-moon" v-if="!useAuth.isDarkMode"></i>
                     <i class="fa-regular fa-sun" v-else></i>
@@ -94,6 +98,9 @@ export default {
             } else {
                 cancelFullScreen.call(doc)
             }
+        },
+        reloadWindow() {
+            window.location.reload()
         },
 
         openUserMenu() {

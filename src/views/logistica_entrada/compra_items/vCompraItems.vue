@@ -139,6 +139,7 @@ export default {
                 id: 'fv',
                 title: 'Fecha de vencimiento',
                 type: 'date',
+                format: 'date',
                 width: '8rem',
                 show: true,
                 seek: true,

@@ -73,7 +73,7 @@ export default {
                 id: 'baseUrl',
                 title: 'Recurso',
                 type: 'text',
-                width: '10rem',
+                width: '15rem',
                 show: true,
                 seek: false,
                 sort: false
@@ -100,9 +100,10 @@ export default {
     },
     methods: {
         initFiltros() {
-            this.columns[0].op = 'Está dentro de'
-            this.columns[0].val = dayjs().startOf('month').format('YYYY-MM-DDTHH:mm')
-            this.columns[0].val1 = dayjs().format('YYYY-MM-DDTHH:mm')
+            this.columns[0].op = 'Es posterior a'
+            this.columns[0].val = dayjs().format('YYYY-MM-DDT00:00')
+            // this.columns[0].val = dayjs().startOf('week').format('YYYY-MM-DDTHH:mm')
+            // this.columns[0].val1 = dayjs().format('YYYY-MM-DDTHH:mm')
         },
         setQuery() {
             this.vista.qry = {

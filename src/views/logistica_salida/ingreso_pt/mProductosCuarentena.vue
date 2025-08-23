@@ -17,6 +17,7 @@
             :columns="columns"
             :datos="modal.produccion_productos || []"
             :reload="loadProduccionProductos"
+            height="85%"
         >
             <template v-slot:cCantidad="{ item }">
                 {{ redondear(item.cantidad, 0) }}

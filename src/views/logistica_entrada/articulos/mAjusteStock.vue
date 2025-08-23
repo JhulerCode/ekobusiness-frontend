@@ -58,10 +58,11 @@
 
                 <JdInput
                     label="F. venc."
-                    :nec="modal.articulo1.has_fv"
+                    :nec="true"
                     type="date"
                     v-model="modal.transaccion.fv"
                     style="grid-column: 3/5"
+                    v-if="modal.articulo1.has_fv"
                 />
 
                 <JdSelect
@@ -201,7 +202,9 @@ export default {
             const props = ['fecha', 'tipo', 'articulo', 'cantidad']
 
             if (this.modal.is_nuevo_lote) {
-                props.push('moneda', 'pu', 'lote', 'fv')
+                props.push('moneda', 'pu', 'lote')
+
+                if (this.modal.articulo1.has_fv) props.push('fv')
             } else {
                 props.push('lote_padre')
             }

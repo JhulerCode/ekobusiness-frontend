@@ -15,7 +15,10 @@
                     text="Salida de insumos"
                     tipo="2"
                     @click="salidaInsumos2"
-                    v-if="useAuth.verifyPermiso('vProgramaFiltrantes:salidaInsumosCompartidos') && vista.qry?.fltr?.fecha?.op == 'Es'"
+                    v-if="
+                        useAuth.verifyPermiso('vProgramaFiltrantes:salidaInsumosCompartidos') &&
+                        vista.qry?.fltr?.fecha?.op == 'Es'
+                    "
                 />
 
                 <JdInput
@@ -323,7 +326,7 @@ export default {
 
         setQuery() {
             this.vista.qry = {
-                fltr: { tipo: { op: 'Es', val: 1 }, estado: { op: 'Es', val: 1 } },
+                fltr: { tipo: { op: 'Es', val: 1 } },
                 // cols: [
                 // 'fecha',
                 // 'orden',
@@ -502,7 +505,13 @@ export default {
                     maquina: this.columns[1].val,
                 },
             }
-            this.useModals.setModal('mProduccionInsumosCompartidos', `Salida de insumos`, null, send, true)
+            this.useModals.setModal(
+                'mProduccionInsumosCompartidos',
+                `Salida de insumos`,
+                null,
+                send,
+                true,
+            )
         },
         productosTerminados(item) {
             const send = {

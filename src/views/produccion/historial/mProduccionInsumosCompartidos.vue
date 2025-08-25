@@ -7,7 +7,7 @@
                 :nec="true"
                 v-model="modal.transaccion.fecha"
                 style="grid-column: 1/2"
-                :disabled="true"
+                :disabled="modal.transaccion.maquina"
             />
 
             <template v-if="modal.transaccion.maquina">
@@ -82,10 +82,9 @@
             :datos="modal.produccion_insumos || []"
             width="61rem"
             :colAct="true"
-            :seeker="false"
             :download="false"
             :reload="loadProduccionInsumos"
-            colActWidth="4.5rem"
+            class="mrg-top1"
         >
             <template v-slot:cPu="{ item }">
                 {{ item.lote_padre1?.pu }}
@@ -98,15 +97,6 @@
                     icon="fa-solid fa-trash"
                     title="Eliminar"
                     @click="eliminar(item)"
-                />
-
-                <JdButton
-                    tipo="2"
-                    :small="true"
-                    icon="fa-solid fa-rotate-left"
-                    title="Devolución"
-                    v-if="item.tipo == 2"
-                    @click="devolucion(item)"
                 />
             </template>
         </JdTable>
@@ -186,12 +176,13 @@ export default {
                 sort: true,
             },
             {
-                id: 'unidad',
+                id: 'articulo_unidad',
                 title: 'Unidad',
                 prop: 'articulo1.unidad',
                 width: '5rem',
                 show: true,
                 seek: true,
+                sort: true,
             },
             {
                 id: 'cantidad',
@@ -201,6 +192,7 @@ export default {
                 width: '8rem',
                 show: true,
                 seek: true,
+                sort: true,
             },
             {
                 id: 'lote',
@@ -209,6 +201,7 @@ export default {
                 width: '7rem',
                 show: true,
                 seek: true,
+                sort: true,
             },
             {
                 id: 'fv',
@@ -218,6 +211,16 @@ export default {
                 width: '7rem',
                 show: true,
                 seek: true,
+                sort: true,
+            },
+            {
+                id: 'maquina',
+                title: 'Máquina',
+                prop: 'maquina1.nombre',
+                width: '8rem',
+                show: true,
+                seek: true,
+                sort: true,
             },
         ],
     }),
@@ -246,13 +249,16 @@ export default {
                     fecha: { op: 'Es', val: this.modal.transaccion.fecha },
                     tipo: { op: 'Es', val: [2, 3] },
                 },
-                cols: ['tipo', 'fecha', 'articulo', 'lote_padre', 'cantidad'],
-                incl: ['lote_padre1', 'articulo1'],
+                incl: ['lote_padre1', 'articulo1', 'maquina1'],
             }
+
+            this.useAuth.updateQuery(this.columns, qry)
 
             if (this.modal.transaccion.maquina != null) {
                 qry.fltr.maquina = { op: 'Es', val: this.modal.transaccion.maquina }
             }
+
+            qry.cols.push('tipo')
 
             this.useAuth.setLoading(true, 'Cargando...')
             const res = await get(`${urls.kardex}?qry=${JSON.stringify(qry)}`)

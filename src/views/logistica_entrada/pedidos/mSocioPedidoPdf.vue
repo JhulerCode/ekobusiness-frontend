@@ -27,13 +27,13 @@
 
                 <div class="right">
                     <div>
-                        <strong>R.U.C. 20601670560</strong>
+                        <strong>R.U.C. 20557053213</strong>
                     </div>
                     <div>
                         <strong>ORDEN DE COMPRA</strong>
                     </div>
                     <div>
-                        <strong>1755617337892147</strong>
+                        <strong>{{ modal.item.codigo }}</strong>
                     </div>
                 </div>
             </div>

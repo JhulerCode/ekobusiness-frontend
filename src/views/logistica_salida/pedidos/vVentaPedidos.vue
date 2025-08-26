@@ -180,6 +180,17 @@ export default {
                 sort: true,
             },
             {
+                id: 'pagado',
+                title: 'Pagado',
+                prop: 'pagado1.nombre',
+                type: 'select',
+                format: 'yesno',
+                width: '8rem',
+                show: true,
+                seek: true,
+                sort: true,
+            },
+            {
                 id: 'createdBy',
                 title: 'Creado por',
                 prop: 'createdBy1.nombres_apellidos',

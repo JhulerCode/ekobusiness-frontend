@@ -78,6 +78,8 @@
                     :disabled="modal.mode == 3"
                     style="grid-column: 1/5"
                 />
+
+                <JdSwitch label="Pagado?" v-model="modal.item.pagado" style="grid-column: 1/5" />
             </div>
         </div>
 
@@ -143,6 +145,7 @@ import JdModal from '@/components/JdModal.vue'
 import JdInput from '@/components/inputs/JdInput.vue'
 import JdSelect from '@/components/inputs/JdSelect.vue'
 import JdTextArea from '@/components/inputs/JdTextArea.vue'
+import JdSwitch from '@/components/inputs/JdSwitch.vue'
 import mSocioPedidoItems from './mSocioPedidoItems.vue'
 
 import { useAuth } from '@/pinia/auth'
@@ -161,6 +164,7 @@ export default {
         JdInput,
         JdSelect,
         JdTextArea,
+        JdSwitch,
         mSocioPedidoItems,
     },
     data: () => ({

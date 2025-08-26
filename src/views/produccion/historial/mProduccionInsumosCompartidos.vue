@@ -7,7 +7,7 @@
                 :nec="true"
                 v-model="modal.transaccion.fecha"
                 style="grid-column: 1/2"
-                :disabled="modal.transaccion.maquina"
+                :disabled="modal.transaccion.maquina != null"
             />
 
             <template v-if="modal.transaccion.maquina">
@@ -84,6 +84,7 @@
             :colAct="true"
             :download="false"
             :reload="loadProduccionInsumos"
+            colActWidth="4.5rem"
             class="mrg-top1"
         >
             <template v-slot:cPu="{ item }">
@@ -97,6 +98,15 @@
                     icon="fa-solid fa-trash"
                     title="Eliminar"
                     @click="eliminar(item)"
+                />
+
+                <JdButton
+                    tipo="2"
+                    :small="true"
+                    icon="fa-solid fa-rotate-left"
+                    title="Devolución"
+                    v-if="item.tipo == 2"
+                    @click="devolucion(item)"
                 />
             </template>
         </JdTable>
@@ -258,7 +268,7 @@ export default {
                 qry.fltr.maquina = { op: 'Es', val: this.modal.transaccion.maquina }
             }
 
-            qry.cols.push('tipo')
+            qry.cols.push('tipo', 'lote_padre')
 
             this.useAuth.setLoading(true, 'Cargando...')
             const res = await get(`${urls.kardex}?qry=${JSON.stringify(qry)}`)

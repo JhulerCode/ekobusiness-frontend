@@ -43,15 +43,9 @@
             </div>
         </div>
     </header>
-
-    <!-- <mUserMenu v-if="useModals?.show?.mUserMenu" class="user-menu" />
-    <mUserPreferences v-if="useModals?.show?.mUserPreferences" /> -->
 </template>
 
 <script>
-// import mUserMenu from './mUserMenu.vue'
-// import mUserPreferences from './mUserPreferences.vue'
-
 import { useAuth } from '@/pinia/auth.js'
 import { useModals } from '@/pinia/modals'
 
@@ -59,8 +53,6 @@ import { urls, patch } from '@/utils/crud'
 
 export default {
     components: {
-        // mUserMenu,
-        // mUserPreferences
     },
     data: () => ({
         useAuth: useAuth(),

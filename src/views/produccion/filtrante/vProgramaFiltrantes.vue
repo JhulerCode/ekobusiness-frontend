@@ -246,6 +246,7 @@ export default {
     }),
     async created() {
         this.vista = this.useVistas.vProgramaFiltrantes
+        this.initFiltros()
         this.useAuth.setColumns(this.tableName, this.columns)
 
         if (this.vista.loaded) return
@@ -255,10 +256,10 @@ export default {
             this.loadProduccionOrdenes()
     },
     methods: {
-        // loadMaquina() {
-        //     const maq = localStorage.getItem('vProgramaFiltrantes_maquina')
-        //     if (maq != null) this.vista.maquina = maq
-        // },
+        initFiltros() {
+            this.columns[0].op = 'Es'
+            this.columns[0].val = dayjs().format('YYYY-MM-DD')
+        },
         async setFecha() {
             if (this.columns[0].val == null) {
                 delete this.columns[1].op

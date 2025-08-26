@@ -70,16 +70,13 @@ main {
     grid-template-columns: 1fr;
     overflow-x: hidden;
     background-color: var(--bg-color2);
-    // background-color: var(--primary-color);
 
     .main-body {
         height: 100%;
-        // display: flex;
         display: grid;
         grid-template-columns: auto 1fr;
         overflow-y: hidden;
         padding: 0 1rem 1rem 1rem;
-        // gap: 1rem;
     }
 }
 
@@ -87,11 +84,4 @@ main {
     top: 4rem;
     right: 2rem;
 }
-
-// @media (max-width: 540px) {
-//     .main-body{
-//         grid-template-columns: auto 100% !important;
-//         // overflow-x: hidden;
-//     }
-// }
 </style>

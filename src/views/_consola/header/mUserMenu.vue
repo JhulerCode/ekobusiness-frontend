@@ -1,15 +1,23 @@
 <template>
-    <JdModal modal="mUserMenu" :hasHead="false" :hasBack="false" padding="0.5rem" :closeOnClickOutside="true"
-        :closeOnInputEsc="true">
+    <JdModal
+        modal="mUserMenu"
+        :hasHead="false"
+        :hasBack="false"
+        padding="0.5rem"
+        :closeOnClickOutside="true"
+        :closeOnInputEsc="true"
+    >
         <ul>
             <li @click="openPreferenciasUsuario">
                 <i class="fa-solid fa-sliders" @click="openPreferencias"></i>
                 <span>Preferencias</span>
             </li>
+
             <li @click="updateSession">
                 <i class="fa-solid fa-rotate-right"></i>
                 <span>Actualizar sesión</span>
             </li>
+
             <li @click="logout">
                 <i class="fa-solid fa-right-from-bracket"></i>
                 <span>Salir del sistema</span>
@@ -27,7 +35,6 @@ import { useModals } from '@/pinia/modals'
 export default {
     components: {
         JdModal,
-
     },
     data: () => ({
         useAuth: useAuth(),
@@ -49,7 +56,7 @@ export default {
         async logout() {
             await this.useAuth.logout(this.$router)
         },
-    }
+    },
 }
 </script>
 

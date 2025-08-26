@@ -91,6 +91,13 @@
                 v-model="modal.transaccion.cantidad"
                 style="grid-column: 1/3"
             />
+
+            <JdTextArea
+                label="Observación"
+                :nec="true"
+                v-model="modal.transaccion.observacion"
+                style="grid-column: 1/5"
+            />
         </div>
     </JdModal>
 </template>
@@ -101,6 +108,7 @@ import JdInput from '@/components/inputs/JdInput.vue'
 import JdSelect from '@/components/inputs/JdSelect.vue'
 import JdSelectQuery from '@/components/inputs/JdSelectQuery.vue'
 import JdCheckBox from '@/components/inputs/JdCheckBox.vue'
+import JdTextArea from '@/components/inputs/JdTextArea.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
@@ -119,6 +127,7 @@ export default {
         JdSelect,
         JdSelectQuery,
         JdCheckBox,
+        JdTextArea,
     },
     data: () => ({
         useAuth: useAuth(),
@@ -199,7 +208,7 @@ export default {
         },
 
         checkDatos() {
-            const props = ['fecha', 'tipo', 'articulo', 'cantidad']
+            const props = ['fecha', 'tipo', 'articulo', 'cantidad', 'observacion']
 
             if (this.modal.is_nuevo_lote) {
                 props.push('moneda', 'pu', 'lote')

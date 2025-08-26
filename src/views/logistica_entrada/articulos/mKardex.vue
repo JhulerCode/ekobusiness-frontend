@@ -29,6 +29,7 @@
                 {{ item.transaccion1?.socio1?.nombres }}
                 {{ item.produccion_orden1?.maquina1?.nombre }}
                 {{ item.maquina1?.nombre }}
+                {{ item.observacion }}
             </template>
         </JdTable>
     </JdModal>
@@ -177,6 +178,8 @@ export default {
                 ],
                 incl: ['lote_padre1', 'transaccion1', 'produccion_orden1', 'maquina1'],
             }
+
+            qry.cols.push('observacion')
 
             this.modal.kardex = []
             this.useAuth.setLoading(true, 'Cargando...')

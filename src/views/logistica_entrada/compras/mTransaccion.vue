@@ -40,9 +40,9 @@
                     label="Guía de remisión"
                     :nec="true"
                     v-model="modal.transaccion.guia"
-                    :disabled="modal.mode == 3"
                     style="grid-column: 1/4"
                 />
+                <!-- :disabled="modal.mode == 3" -->
 
                 <JdInput
                     label="Factura"

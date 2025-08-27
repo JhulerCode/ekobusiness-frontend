@@ -345,6 +345,13 @@
                                         {{ redondear(a[column.id]) }}
                                     </template>
                                 </template>
+
+                                <template v-if="column.format == 'color'">
+                                    <div
+                                        class="color-box"
+                                        :style="{ background: a[column.id] }"
+                                    ></div>
+                                </template>
                             </template>
 
                             <template v-else-if="column.prop">
@@ -949,6 +956,11 @@ export default {
                     .cerrado {
                         border: solid 1px var(--verde);
                         // background-color: var(--azul);
+                    }
+
+                    .color-box {
+                        width: 2rem;
+                        height: 1rem;
                     }
                 }
 

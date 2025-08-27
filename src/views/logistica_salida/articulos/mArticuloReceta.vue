@@ -1,32 +1,73 @@
 <template>
     <JdModal modal="mArticuloReceta">
         <div class="agregar" v-if="useAuth.verifyPermiso('vReceta:crear')">
-            <JdSelectQuery label="Artículo" :nec="true" v-model="nuevo.articulo" :spin="spinArticulos"
-                :lista="articulos" @search="searchArticulos" @elegir="setArticulo" style="grid-column: 1/5" />
+            <JdSelectQuery
+                label="Artículo"
+                :nec="true"
+                v-model="nuevo.articulo"
+                :spin="spinArticulos"
+                :lista="articulos"
+                @search="searchArticulos"
+                @elegir="setArticulo"
+                style="grid-column: 1/5"
+            />
 
-            <JdInput type="number" label="Cantidad" :nec="true" v-model="nuevo.cantidad" style="grid-column: 1/3" />
+            <JdInput
+                type="number"
+                label="Cantidad"
+                :nec="true"
+                v-model="nuevo.cantidad"
+                style="grid-column: 1/3"
+            />
 
             <JdButton text="Agregar" @click="crear" />
         </div>
 
-        <JdTable :columns="columns" :datos="receta.receta_insumos || []" :seeker="false" :download="false"
-            :colAct="true" class="jd-table" height="29rem" @onChange="(action, a) => this[action](a)"
-            :inputsDisabled="!this.useAuth.verifyPermiso('vReceta:editar')">
-
+        <JdTable
+            :columns="columns"
+            :datos="receta.receta_insumos || []"
+            :seeker="false"
+            :download="false"
+            :colAct="true"
+            :reload="loadReceta"
+            class="jd-table"
+            height="25rem"
+            @onChange="(action, a) => this[action](a)"
+            :inputsDisabled="!this.useAuth.verifyPermiso('vReceta:editar')"
+        >
             <template v-slot:cAction="{ item }">
-                <JdButton :small="true" tipo="2" icon="fa-solid fa-trash-can" title="Eliminar" @click="quitar(item)"
-                    v-if="this.useAuth.verifyPermiso('vReceta:eliminar')" />
+                <JdButton
+                    :small="true"
+                    tipo="2"
+                    icon="fa-solid fa-trash-can"
+                    title="Eliminar"
+                    @click="quitar(item)"
+                    v-if="this.useAuth.verifyPermiso('vReceta:eliminar')"
+                />
             </template>
 
             <template v-slot:cOrden="{ item }">
                 <div class="acts">
-                    <JdButton icon="fa-solid fa-angle-down" :small="true" tipo="2" @click="upDown(item, 1)"
-                        v-if="receta.receta_insumos.findIndex(a => a.id == item.id) != receta.receta_insumos.length - 1" />
+                    <JdButton
+                        icon="fa-solid fa-angle-down"
+                        :small="true"
+                        tipo="2"
+                        @click="upDown(item, 1)"
+                        v-if="
+                            receta.receta_insumos.findIndex((a) => a.id == item.id) !=
+                            receta.receta_insumos.length - 1
+                        "
+                    />
 
                     <span v-else></span>
 
-                    <JdButton icon="fa-solid fa-angle-up" :small="true" tipo="2" @click="upDown(item, 2)"
-                        v-if="receta.receta_insumos.findIndex(a => a.id == item.id) != 0" />
+                    <JdButton
+                        icon="fa-solid fa-angle-up"
+                        :small="true"
+                        tipo="2"
+                        @click="upDown(item, 2)"
+                        v-if="receta.receta_insumos.findIndex((a) => a.id == item.id) != 0"
+                    />
                 </div>
             </template>
         </JdTable>
@@ -73,21 +114,21 @@ export default {
                 title: 'Ordenar',
                 slot: 'cOrden',
                 width: '5rem',
-                show: true
+                show: true,
             },
             {
                 id: 'articulo',
                 title: 'Artículo',
                 prop: 'articulo1.nombre',
                 width: '25rem',
-                show: true
+                show: true,
             },
             {
                 id: 'unidad',
                 title: 'Unidad',
                 prop: 'articulo1.unidad',
                 width: '5rem',
-                show: true
+                show: true,
             },
             {
                 id: 'cantidad',
@@ -97,24 +138,17 @@ export default {
                 type: 'number',
                 onchange: 'modificar',
                 width: '6rem',
-                show: true
+                show: true,
             },
-            // {
-            //     id: 'actions',
-            //     width: '3rem',
-            //     title: '',
-            //     slot: 'colActions',
-            //     show: true
-            // },
         ],
     }),
     created() {
         this.modal = this.useModals.mArticuloReceta
         this.receta = this.useModals.mArticuloReceta.item
 
-        // this.loadDatosSistema()
-
         if (this.useAuth.verifyPermiso('vReceta:editar') == false) this.columns[0].show = false
+
+        this.loadReceta()
     },
     methods: {
         async searchArticulos(txtBuscar) {
@@ -128,7 +162,7 @@ export default {
                     tipo: { op: 'Es', val: 1 },
                     activo: { op: 'Es', val: true },
                     nombre: { op: 'Contiene', val: txtBuscar },
-                }
+                },
             }
 
             this.spinArticulos = true
@@ -142,20 +176,24 @@ export default {
         setArticulo(a) {
             if (a == null) {
                 this.nuevo = {}
-            }
-            else {
+            } else {
                 this.nuevo.nombre = a.nombre
                 this.nuevo.unidad = a.unidad
             }
         },
         async crear() {
-            if (this.nuevo.articulo == null || this.nuevo.cantidad == null) return jmsg('warning', 'Selecciona un artículo e ingrese la cantidad')
+            if (this.nuevo.articulo == null || this.nuevo.cantidad == null)
+                return jmsg('warning', 'Selecciona un artículo e ingrese la cantidad')
 
-            const i = this.receta.receta_insumos.findIndex(a => a.articulo == this.nuevo.articulo)
+            const i = this.receta.receta_insumos.findIndex((a) => a.articulo == this.nuevo.articulo)
             if (i !== -1) return jmsg('warning', 'El artículo ya está agregado')
 
             this.useAuth.setLoading(true, 'Agregando...')
-            const res = await post(urls.receta_insumos, { ...this.nuevo, articulo_principal: this.receta.id, orden: this.receta.receta_insumos.length + 1 })
+            const res = await post(urls.receta_insumos, {
+                ...this.nuevo,
+                articulo_principal: this.receta.id,
+                orden: this.receta.receta_insumos.length + 1,
+            })
             this.useAuth.setLoading(false)
 
             if (res.code !== 0) return
@@ -171,7 +209,7 @@ export default {
 
             if (res.code !== 0) return
 
-            const i = this.receta.receta_insumos.findIndex(a => a.articulo == item.articulo)
+            const i = this.receta.receta_insumos.findIndex((a) => a.articulo == item.articulo)
             this.receta.receta_insumos.splice(i, 1)
         },
         async modificar(item) {
@@ -184,7 +222,7 @@ export default {
             return true
         },
         async upDown(item, k) {
-            const i = this.receta.receta_insumos.findIndex(a => a.id == item.id)
+            const i = this.receta.receta_insumos.findIndex((a) => a.id == item.id)
 
             const o = k == 1 ? item.orden + 1 : item.orden - 1
             const j = k == 1 ? i + 1 : i - 1
@@ -201,15 +239,25 @@ export default {
             this.receta.receta_insumos.sort((a, b) => a.orden - b.orden)
         },
 
-        // async loadDatosSistema() {
-        //     const qry = ['unidades']
-        //     const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
+        async loadReceta() {
+            const qry = {
+                fltr: {
+                    articulo_principal: { op: 'Es', val: this.receta.id },
+                },
+                cols: ['articulo', 'cantidad', 'orden'],
+                incl: ['articulo1'],
+            }
 
-        //     if (res.code != 0) return
+            this.receta.receta_insumos = []
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.receta_insumos}?qry=${JSON.stringify(qry)}`)
+            this.useAuth.setLoading(false, '')
 
-        //     Object.assign(this.modal, res.data)
-        // },
-    }
+            if (res.code != 0) return
+
+            this.receta.receta_insumos = res.data
+        },
+    },
 }
 </script>
 

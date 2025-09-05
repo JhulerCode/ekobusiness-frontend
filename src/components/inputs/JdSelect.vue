@@ -47,10 +47,10 @@
                     v-if="lista.length > 10"
                 />
 
-                <ul>
-                    <li v-if="lista.length == 0"><small>Sin datos</small></li>
+                <ul v-if="!groupBy" class="ul-main">
+                    <li v-if="lista.length === 0"><small>Sin datos</small></li>
 
-                    <li v-else-if="listaFiltrada.length == 0">
+                    <li v-else-if="listaFiltrada.length === 0">
                         <small>Sin resultados</small>
                     </li>
 
@@ -60,8 +60,28 @@
                         :key="i"
                         @click="elegir(a[id])"
                         :class="{ selected: inputModel == a[id] }"
+                        class="li-option"
                     >
+                        <!-- @click="elegir(getNestedProp(a, id))"
+                        :class="{ selected: inputModel == getNestedProp(a, id) }" -->
                         {{ getNestedProp(a, mostrar) }}
+                    </li>
+                </ul>
+
+                <ul v-else class="ul-main">
+                    <li v-for="(group, groupName) in listaAgrupada" :key="groupName">
+                        <ul class="options-grouped">
+                            <li class="group-label">{{ groupName }}</li>
+                            <li
+                                v-for="(a, i) in group"
+                                :key="i"
+                                @click="elegir(a[id])"
+                                :class="{ selected: inputModel == a[id] }"
+                                class="li-option group-options"
+                            >
+                                {{ getNestedProp(a, mostrar) }}
+                            </li>
+                        </ul>
                     </li>
                 </ul>
             </div>
@@ -82,6 +102,7 @@ export default {
         id: { type: String, default: 'id' },
         mostrar: { type: String, default: 'nombre' },
         placeholder: { type: String, default: null },
+        groupBy: { type: String, default: null },
         disabled: { type: Boolean, default: false },
     },
     computed: {
@@ -103,7 +124,6 @@ export default {
 
                 if (send) {
                     return this.getNestedProp(send, this.mostrar)
-                    // return send[this.mostrar]
                 }
             }
 
@@ -118,6 +138,23 @@ export default {
                 const valor = this.getNestedProp(a, this.mostrar)
                 return this.normalizarTexto(valor).includes(textoBuscado)
             })
+        },
+        listaAgrupada() {
+            if (!this.groupBy) {
+                return {}
+            }
+
+            const grouped = this.listaFiltrada.reduce((acc, item) => {
+                // const groupName = this.getNestedProp(item, this.groupBy) || 'Sin agrupar'
+                const groupName = item[this.groupBy] || 'Sin agrupar'
+                if (!acc[groupName]) {
+                    acc[groupName] = []
+                }
+                acc[groupName].push(item)
+                return acc
+            }, {})
+
+            return grouped
         },
     },
     data: () => ({
@@ -302,12 +339,12 @@ export default {
                 background-color: var(--bg-color);
             }
 
-            ul {
-                width: 100%;
-                max-height: 10rem;
+            .ul-main {
+                max-height: 13rem;
                 overflow-y: auto;
+                width: 100%;
 
-                li {
+                .li-option {
                     cursor: pointer;
                     padding: 0.4rem 0.5rem;
 
@@ -319,6 +356,19 @@ export default {
                 .selected {
                     color: var(--primary-color);
                     font-weight: bold;
+                }
+            }
+
+            .options-grouped {
+                .group-label {
+                    font-weight: bold;
+                    color: var(--text-color-muted);
+                    padding: 0.4rem 0.5rem;
+                    cursor: default;
+                }
+
+                .group-options {
+                    margin-left: 0.5rem;
                 }
             }
         }

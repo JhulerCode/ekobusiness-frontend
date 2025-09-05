@@ -199,7 +199,7 @@ export default {
             await this.loadDatosSistema()
             await this.loadMaquinas()
 
-            const cols = this.columns.filter((a) => a.filtrable !== false)
+            const cols = this.columns
             cols.find((a) => a.id == 'produccion_orden_tipo').lista = this.vista.produccion_tipos
             cols.find((a) => a.id == 'produccion_orden_maquina').lista = this.vista.maquinas
 

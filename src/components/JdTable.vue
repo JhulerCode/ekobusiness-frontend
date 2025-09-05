@@ -248,6 +248,7 @@
                                         v-model="a[column.id]"
                                         :disabled="inputsDisabled"
                                         :lista="column.list"
+                                        :mostrar="column.mostrar"
                                         @elegir="
                                             column.onchange
                                                 ? $emit('onChange', column.onchange, a)
@@ -270,21 +271,25 @@
                             </template>
 
                             <template v-else-if="column.format">
-                                <div
-                                    class="estado"
-                                    :class="`${a[column.id] ? 'si' : 'no'}`"
-                                    v-if="column.format == 'yesno' && a[column.id] != null"
-                                >
-                                    {{ getNestedProp(a, column.prop) }}
-                                </div>
+                                <template v-if="column.format == 'yesno'">
+                                    <div
+                                        class="estado"
+                                        :class="`${a[column.id] ? 'si' : 'no'}`"
+                                        v-if="a[column.id] != null"
+                                    >
+                                        {{ getNestedProp(a, column.prop) }}
+                                    </div>
+                                </template>
 
-                                <div
-                                    class="estado"
-                                    :class="`${a[column.id] < 1 ? 'anulado' : a[column.id] < 2 ? 'abierto' : 'cerrado'}`"
-                                    v-if="column.format == 'estado' && a[column.id] != null"
-                                >
-                                    {{ getNestedProp(a, column.prop) }}
-                                </div>
+                                <template v-if="column.format == 'estado'">
+                                    <div
+                                        class="estado"
+                                        :class="`${a[column.id] < 1 ? 'anulado' : a[column.id] < 2 ? 'abierto' : 'cerrado'}`"
+                                        v-if="a[column.id] != null"
+                                    >
+                                        {{ getNestedProp(a, column.prop) }}
+                                    </div>
+                                </template>
 
                                 <template v-if="column.format == 'date'">
                                     <template v-if="column.prop">
@@ -351,6 +356,24 @@
                                         class="color-box"
                                         :style="{ background: a[column.id] }"
                                     ></div>
+                                </template>
+
+                                <template v-if="column.format == 'currency'">
+                                    <template v-if="column.prop">
+                                        <div
+                                            class="currency-box"
+                                            v-if="getNestedProp(a, column.prop)"
+                                        >
+                                            {{ column.moneda }}
+                                            {{ redondear(getNestedProp(a, column.prop)) }}
+                                        </div>
+                                    </template>
+                                    <template v-else>
+                                        <div class="currency-box" v-if="a[column.id]">
+                                            <span>{{ column.moneda }}</span>
+                                            <span>{{ redondear(a[column.id]) }}</span>
+                                        </div>
+                                    </template>
                                 </template>
                             </template>
 
@@ -724,16 +747,22 @@ export default {
             // Si existe 'ocultar', evaluar condiciones para ocultar
             if (b.ocultar) {
                 for (const prop in b.ocultar) {
-                    const valorOcultar = b.ocultar[prop]
+                    const condicion = b.ocultar[prop]
                     const valorFila = a[prop]
 
                     if (valorFila === undefined) continue
 
-                    // Si el valor en ocultar es un array
-                    if (Array.isArray(valorOcultar)) {
-                        if (valorOcultar.includes(valorFila)) return false // se oculta
-                    } else {
-                        if (valorOcultar == valorFila) return false // se oculta
+                    // Caso 1: array
+                    if (Array.isArray(condicion)) {
+                        if (condicion.includes(valorFila)) return false // se oculta
+                    }
+                    // Caso 2: objeto con operador
+                    else if (typeof condicion === 'object' && condicion.op && 'val' in condicion) {
+                        if (this.comparar(valorFila, condicion.op, condicion.val)) return false
+                    }
+                    // Caso 3: valor simple
+                    else {
+                        if (condicion == valorFila) return false // se oculta
                     }
                 }
             }
@@ -742,7 +771,27 @@ export default {
             if (!b.permiso) return true
 
             // Evaluar permiso si existe
-            return this.useAuth.verifyPermiso(b.permiso)
+            return Array.isArray(b.permiso)
+                ? this.useAuth.verifyPermiso(...b.permiso)
+                : this.useAuth.verifyPermiso(b.permiso)
+        },
+        comparar(a, op, b) {
+            switch (op) {
+                case '>':
+                    return a > b
+                case '<':
+                    return a < b
+                case '>=':
+                    return a >= b
+                case '<=':
+                    return a <= b
+                case '==':
+                    return a == b
+                case '!=':
+                    return a != b
+                default:
+                    return false
+            }
         },
     },
 }
@@ -961,6 +1010,11 @@ export default {
                     .color-box {
                         width: 2rem;
                         height: 1rem;
+                    }
+
+                    .currency-box {
+                        display: flex;
+                        justify-content: space-between;
                     }
                 }
 

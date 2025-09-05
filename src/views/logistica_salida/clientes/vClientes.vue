@@ -245,7 +245,7 @@ export default {
 
             if (res.code != 0) return
 
-            this.useModals.setModal('mSocio', 'Ver proveedor', 3, res.data)
+            this.useModals.setModal('mSocio', 'Ver cliente', 3, res.data)
         },
         async editar(item) {
             this.useAuth.setLoading(true, 'Cargando...')

@@ -382,7 +382,7 @@ export default {
                 transaccion: {
                     tipo: 3,
                     fecha: item.fecha,
-                    maquina: this.modal.transaccion.maquina,
+                    maquina: item.maquina,
                     articulo: item.articulo,
                     lote_padre: item.lote_padre,
                 },

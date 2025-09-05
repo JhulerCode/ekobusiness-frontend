@@ -1,37 +1,75 @@
 <template>
     <JdModal modal="mConfigFiltros" :buttons="buttons" @button-click="(action) => this[action]()">
-        <JdTable :columns="columns" :datos="modal.cols1.sort((a, b) => a.orden - b.orden) || []" :seeker="false"
-            :download="false">
-
+        <JdTable
+            :columns="columns"
+            :datos="modal.cols1.sort((a, b) => a.orden - b.orden) || []"
+            :seeker="false"
+            :download="false"
+        >
             <template v-slot:cOperacion="{ item }">
-                <JdSelect :lista="operaciones[item.type]" id="op" mostrar="op" v-model="item.op"
-                    @elegir="(a) => elegir(a, item)" />
+                <JdSelect
+                    :lista="operaciones[item.type]"
+                    id="op"
+                    mostrar="op"
+                    v-model="item.op"
+                    @elegir="(a) => elegir(a, item)"
+                />
             </template>
 
             <template v-slot:cValor="{ item }">
-                <JdInput v-model="item.val"
-                    v-if="item.type == 'text' && operaciones[item.type].find(a => a.op == item.op)?.show" />
+                <JdInput
+                    v-model="item.val"
+                    v-if="
+                        item.type == 'text' &&
+                        operaciones[item.type].find((a) => a.op == item.op)?.show
+                    "
+                />
 
-                <JdInput type="number" v-model="item.val"
-                    v-if="item.type == 'number' && operaciones[item.type].find(a => a.op == item.op)?.show" />
+                <JdInput
+                    type="number"
+                    v-model="item.val"
+                    v-if="
+                        item.type == 'number' &&
+                        operaciones[item.type].find((a) => a.op == item.op)?.show
+                    "
+                />
 
-                <JdSelect :lista="item.lista" :mostrar="item.mostrar || 'nombre'" v-model="item.val"
-                    v-if="item.type == 'select' && operaciones[item.type].find(a => a.op == item.op)?.show" />
+                <JdSelect
+                    :lista="item.lista"
+                    :mostrar="item.mostrar || 'nombre'"
+                    v-model="item.val"
+                    v-if="
+                        item.type == 'select' &&
+                        operaciones[item.type].find((a) => a.op == item.op)?.show
+                    "
+                />
 
                 <div v-if="item.type === 'date'">
-                    <JdInput type="date" v-model="item.val"
-                        v-if="operaciones[item.type].find(a => a.op == item.op)?.show" />
+                    <JdInput
+                        type="date"
+                        v-model="item.val"
+                        v-if="operaciones[item.type].find((a) => a.op == item.op)?.show"
+                    />
 
-                    <JdInput type="date" v-model="item.val1"
-                        v-if="operaciones[item.type].find(a => a.op == item.op)?.show1" />
+                    <JdInput
+                        type="date"
+                        v-model="item.val1"
+                        v-if="operaciones[item.type].find((a) => a.op == item.op)?.show1"
+                    />
                 </div>
 
                 <div v-if="item.type === 'datetime'">
-                    <JdInput type="datetime-local" v-model="item.val"
-                        v-if="operaciones[item.type].find(a => a.op == item.op)?.show" />
+                    <JdInput
+                        type="datetime-local"
+                        v-model="item.val"
+                        v-if="operaciones[item.type].find((a) => a.op == item.op)?.show"
+                    />
 
-                    <JdInput type="datetime-local" v-model="item.val1"
-                        v-if="operaciones[item.type].find(a => a.op == item.op)?.show1" />
+                    <JdInput
+                        type="datetime-local"
+                        v-model="item.val1"
+                        v-if="operaciones[item.type].find((a) => a.op == item.op)?.show1"
+                    />
                 </div>
             </template>
         </JdTable>
@@ -108,7 +146,7 @@ export default {
                 { op: 'Está dentro de', show: true, show1: true },
                 { op: 'Está vacío', show: false },
                 { op: 'No está vacío', show: false },
-            ]
+            ],
         },
 
         columns: [
@@ -116,21 +154,21 @@ export default {
                 id: 'title',
                 title: 'Propiedad',
                 show: true,
-                width: '10rem'
+                width: '10rem',
             },
             {
                 id: 'op',
                 title: 'Operación',
                 slot: 'cOperacion',
                 show: true,
-                width: '10rem'
+                width: '10rem',
             },
             {
                 id: 'val',
                 title: 'Valor',
                 slot: 'cValor',
                 show: true,
-                width: '12rem'
+                width: '12rem',
             },
         ],
 
@@ -141,7 +179,9 @@ export default {
     }),
     created() {
         this.modal = this.useModals.mConfigFiltros
-        this.modal.cols1 = JSON.parse(JSON.stringify(this.modal.cols))
+        this.modal.cols1 = JSON.parse(
+            JSON.stringify(this.modal.cols.filter((a) => a.filtrable != false)),
+        )
     },
     methods: {
         elegir(sel, item) {
@@ -150,7 +190,7 @@ export default {
                 item.val1 = null
             }
 
-            if (this.operaciones[item.type].find(a => a.op == item.op)?.show == false) {
+            if (this.operaciones[item.type].find((a) => a.op == item.op)?.show == false) {
                 item.val = null
                 item.val1 = null
             }
@@ -165,7 +205,7 @@ export default {
         checkDatos() {
             for (const a of this.modal.cols1) {
                 if (this.operaciones[a.type] == null) continue
-                const currentOp = this.operaciones[a.type].find(b => b.op == a.op)
+                const currentOp = this.operaciones[a.type].find((b) => b.op == a.op)
 
                 if (currentOp && currentOp.show) {
                     if (a.val === null || a.val === undefined || a.val === '') {
@@ -188,7 +228,7 @@ export default {
             if (this.checkDatos()) return
 
             // ----- ASIGNAR A COLS ORIGINIAL ----- //
-            const cols1Map = this.modal.cols1.reduce((obj, a) => (obj[a.id] = a, obj), {})
+            const cols1Map = this.modal.cols1.reduce((obj, a) => ((obj[a.id] = a), obj), {})
 
             for (const a of this.modal.cols) {
                 Object.assign(a, cols1Map[a.id])

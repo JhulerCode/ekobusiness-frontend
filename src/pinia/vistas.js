@@ -18,7 +18,6 @@ export const useVistas = defineStore('vistas', {
             if (this[goto] == undefined) {
                 this[goto] = {
                     loaded: false,
-                    filtros: {}
                 }
             }
             else {
@@ -58,11 +57,15 @@ export const useVistas = defineStore('vistas', {
             delete this[goto]
         },
 
-        addItem(goto, array, item) {
+        addItem(goto, array, item, where = 'last') {
             if (!this[goto]) return
             if (!this[goto][array]) return
 
-            this[goto][array].push(item)
+            if (where == 'last') {
+                this[goto][array].push(item)
+            } else {
+                this[goto][array].unshift(item)
+            }
         },
         removeItem(goto, array, item) {
             if (!this[goto]) return

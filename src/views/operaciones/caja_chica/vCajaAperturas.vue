@@ -4,14 +4,25 @@
             <strong>Caja chica</strong>
 
             <div class="buttons">
-                <JdButton text="Nuevo" title="Crear nuevo" @click="nuevo()"
-                    v-if="useAuth.verifyPermiso('vCajaAperturas:aperturarCaja')" />
+                <JdButton
+                    text="Nuevo"
+                    title="Crear nuevo"
+                    @click="nuevo()"
+                    v-if="useAuth.verifyPermiso('vCajaAperturas:aperturarCaja')"
+                />
             </div>
         </div>
 
-        <JdTable :name="tableName" :columns="columns" :datos="vista.caja_aperturas || []" :colAct="true"
-            :configFiltros="openConfigFiltros" :reload="loadCajaAperturas" :rowOptions="tableRowOptions"
-            @rowOptionSelected="runMethod">
+        <JdTable
+            :name="tableName"
+            :columns="columns"
+            :datos="vista.caja_aperturas || []"
+            :colAct="true"
+            :configFiltros="openConfigFiltros"
+            :reload="loadCajaAperturas"
+            :rowOptions="tableRowOptions"
+            @rowOptionSelected="runMethod"
+        >
         </JdTable>
     </div>
 
@@ -65,7 +76,7 @@ export default {
                 width: '12rem',
                 show: true,
                 seek: true,
-                sort: true
+                sort: true,
             },
             {
                 id: 'monto_apertura',
@@ -75,7 +86,7 @@ export default {
                 width: '12rem',
                 show: true,
                 seek: false,
-                sort: false
+                sort: false,
             },
             {
                 id: 'fecha_cierre',
@@ -85,7 +96,7 @@ export default {
                 width: '12rem',
                 show: true,
                 seek: true,
-                sort: true
+                sort: true,
             },
             {
                 id: 'monto_cierre',
@@ -95,7 +106,7 @@ export default {
                 width: '12rem',
                 show: true,
                 seek: false,
-                sort: false
+                sort: false,
             },
             {
                 id: 'estado',
@@ -106,14 +117,41 @@ export default {
                 width: '10rem',
                 show: true,
                 seek: false,
-                sort: false
+                sort: false,
             },
         ],
         tableRowOptions: [
-            { id: 1, label: 'Ver', icon: 'fa-solid fa-up-right-from-square', action: 'ver', permiso: 'vCajaAperturas:ver' },
-            { id: 2, label: 'Cerrar caja', icon: 'fa-solid fa-check-double', action: 'cerrarCaja', permiso: 'vCajaAperturas:cerrarCaja', ocultar: { estado: 2 } },
-            { id: 3, label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar', permiso: 'vCajaAperturas:eliminar', ocultar: { estado: 2 } },
-            { id: 4, label: 'Movimientos', icon: 'fa-solid fa-right-left', action: 'agregarMovimientos', permiso: 'vCajaMovimientos:listar', ocultar: { estado: 2 } },
+            {
+                id: 1,
+                label: 'Ver',
+                icon: 'fa-solid fa-up-right-from-square',
+                action: 'ver',
+                permiso: 'vCajaAperturas:ver',
+            },
+            {
+                id: 2,
+                label: 'Cerrar caja',
+                icon: 'fa-solid fa-check-double',
+                action: 'cerrarCaja',
+                permiso: 'vCajaAperturas:cerrarCaja',
+                ocultar: { estado: 2 },
+            },
+            {
+                id: 3,
+                label: 'Eliminar',
+                icon: 'fa-solid fa-trash-can',
+                action: 'eliminar',
+                permiso: 'vCajaAperturas:eliminar',
+                ocultar: { estado: 2 },
+            },
+            {
+                id: 4,
+                label: 'Movimientos',
+                icon: 'fa-solid fa-right-left',
+                action: 'agregarMovimientos',
+                permiso: 'vCajaMovimientos:listar',
+                ocultar: { estado: 2 },
+            },
         ],
     }),
     created() {
@@ -155,12 +193,12 @@ export default {
             await this.loadDatosSistema()
 
             const cols = this.columns
-            cols.find(a => a.id == 'estado').lista = this.vista.caja_apertura_estados
+            cols.find((a) => a.id == 'estado').lista = this.vista.caja_apertura_estados
 
             const send = {
                 table: this.tableName,
                 cols,
-                reload: this.loadCajaAperturas
+                reload: this.loadCajaAperturas,
             }
 
             this.useModals.setModal('mConfigFiltros', 'Filtros', null, send, true)
@@ -218,7 +256,6 @@ export default {
             Object.assign(this.vista, res.data)
         },
     },
-
 }
 </script>
 

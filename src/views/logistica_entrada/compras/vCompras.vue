@@ -96,8 +96,8 @@ export default {
                 type: 'text',
                 width: '8rem',
                 show: true,
-                seek: false,
-                sort: false,
+                seek: true,
+                sort: true,
             },
             {
                 id: 'factura',
@@ -105,8 +105,8 @@ export default {
                 type: 'text',
                 width: '8rem',
                 show: true,
-                seek: false,
-                sort: false,
+                seek: true,
+                sort: true,
             },
             {
                 id: 'socio',
@@ -117,7 +117,7 @@ export default {
                 width: '15rem',
                 show: true,
                 seek: true,
-                sort: false,
+                sort: true,
             },
             {
                 id: 'pago_condicion',
@@ -127,7 +127,7 @@ export default {
                 width: '12rem',
                 show: true,
                 seek: false,
-                sort: false,
+                sort: true,
             },
             {
                 id: 'moneda',
@@ -137,7 +137,7 @@ export default {
                 width: '10rem',
                 show: true,
                 seek: false,
-                sort: false,
+                sort: true,
             },
             {
                 id: 'monto',
@@ -147,8 +147,8 @@ export default {
                 toRight: true,
                 width: '10rem',
                 show: true,
-                seek: false,
-                sort: false,
+                seek: true,
+                sort: true,
             },
             {
                 id: 'estado',
@@ -156,10 +156,20 @@ export default {
                 type: 'select',
                 prop: 'estado1.nombre',
                 format: 'estado',
+                width: '7rem',
+                show: true,
+                seek: false,
+                sort: true,
+            },
+            {
+                id: 'socio_pedido',
+                title: 'Pedido',
+                filtrable: false,
+                prop: 'socio_pedido1.codigo',
                 width: '10rem',
                 show: true,
                 seek: false,
-                sort: false,
+                sort: true,
             },
         ],
         tableRowOptions: [
@@ -192,6 +202,7 @@ export default {
         setQuery() {
             this.vista.qry = {
                 fltr: { tipo: { op: 'Es', val: 1 } },
+                incl: ['socio_pedido1']
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)

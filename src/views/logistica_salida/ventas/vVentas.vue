@@ -85,8 +85,8 @@ export default {
                 type: 'text',
                 width: '10rem',
                 show: true,
-                seek: false,
-                sort: false,
+                seek: true,
+                sort: true,
             },
             {
                 id: 'socio',
@@ -97,7 +97,7 @@ export default {
                 width: '20rem',
                 show: true,
                 seek: true,
-                sort: false,
+                sort: true,
             },
             {
                 id: 'pago_condicion',
@@ -107,7 +107,7 @@ export default {
                 width: '12rem',
                 show: true,
                 seek: false,
-                sort: false,
+                sort: true,
             },
             {
                 id: 'moneda',
@@ -117,7 +117,7 @@ export default {
                 width: '8rem',
                 show: true,
                 seek: false,
-                sort: false,
+                sort: true,
             },
             {
                 id: 'monto',
@@ -127,8 +127,8 @@ export default {
                 toRight: true,
                 width: '8rem',
                 show: true,
-                seek: false,
-                sort: false,
+                seek: true,
+                sort: true,
             },
             {
                 id: 'estado',
@@ -139,7 +139,7 @@ export default {
                 width: '8rem',
                 show: true,
                 seek: false,
-                sort: false,
+                sort: true,
             },
         ],
         tableRowOptions: [

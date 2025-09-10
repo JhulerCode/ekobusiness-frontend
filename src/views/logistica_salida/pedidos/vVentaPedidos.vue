@@ -144,7 +144,7 @@ export default {
                 type: 'select',
                 width: '12rem',
                 show: true,
-                seek: true,
+                seek: false,
                 sort: true,
             },
             {
@@ -154,7 +154,7 @@ export default {
                 type: 'select',
                 width: '8rem',
                 show: true,
-                seek: true,
+                seek: false,
                 sort: true,
             },
             {
@@ -176,7 +176,7 @@ export default {
                 format: 'estado',
                 width: '8rem',
                 show: true,
-                seek: true,
+                seek: false,
                 sort: true,
             },
             {
@@ -187,7 +187,7 @@ export default {
                 format: 'yesno',
                 width: '8rem',
                 show: true,
-                seek: true,
+                seek: false,
                 sort: true,
             },
             {

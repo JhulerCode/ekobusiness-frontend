@@ -128,7 +128,7 @@ export default {
                 type: 'select',
                 width: '12rem',
                 show: true,
-                seek: true,
+                seek: false,
                 sort: true,
             },
             {
@@ -138,7 +138,7 @@ export default {
                 type: 'select',
                 width: '10rem',
                 show: true,
-                seek: true,
+                seek: false,
                 sort: true,
             },
             {
@@ -160,7 +160,7 @@ export default {
                 format: 'estado',
                 width: '10rem',
                 show: true,
-                seek: true,
+                seek: false,
                 sort: true,
             },
         ],
@@ -319,7 +319,7 @@ export default {
 
             if (res.code != 0) return
 
-            this.useVistas.updateItem('vCompraPedidos', 'pedidos', { ...item, estado: 2 })
+            this.useVistas.updateItem('vCompraPedidos', 'pedidos', res.data)
         },
         anular(item) {
             const send = {

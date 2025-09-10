@@ -106,6 +106,8 @@
                     :disabled="true"
                     v-if="modal.transaccion.anulado_motivo"
                 />
+
+                <small>{{ modal.transaccion.id }}</small>
             </div>
 
             <div class="totales">

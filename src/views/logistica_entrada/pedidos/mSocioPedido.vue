@@ -112,6 +112,8 @@
                     v-model="modal.item.observacion"
                     :disabled="modal.mode == 3"
                 />
+
+                <small>{{ modal.item.id }}</small>
             </div>
 
             <div class="totales">

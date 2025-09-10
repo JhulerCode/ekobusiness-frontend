@@ -41,10 +41,7 @@
                     class="right"
                     @click="nuevo(a)"
                     title="Agregar orden de producción"
-                    v-if="
-                        useAuth.verifyPermiso('vProgramaLuxury:crear') &&
-                        this.vista.filtros.maquina == null
-                    "
+                    v-if="useAuth.verifyPermiso('vProgramaLuxury:crear')"
                 >
                     <i class="fa-solid fa-plus"></i>
                 </div>
@@ -240,9 +237,9 @@ export default {
         async setMaquinas() {
             await this.loadMaquinas()
 
-            if (this.vista.filtros.maquina != null) {
+            if (this.columns[1].val != null) {
                 this.vista.maquinasConProduccion = this.vista.maquinas
-                    .filter((a) => a.produccion_tipo == 3 && a.id == this.vista.filtros.maquina)
+                    .filter((a) => a.produccion_tipo == 3 && a.id == this.columns[1].val)
                     .map((a) => ({
                         ...a,
                         tiempo: 0,

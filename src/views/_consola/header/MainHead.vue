@@ -5,8 +5,8 @@
                 <i class="fa-solid fa-bars"></i>
             </div>
 
-            <img src="@/assets/img/logo-sunka-black.webp" v-if="!useAuth.isDarkMode">
-            <img src="@/assets/img/logo-sunka-white.webp" v-else>
+            <img src="@/assets/img/logo-sunka-black.webp" v-if="!useAuth.isDarkMode" />
+            <img src="@/assets/img/logo-sunka-white.webp" v-else />
         </div>
 
         <div class="right">
@@ -15,7 +15,11 @@
                     <i class="fa-solid fa-rotate-left"></i>
                 </div>
 
-                <div class="btn" @click="darkLigthMode" :title="`Modo ${!useAuth.isDarkMode ? 'oscuro' : 'claro'}`">
+                <div
+                    class="btn"
+                    @click="darkLigthMode"
+                    :title="`Modo ${!useAuth.isDarkMode ? 'oscuro' : 'claro'}`"
+                >
                     <i class="fa-regular fa-moon" v-if="!useAuth.isDarkMode"></i>
                     <i class="fa-regular fa-sun" v-else></i>
                 </div>
@@ -27,7 +31,10 @@
 
             <div class="user-info" v-if="useAuth.usuario" @click="openUserMenu">
                 <div class="user-texts">
-                    <p class="user-name max-1line" :title="`${useAuth.usuario.nombres} ${useAuth.usuario.apellidos}`">
+                    <p
+                        class="user-name max-1line"
+                        :title="`${useAuth.usuario.nombres} ${useAuth.usuario.apellidos}`"
+                    >
                         {{ useAuth.usuario.nombres }} {{ useAuth.usuario.apellidos }}
                     </p>
                     <p class="max-1line" :title="useAuth.usuario.cargo">
@@ -36,9 +43,11 @@
                 </div>
 
                 <div class="user-foto">
-                    {{ useAuth.usuario.apellidos
-                        ? useAuth.usuario.nombres[0] + useAuth.usuario.apellidos[0]
-                        : useAuth.usuario.nombres?.slice(0, 2) }}
+                    {{
+                        useAuth.usuario.apellidos
+                            ? useAuth.usuario.nombres[0] + useAuth.usuario.apellidos[0]
+                            : useAuth.usuario.nombres?.slice(0, 2)
+                    }}
                 </div>
             </div>
         </div>
@@ -52,8 +61,7 @@ import { useModals } from '@/pinia/modals'
 import { urls, patch } from '@/utils/crud'
 
 export default {
-    components: {
-    },
+    components: {},
     data: () => ({
         useAuth: useAuth(),
         useModals: useModals(),
@@ -63,6 +71,9 @@ export default {
             this.useAuth.showNavbar = !this.useAuth.showNavbar
         },
 
+        reloadWindow() {
+            window.location.reload()
+        },
         async darkLigthMode() {
             const send = {
                 id: this.useAuth.usuario.colaborador,
@@ -82,17 +93,27 @@ export default {
             const doc = window.document
             const docEl = doc.documentElement
 
-            const requestFullScreen = docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullscreen || docEl.msRequestFullscreen
-            const cancelFullScreen = doc.exitFullscreen || doc.mozCancelFullScreen || doc.webkitExitFullscreen || doc.msExitFullscreen
+            const requestFullScreen =
+                docEl.requestFullscreen ||
+                docEl.mozRequestFullScreen ||
+                docEl.webkitRequestFullscreen ||
+                docEl.msRequestFullscreen
+            const cancelFullScreen =
+                doc.exitFullscreen ||
+                doc.mozCancelFullScreen ||
+                doc.webkitExitFullscreen ||
+                doc.msExitFullscreen
 
-            if (!doc.fullscreenElement && !doc.mozFullScreenElement && !doc.webkitFullscreenElement && !doc.msFullscreenElement) {
+            if (
+                !doc.fullscreenElement &&
+                !doc.mozFullScreenElement &&
+                !doc.webkitFullscreenElement &&
+                !doc.msFullscreenElement
+            ) {
                 requestFullScreen.call(docEl)
             } else {
                 cancelFullScreen.call(doc)
             }
-        },
-        reloadWindow() {
-            window.location.reload()
         },
 
         openUserMenu() {
@@ -108,8 +129,6 @@ header {
     justify-content: space-between;
     gap: 1rem;
     padding: 0.5rem 1.5rem;
-    // background-color: var(--bg-color);
-    // background-color: var(--primary-color);
     height: 4.5rem;
 
     .left {
@@ -122,8 +141,7 @@ header {
         }
     }
 
-    >.right {
-        // height: 100%;
+    > .right {
         display: flex;
         align-items: center;
         gap: 1rem;
@@ -179,7 +197,6 @@ header {
 
         &:hover {
             background-color: var(--bg-color);
-            // border: solid 1px var(--primary-color);
 
             * {
                 color: var(--primary-color);
@@ -188,14 +205,9 @@ header {
     }
 }
 
-// .user-menu {
-//     top: 4rem;
-//     right: 2rem;
-// }
-
 @media (max-width: 540px) {
     header {
-        >.right {
+        > .right {
             .actions {
                 display: none;
             }

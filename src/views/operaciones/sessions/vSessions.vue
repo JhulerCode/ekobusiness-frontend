@@ -1,17 +1,27 @@
 <template>
-    <div style="display: flex; gap: 20px;">
+    <div style="display: flex; gap: 20px">
         <!-- Gráfico de Barras -->
-        <v-chart :option="barOptions" @click="handleBarClick" style="width: 50%; height: 400px;" autoresize />
+        <v-chart
+            :option="barOptions"
+            @click="handleBarClick"
+            style="width: 50%; height: 400px"
+            autoresize
+        />
 
         <!-- Gráfico de Pie -->
-        <v-chart :option="pieOptions" style="width: 50%; height: 400px;" autoresize />
+        <v-chart :option="pieOptions" style="width: 50%; height: 400px" autoresize />
     </div>
 </template>
 
 <script>
 import { use } from 'echarts/core'
 import { BarChart, PieChart } from 'echarts/charts'
-import { TitleComponent, TooltipComponent, LegendComponent, GridComponent } from 'echarts/components'
+import {
+    TitleComponent,
+    TooltipComponent,
+    LegendComponent,
+    GridComponent,
+} from 'echarts/components'
 import { CanvasRenderer } from 'echarts/renderers'
 import VChart from 'vue-echarts'
 
@@ -28,7 +38,7 @@ use([
     TooltipComponent,
     LegendComponent,
     GridComponent,
-    CanvasRenderer
+    CanvasRenderer,
 ])
 
 export default {
@@ -45,16 +55,34 @@ export default {
         meses: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio'],
         ventas: [500, 700, 800, 600, 1200, 900],
         detalles: {
-            'Enero': [{ name: 'Producto A', value: 300 }, { name: 'Producto B', value: 200 }],
-            'Febrero': [{ name: 'Producto A', value: 400 }, { name: 'Producto B', value: 300 }],
-            'Marzo': [{ name: 'Producto A', value: 500 }, { name: 'Producto B', value: 300 }],
-            'Abril': [{ name: 'Producto A', value: 350 }, { name: 'Producto B', value: 250 }],
-            'Mayo': [{ name: 'Producto A', value: 800 }, { name: 'Producto B', value: 400 }],
-            'Junio': [{ name: 'Producto A', value: 500 }, { name: 'Producto B', value: 400 }]
+            Enero: [
+                { name: 'Producto A', value: 300 },
+                { name: 'Producto B', value: 200 },
+            ],
+            Febrero: [
+                { name: 'Producto A', value: 400 },
+                { name: 'Producto B', value: 300 },
+            ],
+            Marzo: [
+                { name: 'Producto A', value: 500 },
+                { name: 'Producto B', value: 300 },
+            ],
+            Abril: [
+                { name: 'Producto A', value: 350 },
+                { name: 'Producto B', value: 250 },
+            ],
+            Mayo: [
+                { name: 'Producto A', value: 800 },
+                { name: 'Producto B', value: 400 },
+            ],
+            Junio: [
+                { name: 'Producto A', value: 500 },
+                { name: 'Producto B', value: 400 },
+            ],
         },
         selectedIndex: null, // Por defecto no hay selección
         defaultColor: '#7cb5ec',
-        highlightColor: '#f45b5b'
+        highlightColor: '#f45b5b',
     }),
     created() {
         this.vista = this.useVistas.vSessions
@@ -76,14 +104,16 @@ export default {
                 tooltip: {},
                 xAxis: { data: this.meses },
                 yAxis: {},
-                series: [{
-                    name: 'Ventas',
-                    type: 'bar',
-                    data: this.ventas,
-                    itemStyle: {
-                        color: (params) => colors[params.dataIndex]
-                    }
-                }]
+                series: [
+                    {
+                        name: 'Ventas',
+                        type: 'bar',
+                        data: this.ventas,
+                        itemStyle: {
+                            color: (params) => colors[params.dataIndex],
+                        },
+                    },
+                ],
             }
         },
         pieOptions() {
@@ -100,15 +130,17 @@ export default {
                     title: { text: 'Detalle Total' },
                     tooltip: {},
                     legend: { orient: 'vertical', left: 'left' },
-                    series: [{
-                        name: 'Productos',
-                        type: 'pie',
-                        radius: '70%',
-                        data: Object.keys(total).map(name => ({
-                            name,
-                            value: total[name]
-                        }))
-                    }]
+                    series: [
+                        {
+                            name: 'Productos',
+                            type: 'pie',
+                            radius: '70%',
+                            data: Object.keys(total).map((name) => ({
+                                name,
+                                value: total[name],
+                            })),
+                        },
+                    ],
                 }
             } else {
                 // Pie de un mes específico
@@ -117,15 +149,17 @@ export default {
                     title: { text: `Detalle de ${month}` },
                     tooltip: {},
                     legend: { orient: 'vertical', left: 'left' },
-                    series: [{
-                        name: 'Productos',
-                        type: 'pie',
-                        radius: '70%',
-                        data: this.detalles[month]
-                    }]
+                    series: [
+                        {
+                            name: 'Productos',
+                            type: 'pie',
+                            radius: '70%',
+                            data: this.detalles[month],
+                        },
+                    ],
                 }
             }
-        }
+        },
     },
     methods: {
         handleBarClick(params) {

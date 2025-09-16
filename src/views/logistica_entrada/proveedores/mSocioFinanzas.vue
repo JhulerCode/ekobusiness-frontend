@@ -45,7 +45,7 @@
 
                 <JdInput label="NC" :nec="true" v-model="nuevo.nc" :disabled="modal.mode == 3" />
 
-                <JdInput label="CCI" :nec="true" v-model="nuevo.cci" :disabled="modal.mode == 3" />
+                <JdInput label="CCI" v-model="nuevo.cci" :disabled="modal.mode == 3" />
 
                 <JdSwitch
                     label="Principal?"
@@ -164,7 +164,7 @@ export default {
             }
         },
         checkDatos() {
-            const props = ['nombre', 'moneda', 'nc', 'cci']
+            const props = ['nombre', 'moneda', 'nc']
 
             if (incompleteData(this.nuevo, props)) {
                 jmsg('warning', 'Ingrese los datos necesarios')

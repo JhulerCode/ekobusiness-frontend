@@ -1,25 +1,54 @@
 <template>
     <JdModal modal="mSocio" :buttons="buttons" @button-click="(action) => this[action]()">
         <div class="container-datos">
-            <JdSelect label="Tipo doc" :nec="true" v-model="socio.doc_tipo" :lista="modal.documentos_identidad || []"
-                mostrar="nombre" :disabled="modal.mode == 3" style="grid-column: 1/3;" />
+            <JdSelect
+                label="Tipo doc"
+                :nec="true"
+                v-model="socio.doc_tipo"
+                :lista="modal.documentos_identidad || []"
+                mostrar="nombre"
+                :disabled="modal.mode == 3"
+                style="grid-column: 1/3"
+            />
 
-            <JdInput label="Nro documento" :nec="true" v-model="socio.doc_numero" :disabled="modal.mode == 3"
-                style="grid-column: 3/5" />
+            <JdInput
+                label="Nro documento"
+                :nec="true"
+                v-model="socio.doc_numero"
+                :disabled="modal.mode == 3"
+                style="grid-column: 3/5"
+            />
 
-            <JdInput label="Razón social o nombre" :nec="true" v-model="socio.nombres" :disabled="modal.mode == 3"
-                style="grid-column: 1/5" />
+            <JdInput
+                label="Razón social o nombre"
+                :nec="true"
+                v-model="socio.nombres"
+                :disabled="modal.mode == 3"
+                style="grid-column: 1/5"
+            />
 
-            <JdInput label="E-mail" v-model="socio.correo" :disabled="modal.mode == 3" style="grid-column: 1/3" />
+            <JdInput
+                label="E-mail"
+                v-model="socio.correo"
+                :disabled="modal.mode == 3"
+                style="grid-column: 1/3"
+            />
 
-            <JdInput label="Teléfono" v-model="socio.telefono1" :disabled="modal.mode == 3" style="grid-column: 1/3" />
+            <JdInput
+                label="Teléfono"
+                v-model="socio.telefono1"
+                :disabled="modal.mode == 3"
+                style="grid-column: 1/3"
+            />
 
             <JdSwitch label="Activo?" v-model="socio.activo" :disabled="modal.mode == 3" />
         </div>
 
         <div class="extra-datos">
             <ul class="pestanas">
-                <li @click="pestana = 1" :class="{ 'pestana-activo': pestana == 1 }">Direcciones</li>
+                <li @click="pestana = 1" :class="{ 'pestana-activo': pestana == 1 }">
+                    Direcciones
+                </li>
                 <li @click="pestana = 2" :class="{ 'pestana-activo': pestana == 2 }">Contactos</li>
                 <li @click="pestana = 3" :class="{ 'pestana-activo': pestana == 3 }">Finanzas</li>
                 <li @click="pestana = 4" :class="{ 'pestana-activo': pestana == 4 }">Documentos</li>
@@ -85,13 +114,14 @@ export default {
 
         this.showButtons()
         this.loadDatosSistema()
+        // if (this.modal.mode != 3) this.loadMonedas()
+        this.loadMonedas()
     },
     methods: {
         showButtons() {
             if (this.modal.mode == 1) {
                 this.buttons[0].show = true
-            }
-            else if (this.modal.mode == 2) {
+            } else if (this.modal.mode == 2) {
                 this.buttons[1].show = true
             }
         },
@@ -155,14 +185,30 @@ export default {
         },
 
         async loadDatosSistema() {
-            const qry = ['documentos_identidad', 'monedas', 'pago_condiciones']
+            const qry = ['documentos_identidad', 'pago_condiciones']
             const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
 
             if (res.code != 0) return
 
             Object.assign(this.modal, res.data)
         },
-    }
+        async loadMonedas() {
+            const qry = {
+                fltr: {},
+                cols: ['id', 'nombre', 'simbolo', 'estandar'],
+            }
+
+            this.useAuth.setLoading(true, 'Cargando...')
+            this.modal.monedasLoaded = false
+            const res = await get(`${urls.monedas}?qry=${JSON.stringify(qry)}`)
+            this.modal.monedasLoaded = true
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            this.modal.monedas = res.data
+        },
+    },
 }
 </script>
 
@@ -200,7 +246,7 @@ export default {
     .container-datos {
         grid-template-columns: minmax(100%, 33.5rem) !important;
 
-        >* {
+        > * {
             grid-column: 1/2 !important;
         }
     }

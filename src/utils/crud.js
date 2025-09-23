@@ -90,13 +90,21 @@ async function get(url) {
 function setFormData(item) {
     const formData = new FormData()
 
-    // for (const key in item) {
-    //     const value = item[key];
+    const { archivo, archivos, ...resto } = item
 
-    //     formData.append(key, value);
-    // }
-    const { archivo, ...resto } = item
-    formData.append('archivo', archivo)
+    // Si hay un solo archivo (propiedad archivo)
+    if (archivo) {
+        formData.append('archivo', archivo)
+    }
+
+    // Si hay múltiples archivos (propiedad archivos como array)
+    if (archivos && Array.isArray(archivos)) {
+        archivos.forEach((file) => {
+            formData.append('archivos', file) // backend recibirá como array
+        })
+    }
+
+    // Agregar el resto de datos como JSON
     formData.append("datos", JSON.stringify(resto))
 
     return formData

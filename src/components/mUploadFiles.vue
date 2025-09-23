@@ -1,49 +1,67 @@
 <template>
     <JdModal modal="mUploadFiles">
         <div class="buttons">
-            <JdButton text="Explorar" @click="$refs.inputFile.click()" />
+            <input
+                type="file"
+                hidden
+                ref="inputFile"
+                :multiple="(modal.cantidad || 1) > 1"
+                :accept="modal.accept"
+                @change="onFileChange"
+            />
 
-            <JdButton text="Eliminar" icon="fa-solid fa-trash-can" @click="eliminar()"
-                v-if="modal.item.foto && files.length == 0" />
+            <JdButton text="Explorar" tipo="2" @click="$refs.inputFile.click()" />
 
-            <JdButton text="Actualizar" backColor="primary-color" color="text-color3" @click="actualizar()" />
-            <!-- v-if="files.length > 0" -->
+            <JdButton
+                text="Actualizar"
+                backColor="primary-color"
+                color="text-color3"
+                @click="actualizar()"
+            />
         </div>
 
-        <!-- <div class="container-foto" v-if="files.length == 0">
-            <img
-                src="https://img.freepik.com/vector-premium/vector-icono-imagen-predeterminado-pagina-imagen-faltante-diseno-sitio-web-o-aplicacion-movil-no-hay-foto-disponible_87543-11093.jpg">
-        </div> -->
-
-        <ul class="files" v-if="files.length > 0">
-            <li v-for="(a, i) in files" :key="i" class="container-foto">
-                <template>
-                    <img :src="a.uri">
+        <ul class="container-files">
+            <li
+                v-for="(a, i) in files"
+                :key="i"
+                class="container-file"
+                draggable="true"
+                @dragstart="onDragStart(i)"
+                @dragover.prevent
+                @drop="onDrop(i)"
+            >
+                <template v-if="a.id == null">
+                    <div class="container-foto">
+                        <img :src="a.blob" />
+                    </div>
                 </template>
 
-                <template v-if="modal.accept = 'application/pdf'">
-                    {{ a.name }}
+                <template v-else>
+                    <div class="container-foto">
+                        <img :src="`${host}/uploads/${a.id}`" />
+                    </div>
                 </template>
+
+                <div class="file-name">
+                    <small>{{ a.orden }} {{ a.name }}</small>
+                </div>
+
+                <div class="act-delete">
+                    <i class="fa-solid fa-xmark" @click="eliminar(a, i)"></i>
+                </div>
             </li>
         </ul>
-
-        {{ this.modal.formData }}
-
-        <input type="file" hidden ref="inputFile" :multiple="modal.varios > 1" :accept="modal.accept"
-            @change="onFileChange">
     </JdModal>
 </template>
 
 <script>
-import JdModal from '@/components/JdModal.vue'
-import JdButton from '@/components/inputs/JdButton.vue'
+import { JdModal, JdButton } from '@jhuler/components'
 
 import { useAuth } from '@/pinia/auth'
+import { useVistas } from '@/pinia/vistas'
 import { useModals } from '@/pinia/modals'
 
-// import { loadFiles, genId } from '@/utils/mine'
-// import { jmsg } from '@/utils/swal'
-import { host, urls, delet } from '@/utils/crud'
+import { host, patch } from '@/utils/crud'
 
 export default {
     components: {
@@ -52,97 +70,93 @@ export default {
     },
     data: () => ({
         useAuth: useAuth(),
+        useVistas: useVistas(),
         useModals: useModals(),
 
         modal: {},
         files: [],
+        eliminados: [],
         host,
     }),
     created() {
         this.modal = this.useModals.mUploadFiles
+        this.files = JSON.parse(JSON.stringify(this.modal.item.archivos))
     },
     methods: {
-        // async onFileChange(event) {
-        //     this.files.length = 0
+        async onFileChange(e) {
+            const files = e.target.files
 
-        //     const asd = event.target.files
-
-        //     let maximo = true
-
-        //     if (this.files.length == 0) {
-        //         if (asd.length && asd.length > this.modal.varios) maximo = false
-        //     }
-        //     else {
-        //         const falta = this.modal.varios - this.files.length
-        //         if (asd.length && asd.length > falta) maximo = false
-        //     }
-
-        //     if (maximo == false) {
-        //         return jmsg('warning', `Puedes subir ${this.modal.varios} modal.files como máximo`)
-        //     }
-
-        // const archivos = await loadFiles(event)
-
-        // for (const a of archivos) {
-        //     const id = genId(this.files)
-        //     this.files.push({ ...a, id })
-        // }
-        // },
-        async onFileChange(event) {
-            this.modal.formData = new FormData()
-            Array.from(event.target.files).forEach((archivo) => {
-                this.modal.formData.append('archivos', archivo);
-            });
-
-            console.log(this.modal.formData)
+            if (files.length > 0) {
+                for (const a of files) {
+                    this.files.push({
+                        file: a,
+                        orden: this.files.length + 1,
+                        name: a.name,
+                        blob: URL.createObjectURL(a),
+                    })
+                }
+            }
         },
-
         async actualizar() {
-            const uri = `${urls[this.modal.item.url]}/upload/${this.modal.item.id}`
-
-            const res = await fetch(uri, {
-                method: 'POST',
-                headers: {
-                    Authorization: `Bearer ${useAuth().token}`,
-                },
-                body: this.modal.formData,
-            });
-
-            console.log(res)
-        },
-        // async actualizar() {
-        //     const uri = urls[this.modal.item.url] + this.modal.item.route
-        // const send = {
-        //     id: this.modal.item.id,
-        //     files: this.files
-        // }
-
-        // this.useAuth.setLoading(true, 'Subiendo...')
-        // const res = await patch(uri, send)
-        // this.useAuth.setLoading(false)
-
-        // if (res.code !== 0) return
-
-        // this.$emit('uploaded', { id: send.id, documento: res.fileName })
-        // this.useModals.show.mUploadFiles = false
-        // },
-        async eliminar() {
-            const uri = urls[this.modal.item.url] + this.modal.item.route
             const send = {
                 id: this.modal.item.id,
-                foto: this.modal.item.foto
+                formData: true,
+                archivos: this.files.filter((a) => a.id == null).map((a) => a.file),
+                eliminados: this.eliminados,
+                vigentes: this.files.map((a) => ({
+                    id: a.id,
+                    orden: a.orden,
+                    name: a.name,
+                })),
             }
 
-            this.useAuth.setLoading(true, 'Eliminando...')
-            const response = await delet(uri, send)
+            this.useAuth.setLoading(true, 'Subiendo...')
+            const res = await patch(this.modal.url, send)
             this.useAuth.setLoading(false)
 
-            if (response.code !== 0) return
+            if (res.code !== 0) return
 
-            this.$emit('deleted', { id: send.id })
+            if (this.modal.prop) {
+                const tabla = this.useVistas[this.modal.vista][this.modal.tabla]
+                const i = tabla.findIndex((a) => a.id == this.modal.item.id)
+                tabla[i][this.modal.prop] = res.data
+            }
+
             this.useModals.show.mUploadFiles = false
         },
-    }
+        async eliminar(a, i) {
+            if (a.id == null) {
+                this.files.splice(i, 1)
+            } else {
+                this.eliminados.push(a)
+                this.files.splice(i, 1)
+            }
+
+            this.files.forEach((file, idx) => {
+                file.orden = idx + 1
+            })
+        },
+        onDragStart(index) {
+            this.dragIndex = index
+        },
+        onDrop(index) {
+            if (this.dragIndex === null) return
+
+            // Sacamos el elemento arrastrado
+            const movedItem = this.files.splice(this.dragIndex, 1)[0]
+
+            // Lo insertamos en la nueva posición
+            this.files.splice(index, 0, movedItem)
+
+            // Reasignamos orden
+            this.files.forEach((f, idx) => {
+                f.orden = idx + 1
+            })
+
+            // Reset drag
+            this.dragIndex = null
+        },
+    },
 }
 </script>
 
@@ -153,17 +167,56 @@ export default {
     margin-bottom: 1rem;
 }
 
-.container-foto {
-    width: 33.5rem;
+.container-files {
+    max-height: 70dvh;
+    height: fit-content;
+    overflow-y: auto;
+    overflow-x: hidden;
+    display: grid;
+    grid-template-columns: repeat(4, 10rem);
+    gap: 0.5rem;
+}
 
-    img {
+.container-file {
+    background-color: var(--bg-color2);
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+    position: relative;
+
+    .container-foto {
+        display: flex;
+        justify-content: center;
+        align-items: center;
         width: 100%;
+        height: 8rem;
+
+        img {
+            max-width: 100%;
+            max-height: 100%;
+        }
+    }
+
+    .act-delete {
+        position: absolute;
+        top: 0.3rem;
+        right: 0.3rem;
+        background-color: var(--bg-color);
+        border-radius: 50%;
+        box-shadow: 0 0 0.5rem var(--shadow-color);
+        opacity: 0;
+        cursor: pointer;
+    }
+
+    &:hover {
+        .act-delete {
+            opacity: 1;
+        }
     }
 }
 
 @media (max-width: 540px) {
-    .container-foto {
-        width: 100% !important;
+    .container-files {
+        grid-template-columns: repeat(2, 10rem);
     }
 }
 </style>

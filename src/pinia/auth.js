@@ -176,6 +176,7 @@ export const useAuth = defineStore('auth', {
                             { id: 'vProductosTerminados:editar', label: 'Editar' },
                             { id: 'vProductosTerminados:eliminar', label: 'Eliminar' },
 
+                            { id: 'vProductos:actualizarFotos', label: 'Actualizar fotos' },
                             { id: 'vProductosTerminados:clonar', label: 'Clonar' },
                             { id: 'vProductosTerminados:kardex', label: 'Ver kardex' },
                             { id: 'vProductosTerminados:ajusteStock', label: 'Ajuste stock' },

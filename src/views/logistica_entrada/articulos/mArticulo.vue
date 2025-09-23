@@ -81,6 +81,8 @@
             />
             <!-- <JdSwitch label="Se vende?" v-model="articulo.vende" style="grid-column: 1/3;" v-if="articulo.tipo == 1" /> -->
             <JdSwitch label="Activo?" v-model="articulo.activo" style="grid-column: 1/3" />
+
+            <small style="grid-column: 1/3">{{ articulo.id }}</small>
         </div>
     </JdModal>
 </template>

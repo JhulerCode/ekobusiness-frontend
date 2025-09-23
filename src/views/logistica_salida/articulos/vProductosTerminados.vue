@@ -59,6 +59,7 @@
     <mCombo v-if="useModals.show.mCombo" />
     <mKardex v-if="useModals.show.mKardex" />
     <mAjusteStock v-if="useModals.show.mAjusteStock" />
+    <mUploadFiles v-if="useModals.show.mUploadFiles" @updated="fotosUpdated" />
 
     <mConfigCols v-if="useModals.show.mConfigCols" />
     <mConfigFiltros v-if="useModals.show.mConfigFiltros" />
@@ -67,6 +68,7 @@
 
 <script>
 import { JdButton, JdTable, mConfigFiltros, mConfigCols, mEditar } from '@jhuler/components'
+import mUploadFiles from '@/components/mUploadFiles.vue'
 
 import mImportarArticulos from '@/views/logistica_entrada/articulos/mImportarArticulos.vue'
 import mArticulo from '@/views/logistica_entrada/articulos/mArticulo.vue'
@@ -88,6 +90,7 @@ export default {
     components: {
         JdTable,
         JdButton,
+        mUploadFiles,
 
         mConfigCols,
         mConfigFiltros,
@@ -274,6 +277,12 @@ export default {
                 permiso: 'vProductosTerminados:editar',
             },
             {
+                label: 'Actualizar fotos',
+                icon: 'fa-solid fa-image',
+                action: 'openUploadFiles',
+                permiso: 'vProductos:actualizarFotos',
+            },
+            {
                 label: 'Eliminar',
                 icon: 'fa-solid fa-trash-can',
                 action: 'eliminar',
@@ -323,7 +332,7 @@ export default {
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
-            this.vista.qry.cols.push('is_combo')
+            this.vista.qry.cols.push('is_combo', 'fotos')
         },
         async loadArticulos() {
             this.setQuery()
@@ -543,6 +552,25 @@ export default {
             } else {
                 this.useModals.setModal('mArticulo', 'Editar articulo', 2, res.data)
             }
+        },
+        openUploadFiles(item) {
+            const send = {
+                item: {
+                    id: item.id,
+                    archivos: item.fotos || [],
+                },
+                accept: 'image/*',
+                cantidad: 10,
+                url: `${urls.articulos}/fotos`,
+                vista: 'vProductosTerminados',
+                tabla: 'articulos',
+                prop: 'fotos',
+            }
+
+            this.useModals.setModal('mUploadFiles', 'Actualizar fotos', 2, send, true)
+        },
+        fotosUpdated(item) {
+            console.log(item)
         },
         async eliminar(item) {
             const resQst = await jqst('¿Está seguro de eliminar?')

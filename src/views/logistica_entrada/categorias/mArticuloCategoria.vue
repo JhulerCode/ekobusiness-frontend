@@ -1,18 +1,61 @@
 <template>
-    <JdModal modal="mArticuloCategoria" :buttons="buttons" @button-click="(action) => this[action]()">
+    <JdModal
+        modal="mArticuloCategoria"
+        :buttons="buttons"
+        @button-click="(action) => this[action]()"
+    >
         <div class="container-datos">
-            <JdInput label="Nombre" :nec="true" v-model="articulo_categoria.nombre" :disabled="modal.mode == 3" />
-            <JdTextArea label="Descripción" v-model="articulo_categoria.descripcion" :disabled="modal.mode == 3" />
-            <JdSwitch label="Activo" v-model="articulo_categoria.activo" :disabled="modal.mode == 3" />
+            <JdInput
+                label="Nombre"
+                :nec="true"
+                v-model="articulo_categoria.nombre"
+                :disabled="modal.mode == 3"
+            />
+
+            <JdTextArea
+                label="Descripción"
+                v-model="articulo_categoria.descripcion"
+                :disabled="modal.mode == 3"
+            />
+
+            <JdInputFile
+                label="Imagen"
+                accept="image/*"
+                v-model="articulo_categoria.imagen"
+                @handleFile="
+                    (file, blob) => ((articulo_categoria.archivo = file), (modal.blob = blob))
+                "
+                @deleteFile="((articulo_categoria.archivo = null), (modal.blob = null))"
+                :disabled="modal.mode == 3"
+            />
+
+            <JdSwitch
+                label="Activo"
+                v-model="articulo_categoria.activo"
+                :disabled="modal.mode == 3"
+            />
+
+            <div
+                v-if="articulo_categoria.archivo || articulo_categoria.imagen"
+                class="container-foto"
+            >
+                <img
+                    :src="modal.blob"
+                    :alt="articulo_categoria.nombre"
+                    v-if="articulo_categoria.archivo"
+                />
+                <img
+                    :src="`${urls.uploads}/${articulo_categoria.imagen}`"
+                    :alt="articulo_categoria.nombre"
+                    v-else
+                />
+            </div>
         </div>
     </JdModal>
 </template>
 
 <script>
-import JdModal from '@/components/JdModal.vue'
-import JdInput from '@/components/inputs/JdInput.vue'
-import JdTextArea from '@/components/inputs/JdTextArea.vue'
-import JdSwitch from '@/components/inputs/JdSwitch.vue'
+import { JdModal, JdInput, JdTextArea, JdSwitch, JdInputFile } from '@jhuler/components'
 
 import { useModals } from '@/pinia/modals'
 import { useVistas } from '@/pinia/vistas'
@@ -27,10 +70,12 @@ export default {
         JdInput,
         JdTextArea,
         JdSwitch,
+        JdInputFile,
     },
     data: () => ({
         useModals: useModals(),
         useVistas: useVistas(),
+        urls,
 
         modal: {},
         articulo_categoria: {},
@@ -50,35 +95,11 @@ export default {
         showButtons() {
             if (this.modal.mode == 1) {
                 this.buttons[0].show = true
-            }
-            else if (this.modal.mode == 2) {
+            } else if (this.modal.mode == 2) {
                 this.buttons[1].show = true
             }
         },
-        async crear() {
-            if (this.checkDatos()) return
 
-            this.buttons[0].spin = true
-            const res = await post(urls.articulo_categorias, this.articulo_categoria)
-            this.buttons[0].spin = false
-
-            if (res.code != 0) return
-
-            this.useVistas.addItem(this.articulo_categoria.tipo == 1 ? 'vArticuloCategorias' : 'vProductoCategorias', 'articulo_categorias', res.data)
-            this.useModals.show.mArticuloCategoria = false
-        },
-        async modificar() {
-            if (this.checkDatos()) return
-
-            this.buttons[1].spin = true
-            const res = await patch(urls.articulo_categorias, this.articulo_categoria)
-            this.buttons[1].spin = false
-
-            if (res.code != 0) return
-
-            this.useVistas.updateItem(this.articulo_categoria.tipo == 1 ? 'vArticuloCategorias' : 'vProductoCategorias', 'articulo_categorias', res.data)
-            this.useModals.show.mArticuloCategoria = false
-        },
         checkDatos() {
             if (incompleteData(this.articulo_categoria, ['tipo', 'nombre'])) {
                 jmsg('warning', 'Ingrese los datos necesarios')
@@ -87,7 +108,44 @@ export default {
 
             return false
         },
-    }
+        shapeDatos() {
+            if (this.articulo_categoria.archivo) this.articulo_categoria.formData = true
+        },
+        async crear() {
+            if (this.checkDatos()) return
+            this.shapeDatos()
+
+            this.buttons[0].spin = true
+            const res = await post(urls.articulo_categorias, this.articulo_categoria)
+            this.buttons[0].spin = false
+
+            if (res.code != 0) return
+
+            this.useVistas.addItem(
+                this.articulo_categoria.tipo == 1 ? 'vArticuloCategorias' : 'vProductoCategorias',
+                'articulo_categorias',
+                res.data,
+            )
+            this.useModals.show.mArticuloCategoria = false
+        },
+        async modificar() {
+            if (this.checkDatos()) return
+            this.shapeDatos()
+
+            this.buttons[1].spin = true
+            const res = await patch(urls.articulo_categorias, this.articulo_categoria)
+            this.buttons[1].spin = false
+
+            if (res.code != 0) return
+
+            this.useVistas.updateItem(
+                this.articulo_categoria.tipo == 1 ? 'vArticuloCategorias' : 'vProductoCategorias',
+                'articulo_categorias',
+                res.data,
+            )
+            this.useModals.show.mArticuloCategoria = false
+        },
+    },
 }
 </script>
 
@@ -96,5 +154,16 @@ export default {
     display: grid;
     grid-template-columns: 20rem;
     gap: 0.5rem;
+
+    .container-foto {
+        width: 20rem;
+        height: 20rem;
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    }
 }
 </style>

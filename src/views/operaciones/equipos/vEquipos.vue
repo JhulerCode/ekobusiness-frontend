@@ -21,10 +21,7 @@
 </template>
 
 <script>
-import JdButton from '@/components/inputs/JdButton.vue'
-import JdTable from '@/components/JdTable.vue'
-
-import mConfigFiltros from '@/components/mConfigFiltros.vue'
+import { JdButton, JdTable, mConfigFiltros } from '@jhuler/components'
 
 import mMaquina from '@/views/operaciones/maquinas/mMaquina.vue'
 

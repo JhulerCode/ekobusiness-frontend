@@ -16,26 +16,20 @@
     </div>
 
     <mDocumento v-if="useModals.show.mDocumento" />
-    <!-- <mUploadFiles v-if="useModals.show.mUploadFiles" @uploaded="handelUploadFiles" @deleted="handelDeleteFiles" /> -->
-    <mUploadFiles v-if="useModals.show.mUploadFiles" />
 
     <mConfigFiltros v-if="useModals.show.mConfigFiltros" />
 </template>
 
 <script>
-import JdButton from '@/components/inputs/JdButton.vue'
-import JdTable from '@/components/JdTable.vue'
-
-import mConfigFiltros from '@/components/mConfigFiltros.vue'
+import { JdButton, JdTable, mConfigFiltros } from '@jhuler/components'
 
 import mDocumento from '@/views/operaciones/documentos/mDocumento.vue'
-import mUploadFiles from '@/components/mUploadFiles.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
 import { useModals } from '@/pinia/modals'
 
-import { urls, get, delet, getFile } from '@/utils/crud'
+import { urls, get, delet } from '@/utils/crud'
 import { jqst } from '@/utils/swal'
 
 export default {
@@ -46,7 +40,6 @@ export default {
         mConfigFiltros,
 
         mDocumento,
-        mUploadFiles
     },
     data: () => ({
         useAuth: useAuth(),
@@ -194,7 +187,8 @@ export default {
             this.useModals.setModal('mDocumento', 'Editar registro sanitario', 2, res.data)
         },
         verFile(item) {
-            getFile(`${urls.documentos}/uploads/${item.file_name}`)
+            console.log(item)
+            // getFile(`${urls.documentos}/uploads/${item.file_name}`)
         },
         async eliminar(item) {
             const resQst = await jqst('¿Está seguro de eliminar?')

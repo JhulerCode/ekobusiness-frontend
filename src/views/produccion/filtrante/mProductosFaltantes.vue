@@ -15,8 +15,7 @@
 </template>
 
 <script>
-import JdModal from '@/components/JdModal.vue'
-import JdTable from '@/components/JdTable.vue'
+import { JdModal, JdTable } from '@jhuler/components'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'

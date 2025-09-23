@@ -27,11 +27,9 @@
 </template>
 
 <script>
-import JdButton from '@/components/inputs/JdButton.vue'
-import JdTable from '@/components/JdTable.vue'
+import { JdButton, JdTable } from '@jhuler/components'
 
 import mFormato from '@/views/calidad/formatos/mFormato.vue'
-// import mUploadFiles from '@/components/mUploadFiles.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
@@ -46,7 +44,6 @@ export default {
         JdTable,
 
         mFormato,
-        // mUploadFiles
     },
     data: () => ({
         useAuth: useAuth(),

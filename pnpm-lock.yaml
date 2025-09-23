@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@jhuler/components':
+        specifier: ^1.0.2
+        version: 1.0.2(vue@3.5.17)
       dayjs:
         specifier: ^1.11.13
         version: 1.11.13
@@ -855,6 +858,11 @@ packages:
   '@humanwhocodes/retry@0.4.3':
     resolution: {integrity: sha512-bV0Tgo9K4hfPCek+aMAn81RppFKv2ySDQeMoSZuvTASywNTnVJCArCZE2FWqpvIatKu7VMRLWlR1EazvVhDyhQ==}
     engines: {node: '>=18.18'}
+
+  '@jhuler/components@1.0.2':
+    resolution: {integrity: sha512-V1NAs2gGFOVcDd0Kty+N0qA3hTZWIp5QvgRjerav783BFn5okf5krgRkvVeQ8VmbM68XtjD1re6r85miHHafng==}
+    peerDependencies:
+      vue: ^3.0.0
 
   '@jridgewell/gen-mapping@0.3.12':
     resolution: {integrity: sha512-OuLGC46TjB5BbN1dH8JULVVZY4WTdkF7tV9Ys6wLL1rubZnCMstOhNHueU5bLCrnRuDhKPDM4g6sw4Bel5Gzqg==}
@@ -3979,6 +3987,10 @@ snapshots:
   '@humanwhocodes/retry@0.3.1': {}
 
   '@humanwhocodes/retry@0.4.3': {}
+
+  '@jhuler/components@1.0.2(vue@3.5.17)':
+    dependencies:
+      vue: 3.5.17
 
   '@jridgewell/gen-mapping@0.3.12':
     dependencies:

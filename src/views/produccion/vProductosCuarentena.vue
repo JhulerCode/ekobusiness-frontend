@@ -26,8 +26,7 @@
 </template>
 
 <script>
-import JdTable from '@/components/JdTable.vue'
-import mConfigFiltros from '@/components/mConfigFiltros.vue'
+import { JdTable, mConfigFiltros } from '@jhuler/components'
 
 import mFormato from '@/views/calidad/formatos/mFormato.vue'
 import mProduccionTrazabilidad from '@/views/produccion/historial/mProduccionTrazabilidad.vue'

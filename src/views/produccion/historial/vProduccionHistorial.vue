@@ -37,9 +37,7 @@
 </template>
 
 <script>
-import JdTable from '@/components/JdTable.vue'
-import JdButton from '@/components/inputs/JdButton.vue'
-import mConfigFiltros from '@/components/mConfigFiltros.vue'
+import { JdTable, JdButton, mConfigFiltros } from '@jhuler/components'
 
 import mProduccionOrden from '@/views/produccion/historial/mProduccionOrden.vue'
 import mProduccionInsumos from '@/views/produccion/historial/mProduccionInsumos.vue'

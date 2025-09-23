@@ -22,11 +22,7 @@
 </template>
 
 <script>
-import JdTable from '@/components/JdTable.vue'
-import JdButton from '@/components/inputs/JdButton.vue'
-import mConfigCols from '@/components/mConfigCols.vue'
-import mConfigFiltros from '@/components/mConfigFiltros.vue'
-import mEditar from '@/components/mEditar.vue'
+import { JdButton, JdTable, mConfigFiltros, mConfigCols, mEditar } from '@jhuler/components'
 
 import mSocio from '@/views/logistica_entrada/proveedores/mSocio.vue'
 

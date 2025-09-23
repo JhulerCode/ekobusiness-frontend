@@ -120,12 +120,7 @@
 </template>
 
 <script>
-import JdModal from '@/components/JdModal.vue'
-import JdInput from '@/components/inputs/JdInput.vue'
-import JdSelect from '@/components/inputs/JdSelect.vue'
-import JdSelectQuery from '@/components/inputs/JdSelectQuery.vue'
-import JdButton from '@/components/inputs/JdButton.vue'
-import JdTable from '@/components/JdTable.vue'
+import { JdModal, JdInput, JdSelect, JdSelectQuery, JdButton, JdTable } from '@jhuler/components'
 import mProduccionInsumosDevolucion from '@/views/produccion/historial/mProduccionInsumosDevolucion.vue'
 
 import { useAuth } from '@/pinia/auth'

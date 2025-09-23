@@ -48,10 +48,7 @@
 </template>
 
 <script>
-import JdModal from '@/components/JdModal.vue'
-import JdButton from '@/components/inputs/JdButton.vue'
-import JdInput from '@/components/inputs/JdInput.vue'
-import JdTable from '@/components/JdTable.vue'
+import { JdModal, JdInput, JdButton, JdTable } from '@jhuler/components'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'

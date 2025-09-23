@@ -137,10 +137,7 @@
 </template>
 
 <script>
-import JdModal from '@/components/JdModal.vue'
-import JdInput from '@/components/inputs/JdInput.vue'
-import JdSelect from '@/components/inputs/JdSelect.vue'
-import JdTextArea from '@/components/inputs/JdTextArea.vue'
+import { JdModal, JdInput, JdSelect, JdTextArea } from '@jhuler/components'
 
 import mTransaccionItems from './mTransaccionItems.vue'
 

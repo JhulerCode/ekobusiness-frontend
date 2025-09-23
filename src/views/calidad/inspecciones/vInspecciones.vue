@@ -16,19 +16,13 @@
     </div>
 
     <mInspeccion v-if="useModals.show.mInspeccion" />
-    <!-- <mUploadFiles v-if="useModals.show.mUploadFiles" @uploaded="handelUploadFiles" @deleted="handelDeleteFiles" /> -->
-
     <mConfigFiltros v-if="useModals.show.mConfigFiltros" />
 </template>
 
 <script>
-import JdButton from '@/components/inputs/JdButton.vue'
-import JdTable from '@/components/JdTable.vue'
-
-import mConfigFiltros from '@/components/mConfigFiltros.vue'
+import { JdButton, JdTable, mConfigFiltros } from '@jhuler/components'
 
 import mInspeccion from './mInspeccion.vue'
-// import mUploadFiles from '@/components/mUploadFiles.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
@@ -46,7 +40,6 @@ export default {
         mConfigFiltros,
 
         mInspeccion,
-        // mUploadFiles
     },
     data: () => ({
         useAuth: useAuth(),

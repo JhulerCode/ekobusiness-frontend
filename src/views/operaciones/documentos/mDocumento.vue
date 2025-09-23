@@ -23,10 +23,7 @@
 </template>
 
 <script>
-import JdModal from '@/components/JdModal.vue'
-import JdInput from '@/components/inputs/JdInput.vue'
-import JdTextArea from '@/components/inputs/JdTextArea.vue'
-import JdInputFile from '@/components/inputs/JdInputFile.vue'
+import { JdModal, JdInput, JdTextArea, JdInputFile } from '@jhuler/components'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'

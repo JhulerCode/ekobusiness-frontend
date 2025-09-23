@@ -6,6 +6,7 @@ const host = import.meta.env.VITE_API_HOST
 
 const urls = {
     signin: `${host}/signin`,
+    uploads: `${host}/uploads`,
 
     sistema: `${host}/api/sistema`,
 
@@ -34,11 +35,11 @@ const urls = {
     transacciones: `${host}/api/transacciones`,
 }
 
-async function get(url, is_file) {
-    let query
+async function get(url) {
+    let response
 
     try {
-        query = await fetch(url, {
+        response = await fetch(url, {
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${useAuth().token}`,
@@ -49,44 +50,54 @@ async function get(url, is_file) {
         return { code: -2 }
     }
 
-    if (query.status == 401) {
+    if (response.status == 401) {
         jmsg('error', 'Acceso denegado: autenticación incorrecta')
         useModals().setModal('mLogin', 'Sesión terminada', null, null)
         return { code: 401 }
     }
 
-    if (query.status == 403) {
+    if (response.status == 403) {
         jmsg('error', 'Acceso denegado: permisos insuficientes')
         return { code: 403 }
     }
 
-    if (query.status == 404) {
+    if (response.status == 404) {
         jmsg('error', 'Recurso no encontrado')
         return { code: 404 }
     }
 
-    if (is_file) {
-        const blob = await query.blob()
-        return blob
+    const contentType = response.headers.get("Content-Type")
+    if (contentType && contentType.includes("application/json")) {
+        const data = await response.json()
+
+        if (data.code == -1) jmsg('error', 'Algo salió mal')
+
+        if (data.code > 0) jmsg('error', data.msg)
+
+        return data
     }
-
-    const res = await query.json()
-
-    if (res.code == -1) jmsg('error', 'Algo salió mal')
-
-    if (res.code > 0) jmsg('error', res.msg)
-
-    return res
+    else {
+        const blob = await response.blob()
+        return blob
+        // const fileName = response.headers
+        //     .get("Content-Disposition")
+        //     ?.split("filename=")[1]
+        //     ?.replace(/"/g, "")
+        // saveAs(blob, fileName)
+    }
 }
 
 function setFormData(item) {
-    const formData = new FormData();
+    const formData = new FormData()
 
-    for (const key in item) {
-        const value = item[key];
+    // for (const key in item) {
+    //     const value = item[key];
 
-        formData.append(key, value);
-    }
+    //     formData.append(key, value);
+    // }
+    const { archivo, ...resto } = item
+    formData.append('archivo', archivo)
+    formData.append("datos", JSON.stringify(resto))
 
     return formData
 }
@@ -226,25 +237,6 @@ async function delet(url, item, ms) {
     return res
 }
 
-async function getFile(url) {
-    const response = await fetch(url, {
-        headers: {
-            method: 'GET',
-            Authorization: `Bearer ${useAuth().token}`,
-        }
-    })
-
-    if (!response.ok) {
-        jmsg('error', 'Archivo no encontrado')
-        return
-    }
-
-    const blob = await response.blob()
-    const newuri = window.URL.createObjectURL(blob)
-
-    window.open(newuri, '_blank')
-}
-
 export {
     host,
     urls,
@@ -252,5 +244,4 @@ export {
     post,
     patch,
     delet,
-    getFile,
 }

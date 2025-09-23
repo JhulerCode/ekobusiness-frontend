@@ -33,11 +33,7 @@
 </template>
 
 <script>
-import JdButton from '@/components/inputs/JdButton.vue'
-import JdTable from '@/components/JdTable.vue'
-
-import mConfigCols from '@/components/mConfigCols.vue'
-import mConfigFiltros from '@/components/mConfigFiltros.vue'
+import { JdButton, JdTable, mConfigFiltros, mConfigCols } from '@jhuler/components'
 
 import mCajaApertura from './mCajaApertura.vue'
 

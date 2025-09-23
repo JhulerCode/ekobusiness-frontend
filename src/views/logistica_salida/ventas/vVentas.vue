@@ -27,14 +27,9 @@
 </template>
 
 <script>
-import JdButton from '@/components/inputs/JdButton.vue'
-import JdTable from '@/components/JdTable.vue'
-import mAnular from '@/components/mAnular.vue'
+import { JdButton, JdTable, mConfigFiltros, mConfigCols, mAnular } from '@jhuler/components'
 
-import mConfigCols from '@/components/mConfigCols.vue'
-import mConfigFiltros from '@/components/mConfigFiltros.vue'
 import mFormato from '@/views/calidad/formatos/mFormato.vue'
-
 import mTransaccion from '@/views/logistica_entrada/compras/mTransaccion.vue'
 
 import { useAuth } from '@/pinia/auth'

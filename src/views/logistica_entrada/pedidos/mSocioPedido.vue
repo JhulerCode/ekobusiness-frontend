@@ -143,11 +143,8 @@
 </template>
 
 <script>
-import JdModal from '@/components/JdModal.vue'
-import JdInput from '@/components/inputs/JdInput.vue'
-import JdSelect from '@/components/inputs/JdSelect.vue'
-import JdTextArea from '@/components/inputs/JdTextArea.vue'
-import JdSwitch from '@/components/inputs/JdSwitch.vue'
+import { JdModal, JdInput, JdSelect, JdTextArea, JdSwitch } from '@jhuler/components'
+
 import mSocioPedidoItems from './mSocioPedidoItems.vue'
 
 import { useAuth } from '@/pinia/auth'
@@ -167,6 +164,7 @@ export default {
         JdSelect,
         JdTextArea,
         JdSwitch,
+
         mSocioPedidoItems,
     },
     data: () => ({

@@ -75,11 +75,7 @@
 </template>
 
 <script>
-import JdModal from '@/components/JdModal.vue'
-import JdSelectQuery from '@/components/inputs/JdSelectQuery.vue'
-import JdInput from '@/components/inputs/JdInput.vue'
-import JdButton from '@/components/inputs/JdButton.vue'
-import JdTable from '@/components/JdTable.vue'
+import { JdModal, JdTable, JdButton, JdInput, JdSelectQuery } from '@jhuler/components'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'

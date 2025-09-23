@@ -72,8 +72,7 @@
 </template>
 
 <script>
-import JdTable from '@/components/JdTable.vue'
-import JdButton from '@/components/inputs/JdButton.vue'
+import { JdTable, JdButton } from '@jhuler/components'
 
 import mProduccionOrden from '@/views/produccion/historial/mProduccionOrden.vue'
 import mProduccionInsumos from '@/views/produccion/historial/mProduccionInsumos.vue'

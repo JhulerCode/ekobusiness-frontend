@@ -16,10 +16,11 @@
 </template>
 
 <script>
+import { mLogin } from '@jhuler/components'
+
 import MainHead from '@/views/_consola/header/MainHead.vue'
 import SideBar from '@/views/_consola/sidebar/SideBar.vue'
 import MainCenter from '@/views/_consola/center/MainCenter.vue'
-import mLogin from '@/components/mLogin.vue'
 
 import mUserMenu from './header/mUserMenu.vue'
 import mUserPreferences from './header/mUserPreferences.vue'

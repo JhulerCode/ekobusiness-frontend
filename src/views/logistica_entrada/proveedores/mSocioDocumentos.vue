@@ -24,11 +24,7 @@
 </template>
 
 <script>
-import JdInput from '@/components/inputs/JdInput.vue'
-import JdTextArea from '@/components/inputs/JdTextArea.vue'
-// import JdSwitch from '@/components/inputs/JdSwitch.vue'
-import JdTable from '@/components/JdTable.vue'
-import JdButton from '@/components/inputs/JdButton.vue'
+import { JdInput, JdTable, JdButton, JdTextArea } from '@jhuler/components'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'

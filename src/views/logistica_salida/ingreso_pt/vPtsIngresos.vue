@@ -28,10 +28,7 @@
 </template>
 
 <script>
-import JdButton from '@/components/inputs/JdButton.vue'
-import JdTable from '@/components/JdTable.vue'
-
-import mConfigFiltros from '@/components/mConfigFiltros.vue'
+import { JdButton, JdTable, mConfigFiltros } from '@jhuler/components'
 
 import mProductosCuarentena from '@/views/logistica_salida/ingreso_pt/mProductosCuarentena.vue'
 

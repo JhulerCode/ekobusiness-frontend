@@ -98,11 +98,7 @@
 </template>
 
 <script>
-import JdInput from '@/components/inputs/JdInput.vue'
-import JdSelectQuery from '@/components/inputs/JdSelectQuery.vue'
-import JdSelect from '@/components/inputs/JdSelect.vue'
-import JdButton from '@/components/inputs/JdButton.vue'
-import JdTable from '@/components/JdTable.vue'
+import { JdInput, JdSelect, JdSelectQuery, JdButton, JdTable } from '@jhuler/components'
 
 import mPreciosLista from '@/views/logistica_entrada/pedidos/mPreciosLista.vue'
 import mPedidoItems from '@/views/logistica_entrada/compras/mPedidoItems.vue'

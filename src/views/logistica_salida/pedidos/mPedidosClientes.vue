@@ -28,10 +28,7 @@
 </template>
 
 <script>
-import JdModal from '@/components/JdModal.vue'
-import JdTable from '@/components/JdTable.vue'
-import JdSelect from '@/components/inputs/JdSelect.vue'
-import JdButton from '@/components/inputs/JdButton.vue'
+import { JdModal, JdSelect, JdTable, JdButton } from '@jhuler/components'
 
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'

@@ -557,6 +557,7 @@ export default {
             const send = {
                 item: {
                     id: item.id,
+                    nombre: item.nombre,
                     archivos: item.fotos || [],
                 },
                 accept: 'image/*',

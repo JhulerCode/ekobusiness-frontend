@@ -1,5 +1,9 @@
 <template>
     <JdModal modal="mUploadFiles">
+        <div v-if="modal.item.nombre" class="mrg-btm1">
+            {{ modal.item.nombre }}
+        </div>
+
         <div class="buttons">
             <input
                 type="file"
@@ -38,12 +42,13 @@
 
                 <template v-else>
                     <div class="container-foto">
-                        <img :src="`${host}/uploads/${a.id}`" />
+                        <!-- <img :src="`${host}/uploads/${a.id}`" /> -->
+                        <img :src="a.url" />
                     </div>
                 </template>
 
                 <div class="file-name">
-                    <small>{{ a.orden }} {{ a.name }}</small>
+                    <small>{{ a.name }}</small>
                 </div>
 
                 <div class="act-delete">
@@ -107,6 +112,7 @@ export default {
                     id: a.id,
                     orden: a.orden,
                     name: a.name,
+                    url: a.url,
                 })),
             }
 

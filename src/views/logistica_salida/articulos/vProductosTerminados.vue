@@ -59,7 +59,7 @@
     <mCombo v-if="useModals.show.mCombo" />
     <mKardex v-if="useModals.show.mKardex" />
     <mAjusteStock v-if="useModals.show.mAjusteStock" />
-    <mUploadFiles v-if="useModals.show.mUploadFiles" @updated="fotosUpdated" />
+    <mUploadFiles v-if="useModals.show.mUploadFiles" />
 
     <mConfigCols v-if="useModals.show.mConfigCols" />
     <mConfigFiltros v-if="useModals.show.mConfigFiltros" />
@@ -569,9 +569,6 @@ export default {
             }
 
             this.useModals.setModal('mUploadFiles', 'Actualizar fotos', 2, send, true)
-        },
-        fotosUpdated(item) {
-            console.log(item)
         },
         async eliminar(item) {
             const resQst = await jqst('¿Está seguro de eliminar?')

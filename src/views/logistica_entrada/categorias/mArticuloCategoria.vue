@@ -18,38 +18,17 @@
                 :disabled="modal.mode == 3"
             />
 
-            <JdInputFile
-                label="Imagen"
-                accept="image/*"
-                v-model="articulo_categoria.imagen"
-                @handleFile="
-                    (file, blob) => ((articulo_categoria.archivo = file), (modal.blob = blob))
-                "
-                @deleteFile="((articulo_categoria.archivo = null), (modal.blob = null))"
-                :disabled="modal.mode == 3"
-            />
-
             <JdSwitch
                 label="Activo"
                 v-model="articulo_categoria.activo"
                 :disabled="modal.mode == 3"
             />
 
-            <div
-                v-if="articulo_categoria.archivo || articulo_categoria.imagen"
-                class="container-foto"
-            >
-                <img
-                    :src="modal.blob"
-                    :alt="articulo_categoria.nombre"
-                    v-if="articulo_categoria.archivo"
-                />
-                <img
-                    :src="`${urls.uploads}/${articulo_categoria.imagen}`"
-                    :alt="articulo_categoria.nombre"
-                    v-else
-                />
-            </div>
+            <JdSwitch
+                label="Destacado"
+                v-model="articulo_categoria.is_destacado"
+                :disabled="modal.mode == 3"
+            />
         </div>
     </JdModal>
 </template>
@@ -154,7 +133,7 @@ export default {
 <style lang="scss" scoped>
 .container-datos {
     display: grid;
-    grid-template-columns: 20rem;
+    grid-template-columns: 30rem;
     gap: 0.5rem;
 
     .container-foto {

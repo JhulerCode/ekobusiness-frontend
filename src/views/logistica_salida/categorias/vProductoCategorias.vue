@@ -106,12 +106,12 @@ export default {
             },
         ],
         tableRowOptions: [
-            {
-                label: 'Ver',
-                icon: 'fa-regular fa-folder-open',
-                action: 'ver',
-                permiso: 'vProductoCategorias_ver',
-            },
+            // {
+            //     label: 'Ver',
+            //     icon: 'fa-regular fa-folder-open',
+            //     action: 'ver',
+            //     permiso: 'vProductoCategorias:ver',
+            // },
             {
                 label: 'Editar',
                 icon: 'fa-solid fa-pen-to-square',
@@ -128,7 +128,7 @@ export default {
                 label: 'Actualizar fotos',
                 icon: 'fa-solid fa-image',
                 action: 'openUploadFiles',
-                permiso: 'vProductos:actualizarFotos',
+                permiso: 'vProductoCategorias:actualizarFotos',
             },
         ],
     }),

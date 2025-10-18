@@ -167,6 +167,7 @@ export const useAuth = defineStore('auth', {
                             { id: 'vProductoCategorias:crear', label: 'Crear' },
                             { id: 'vProductoCategorias:editar', label: 'Editar' },
                             { id: 'vProductoCategorias:eliminar', label: 'Eliminar' },
+                            { id: 'vProductoCategorias:actualizarFotos', label: 'Actualizar fotos' },
                         ]
                     },
                     {

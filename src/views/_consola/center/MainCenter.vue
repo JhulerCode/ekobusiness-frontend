@@ -16,6 +16,7 @@
         <vPtsIngresos v-if="useVistas.show.vPtsIngresos" />
         <vVentaPedidos v-if="useVistas.show.vVentaPedidos" />
         <vVentas v-if="useVistas.show.vVentas" />
+        <vVentaItems v-if="useVistas.show.vVentaItems" />
 
         <vProgramaFiltrantes v-if="useVistas.show.vProgramaFiltrantes" />
         <vProgramaGranel v-if="useVistas.show.vProgramaGranel" />
@@ -61,6 +62,7 @@ import vProductosTerminados from '@/views/logistica_salida/articulos/vProductosT
 import vPtsIngresos from '@/views/logistica_salida/ingreso_pt/vPtsIngresos.vue'
 import vVentaPedidos from '@/views/logistica_salida/pedidos/vVentaPedidos.vue'
 import vVentas from '@/views/logistica_salida/ventas/vVentas.vue'
+import vVentaItems from '@/views/logistica_salida/venta_items/vVentaItems.vue'
 
 // ----- PRODUCCIÓN ----- //
 import vProgramaFiltrantes from '@/views/produccion/filtrante/vProgramaFiltrantes.vue'
@@ -107,6 +109,7 @@ export default {
         vPtsIngresos,
         vVentaPedidos,
         vVentas,
+        vVentaItems,
 
         vProgramaFiltrantes,
         vProgramaGranel,
@@ -130,8 +133,8 @@ export default {
         vActivityLogs,
     },
     data: () => ({
-        useVistas: useVistas()
-    })
+        useVistas: useVistas(),
+    }),
 }
 </script>
 
@@ -147,7 +150,7 @@ export default {
         padding: 2rem 2rem;
         border-radius: 0.5rem;
 
-        >.head {
+        > .head {
             margin-bottom: 1rem;
             display: flex;
             justify-content: space-between;

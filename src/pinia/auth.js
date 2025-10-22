@@ -28,6 +28,7 @@ export const useAuth = defineStore('auth', {
                     { label: 'Productos terminados', goto: 'vProductosTerminados' },
                     { label: 'Ingreso de productos', goto: 'vPtsIngresos' },
                     { label: 'Pedidos de venta', goto: 'vVentaPedidos' },
+                    { label: 'Pedidos de venta detalle', goto: 'vVentaPedidoItems' },
                     { label: 'Ventas', goto: 'vVentas' },
                     { label: 'Ventas detalle', goto: 'vVentaItems' },
                 ]
@@ -147,7 +148,7 @@ export const useAuth = defineStore('auth', {
                             { id: 'vCompraItems:listar', label: 'Listar' },
                             { id: 'vCompraItems:inspeccion', label: 'Inspeccionar' },
                         ]
-                    }
+                    },
                 ]
             },
             {
@@ -219,6 +220,11 @@ export const useAuth = defineStore('auth', {
                         ]
                     },
                     {
+                        id: 'vVentaPedidoItems', label: 'Pedidos de venta detalle', permisos: [
+                            { id: 'vVentaPedidoItems:listar', label: 'Listar' },
+                        ]
+                    },
+                    {
                         id: 'vVentas', label: 'Ventas', permisos: [
                             { id: 'vVentas:listar', label: 'Listar' },
                             { id: 'vVentas:crear', label: 'Crear' },
@@ -231,7 +237,7 @@ export const useAuth = defineStore('auth', {
                         id: 'vVentaItems', label: 'Ventas detalle', permisos: [
                             { id: 'vVentaItems:listar', label: 'Listar' },
                         ]
-                    }
+                    },
                 ]
             },
             {

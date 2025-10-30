@@ -79,7 +79,12 @@
                     style="grid-column: 1/5"
                 />
 
-                <JdSwitch label="Pagado?" v-model="modal.item.pagado" style="grid-column: 1/5" />
+                <JdSwitch
+                    label="Pagado?"
+                    v-model="modal.item.pagado"
+                    :disabled="modal.mode == 3"
+                    style="grid-column: 1/5"
+                />
             </div>
         </div>
 

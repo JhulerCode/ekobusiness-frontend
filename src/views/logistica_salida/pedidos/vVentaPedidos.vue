@@ -223,6 +223,7 @@ export default {
                 icon: 'fa-solid fa-trash-can',
                 action: 'eliminar',
                 permiso: 'vVentaPedidos:eliminar',
+                ocultar: { pagado: true },
             },
             {
                 label: 'Exportar en PDF',

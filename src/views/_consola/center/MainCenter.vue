@@ -11,6 +11,7 @@
         <vCompraItems v-if="useVistas.show.vCompraItems" />
 
         <vClientes v-if="useVistas.show.vClientes" />
+        <vProductoLineas v-if="useVistas.show.vProductoLineas" />
         <vProductoCategorias v-if="useVistas.show.vProductoCategorias" />
         <vProductosTerminados v-if="useVistas.show.vProductosTerminados" />
         <vPtsIngresos v-if="useVistas.show.vPtsIngresos" />
@@ -58,6 +59,7 @@ import vCompraItems from '@/views/logistica_entrada/compra_items/vCompraItems.vu
 
 // ----- LOGISTICA SALIDA ----- //
 import vClientes from '@/views/logistica_salida/clientes/vClientes.vue'
+import vProductoLineas from '@/views/logistica_salida/lineas/vProductoLineas.vue'
 import vProductoCategorias from '@/views/logistica_salida/categorias/vProductoCategorias.vue'
 import vProductosTerminados from '@/views/logistica_salida/articulos/vProductosTerminados.vue'
 import vPtsIngresos from '@/views/logistica_salida/ingreso_pt/vPtsIngresos.vue'
@@ -106,6 +108,7 @@ export default {
         vCompraItems,
 
         vClientes,
+        vProductoLineas,
         vProductoCategorias,
         vProductosTerminados,
         vPtsIngresos,

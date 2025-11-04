@@ -87,9 +87,9 @@ export default {
         async crear() {
             if (this.checkDatos()) return
 
-            this.buttons[0].spin = true
+            this.useAuth.setLoading(true)
             const res = await post(urls.precio_listas, this.precio_lista)
-            this.buttons[0].spin = false
+            this.useAuth.setLoading(false)
 
             if (res.code != 0) return
 
@@ -99,9 +99,9 @@ export default {
         async modificar() {
             if (this.checkDatos()) return
 
-            this.buttons[1].spin = true
+            this.useAuth.setLoading(true)
             const res = await patch(urls.precio_listas, this.precio_lista)
-            this.buttons[1].spin = false
+            this.useAuth.setLoading(false)
 
             if (res.code != 0) return
 

@@ -24,6 +24,7 @@ export const useAuth = defineStore('auth', {
             {
                 label: 'Logística de salida', icon: 'fa-solid fa-truck', children: [
                     { label: 'Clientes', goto: 'vClientes' },
+                    { label: 'Líneas de productos', goto: 'vProductoLineas' },
                     { label: 'Categorías de productos', goto: 'vProductoCategorias' },
                     { label: 'Productos terminados', goto: 'vProductosTerminados' },
                     { label: 'Ingreso de productos', goto: 'vPtsIngresos' },
@@ -160,6 +161,15 @@ export const useAuth = defineStore('auth', {
                             { id: 'vClientes:ver', label: 'Ver' },
                             { id: 'vClientes:editar', label: 'Editar' },
                             { id: 'vClientes:eliminar', label: 'Eliminar' },
+                        ]
+                    },
+                    {
+                        id: 'vProductoLineas', label: 'Líneas de productos', permisos: [
+                            { id: 'vProductoLineas:listar', label: 'Listar' },
+                            { id: 'vProductoLineas:crear', label: 'Crear' },
+                            { id: 'vProductoLineas:editar', label: 'Editar' },
+                            { id: 'vProductoLineas:eliminar', label: 'Eliminar' },
+                            { id: 'vProductoLineas:actualizarFotos', label: 'Actualizar fotos' },
                         ]
                     },
                     {

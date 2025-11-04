@@ -11,6 +11,7 @@ const urls = {
     sistema: `${host}/api/sistema`,
 
     activity_logs: `${host}/api/activity_logs`,
+    articulo_lineas: `${host}/api/articulo_lineas`,
     articulo_categorias: `${host}/api/articulo_categorias`,
     articulos: `${host}/api/articulos`,
     caja_aperturas: `${host}/api/caja_aperturas`,

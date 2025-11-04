@@ -1,34 +1,20 @@
 <template>
-    <JdModal
-        modal="mArticuloCategoria"
-        :buttons="buttons"
-        @button-click="(action) => this[action]()"
-    >
+    <JdModal modal="mArticuloLinea" :buttons="buttons" @button-click="(action) => this[action]()">
         <div class="container-datos">
             <JdInput
                 label="Nombre"
                 :nec="true"
-                v-model="articulo_categoria.nombre"
+                v-model="articulo_linea.nombre"
                 :disabled="modal.mode == 3"
             />
 
             <JdTextArea
                 label="Descripción"
-                v-model="articulo_categoria.descripcion"
+                v-model="articulo_linea.descripcion"
                 :disabled="modal.mode == 3"
             />
 
-            <JdSwitch
-                label="Activo"
-                v-model="articulo_categoria.activo"
-                :disabled="modal.mode == 3"
-            />
-
-            <JdSwitch
-                label="Destacado"
-                v-model="articulo_categoria.is_destacado"
-                :disabled="modal.mode == 3"
-            />
+            <JdSwitch label="Activo" v-model="articulo_linea.activo" :disabled="modal.mode == 3" />
         </div>
     </JdModal>
 </template>
@@ -58,7 +44,7 @@ export default {
         urls,
 
         modal: {},
-        articulo_categoria: {},
+        articulo_linea: {},
 
         buttons: [
             { text: 'Grabar', action: 'crear', spin: false },
@@ -66,8 +52,8 @@ export default {
         ],
     }),
     created() {
-        this.modal = this.useModals.mArticuloCategoria
-        this.articulo_categoria = this.useModals.mArticuloCategoria.item
+        this.modal = this.useModals.mArticuloLinea
+        this.articulo_linea = this.useModals.mArticuloLinea.item
 
         this.showButtons()
     },
@@ -81,7 +67,7 @@ export default {
         },
 
         checkDatos() {
-            if (incompleteData(this.articulo_categoria, ['tipo', 'nombre'])) {
+            if (incompleteData(this.articulo_linea, ['nombre'])) {
                 jmsg('warning', 'Ingrese los datos necesarios')
                 return true
             }
@@ -92,33 +78,25 @@ export default {
             if (this.checkDatos()) return
 
             this.useAuth.setLoading(true)
-            const res = await post(urls.articulo_categorias, this.articulo_categoria)
+            const res = await post(urls.articulo_lineas, this.articulo_linea)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
 
-            this.useVistas.addItem(
-                this.articulo_categoria.tipo == 1 ? 'vArticuloCategorias' : 'vProductoCategorias',
-                'articulo_categorias',
-                res.data,
-            )
-            this.useModals.show.mArticuloCategoria = false
+            this.useVistas.addItem('vProductoLineas', 'articulo_lineas', res.data)
+            this.useModals.show.mArticuloLinea = false
         },
         async modificar() {
             if (this.checkDatos()) return
 
             this.useAuth.setLoading(true)
-            const res = await patch(urls.articulo_categorias, this.articulo_categoria)
+            const res = await patch(urls.articulo_lineas, this.articulo_linea)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
 
-            this.useVistas.updateItem(
-                this.articulo_categoria.tipo == 1 ? 'vArticuloCategorias' : 'vProductoCategorias',
-                'articulo_categorias',
-                res.data,
-            )
-            this.useModals.show.mArticuloCategoria = false
+            this.useVistas.updateItem('vProductoLineas', 'articulo_lineas', res.data)
+            this.useModals.show.mArticuloLinea = false
         },
     },
 }

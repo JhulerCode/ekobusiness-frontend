@@ -6,7 +6,7 @@
                     label="Tipo de producción"
                     :nec="true"
                     v-model="articulo.produccion_tipo"
-                    :lista="modal.produccion_tipos"
+                    :lista="modal.articulo_lineas"
                     v-if="articulo.tipo == 2"
                     style="grid-column: 1/3"
                 />
@@ -53,7 +53,7 @@
                 />
 
                 <JdInput
-                    label="Contenido neto"
+                    label="Contenido neto (g)"
                     type="number"
                     :nec="true"
                     v-model="articulo.contenido_neto"
@@ -247,6 +247,7 @@ export default {
 
         this.showButtons()
 
+        this.loadLineas()
         this.loadCategorias()
         this.loadDatosSistema()
     },
@@ -259,6 +260,22 @@ export default {
             }
         },
 
+        async loadLineas() {
+            const qry = {
+                fltr: {
+                    activo: { op: 'Es', val: true },
+                },
+            }
+
+            this.modal.articulo_lineas = []
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.articulo_lineas}?qry=${JSON.stringify(qry)}`)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            this.modal.articulo_lineas = res.data
+        },
         async loadCategorias() {
             const qry = {
                 fltr: {
@@ -277,7 +294,7 @@ export default {
             this.modal.articulo_categorias = res.data
         },
         async loadDatosSistema() {
-            const qry = ['produccion_tipos', 'igv_afectaciones', 'unidades']
+            const qry = ['igv_afectaciones', 'unidades']
             const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
 
             if (res.code != 0) return
@@ -326,6 +343,10 @@ export default {
 
             if (this.articulo.produccion_tipo == 2) {
                 this.articulo.filtrantes = null
+            }
+
+            if (this.articulo.precio_anterior == '') {
+                this.articulo.precio_anterior = null
             }
         },
         async crear() {

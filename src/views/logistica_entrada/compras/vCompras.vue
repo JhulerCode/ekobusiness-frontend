@@ -28,8 +28,7 @@
             :reload="loadTransacciones"
             :rowOptions="tableRowOptions"
             @rowOptionSelected="runMethod"
-        >
-        </JdTable>
+        />
     </div>
 
     <mTransaccion v-if="useModals.show.mTransaccion" />
@@ -197,7 +196,7 @@ export default {
         setQuery() {
             this.vista.qry = {
                 fltr: { tipo: { op: 'Es', val: 1 } },
-                incl: ['socio_pedido1']
+                incl: ['socio_pedido1'],
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)

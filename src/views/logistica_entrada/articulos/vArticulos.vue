@@ -50,6 +50,7 @@
     <mImportarArticulos v-if="useModals.show.mImportarArticulos" />
     <mArticulo v-if="useModals.show.mArticulo" />
     <mKardex v-if="useModals.show.mKardex" />
+    <mLotes v-if="useModals.show.mLotes" />
     <mAjusteStock v-if="useModals.show.mAjusteStock" />
 
     <mConfigCols v-if="useModals.show.mConfigCols" />
@@ -63,6 +64,7 @@ import { JdButton, JdTable, mConfigFiltros, mConfigCols, mEditar } from '@jhuler
 import mImportarArticulos from '@/views/logistica_entrada/articulos/mImportarArticulos.vue'
 import mArticulo from '@/views/logistica_entrada/articulos/mArticulo.vue'
 import mKardex from '@/views/logistica_entrada/articulos/mKardex.vue'
+import mLotes from '@/views/logistica_entrada/articulos/mLotes.vue'
 import mAjusteStock from '@/views/logistica_entrada/articulos/mAjusteStock.vue'
 
 import { useAuth } from '@/pinia/auth'
@@ -86,6 +88,7 @@ export default {
         mImportarArticulos,
         mArticulo,
         mKardex,
+        mLotes,
         mAjusteStock,
     },
     data: () => ({
@@ -230,6 +233,12 @@ export default {
                 icon: 'fa-solid fa-table-list',
                 action: 'verKardex',
                 permiso: 'vArticulos:kardex',
+            },
+            {
+                label: 'Ver lotes',
+                icon: 'fa-solid fa-table-list',
+                action: 'verLotes',
+                permiso: 'vProductosTerminados:lotes',
             },
             {
                 label: 'Ajuste stock',
@@ -457,7 +466,7 @@ export default {
                 id: null,
             }
 
-            this.useModals.setModal('mArticulo', 'Nuevo articulo', 1, send)
+            this.useModals.setModal('mArticulo', 'Nuevo artículo', 1, send)
         },
         async verKardex(item) {
             const send = {
@@ -469,6 +478,17 @@ export default {
             }
 
             this.useModals.setModal('mKardex', 'Kardex de artículo', null, send, true)
+        },
+        verLotes(item) {
+            const send = {
+                articulo: {
+                    id: item.id,
+                    nombre: item.nombre,
+                    unidad: item.unidad,
+                },
+            }
+
+            this.useModals.setModal('mLotes', 'Lotes del artículo', null, send, true)
         },
         async ajusteStock(item) {
             const send = {

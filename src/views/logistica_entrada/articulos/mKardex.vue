@@ -26,7 +26,7 @@
             :reload="loadKardex"
             :colAct="true"
             :rowOptions="tableRowOptions"
-            maxHeight="80vh"
+            maxHeight="70vh"
             @rowOptionSelected="runMethod"
             ref="TableKardex"
         >

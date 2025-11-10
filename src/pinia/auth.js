@@ -97,6 +97,7 @@ export const useAuth = defineStore('auth', {
 
                             { id: 'vArticulos:clonar', label: 'Clonar' },
                             { id: 'vArticulos:kardex', label: 'Ver kardex' },
+                            { id: 'vArticulos:lotes', label: 'Ver Lotes' },
                             { id: 'vArticulos:kardexDelete', label: 'Eliminar movimiento kardex' },
                             { id: 'vArticulos:ajusteStock', label: 'Ajuste stock' },
 
@@ -191,6 +192,7 @@ export const useAuth = defineStore('auth', {
                             { id: 'vProductos:actualizarFotos', label: 'Actualizar fotos' },
                             { id: 'vProductosTerminados:clonar', label: 'Clonar' },
                             { id: 'vProductosTerminados:kardex', label: 'Ver kardex' },
+                            { id: 'vProductosTerminados:lotes', label: 'Ver Lotes' },
                             { id: 'vProductosTerminados:ajusteStock', label: 'Ajuste stock' },
 
                             { id: 'vProductosTerminados:crearCombo', label: 'Crear combo' },

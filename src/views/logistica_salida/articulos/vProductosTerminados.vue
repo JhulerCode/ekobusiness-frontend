@@ -58,6 +58,7 @@
     <mArticulo v-if="useModals.show.mArticulo" />
     <mCombo v-if="useModals.show.mCombo" />
     <mKardex v-if="useModals.show.mKardex" />
+    <mLotes v-if="useModals.show.mLotes" />
     <mAjusteStock v-if="useModals.show.mAjusteStock" />
     <mUploadFiles v-if="useModals.show.mUploadFiles" />
 
@@ -75,6 +76,7 @@ import mArticulo from '@/views/logistica_entrada/articulos/mArticulo.vue'
 import mCombo from '@/views/logistica_salida/articulos/mCombo.vue'
 import mArticuloReceta from '@/views/logistica_salida/articulos/mArticuloReceta.vue'
 import mKardex from '@/views/logistica_entrada/articulos/mKardex.vue'
+import mLotes from '@/views/logistica_entrada/articulos/mLotes.vue'
 import mAjusteStock from '@/views/logistica_entrada/articulos/mAjusteStock.vue'
 
 import { useAuth } from '@/pinia/auth'
@@ -101,6 +103,7 @@ export default {
         mCombo,
         mArticuloReceta,
         mKardex,
+        mLotes,
         mAjusteStock,
     },
     data: () => ({
@@ -296,17 +299,23 @@ export default {
                 ocultar: { is_combo: true },
             },
             {
+                label: 'Receta',
+                icon: 'fa-solid fa-flask',
+                action: 'showReceta',
+                permiso: 'vReceta:listar',
+                ocultar: { is_combo: true },
+            },
+            {
                 label: 'Ver kardex',
                 icon: 'fa-solid fa-table-list',
                 action: 'verKardex',
                 permiso: 'vProductosTerminados:kardex',
             },
             {
-                label: 'Receta',
-                icon: 'fa-solid fa-flask',
-                action: 'showReceta',
-                permiso: 'vReceta:listar',
-                ocultar: { is_combo: true },
+                label: 'Ver lotes',
+                icon: 'fa-solid fa-table-list',
+                action: 'verLotes',
+                permiso: 'vProductosTerminados:lotes',
             },
             {
                 label: 'Ajuste stock',
@@ -550,7 +559,7 @@ export default {
             if (res.data.is_combo) {
                 this.useModals.setModal('mCombo', 'Editar combo', 2, res.data)
             } else {
-                this.useModals.setModal('mArticulo', 'Editar articulo', 2, res.data)
+                this.useModals.setModal('mArticulo', 'Editar producto', 2, res.data)
             }
         },
         openUploadFiles(item) {
@@ -594,7 +603,7 @@ export default {
                 id: null,
             }
 
-            this.useModals.setModal('mArticulo', 'Nuevo articulo', 1, send)
+            this.useModals.setModal('mArticulo', 'Nuevo producto', 1, send)
         },
         async showReceta(item) {
             const send = {
@@ -612,7 +621,18 @@ export default {
                 },
             }
 
-            this.useModals.setModal('mKardex', 'Kardex de artículo', null, send, true)
+            this.useModals.setModal('mKardex', 'Kardex del producto', null, send, true)
+        },
+        verLotes(item) {
+            const send = {
+                articulo: {
+                    id: item.id,
+                    nombre: item.nombre,
+                    unidad: item.unidad,
+                },
+            }
+
+            this.useModals.setModal('mLotes', 'Lotes del producto', null, send, true)
         },
         ajusteStock(item) {
             const send = {

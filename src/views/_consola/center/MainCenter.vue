@@ -38,6 +38,7 @@
         <vMaquinas v-if="useVistas.show.vMaquinas" />
         <vEquipos v-if="useVistas.show.vEquipos" />
         <vColaboradores v-if="useVistas.show.vColaboradores" />
+        <vAsistencias v-if="useVistas.show.vAsistencias"/>
         <vSessions v-if="useVistas.show.vSessions" />
         <vActivityLogs v-if="useVistas.show.vActivityLogs" />
     </section>
@@ -89,6 +90,7 @@ import vMonedas from '@/views/operaciones/monedas/vMonedas.vue'
 import vMaquinas from '@/views/operaciones/maquinas/vMaquinas.vue'
 import vEquipos from '@/views/operaciones/equipos/vEquipos.vue'
 import vColaboradores from '@/views/operaciones/colaboradores/vColaboradores.vue'
+import vAsistencias from '@/views/operaciones/asistencias/vAsistencias.vue'
 import vSessions from '@/views/operaciones/sessions/vSessions.vue'
 import vActivityLogs from '@/views/operaciones/activity_logs/vActivityLogs.vue'
 
@@ -135,6 +137,7 @@ export default {
         vMaquinas,
         vEquipos,
         vColaboradores,
+        vAsistencias,
         vSessions,
         vActivityLogs,
     },

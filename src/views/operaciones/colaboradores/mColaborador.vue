@@ -2,36 +2,95 @@
     <JdModal modal="mColaborador" :buttons="buttons" @button-click="(action) => this[action]()">
         <div class="container-todo">
             <div class="container-datos">
-                <JdInput label="Nombres" :nec="true" v-model="colaborador.nombres" :disabled="modal.mode == 3" />
-                <JdInput label="Apellidos" :nec="true" v-model="colaborador.apellidos" :disabled="modal.mode == 3" />
+                <JdInput
+                    label="Nombres"
+                    :nec="true"
+                    v-model="colaborador.nombres"
+                    :disabled="modal.mode == 3"
+                />
+                <JdInput
+                    label="Apellidos"
+                    :nec="true"
+                    v-model="colaborador.apellidos"
+                    :disabled="modal.mode == 3"
+                />
 
-                <JdSelect label="Tipo documento" :nec="true" v-model="colaborador.doc_tipo"
-                    :lista="modal.documentos_identidad || []" :disabled="modal.mode == 3" />
-                <JdInput label="Nro documento" :nec="true" v-model="colaborador.doc_numero"
-                    :disabled="modal.mode == 3" />
+                <JdSelect
+                    label="Tipo documento"
+                    :nec="true"
+                    v-model="colaborador.doc_tipo"
+                    :lista="modal.documentos_identidad || []"
+                    :disabled="modal.mode == 3"
+                />
+                <JdInput
+                    label="Nro documento"
+                    :nec="true"
+                    v-model="colaborador.doc_numero"
+                    :disabled="modal.mode == 3"
+                />
 
-                <JdInput label="Fecha de nacimiento" type="date" v-model="colaborador.fecha_nacimiento"
-                    :disabled="modal.mode == 3" />
-                <JdSelect label="Sexo" v-model="colaborador.sexo" :lista="modal.generos || []"
-                    :disabled="modal.mode == 3" />
+                <JdInput
+                    label="Fecha de nacimiento"
+                    type="date"
+                    v-model="colaborador.fecha_nacimiento"
+                    :disabled="modal.mode == 3"
+                />
+                <JdSelect
+                    label="Sexo"
+                    v-model="colaborador.sexo"
+                    :lista="modal.generos || []"
+                    :disabled="modal.mode == 3"
+                />
 
-                <JdInput label="Dirección" v-model="colaborador.direccion" :disabled="modal.mode == 3" />
-                <JdInput label="Teléfono" v-model="colaborador.telefono" :disabled="modal.mode == 3" />
+                <JdInput
+                    label="Dirección"
+                    v-model="colaborador.direccion"
+                    :disabled="modal.mode == 3"
+                />
+                <JdInput
+                    label="Teléfono"
+                    v-model="colaborador.telefono"
+                    :disabled="modal.mode == 3"
+                />
 
-                <JdInput label="Cargo" :nec="true" v-model="colaborador.cargo" :disabled="modal.mode == 3" />
+                <JdInput
+                    label="Cargo"
+                    :nec="true"
+                    v-model="colaborador.cargo"
+                    :disabled="modal.mode == 3"
+                />
                 <JdSwitch label="Activo" v-model="colaborador.activo" :disabled="modal.mode == 3" />
-                <JdSwitch label="Tiene usuario?" v-model="colaborador.has_signin" :disabled="modal.mode == 3" />
+                <JdSwitch
+                    label="Tiene usuario?"
+                    v-model="colaborador.has_signin"
+                    :disabled="modal.mode == 3"
+                />
             </div>
 
             <div class="right" v-if="colaborador.has_signin">
                 <div class="container-accesos">
-                    <JdSelect label="Vista inicial" :nec="true" v-model="colaborador.vista_inicial" :lista="vistas"
-                        mostrar="label" :disabled="modal.mode == 3" />
+                    <JdSelect
+                        label="Vista inicial"
+                        :nec="true"
+                        v-model="colaborador.vista_inicial"
+                        :lista="vistas"
+                        mostrar="label"
+                        :disabled="modal.mode == 3"
+                    />
 
-                    <JdInput label="Usuario" :nec="true" v-model="colaborador.usuario" :disabled="modal.mode == 3" />
+                    <JdInput
+                        label="Usuario"
+                        :nec="true"
+                        v-model="colaborador.usuario"
+                        :disabled="modal.mode == 3"
+                    />
 
                     <div>
-                        <JdInput label="Contraseña" v-model="colaborador.contrasena" :disabled="modal.mode == 3" />
+                        <JdInput
+                            label="Contraseña"
+                            v-model="colaborador.contrasena"
+                            :disabled="modal.mode == 3"
+                        />
                         <small class="fa-solid fa-triangle-exclamation"></small>
                         <small> No modificar este campo si no desea actualizar la contraseña</small>
                     </div>
@@ -47,7 +106,10 @@
                             {{ a.label }}
 
                             <span class="icono-expand">
-                                <i class="fa-solid fa-caret-down" v-if="modal.grupoExpandido === a.id"></i>
+                                <i
+                                    class="fa-solid fa-caret-down"
+                                    v-if="modal.grupoExpandido === a.id"
+                                ></i>
                                 <i class="fa-solid fa-caret-right" v-else></i>
                             </span>
                         </div>
@@ -58,19 +120,39 @@
                                     {{ b.label }}
 
                                     <span class="icono-expand">
-                                        <i class="fa-solid fa-caret-down" v-if="modal.vistaExpandida === b.id"></i>
+                                        <i
+                                            class="fa-solid fa-caret-down"
+                                            v-if="modal.vistaExpandida === b.id"
+                                        ></i>
                                         <i class="fa-solid fa-caret-right" v-else></i>
                                     </span>
                                 </div>
 
-                                <div class="permisos" v-if="b.permisos && modal.vistaExpandida === b.id">
+                                <div
+                                    class="permisos"
+                                    v-if="b.permisos && modal.vistaExpandida === b.id"
+                                >
                                     <div class="permisos-acciones">
-                                        <JdButton text="Sel. todo" tipo="3" @click="selectAll(b.id)" />
-                                        <JdButton text="Sel. ninguno" tipo="3" @click="selectNone(b.id)" />
+                                        <JdButton
+                                            text="Sel. todo"
+                                            tipo="3"
+                                            @click="selectAll(b.id)"
+                                        />
+                                        <JdButton
+                                            text="Sel. ninguno"
+                                            tipo="3"
+                                            @click="selectNone(b.id)"
+                                        />
                                     </div>
 
-                                    <JdCheckBox :label="c.label" v-model="c.val" v-for="c in b.permisos" :key="c.id"
-                                        class="mrg-btm05" :disabled="modal.mode == 3" />
+                                    <JdCheckBox
+                                        :label="c.label"
+                                        v-model="c.val"
+                                        v-for="c in b.permisos"
+                                        :key="c.id"
+                                        class="mrg-btm05"
+                                        :disabled="modal.mode == 3"
+                                    />
                                 </div>
                             </div>
                         </div>
@@ -111,12 +193,19 @@ export default {
 
         buttons: [
             { text: 'Grabar', action: 'crear', spin: false, permiso: 'vColaboradores:crear' },
-            { text: 'Actualizar', action: 'modificar', spin: false, permiso: 'vColaboradores:editar' },
+            {
+                text: 'Actualizar',
+                action: 'modificar',
+                spin: false,
+                permiso: 'vColaboradores:editar',
+            },
         ],
     }),
     computed: {
         vistas() {
-            return this.useAuth.menu.map(a => a.children.map(b => ({ id: b.goto, label: b.label }))).flat()
+            return this.useAuth.menu
+                .map((a) => a.children.map((b) => ({ id: b.goto, label: b.label })))
+                .flat()
         },
     },
     created() {
@@ -131,14 +220,21 @@ export default {
         showButtons() {
             if (this.modal.mode == 1) {
                 this.buttons[0].show = true
-            }
-            else if (this.modal.mode == 2) {
+            } else if (this.modal.mode == 2) {
                 this.buttons[1].show = true
             }
         },
 
         checkDatos() {
-            const props = ['nombres', 'apellidos', 'doc_tipo', 'doc_numero', 'cargo', 'activo', 'has_signin']
+            const props = [
+                'nombres',
+                'apellidos',
+                'doc_tipo',
+                'doc_numero',
+                'cargo',
+                'activo',
+                'has_signin',
+            ]
 
             if (this.colaborador.has_signin) props.push('vista_inicial', 'usuario', 'contrasena')
 
@@ -268,7 +364,7 @@ export default {
                 }
             }
         },
-    }
+    },
 }
 </script>
 

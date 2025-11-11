@@ -14,6 +14,7 @@ const urls = {
     articulo_lineas: `${host}/api/articulo_lineas`,
     articulo_categorias: `${host}/api/articulo_categorias`,
     articulos: `${host}/api/articulos`,
+    asistencias: `${host}/api/asistencias`,
     caja_aperturas: `${host}/api/caja_aperturas`,
     caja_movimientos: `${host}/api/caja_movimientos`,
     colaboradores: `${host}/api/colaboradores`,

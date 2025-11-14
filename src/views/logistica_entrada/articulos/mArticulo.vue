@@ -76,6 +76,15 @@
                     style="grid-column: 1/4"
                 />
 
+                <JdSelect
+                    label="Tipo de materia prima"
+                    :nec="true"
+                    :lista="modal.mp_tipos || []"
+                    v-model="articulo.mp_tipo"
+                    style="grid-column: 1/4"
+                    v-if="articulo.is_ecommerce == true && articulo.categoria == materiaprima_id"
+                />
+
                 <JdSwitch
                     label="Tiene fecha de vencimiento?"
                     v-model="articulo.has_fv"
@@ -88,12 +97,16 @@
                     label="Mostrar en tienda online"
                     v-model="articulo.is_ecommerce"
                     style="grid-column: 1/3"
+                    v-if="articulo.tipo == 2 || articulo.categoria == materiaprima_id"
                 />
 
                 <small style="grid-column: 1/3">{{ articulo.id }}</small>
             </div>
 
-            <div class="container-datos2" v-if="articulo.is_ecommerce == true">
+            <div
+                class="container-datos2"
+                v-if="articulo.is_ecommerce == true && articulo.tipo == 2"
+            >
                 <strong>--- Datos para la tienda online ---</strong>
 
                 <JdTextArea
@@ -212,6 +225,7 @@ export default {
 
         modal: {},
         articulo: {},
+        materiaprima_id: 'f000be66-e4b1-4334-b57a-0e356eb8c7a6',
 
         buttons: [
             { text: 'Grabar', action: 'crear', spin: false },
@@ -294,7 +308,7 @@ export default {
             this.modal.articulo_categorias = res.data
         },
         async loadDatosSistema() {
-            const qry = ['igv_afectaciones', 'unidades']
+            const qry = ['igv_afectaciones', 'unidades', 'mp_tipos']
             const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
 
             if (res.code != 0) return
@@ -305,6 +319,14 @@ export default {
         checkDatos() {
             const props = ['tipo', 'categoria', 'nombre', 'unidad', 'igv_afectacion']
 
+            if (this.articulo.tipo == 1) {
+                if (this.articulo.is_ecommerce == true) {
+                    if (this.articulo.categoria == this.materiaprima_id) {
+                        props.push('mp_tipo')
+                    }
+                }
+            }
+
             if (this.articulo.tipo == 2) {
                 props.push('codigo_barra', 'produccion_tipo', 'contenido_neto')
 
@@ -314,21 +336,21 @@ export default {
 
                 if (this.articulo.is_ecommerce == true) {
                     props.push('descripcion', 'precio', 'dimenciones', 'envase_tipo')
+
+                    if (this.articulo.ingredientes.length == 0) {
+                        jmsg('warning', 'Ingrese al menos un ingrediente')
+                        return true
+                    }
+
+                    if (this.articulo.beneficios.length == 0) {
+                        jmsg('warning', 'Ingrese al menos un beneficio')
+                        return true
+                    }
                 }
             }
 
             if (incompleteData(this.articulo, props)) {
                 jmsg('warning', 'Ingrese los datos necesarios')
-                return true
-            }
-
-            if (this.articulo.ingredientes.length == 0) {
-                jmsg('warning', 'Ingrese al menos un ingrediente')
-                return true
-            }
-
-            if (this.articulo.beneficios.length == 0) {
-                jmsg('warning', 'Ingrese al menos un beneficio')
                 return true
             }
 

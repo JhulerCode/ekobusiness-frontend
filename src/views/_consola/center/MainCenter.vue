@@ -9,6 +9,7 @@
         <vCompraPedidos v-if="useVistas.show.vCompraPedidos" />
         <vCompras v-if="useVistas.show.vCompras" />
         <vCompraItems v-if="useVistas.show.vCompraItems" />
+        <vInventarioArticulos v-if="useVistas.show.vInventarioArticulos" />
 
         <vClientes v-if="useVistas.show.vClientes" />
         <vProductoLineas v-if="useVistas.show.vProductoLineas" />
@@ -19,12 +20,14 @@
         <vVentaPedidoItems v-if="useVistas.show.vVentaPedidoItems" />
         <vVentas v-if="useVistas.show.vVentas" />
         <vVentaItems v-if="useVistas.show.vVentaItems" />
+        <vInventarioProductos v-if="useVistas.show.vInventarioProductos" />
 
         <vProgramaFiltrantes v-if="useVistas.show.vProgramaFiltrantes" />
         <vProgramaGranel v-if="useVistas.show.vProgramaGranel" />
         <vProgramaLuxury v-if="useVistas.show.vProgramaLuxury" />
         <vProduccionHistorial v-if="useVistas.show.vProduccionHistorial" />
         <vProductosCuarentena v-if="useVistas.show.vProductosCuarentena" />
+        <vReporteProduccion v-if="useVistas.show.vReporteProduccion" />
 
         <vFormatosBpm v-if="useVistas.show.vFormatosBpm" />
         <vFormatosPhs v-if="useVistas.show.vFormatosPhs" />
@@ -38,7 +41,7 @@
         <vMaquinas v-if="useVistas.show.vMaquinas" />
         <vEquipos v-if="useVistas.show.vEquipos" />
         <vColaboradores v-if="useVistas.show.vColaboradores" />
-        <vAsistencias v-if="useVistas.show.vAsistencias"/>
+        <vAsistencias v-if="useVistas.show.vAsistencias" />
         <vSessions v-if="useVistas.show.vSessions" />
         <vActivityLogs v-if="useVistas.show.vActivityLogs" />
     </section>
@@ -57,6 +60,7 @@ import vPrecioListas from '@/views/logistica_entrada/precios/vPrecioListas.vue'
 import vCompraPedidos from '@/views/logistica_entrada/pedidos/vCompraPedidos.vue'
 import vCompras from '@/views/logistica_entrada/compras/vCompras.vue'
 import vCompraItems from '@/views/logistica_entrada/compra_items/vCompraItems.vue'
+import vInventarioArticulos from '@/views/logistica_entrada/inventario/vInventarioArticulos.vue'
 
 // ----- LOGISTICA SALIDA ----- //
 import vClientes from '@/views/logistica_salida/clientes/vClientes.vue'
@@ -68,6 +72,7 @@ import vVentaPedidos from '@/views/logistica_salida/pedidos/vVentaPedidos.vue'
 import vVentaPedidoItems from '@/views/logistica_salida/pedido_items/vVentaPedidoItems.vue'
 import vVentas from '@/views/logistica_salida/ventas/vVentas.vue'
 import vVentaItems from '@/views/logistica_salida/venta_items/vVentaItems.vue'
+import vInventarioProductos from '@/views/logistica_salida/inventario/vInventarioProductos.vue'
 
 // ----- PRODUCCIÓN ----- //
 import vProgramaFiltrantes from '@/views/produccion/filtrante/vProgramaFiltrantes.vue'
@@ -75,6 +80,7 @@ import vProgramaGranel from '@/views/produccion/granel/vProgramaGranel.vue'
 import vProgramaLuxury from '@/views/produccion/piramidal/vProgramaLuxury.vue'
 import vProduccionHistorial from '@/views/produccion/historial/vProduccionHistorial.vue'
 import vProductosCuarentena from '@/views/produccion/vProductosCuarentena.vue'
+import vReporteProduccion from '@/views/produccion/reporte/vReporteProduccion.vue'
 
 // ----- CALIDAD ----- //
 import vFormatosBpm from '@/views/calidad/formatos/vFormatosBpm.vue'
@@ -108,6 +114,7 @@ export default {
         vCompraPedidos,
         vCompras,
         vCompraItems,
+        vInventarioArticulos,
 
         vClientes,
         vProductoLineas,
@@ -118,12 +125,14 @@ export default {
         vVentaPedidoItems,
         vVentas,
         vVentaItems,
+        vInventarioProductos,
 
         vProgramaFiltrantes,
         vProgramaGranel,
         vProgramaLuxury,
         vProduccionHistorial,
         vProductosCuarentena,
+        vReporteProduccion,
 
         vFormatosBpm,
         vFormatosPhs,

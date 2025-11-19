@@ -19,6 +19,7 @@ export const useAuth = defineStore('auth', {
                     { label: 'Pedidos de compra', goto: 'vCompraPedidos' },
                     { label: 'Compras', goto: 'vCompras' },
                     { label: 'Compras detalle', goto: 'vCompraItems' },
+                    { label: 'Inventario', goto: 'vInventarioArticulos' },
                 ]
             },
             {
@@ -32,6 +33,7 @@ export const useAuth = defineStore('auth', {
                     { label: 'Pedidos de venta detalle', goto: 'vVentaPedidoItems' },
                     { label: 'Ventas', goto: 'vVentas' },
                     { label: 'Ventas detalle', goto: 'vVentaItems' },
+                    { label: 'Inventario', goto: 'vInventarioProductos' },
                 ]
             },
             {
@@ -41,6 +43,7 @@ export const useAuth = defineStore('auth', {
                     { label: 'Programa luxury', goto: 'vProgramaLuxury' },
                     { label: 'Órdenes de producción', goto: 'vProduccionHistorial' },
                     { label: 'Productos terminados', goto: 'vProductosCuarentena' },
+                    { label: 'Reporte', goto: 'vReporteProduccion' },
                 ]
             },
             {
@@ -152,6 +155,11 @@ export const useAuth = defineStore('auth', {
                             { id: 'vCompraItems:inspeccion', label: 'Inspeccionar' },
                         ]
                     },
+                    {
+                        id: 'vInventarioArticulos', label: 'Inventario', permisos: [
+                            { id: 'vInventarioArticulos:listar', label: 'Listar' },
+                        ]
+                    },
                 ]
             },
             {
@@ -251,6 +259,11 @@ export const useAuth = defineStore('auth', {
                             { id: 'vVentaItems:listar', label: 'Listar' },
                         ]
                     },
+                    {
+                        id: 'vInventarioProductos', label: 'Inventario', permisos: [
+                            { id: 'vInventarioProductos:listar', label: 'Listar' },
+                        ]
+                    },
                 ]
             },
             {
@@ -313,7 +326,12 @@ export const useAuth = defineStore('auth', {
                             { id: 'vProductosCuarentena:liberar_lote', label: 'Liberar lote' },
                             { id: 'vProductosCuarentena:trazabilidad', label: 'Ver trazabilidad' },
                         ]
-                    }
+                    },
+                    {
+                        id: 'vReporteProduccion', label: 'Reporte', permisos: [
+                            { id: 'vReporteProduccion:listar', label: 'Listar' },
+                        ]
+                    },
                 ]
             },
             {

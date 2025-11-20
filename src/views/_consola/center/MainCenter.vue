@@ -22,9 +22,9 @@
         <vVentaItems v-if="useVistas.show.vVentaItems" />
         <vInventarioProductos v-if="useVistas.show.vInventarioProductos" />
 
-        <vProgramaFiltrantes v-if="useVistas.show.vProgramaFiltrantes" />
-        <vProgramaGranel v-if="useVistas.show.vProgramaGranel" />
-        <vProgramaLuxury v-if="useVistas.show.vProgramaLuxury" />
+        <vPrograma v-if="useVistas.show.vPrograma" />
+        <!-- <vProgramaGranel v-if="useVistas.show.vProgramaGranel" />
+        <vProgramaLuxury v-if="useVistas.show.vProgramaLuxury" /> -->
         <vProduccionHistorial v-if="useVistas.show.vProduccionHistorial" />
         <vProductosCuarentena v-if="useVistas.show.vProductosCuarentena" />
         <vReporteProduccion v-if="useVistas.show.vReporteProduccion" />
@@ -75,12 +75,12 @@ import vVentaItems from '@/views/logistica_salida/venta_items/vVentaItems.vue'
 import vInventarioProductos from '@/views/logistica_salida/inventario/vInventarioProductos.vue'
 
 // ----- PRODUCCIÓN ----- //
-import vProgramaFiltrantes from '@/views/produccion/filtrante/vProgramaFiltrantes.vue'
-import vProgramaGranel from '@/views/produccion/granel/vProgramaGranel.vue'
-import vProgramaLuxury from '@/views/produccion/piramidal/vProgramaLuxury.vue'
+import vPrograma from '@/views/produccion/vPrograma.vue'
+// import vProgramaGranel from '@/views/produccion/granel/vProgramaGranel.vue'
+// import vProgramaLuxury from '@/views/produccion/piramidal/vProgramaLuxury.vue'
 import vProduccionHistorial from '@/views/produccion/historial/vProduccionHistorial.vue'
 import vProductosCuarentena from '@/views/produccion/vProductosCuarentena.vue'
-import vReporteProduccion from '@/views/produccion/reporte/vReporteProduccion.vue'
+import vReporteProduccion from '@/views/produccion/vReporteProduccion.vue'
 
 // ----- CALIDAD ----- //
 import vFormatosBpm from '@/views/calidad/formatos/vFormatosBpm.vue'
@@ -127,9 +127,9 @@ export default {
         vVentaItems,
         vInventarioProductos,
 
-        vProgramaFiltrantes,
-        vProgramaGranel,
-        vProgramaLuxury,
+        vPrograma,
+        // vProgramaGranel,
+        // vProgramaLuxury,
         vProduccionHistorial,
         vProductosCuarentena,
         vReporteProduccion,
@@ -196,5 +196,72 @@ export default {
         flex-direction: column;
         overflow: hidden;
     }
+
+    .tablero {
+        height: 100%;
+        overflow-y: auto;
+        // padding: 0 1rem;
+
+        .head {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+            flex-wrap: wrap;
+            // position: sticky;
+            top: 0;
+            background-color: var(--bg-color2);
+            padding: 1rem 0;
+            // z-index: 3;
+
+            strong {
+                font-size: 1.4rem;
+            }
+
+            .buttons {
+                display: flex;
+                gap: 0.5rem;
+                flex-wrap: wrap;
+            }
+        }
+
+        .card {
+            padding: 1rem;
+            background-color: var(--bg-color);
+            border-radius: 1rem;
+            box-shadow: 0 0 0.5rem var(--shadow-color);
+            overflow: hidden;
+        }
+
+        .card-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
+        .monto-resumen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            // text-align: center;
+
+            p {
+                color: var(--text-color2);
+            }
+
+            span {
+                font-size: 1.5rem;
+            }
+        }
+
+        .cols2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+    }
+
 }
 </style>

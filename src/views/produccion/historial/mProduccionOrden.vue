@@ -1,53 +1,97 @@
 <template>
     <JdModal modal="mProduccionOrden" :buttons="buttons" @button-click="(action) => this[action]()">
         <div class="container-datos">
-            <JdInput type="date" label="Fecha" :nec="true" v-model="modal.produccion_orden.fecha"
-                :disabled="modal.mode == 3" style="grid-column: 1/3" />
+            <JdInput
+                type="date"
+                label="Fecha"
+                :nec="true"
+                v-model="modal.produccion_orden.fecha"
+                :disabled="modal.mode == 3"
+                style="grid-column: 1/3"
+            />
 
-            <JdSelect v-model="modal.produccion_orden.estado" :lista="modal.produccion_orden_estados" :disabled="true"
-                style="grid-column: 4/5" />
+            <JdSelect
+                v-model="modal.produccion_orden.estado"
+                :lista="modal.produccion_orden_estados"
+                :disabled="true"
+                style="grid-column: 4/5"
+            />
 
             <template v-if="modal.produccion_orden.tipo != 2">
-                <JdSelect label="Máquina" :nec="true" v-model="modal.produccion_orden.maquina"
-                    :lista="modal.maquinas?.filter(a => a.produccion_tipo == modal.produccion_orden.tipo) || []"
-                    @elegir="setMaquina" :disabled="modal.mode == 3" style="grid-column: 1/3" />
+                <JdSelect
+                    label="Máquina"
+                    :nec="true"
+                    v-model="modal.produccion_orden.maquina"
+                    :lista="
+                        modal.maquinas?.filter(
+                            (a) => a.produccion_tipo == modal.produccion_orden.tipo,
+                        ) || []
+                    "
+                    @elegir="setMaquina"
+                    :disabled="modal.mode == 3"
+                    style="grid-column: 1/3"
+                />
 
                 <div>
                     <small>
-                        VL: {{ modal.produccion_orden.maquina_info?.velocidad }} und/min
+                        VP: {{ modal.produccion_orden.maquina_info?.velocidad }} und/min
                     </small>
-                    <br>
+                    <br />
                     <small>
                         TL: {{ modal.produccion_orden.maquina_info?.limpieza_tiempo }} min
                     </small>
                 </div>
             </template>
 
-            <JdSelectQuery label="Producto" :nec="true" v-model="modal.produccion_orden.articulo" :spin="spinArticulos"
-                :lista="modal.articulos" @search="searchArticulos" @elegir="setArticulo" :disabled="modal.mode == 3"
-                style="grid-column: 1/4" />
+            <JdSelectQuery
+                label="Producto"
+                :nec="true"
+                v-model="modal.produccion_orden.articulo"
+                :spin="spinArticulos"
+                :lista="modal.articulos"
+                @search="searchArticulos"
+                @elegir="setArticulo"
+                :disabled="modal.mode == 3"
+                style="grid-column: 1/4"
+            />
 
-            <JdInput type="number" label="Cantidad planificada" :nec="true" v-model="modal.produccion_orden.cantidad"
-                :disabled="modal.mode == 3" style="grid-column: 1/3" />
+            <JdInput
+                type="number"
+                label="Cantidad planificada"
+                :nec="true"
+                v-model="modal.produccion_orden.cantidad"
+                :disabled="modal.mode == 3"
+                style="grid-column: 1/3"
+            />
 
-            <JdInput type="number" label="Orden" :nec="true" v-model="modal.produccion_orden.orden"
-                :disabled="modal.mode == 3" style="grid-column: 1/2" />
+            <JdInput
+                type="number"
+                label="Orden"
+                :nec="true"
+                v-model="modal.produccion_orden.orden"
+                :disabled="modal.mode == 3"
+                style="grid-column: 1/2"
+            />
 
             <p v-if="modal.produccion_orden.tipo != 2" style="grid-column: 4/5; text-align: right">
                 <small>Tiempo de producción:</small>
-                {{ setTiempo() }} <br>
+                {{ setTiempo() }} <br />
             </p>
         </div>
 
-        <JdTable :columns="columns" :datos="modal.produccion_orden.articulo_info?.receta_insumos || []" :seeker="false"
-            :download="false" class="jd-table">
-            <template v-slot:colCantidad="{ item }">
-                {{ redondear(item.cantidad * (modal.produccion_orden.cantidad || 0)) }}
-            </template>
-
+        <JdTable
+            :columns="columns1"
+            :datos="insumos_necesitados"
+            :seeker="false"
+            :download="false"
+            class="jd-table"
+        >
             <template v-slot:colStock="{ item }">
                 <span
-                    :class="{ falta: item.articulo1.stock < (item.cantidad * (modal.produccion_orden.cantidad || 0)) }">
+                    :class="{
+                        falta: item.articulo1.stock < item.cantidad_necesitada,
+                    }"
+                >
                     {{ redondear(item.articulo1.stock) }}
                 </span>
             </template>
@@ -89,7 +133,7 @@ export default {
         tipoPrograma: {
             1: 'vProgramaFiltrantes',
             2: 'vProgramaGranel',
-            3: 'vProgramaLuxury'
+            3: 'vProgramaLuxury',
         },
 
         buttons: [
@@ -121,23 +165,61 @@ export default {
                 show: true,
             },
         ],
+
+        columns1: [
+            {
+                id: 'articulo',
+                title: 'Nombre',
+                prop: 'articulo1.nombre',
+                width: '25rem',
+                show: true,
+            },
+            {
+                id: 'cantidad_necesitada',
+                title: 'Cantidad req.',
+                toRight: true,
+                format: 'decimal',
+                width: '8rem',
+                show: true,
+            },
+            {
+                title: 'Stock',
+                toRight: true,
+                slot: 'colStock',
+                width: '8rem',
+                show: true,
+            },
+        ],
     }),
+    computed: {
+        insumos_necesitados() {
+            if (
+                !this.modal.produccion_orden.articulo_info ||
+                !this.modal.produccion_orden.articulo_info.receta_insumos
+            )
+                return []
+
+            return this.modal.produccion_orden.articulo_info.receta_insumos.map((a) => ({
+                ...a,
+                cantidad_necesitada: a.cantidad * (this.modal.produccion_orden.cantidad || 0),
+            }))
+        },
+    },
     created() {
         this.modal = this.useModals.mProduccionOrden
 
         this.showButtons()
         this.loadDatosSistema()
 
-        if (this.modal.mode != 3) {
-            this.loadMaquinas()
-        }
+        // if (this.modal.mode != 3) {
+        //     this.loadMaquinas()
+        // }
     },
     methods: {
         showButtons() {
             if (this.useModals.mProduccionOrden.mode == 1) {
                 this.buttons[0].show = true
-            }
-            else if (this.useModals.mProduccionOrden.mode == 2) {
+            } else if (this.useModals.mProduccionOrden.mode == 2) {
                 this.buttons[1].show = true
             }
         },
@@ -153,10 +235,10 @@ export default {
                     activo: { op: 'Es', val: true },
                     nombre: { op: 'Contiene', val: txtBuscar },
                     tipo: { op: 'Es', val: 2 },
-                    produccion_tipo: { op: 'Es', val: this.modal.produccion_orden.tipo }
+                    produccion_tipo: { op: 'Es', val: this.modal.produccion_orden.tipo },
                 },
                 cols: ['produccion_tipo', 'filtrantes'],
-                incl: ['receta_insumos']
+                incl: ['receta_insumos'],
             }
 
             this.spinArticulos = true
@@ -170,32 +252,38 @@ export default {
         setArticulo(a) {
             if (a == null) {
                 this.modal.produccion_orden.articulo_info = {}
-            }
-            else {
+            } else {
                 this.modal.produccion_orden.articulo_info = a
 
-                this.modal.produccion_orden.articulo_info.receta_insumos.sort((a, b) => a.orden - b.orden)
+                this.modal.produccion_orden.articulo_info.receta_insumos.sort(
+                    (a, b) => a.orden - b.orden,
+                )
             }
         },
 
         setMaquina(a) {
             if (a == null) {
                 this.modal.produccion_orden.maquina_info = {}
-            }
-            else {
+            } else {
                 this.modal.produccion_orden.maquina_info = {
                     id: a.id,
                     velocidad: a.velocidad,
-                    limpieza_tiempo: a.limpieza_tiempo
+                    limpieza_tiempo: a.limpieza_tiempo,
                 }
             }
         },
         setTiempo() {
-            if (this.modal.produccion_orden.maquina == null || this.modal.produccion_orden.articulo == null || this.modal.produccion_orden.cantidad == null) {
+            if (
+                this.modal.produccion_orden.maquina == null ||
+                this.modal.produccion_orden.articulo == null ||
+                this.modal.produccion_orden.cantidad == null
+            ) {
                 return '00:00'
             }
 
-            const tiempo = (this.modal.produccion_orden.cantidad * this.modal.produccion_orden.articulo_info?.filtrantes) /
+            const tiempo =
+                (this.modal.produccion_orden.cantidad *
+                    this.modal.produccion_orden.articulo_info?.filtrantes) /
                 this.modal.produccion_orden.maquina_info?.velocidad
 
             return dayjs().startOf('day').add(tiempo, 'minute').format('HH:mm')
@@ -227,8 +315,11 @@ export default {
 
             if (res.code != 0) return
 
-            this.useVistas.addItem(this.tipoPrograma[this.modal.produccion_orden.tipo], 'produccion_ordenes', res.data)
-            this.$emit('calcularTiempo')
+            this.useVistas.addItem(
+                this.tipoPrograma[this.modal.produccion_orden.tipo],
+                'produccion_ordenes',
+                { ...res.data, receta: this.insumos_necesitados },
+            )
             this.useModals.show.mProduccionOrden = false
         },
         async modificar() {
@@ -240,8 +331,11 @@ export default {
 
             if (res.code != 0) return
 
-            this.useVistas.updateItem(this.tipoPrograma[this.modal.produccion_orden.tipo], 'produccion_ordenes', res.data)
-            this.$emit('calcularTiempo')
+            this.useVistas.updateItem(
+                this.tipoPrograma[this.modal.produccion_orden.tipo],
+                'produccion_ordenes',
+                { ...res.data, receta: this.insumos_necesitados },
+            )
             this.useModals.show.mProduccionOrden = false
         },
 
@@ -268,7 +362,7 @@ export default {
 
             this.modal.maquinas = res.data
         },
-    }
+    },
 }
 </script>
 

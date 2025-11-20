@@ -38,9 +38,10 @@ export const useAuth = defineStore('auth', {
             },
             {
                 label: 'Producción', icon: 'fa-solid fa-oil-well', children: [
-                    { label: 'Programa filtrantes', goto: 'vProgramaFiltrantes' },
-                    { label: 'Programa granel', goto: 'vProgramaGranel' },
-                    { label: 'Programa luxury', goto: 'vProgramaLuxury' },
+                    // { label: 'Programa filtrantes', goto: 'vProgramaFiltrantes' },
+                    // { label: 'Programa granel', goto: 'vProgramaGranel' },
+                    // { label: 'Programa luxury', goto: 'vProgramaLuxury' },
+                    { label: 'Programa', goto: 'vPrograma' },
                     { label: 'Órdenes de producción', goto: 'vProduccionHistorial' },
                     { label: 'Productos terminados', goto: 'vProductosCuarentena' },
                     { label: 'Reporte', goto: 'vReporteProduccion' },
@@ -269,45 +270,60 @@ export const useAuth = defineStore('auth', {
             {
                 id: 'produccion', label: 'Producción', vistas: [
                     {
-                        id: 'vProgramaFiltrantes', label: 'Programa de filtrantes', permisos: [
-                            { id: 'vProgramaFiltrantes:listar', label: 'Listar' },
-                            { id: 'vProgramaFiltrantes:crear', label: 'Crear' },
-                            { id: 'vProgramaFiltrantes:ver', label: 'Ver' },
-                            { id: 'vProgramaFiltrantes:editar', label: 'Editar' },
-                            { id: 'vProgramaFiltrantes:eliminar', label: 'Eliminar' },
+                        id: 'vPrograma', label: 'Programa', permisos: [
+                            { id: 'vPrograma:listar', label: 'Listar' },
+                            { id: 'vPrograma:crear', label: 'Crear' },
+                            { id: 'vPrograma:ver', label: 'Ver' },
+                            { id: 'vPrograma:editar', label: 'Editar' },
+                            { id: 'vPrograma:eliminar', label: 'Eliminar' },
 
-                            { id: 'vProgramaFiltrantes:terminar', label: 'Terminar' },
-                            { id: 'vProgramaFiltrantes:productosTerminados', label: 'Productos terminados' },
-                            { id: 'vProgramaFiltrantes:verProductosPedidos', label: 'Ver productos pedidos' },
-                            { id: 'vProgramaFiltrantes:salidaInsumosCompartidos', label: 'Salida de insumos compartidos' },
+                            { id: 'vPrograma:terminar', label: 'Terminar' },
+                            { id: 'vPrograma:productosTerminados', label: 'Productos terminados' },
+
+                            { id: 'vPrograma:verProductosPedidos', label: 'Ver productos pedidos' },
+                            { id: 'vPrograma:salidaInsumosCompartidos', label: 'Salida de insumos compartidos' },
                         ]
                     },
-                    {
-                        id: 'vProgramaGranel', label: 'Programa de granel', permisos: [
-                            { id: 'vProgramaGranel:listar', label: 'Listar' },
-                            { id: 'vProgramaGranel:crear', label: 'Crear' },
-                            { id: 'vProgramaGranel:ver', label: 'Ver' },
-                            { id: 'vProgramaGranel:editar', label: 'Editar' },
-                            { id: 'vProgramaGranel:eliminar', label: 'Eliminar' },
+                    // {
+                    //     id: 'vProgramaFiltrantes', label: 'Programa de filtrantes', permisos: [
+                    //         { id: 'vProgramaFiltrantes:listar', label: 'Listar' },
+                    //         { id: 'vProgramaFiltrantes:crear', label: 'Crear' },
+                    //         { id: 'vProgramaFiltrantes:ver', label: 'Ver' },
+                    //         { id: 'vProgramaFiltrantes:editar', label: 'Editar' },
+                    //         { id: 'vProgramaFiltrantes:eliminar', label: 'Eliminar' },
 
-                            { id: 'vProgramaGranel:terminar', label: 'Terminar' },
-                            { id: 'vProgramaGranel:productosTerminados', label: 'Productos terminados' },
-                            { id: 'vProgramaGranel:verProductosPedidos', label: 'Ver productos pedidos' },
-                        ]
-                    },
-                    {
-                        id: 'vProgramaLuxury', label: 'Programa de luxury', permisos: [
-                            { id: 'vProgramaLuxury:listar', label: 'Listar' },
-                            { id: 'vProgramaLuxury:crear', label: 'Crear' },
-                            { id: 'vProgramaLuxury:ver', label: 'Ver' },
-                            { id: 'vProgramaLuxury:editar', label: 'Editar' },
-                            { id: 'vProgramaLuxury:eliminar', label: 'Eliminar' },
+                    //         { id: 'vProgramaFiltrantes:terminar', label: 'Terminar' },
+                    //         { id: 'vProgramaFiltrantes:productosTerminados', label: 'Productos terminados' },
+                    //         { id: 'vProgramaFiltrantes:verProductosPedidos', label: 'Ver productos pedidos' },
+                    //         { id: 'vProgramaFiltrantes:salidaInsumosCompartidos', label: 'Salida de insumos compartidos' },
+                    //     ]
+                    // },
+                    // {
+                    //     id: 'vProgramaGranel', label: 'Programa de granel', permisos: [
+                    //         { id: 'vProgramaGranel:listar', label: 'Listar' },
+                    //         { id: 'vProgramaGranel:crear', label: 'Crear' },
+                    //         { id: 'vProgramaGranel:ver', label: 'Ver' },
+                    //         { id: 'vProgramaGranel:editar', label: 'Editar' },
+                    //         { id: 'vProgramaGranel:eliminar', label: 'Eliminar' },
 
-                            { id: 'vProgramaLuxury:terminar', label: 'Terminar' },
-                            { id: 'vProgramaLuxury:productosTerminados', label: 'Productos terminados' },
-                            { id: 'vProgramaLuxury:verProductosPedidos', label: 'Ver productos pedidos' },
-                        ]
-                    },
+                    //         { id: 'vProgramaGranel:terminar', label: 'Terminar' },
+                    //         { id: 'vProgramaGranel:productosTerminados', label: 'Productos terminados' },
+                    //         { id: 'vProgramaGranel:verProductosPedidos', label: 'Ver productos pedidos' },
+                    //     ]
+                    // },
+                    // {
+                    //     id: 'vProgramaLuxury', label: 'Programa de luxury', permisos: [
+                    //         { id: 'vProgramaLuxury:listar', label: 'Listar' },
+                    //         { id: 'vProgramaLuxury:crear', label: 'Crear' },
+                    //         { id: 'vProgramaLuxury:ver', label: 'Ver' },
+                    //         { id: 'vProgramaLuxury:editar', label: 'Editar' },
+                    //         { id: 'vProgramaLuxury:eliminar', label: 'Eliminar' },
+
+                    //         { id: 'vProgramaLuxury:terminar', label: 'Terminar' },
+                    //         { id: 'vProgramaLuxury:productosTerminados', label: 'Productos terminados' },
+                    //         { id: 'vProgramaLuxury:verProductosPedidos', label: 'Ver productos pedidos' },
+                    //     ]
+                    // },
                     {
                         id: 'vProduccionHistorial', label: 'Órdenes de producción', permisos: [
                             { id: 'vProduccionHistorial:listar', label: 'Listar' },

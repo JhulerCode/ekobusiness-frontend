@@ -1,11 +1,11 @@
 <template>
-    <div class="vista vista-fill">
+    <div class="tablero">
         <div class="head">
             <strong>Reporte de producción</strong>
 
             <div class="buttons">
                 <JdSelect
-                    :lista="vista.produccion_tipos"
+                    :lista="vista.articulo_lineas"
                     v-model="vista.linea"
                     style="width: 10rem"
                 />
@@ -15,9 +15,49 @@
             </div>
         </div>
 
-        <div class="container-tables">
-            <JdTable :columns="columns_produccion" :datos="vista.produccion_mes || []" />
-            <JdTable :columns="columns_insumos" :datos="vista.insumos || []" />
+        <div class="tablero-body" v-if="vista.resumen">
+            <div class="cols2">
+                <div class="card">
+                    <div class="card-head">
+                        <p>Produccion</p>
+
+                        <div class="monto-resumen">
+                            <span>{{ redondear(vista.resumen.produccion_mes_total, 0) }}</span>
+                            <p>Total</p>
+                        </div>
+                    </div>
+
+                    <JdTable
+                        :columns="columns_produccion"
+                        :datos="vista.resumen.produccion_mes || []"
+                        height="30rem"
+                    />
+                </div>
+
+                <div class="card">
+                    <div class="card-head">
+                        <p>Insumos</p>
+                    </div>
+
+                    <JdTable
+                        :columns="columns_insumos"
+                        :datos="vista.resumen.insumos || []"
+                        height="30rem"
+                    />
+                </div>
+
+                <div class="card">
+                    <div class="card-head">
+                        <p>Insumos por categoría</p>
+                    </div>
+
+                    <JdTable
+                        :columns="columns_insumos_categorias"
+                        :datos="vista.resumen.insumos_categorias || []"
+                        height="22rem"
+                    />
+                </div>
+            </div>
         </div>
     </div>
 </template>
@@ -55,7 +95,7 @@ export default {
             {
                 id: 'nombre',
                 title: 'Nombre',
-                width: '20rem',
+                width: '25rem',
                 show: true,
                 seek: true,
                 sort: true,
@@ -92,7 +132,7 @@ export default {
                 sort: true,
             },
             {
-                id: 'cantidad_real',
+                id: 'cantidad',
                 title: 'Cant. real',
                 format: 'decimal',
                 toRight: true,
@@ -106,7 +146,48 @@ export default {
                 title: 'Diferencia',
                 format: 'decimal',
                 toRight: true,
-                width: '5rem',
+                width: '7rem',
+                show: true,
+                seek: true,
+                sort: true,
+            },
+        ],
+
+        columns_insumos_categorias: [
+            {
+                id: 'nombre',
+                title: 'Nombre',
+                width: '12rem',
+                show: true,
+                seek: true,
+                sort: true,
+            },
+            {
+                id: 'cantidad_plan',
+                title: 'Cant. receta',
+                format: 'decimal',
+                toRight: true,
+                width: '7rem',
+                show: true,
+                seek: true,
+                sort: true,
+            },
+            {
+                id: 'cantidad',
+                title: 'Cant. real',
+                format: 'decimal',
+                toRight: true,
+                width: '7rem',
+                show: true,
+                seek: true,
+                sort: true,
+            },
+            {
+                id: 'diferencia',
+                title: 'Diferencia',
+                format: 'decimal',
+                toRight: true,
+                width: '7rem',
                 show: true,
                 seek: true,
                 sort: true,
@@ -117,11 +198,7 @@ export default {
         this.vista = this.useVistas.vReporteProduccion
         this.initFiltros()
 
-        if (this.vista.loaded) return
-
-        this.loadDatosSistema()
-        // if (this.useAuth.verifyPermiso('vReporteProduccion:listar') == true)
-        //     this.loadProduccionProductos()
+        if (!this.vista.lineasLoaded) this.loadLineas()
     },
     methods: {
         initFiltros() {
@@ -155,26 +232,25 @@ export default {
 
             if (res.code != 0) return
 
-            this.vista.produccion_mes = res.data.produccion_mes
-            this.vista.insumos = res.data.insumos
+            this.vista.resumen = res.data
         },
 
-        async loadDatosSistema() {
-            const qry = ['produccion_tipos']
-            const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
+        async loadLineas() {
+            const qry = {
+                fltr: {},
+            }
+
+            this.vista.articulo_lineas = []
+            this.vista.lineasLoaded = false
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.articulo_lineas}?qry=${JSON.stringify(qry)}`)
+            this.useAuth.setLoading(false)
+            this.vista.lineasLoaded = true
 
             if (res.code != 0) return
 
-            Object.assign(this.vista, res.data)
+            this.vista.articulo_lineas = res.data
         },
     },
 }
 </script>
-
-<style lang="scss" scoped>
-.container-tables {
-    display: flex;
-    gap: 2rem;
-    height: calc(100% - 4rem);
-}
-</style>

@@ -238,6 +238,7 @@ export default {
         setQuery() {
             this.vista.qry = {
                 fltr: {},
+                incl: ['maquina1', 'articulo1'],
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
@@ -344,7 +345,13 @@ export default {
                     fecha: dayjs().format('YYYY-MM-DD'),
                 },
             }
-            this.useModals.setModal('mProduccionInsumosCompartidos', `Salida de insumos`, null, send, true)
+            this.useModals.setModal(
+                'mProduccionInsumosCompartidos',
+                `Salida de insumos`,
+                null,
+                send,
+                true,
+            )
         },
         productosTerminados(item) {
             const send = {

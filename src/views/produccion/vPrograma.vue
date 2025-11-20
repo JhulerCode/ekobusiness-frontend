@@ -367,7 +367,7 @@ export default {
 
                 return {
                     ...m,
-                    produccion_ordenes,
+                    produccion_ordenes: produccion_ordenes.sort((a, b) => a.orden - b.orden),
                     tiempo_produccion,
                     tiempo_limpieza,
                 }

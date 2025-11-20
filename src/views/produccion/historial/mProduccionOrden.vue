@@ -316,7 +316,8 @@ export default {
             if (res.code != 0) return
 
             this.useVistas.addItem(
-                this.tipoPrograma[this.modal.produccion_orden.tipo],
+                // this.tipoPrograma[this.modal.produccion_orden.tipo],
+                'vPrograma',
                 'produccion_ordenes',
                 { ...res.data, receta: this.insumos_necesitados },
             )
@@ -332,7 +333,8 @@ export default {
             if (res.code != 0) return
 
             this.useVistas.updateItem(
-                this.tipoPrograma[this.modal.produccion_orden.tipo],
+                // this.tipoPrograma[this.modal.produccion_orden.tipo],
+                'vPrograma',
                 'produccion_ordenes',
                 { ...res.data, receta: this.insumos_necesitados },
             )

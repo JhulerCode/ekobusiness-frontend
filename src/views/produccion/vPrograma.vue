@@ -47,8 +47,15 @@
             <JdInput v-model="columns[0].val" type="date" @change="setFecha" style="width: 10rem" />
 
             <!-- <JdButton text="Buscar" @click="loadProduccionOrdenes" /> -->
-        </div>
 
+            <JdButton
+                text="Exportar"
+                tipo="2"
+                @click="exportarPrograma"
+                v-if="useAuth.verifyPermiso('vPrograma:verProductosPedidos')"
+            />
+        </div>
+        <!-- {{ maquinas_produccion }} -->
         <div class="asdasd">
             <div class="card" v-if="vista.maquinas && vista.maquinas.length == 0">
                 <JdTable
@@ -109,12 +116,11 @@
                 </li>
             </ul>
 
-            <!-- <div class="card" v-if="useAuth.verifyPermiso('vPrograma:crear')"> -->
-            <div class="card" v-if="false">
+            <div class="card" v-if="useAuth.verifyPermiso('vPrograma:crear')">
                 <div class="card-head">
                     <p>Insumos</p>
 
-                    <JdButton text="Calcular" tipo="2" @click="calcularInsumosNecesitados" />
+                    <JdButton text="Calcular" tipo="2" @click="calcularInsumosNecesarios" />
                 </div>
 
                 <JdTable
@@ -167,6 +173,8 @@ import { jmsg, jqst } from '@/utils/swal'
 import { redondear } from '@/utils/mine'
 
 import dayjs from 'dayjs'
+import ExcelJS from 'exceljs'
+import { saveAs } from 'file-saver'
 
 export default {
     components: {
@@ -491,7 +499,7 @@ export default {
             // if (this.vista.maquina != null)
             //     this.vista.qry.fltr.maquina = { op: 'Es', val: this.vista.maquina }
             this.useAuth.updateQuery(this.columns, this.vista.qry)
-            this.vista.qry.cols.push('maquina', 'maquina_info', 'articulo_info')
+            this.vista.qry.cols.push('fecha', 'maquina', 'maquina_info', 'articulo_info')
         },
         async loadProduccionOrdenes() {
             if (!this.columns[0].val) {
@@ -653,14 +661,138 @@ export default {
             pr.productos_terminados = item.productos_terminados
         },
 
-        async verPedidos() {
-            const send = {
-                produccion_tipo: 1,
+        async exportarPrograma() {
+            await this.calcularInsumosNecesarios()
+
+            const fecha_programa = dayjs(this.vista.produccion_ordenes[0].fecha).format(
+                'DD-MM-YYYY',
+            )
+            const nombre = `Programa de producción del ${fecha_programa}`
+            const workbook = new ExcelJS.Workbook()
+            const worksheet = workbook.addWorksheet('Hoja1')
+            worksheet.properties.showGridLines = false
+            worksheet.getColumn(1).width = 40
+
+            //--- Title ---//
+            const titleRow = worksheet.addRow([
+                `Orden de producción`,
+                '',
+                '',
+                // this.vista.produccion_ordenes[0].fecha,
+                fecha_programa,
+                '',
+            ])
+
+            worksheet.mergeCells(`D${titleRow.number}:E${titleRow.number}`)
+
+            // Estilos para la primera celda (A1)
+            titleRow.getCell(1).font = {
+                size: 18,
+                bold: true,
+                color: { argb: '666666' }, // gris
             }
 
-            this.useModals.setModal('mProductosFaltantes', 'Productos pedidos', null, send, true)
+            // Estilos para la última celda (D1:E1)
+            titleRow.getCell(4).font = {
+                size: 18,
+                bold: true,
+                color: { argb: '666666' }, // gris
+                horizontal: 'right',
+            }
+
+            worksheet.addRow([])
+
+            //--- Máquinas ---//
+            const excluir = [
+                'da249f8d-c28e-4eda-a3f9-3ea9659b2f1a', //goma
+                '7068389c-14b4-4a81-a91a-475086719b47', //hilo
+                '5daf8437-e0fe-4c6c-95ef-664288365036', //papel
+            ]
+
+            for (const a of this.maquinas_produccion) {
+                worksheet.addRow([a.nombre])
+                const headerRow = worksheet.addRow([
+                    'Producto',
+                    'Cantidad',
+                    'Hierba',
+                    'Sobre',
+                    'Etiqueta',
+                ])
+
+                headerRow.eachCell((cell) => {
+                    cell.fill = {
+                        type: 'pattern',
+                        pattern: 'solid',
+                        fgColor: { argb: '000000' }, // negro
+                    }
+
+                    cell.font = {
+                        color: { argb: 'FFFFFF' }, // blanco
+                        bold: true,
+                    }
+
+                    cell.border = {
+                        top: { style: 'thin' },
+                        left: { style: 'thin' },
+                        bottom: { style: 'thin' },
+                        right: { style: 'thin' },
+                    }
+                })
+
+                for (const b of a.produccion_ordenes) {
+                    const fila = [b.articulo_info.nombre, b.cantidad, '', '', '']
+
+                    const receta = b.receta
+                        .filter((x) => !x.articulo1.nombre.includes('CAJA'))
+                        .filter((x) => !excluir.includes(x.articulo))
+                        .sort((y, z) =>
+                            y.articulo1.nombre
+                                .toLowerCase()
+                                .localeCompare(z.articulo1.nombre.toLowerCase()),
+                        )
+
+                    for (const c of receta) {
+                        if (c.articulo1.nombre.includes('SOBREE')) {
+                            fila.splice(3, 1, c.cantidad_necesitada.toFixed(2))
+                        } else if (c.articulo1.nombre.includes('ETIQUETA')) {
+                            fila.splice(4, 1, c.cantidad_necesitada.toFixed(2))
+                        } else {
+                            fila.splice(2, 1, c.cantidad_necesitada.toFixed(2))
+                        }
+                    }
+
+                    const dataRow = worksheet.addRow(fila)
+
+                    dataRow.eachCell((cell) => {
+                        cell.border = {
+                            top: { style: 'thin' },
+                            left: { style: 'thin' },
+                            bottom: { style: 'thin' },
+                            right: { style: 'thin' },
+                        }
+                    })
+
+                    const realRow = worksheet.addRow(['', '', '', '', ''])
+                    realRow.eachCell((cell) => {
+                        cell.border = {
+                            top: { style: 'thin' },
+                            left: { style: 'thin' },
+                            bottom: { style: 'thin' },
+                            right: { style: 'thin' },
+                        }
+                    })
+                }
+
+                worksheet.addRow([])
+            }
+
+            const excelBuffer = await workbook.xlsx.writeBuffer()
+            const blob = new Blob([excelBuffer], {
+                type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            })
+            saveAs(blob, `${nombre}.xlsx`)
         },
-        async calcularInsumosNecesitados() {
+        async calcularInsumosNecesarios() {
             const send = {
                 articulos: this.vista.produccion_ordenes,
             }
@@ -672,6 +804,13 @@ export default {
             if (res.code != 0) return
 
             this.vista.produccion_ordenes = res.data
+        },
+        async verPedidos() {
+            const send = {
+                produccion_tipo: 1,
+            }
+
+            this.useModals.setModal('mProductosFaltantes', 'Productos pedidos', null, send, true)
         },
         salidaInsumos2() {
             const send = {

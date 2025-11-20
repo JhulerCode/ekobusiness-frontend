@@ -200,7 +200,7 @@ async function tryOficialExcel(element, file, reader, headers) {
     return { code: 0, data: jsonObject }
 }
 
-async function downloadExcel(columns, datos = [], nombre = `${Date.now()}.xlsx`) {
+async function downloadExcel(columns, datos = [], nombre = Date.now()) {
     const workbook = new ExcelJS.Workbook()
     const worksheet = workbook.addWorksheet('Hoja1')
 
@@ -226,7 +226,7 @@ async function downloadExcel(columns, datos = [], nombre = `${Date.now()}.xlsx`)
     // Configura la hoja de cálculo para que se descargue automáticamente
     const excelBuffer = await workbook.xlsx.writeBuffer()
     const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
-    saveAs(blob, nombre)
+    saveAs(blob, `${nombre}.xlsx`)
 }
 
 // function selectRow(item, many = true) {

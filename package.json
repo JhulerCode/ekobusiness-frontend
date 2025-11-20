@@ -11,7 +11,7 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
-    "@jhuler/components": "^1.2.0",
+    "@jhuler/components": "^1.2.1",
     "dayjs": "^1.11.13",
     "echarts": "^5.6.0",
     "exceljs": "^4.4.0",

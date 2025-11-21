@@ -171,11 +171,11 @@ export default {
             {
                 id: 'cantidad',
                 title: 'Cantidad',
-                type: 'number',
                 input: true,
+                type: 'number',
+                oninput: 'sumarUno',
                 width: '6rem',
                 show: true,
-                oninput: 'sumarUno',
             },
             // {
             //     id: 'pu',

@@ -68,7 +68,20 @@
                     :download="false"
                     :rowOptions="tableRowOptions"
                     @rowOptionSelected="runMethod"
-                />
+                >
+                    <template v-slot:cCantidad="{ item }">
+                        <JdInput
+                            v-model="item.cantidad"
+                            type="number"
+                            :toRight="true"
+                            @input="calcularProducto(item)"
+                            @change="modificarProduccionOrden(item)"
+                            :disabled="
+                                !useAuth.verifyPermiso('vPrograma:crear') || item.estado == 2
+                            "
+                        />
+                    </template>
+                </JdTable>
             </div>
 
             <ul class="container-programa" v-else>
@@ -122,7 +135,20 @@
                         :download="false"
                         :rowOptions="tableRowOptions"
                         @rowOptionSelected="runMethod"
-                    />
+                    >
+                        <template v-slot:cCantidad="{ item }">
+                            <JdInput
+                                v-model="item.cantidad"
+                                type="number"
+                                :toRight="true"
+                                @input="calcularProducto(item)"
+                                @change="modificarProduccionOrden(item)"
+                                :disabled="
+                                    !useAuth.verifyPermiso('vPrograma:crear') || item.estado == 2
+                                "
+                            />
+                        </template>
+                    </JdTable>
                 </li>
             </ul>
 
@@ -241,7 +267,12 @@ export default {
                 id: 'cantidad',
                 title: 'Cantidad',
                 format: 'number',
-                toRight: true,
+                slot: 'cCantidad',
+                // toRight: true,
+                // input: true,
+                // type: 'number',
+                // oninput: 'calcularProducto',
+                // onchange: 'modificarProduccionOrden',
                 width: '7rem',
                 show: true,
             },
@@ -344,16 +375,14 @@ export default {
         maquinas_produccion() {
             if (!this.vista.produccion_ordenes || !this.vista.maquinas) return []
 
-            const mapaProducciones = this.vista.produccion_ordenes
+            const mapaProducciones = JSON.parse(JSON.stringify(this.vista.produccion_ordenes))
                 .filter((a) => a.fecha == this.columns[0].val)
                 .reduce((acc, prod) => {
                     if (!acc[prod.maquina]) {
                         acc[prod.maquina] = []
                     }
 
-                    const tiempo =
-                        (prod.cantidad * prod.articulo_info?.filtrantes) /
-                        prod.maquina_info?.velocidad
+                    const tiempo = this.setProductoTiempo(prod)
 
                     acc[prod.maquina].push({
                         ...prod,
@@ -831,7 +860,7 @@ export default {
             }
 
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await post(`${urls.receta_insumos}/calcular-necesidad`, send)
+            const res = await post(`${urls.receta_insumos}/calcular-necesidad`, send, false)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
@@ -863,6 +892,33 @@ export default {
                 send,
                 true,
             )
+        },
+
+        setProductoTiempo(prod) {
+            return (prod.cantidad * prod.articulo_info?.filtrantes) / prod.maquina_info?.velocidad
+        },
+        calcularProducto(item) {
+            const i = this.vista.produccion_ordenes.findIndex((a) => a.id == item.id)
+            this.vista.produccion_ordenes[i].cantidad = item.cantidad
+        },
+        async modificarProduccionOrden(item) {
+            if (!item.cantidad) {
+                jmsg('warning', 'Ingrese una cantidad')
+                return
+            }
+
+            this.useAuth.setLoading(true)
+            const res = await patch(urls.produccion_ordenes, item)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+        },
+        maquinaTieneOrdenesPendientes(maq) {
+            const maquina = this.maquinas_produccion.find((a) => a.id == maq.id)
+
+            if (!maquina) return false
+
+            return maquina.produccion_ordenes.some((a) => a.estado == 1)
         },
     },
 }

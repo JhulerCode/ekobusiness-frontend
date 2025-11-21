@@ -1,7 +1,5 @@
 <template>
     <JdModal modal="mProduccionInsumosCompartidos">
-        {{ modal.maquinas.some((a) => a.estado == 1) }}
-
         <div class="container-agregar">
             <JdInput
                 type="date"

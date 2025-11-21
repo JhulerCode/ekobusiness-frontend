@@ -7,7 +7,7 @@
                 <JdButton
                     text="Salida de insumos"
                     tipo="2"
-                    @click="salidaInsumos2"
+                    @click="salidaInsumosCompartidos"
                     v-if="useAuth.verifyPermiso('vProduccionHistorial:salidaInsumos')"
                 />
             </div>
@@ -27,8 +27,8 @@
     </div>
 
     <mProduccionOrden v-if="useModals.show.mProduccionOrden" />
-    <mProduccionInsumos v-if="useModals.show.mProduccionInsumos" />
-    <mProduccionProductos v-if="useModals.show.mProduccionProductos" />
+    <!-- <mProduccionInsumos v-if="useModals.show.mProduccionInsumos" /> -->
+    <!-- <mProduccionProductos v-if="useModals.show.mProduccionProductos" /> -->
     <mFormato v-if="useModals.show.mFormato" @created="setFormatoCalidad" />
     <mProduccionTrazabilidad v-if="useModals.show.mProduccionTrazabilidad" />
     <mProduccionInsumosCompartidos v-if="useModals.show.mProduccionInsumosCompartidos" />
@@ -40,11 +40,11 @@
 import { JdTable, JdButton, mConfigFiltros } from '@jhuler/components'
 
 import mProduccionOrden from '@/views/produccion/historial/mProduccionOrden.vue'
-import mProduccionInsumos from '@/views/produccion/historial/mProduccionInsumos.vue'
-import mFormato from '@/views/calidad/formatos/mFormato.vue'
-import mProduccionProductos from '@/views/produccion/historial/mProduccionProductos.vue'
-import mProduccionTrazabilidad from '@/views/produccion/historial/mProduccionTrazabilidad.vue'
 import mProduccionInsumosCompartidos from '@/views/produccion/historial/mProduccionInsumosCompartidos.vue'
+// import mProduccionInsumos from '@/views/produccion/historial/mProduccionInsumos.vue'
+// import mProduccionProductos from '@/views/produccion/historial/mProduccionProductos.vue'
+import mFormato from '@/views/calidad/formatos/mFormato.vue'
+import mProduccionTrazabilidad from '@/views/produccion/historial/mProduccionTrazabilidad.vue'
 
 import { useModals } from '@/pinia/modals'
 import { useAuth } from '@/pinia/auth'
@@ -62,11 +62,11 @@ export default {
         mConfigFiltros,
 
         mProduccionOrden,
-        mProduccionInsumos,
-        mFormato,
-        mProduccionProductos,
-        mProduccionTrazabilidad,
         mProduccionInsumosCompartidos,
+        // mProduccionInsumos,
+        // mProduccionProductos,
+        mFormato,
+        mProduccionTrazabilidad,
     },
     data: () => ({
         useModals: useModals(),
@@ -182,24 +182,24 @@ export default {
                 action: 'ver',
                 permiso: 'vProduccionHistorial:ver',
             },
-            {
-                label: 'Editar',
-                icon: 'fa-solid fa-pen-to-square',
-                action: 'editar',
-                permiso: 'vProduccionHistorial:ver',
-            },
-            {
-                label: 'Salida de insumos',
-                icon: 'fa-regular fa-circle-down',
-                action: 'salidaInsumos',
-                permiso: 'vProduccionHistorial:salidaInsumos',
-            },
-            {
-                label: 'Productos terminados',
-                icon: 'fa-solid fa-boxes-stacked',
-                action: 'productosTerminados',
-                permiso: 'vProduccionHistorial:productosTerminados',
-            },
+            // {
+            //     label: 'Editar',
+            //     icon: 'fa-solid fa-pen-to-square',
+            //     action: 'editar',
+            //     permiso: 'vProduccionHistorial:ver',
+            // },
+            // {
+            //     label: 'Salida de insumos',
+            //     icon: 'fa-regular fa-circle-down',
+            //     action: 'salidaInsumos',
+            //     permiso: 'vProduccionHistorial:salidaInsumos',
+            // },
+            // {
+            //     label: 'Productos terminados',
+            //     icon: 'fa-solid fa-boxes-stacked',
+            //     action: 'productosTerminados',
+            //     permiso: 'vProduccionHistorial:productosTerminados',
+            // },
             {
                 label: 'Ver trazabilidad',
                 icon: 'fa-solid fa-diagram-project',
@@ -258,6 +258,29 @@ export default {
 
             this.vista.produccion_ordenes = res.data
         },
+        async loadDatosSistema() {
+            const qry = ['produccion_tipos', 'produccion_orden_estados']
+            const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
+
+            if (res.code != 0) return
+
+            Object.assign(this.vista, res.data)
+        },
+        async loadMaquinas() {
+            const qry = {
+                fltr: { tipo: { op: 'Es', val: 1 } },
+                cols: ['codigo', 'nombre', 'produccion_tipo', 'velocidad', 'limpieza_tiempo'],
+            }
+
+            this.vista.maquinas = []
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.maquinas}?qry=${JSON.stringify(qry)}`)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            this.vista.maquinas = res.data
+        },
 
         async openConfigFiltros() {
             await this.loadDatosSistema()
@@ -305,67 +328,52 @@ export default {
 
             this.useModals.setModal('mProduccionOrden', 'Ver órden de producción', 3, send, true)
         },
-        async editar(item) {
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.produccion_ordenes}/uno/${item.id}`)
-            this.useAuth.setLoading(false)
+        // async editar(item) {
+        //     this.useAuth.setLoading(true, 'Cargando...')
+        //     const res = await get(`${urls.produccion_ordenes}/uno/${item.id}`)
+        //     this.useAuth.setLoading(false)
 
-            if (res.code != 0) return
+        //     if (res.code != 0) return
 
-            const send = {
-                produccion_orden: res.data,
-                articulos: [
-                    {
-                        id: res.data.articulo,
-                        ...res.data.articulo_info,
-                    },
-                ],
-            }
+        //     const send = {
+        //         produccion_orden: res.data,
+        //         articulos: [
+        //             {
+        //                 id: res.data.articulo,
+        //                 ...res.data.articulo_info,
+        //             },
+        //         ],
+        //     }
 
-            this.useModals.setModal('mProduccionOrden', 'Editar órden de producción', 2, send, true)
-        },
-        async salidaInsumos(item) {
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.produccion_ordenes}/uno/${item.id}`)
-            this.useAuth.setLoading(false)
+        //     this.useModals.setModal('mProduccionOrden', 'Editar órden de producción', 2, send, true)
+        // },
+        // async salidaInsumos(item) {
+        //     this.useAuth.setLoading(true, 'Cargando...')
+        //     const res = await get(`${urls.produccion_ordenes}/uno/${item.id}`)
+        //     this.useAuth.setLoading(false)
 
-            if (res.code != 0) return
+        //     if (res.code != 0) return
 
-            const send = {
-                is_receta: true,
-                produccion_orden: JSON.parse(JSON.stringify(res.data)),
-            }
+        //     const send = {
+        //         is_receta: true,
+        //         produccion_orden: JSON.parse(JSON.stringify(res.data)),
+        //     }
 
-            this.useModals.setModal('mProduccionInsumos', `Salida de insumos`, 1, send, true)
-        },
-        salidaInsumos2() {
-            const send = {
-                transaccion: {
-                    tipo: 2,
-                    fecha: dayjs().format('YYYY-MM-DD'),
-                },
-            }
-            this.useModals.setModal(
-                'mProduccionInsumosCompartidos',
-                `Salida de insumos`,
-                null,
-                send,
-                true,
-            )
-        },
-        productosTerminados(item) {
-            const send = {
-                produccion_orden: { ...item },
-            }
+        //     this.useModals.setModal('mProduccionInsumos', `Salida de insumos`, 1, send, true)
+        // },
+        // productosTerminados(item) {
+        //     const send = {
+        //         produccion_orden: { ...item },
+        //     }
 
-            this.useModals.setModal(
-                'mProduccionProductos',
-                `Productos terminados`,
-                null,
-                send,
-                true,
-            )
-        },
+        //     this.useModals.setModal(
+        //         'mProduccionProductos',
+        //         `Productos terminados`,
+        //         null,
+        //         send,
+        //         true,
+        //     )
+        // },
         async verTrazabilidad(item) {
             this.useAuth.setLoading(true, 'Cargando trazabilidad...')
             const res = await get(`${urls.produccion_ordenes}/trazabilidad/${item.id}`)
@@ -506,28 +514,21 @@ export default {
             }
         },
 
-        async loadDatosSistema() {
-            const qry = ['produccion_tipos', 'produccion_orden_estados']
-            const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
-
-            if (res.code != 0) return
-
-            Object.assign(this.vista, res.data)
-        },
-        async loadMaquinas() {
-            const qry = {
-                fltr: { tipo: { op: 'Es', val: 1 } },
-                cols: ['codigo', 'nombre', 'produccion_tipo', 'velocidad', 'limpieza_tiempo'],
+        salidaInsumosCompartidos() {
+            const send = {
+                transaccion: {
+                    tipo: 2,
+                    fecha: dayjs().format('YYYY-MM-DD'),
+                },
             }
 
-            this.vista.maquinas = []
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.maquinas}?qry=${JSON.stringify(qry)}`)
-            this.useAuth.setLoading(false)
-
-            if (res.code != 0) return
-
-            this.vista.maquinas = res.data
+            this.useModals.setModal(
+                'mProduccionInsumosCompartidos',
+                `Salida de insumos`,
+                null,
+                send,
+                true,
+            )
         },
     },
 }

@@ -1,5 +1,7 @@
 <template>
     <JdModal modal="mProduccionInsumosCompartidos">
+        {{ modal.maquinas.some((a) => a.estado == 1) }}
+
         <div class="container-agregar">
             <JdInput
                 type="date"
@@ -63,17 +65,6 @@
                 style="grid-column: 1/2"
             />
 
-            <small v-if="modal.is_receta && modal.transaccion.articulo" style="grid-column: 2/3">
-                Cant. planificada:
-                {{
-                    redondear(
-                        modal.produccion_orden.articulo_info.receta_insumos.find(
-                            (a) => a.articulo == modal.transaccion.articulo,
-                        )?.cantidad * modal.produccion_orden.cantidad,
-                    )
-                }}
-            </small>
-
             <JdButton text="Grabar" tipo="2" @click="grabar" style="grid-column: 3/4" />
         </div>
 
@@ -81,7 +72,7 @@
             :columns="columns"
             :datos="modal.produccion_insumos || []"
             width="61rem"
-            :colAct="true"
+            :colAct="modal.tableColAct"
             :download="false"
             :reload="loadProduccionInsumos"
             colActWidth="4.5rem"
@@ -232,7 +223,19 @@ export default {
     async created() {
         this.modal = this.useModals.mProduccionInsumosCompartidos
 
-        await this.loadMaquinas()
+        this.modal.tableColAct = false
+
+        if (this.modal.maquina) {
+            if (this.modal.maquina.produccion_ordenes.some((a) => a.estado == 1)) {
+                this.modal.tableColAct = true
+            } else {
+                this.modal.tableColAct = false
+            }
+        } else {
+            this.modal.tableColAct = true
+        }
+
+        // await this.loadMaquinas()
         await this.loadProduccionInsumos()
     },
     methods: {
@@ -246,27 +249,33 @@ export default {
             this.modal.lotes = []
             this.modal.lotesLoaded = false
         },
-        async loadProduccionInsumos() {
+        setQuery() {
             this.modal.produccion_insumos = []
 
-            const qry = {
+            this.modal.qry = {
                 fltr: {
                     fecha: { op: 'Es', val: this.modal.transaccion.fecha },
                     tipo: { op: 'Es', val: [2, 3] },
+                    produccion_orden: { op: 'Es', val: null },
                 },
                 incl: ['lote_padre1', 'articulo1', 'maquina1'],
             }
 
-            this.useAuth.updateQuery(this.columns, qry)
+            this.useAuth.updateQuery(this.columns, this.modal.qry)
 
-            if (this.modal.transaccion.maquina != null) {
-                qry.fltr.maquina = { op: 'Es', val: this.modal.transaccion.maquina }
+            if (!this.modal.transaccion.maquina) {
+                this.modal.qry.fltr.maquina = { op: 'Es', val: null }
+            } else {
+                this.modal.qry.fltr.maquina = { op: 'Es', val: this.modal.transaccion.maquina }
             }
 
-            qry.cols.push('tipo', 'lote_padre')
+            this.modal.qry.cols.push('tipo', 'lote_padre')
+        },
+        async loadProduccionInsumos() {
+            this.setQuery()
 
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.kardex}?qry=${JSON.stringify(qry)}`)
+            const res = await get(`${urls.kardex}?qry=${JSON.stringify(this.modal.qry)}`)
             this.useAuth.setLoading(false)
 
             if (res.code !== 0) return

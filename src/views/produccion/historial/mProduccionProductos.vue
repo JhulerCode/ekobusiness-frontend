@@ -5,7 +5,7 @@
             <small>Cant. planificada:</small> {{ modal.produccion_orden.cantidad }}
         </p>
 
-        <div class="container-datos">
+        <div class="container-datos" v-if="modal.produccion_orden.estado == 1">
             <JdInput label="Lote" :nec="true" v-model="modal.transaccion.lote" />
 
             <JdInput
@@ -36,7 +36,7 @@
         <JdTable
             :columns="columns"
             :datos="modal.produccion_productos || []"
-            :colAct="true"
+            :colAct="modal.tableColAct"
             :seeker="false"
             :download="false"
             :reload="loadProduccionProductos"
@@ -121,6 +121,8 @@ export default {
     }),
     created() {
         this.modal = this.useModals.mProduccionProductos
+
+        this.modal.tableColAct = this.modal.produccion_orden.estado == 1 ? true : false
 
         this.initTransaccion()
         this.loadProduccionProductos()

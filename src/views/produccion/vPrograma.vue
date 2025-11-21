@@ -10,16 +10,6 @@
                     @click="verPedidos"
                     v-if="useAuth.verifyPermiso('vPrograma:verProductosPedidos')"
                 />
-
-                <JdButton
-                    text="Salida de insumos"
-                    tipo="2"
-                    @click="salidaInsumos2"
-                    v-if="
-                        useAuth.verifyPermiso('vPrograma:salidaInsumosCompartidos') &&
-                        vista.qry?.fltr?.fecha?.op == 'Es'
-                    "
-                />
             </div>
         </div>
 
@@ -52,12 +42,22 @@
                 text="Exportar"
                 tipo="2"
                 @click="exportarPrograma"
-                v-if="useAuth.verifyPermiso('vPrograma:verProductosPedidos')"
+                v-if="useAuth.verifyPermiso('vPrograma:crear')"
             />
         </div>
         <!-- {{ maquinas_produccion }} -->
         <div class="asdasd">
             <div class="card" v-if="vista.maquinas && vista.maquinas.length == 0">
+                <div class="maquina-head">
+                    <JdButton
+                        icon="fa-solid fa-plus"
+                        tipo="2"
+                        title="Agregar orden de producción"
+                        @click="nuevo()"
+                        v-if="useAuth.verifyPermiso('vPrograma:crear')"
+                    />
+                </div>
+
                 <JdTable
                     :columns="columns"
                     :datos="vista.produccion_ordenes || []"
@@ -76,13 +76,23 @@
                     <div class="maquina-head">
                         <div>
                             <strong>{{ a.nombre }}</strong>
+
                             <JdButton
                                 icon="fa-solid fa-plus"
                                 tipo="2"
-                                :small="true"
                                 title="Agregar orden de producción"
                                 @click="nuevo(a)"
                                 v-if="useAuth.verifyPermiso('vPrograma:crear')"
+                            />
+
+                            <JdButton
+                                text="Salida de insumos"
+                                tipo="2"
+                                @click="salidaInsumosCompartidos(a)"
+                                v-if="
+                                    useAuth.verifyPermiso('vPrograma:salidaInsumosCompartidos') &&
+                                    columns[0].val
+                                "
                             />
                         </div>
                         <div>
@@ -286,6 +296,12 @@ export default {
                 ocultar: { estado: 2 },
             },
             {
+                label: 'Salida de insumos',
+                icon: 'fa-regular fa-circle-down',
+                action: 'salidaInsumos',
+                permiso: 'vPrograma:salidaInsumos',
+            },
+            {
                 label: 'Productos terminados',
                 icon: 'fa-solid fa-boxes-stacked',
                 action: 'productosTerminados',
@@ -435,6 +451,8 @@ export default {
             this.useAuth.saveTableColumns(this.tableName, this.columns)
 
             await this.loadMaquinas()
+            this.columns[1].op = null
+            this.columns[1].val = null
             this.loadProduccionOrdenes()
         },
         async setMaquina() {
@@ -499,7 +517,7 @@ export default {
             // if (this.vista.maquina != null)
             //     this.vista.qry.fltr.maquina = { op: 'Es', val: this.vista.maquina }
             this.useAuth.updateQuery(this.columns, this.vista.qry)
-            this.vista.qry.cols.push('fecha', 'maquina', 'maquina_info', 'articulo_info')
+            this.vista.qry.cols.push('fecha', 'maquina', 'maquina_info', 'articulo_info', 'estado')
         },
         async loadProduccionOrdenes() {
             if (!this.columns[0].val) {
@@ -526,28 +544,6 @@ export default {
 
             this.vista.produccion_ordenes = res.data
             // this.calcularHoras()
-        },
-
-        nuevo(maquina) {
-            const send = {
-                produccion_orden: {
-                    fecha: dayjs().format('YYYY-MM-DD'),
-                    tipo: 1,
-                    estado: 1,
-                    maquina: maquina.id,
-                    maquina_info: {
-                        id: maquina.id,
-                        velocidad: maquina.velocidad,
-                        limpieza_tiempo: maquina.limpieza_tiempo,
-                    },
-                    orden:
-                        this.maquinas_produccion.find((a) => a.id == maquina.id).produccion_ordenes
-                            .length + 1,
-                },
-                maquinas: this.vista.maquinas,
-            }
-
-            this.useModals.setModal('mProduccionOrden', 'Nueva órden de producción', 1, send, true)
         },
 
         runMethod(method, item) {
@@ -661,6 +657,32 @@ export default {
             pr.productos_terminados = item.productos_terminados
         },
 
+        nuevo(maquina) {
+            const send = {
+                produccion_orden: {
+                    fecha: this.columns[0].val,
+                    tipo: this.columns[6].val,
+                    estado: 1,
+                },
+                maquinas: this.vista.maquinas,
+            }
+
+            if (maquina) {
+                send.maquina = maquina.id
+                send.maquina_info = {
+                    id: maquina.id,
+                    velocidad: maquina.velocidad,
+                    limpieza_tiempo: maquina.limpieza_tiempo,
+                }
+                send.produccion_orden.orden =
+                    this.maquinas_produccion.find((a) => a.id == maquina.id).produccion_ordenes
+                        .length + 1
+            } else {
+                send.produccion_orden.orden = this.vista.produccion_ordenes.length + 1
+            }
+
+            this.useModals.setModal('mProduccionOrden', 'Nueva órden de producción', 1, send, true)
+        },
         async exportarPrograma() {
             await this.calcularInsumosNecesarios()
 
@@ -812,13 +834,15 @@ export default {
 
             this.useModals.setModal('mProductosFaltantes', 'Productos pedidos', null, send, true)
         },
-        salidaInsumos2() {
+        salidaInsumosCompartidos(a) {
             const send = {
                 transaccion: {
                     tipo: 2,
                     fecha: this.columns[0].val,
-                    maquina: this.columns[1].val,
+                    maquina: a.id,
                 },
+                maquinas: this.maquinas_produccion,
+                maquina: a,
             }
 
             this.useModals.setModal(

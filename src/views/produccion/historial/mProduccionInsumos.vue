@@ -5,7 +5,7 @@
             <small>Cant. planificada:</small> {{ modal.produccion_orden.cantidad }}
         </p>
 
-        <div class="container-agregar">
+        <div class="container-agregar" v-if="modal.produccion_orden.estado == 1">
             <JdInput
                 type="date"
                 label="Fecha"
@@ -81,7 +81,7 @@
             :columns="columns"
             :datos="modal.produccion_insumos || []"
             width="61rem"
-            :colAct="true"
+            :colAct="modal.tableColAct"
             :seeker="false"
             :download="false"
             :reload="loadProduccionInsumos"
@@ -120,7 +120,15 @@
 </template>
 
 <script>
-import { JdModal, JdInput, JdCheckBox, JdSelect, JdSelectQuery, JdButton, JdTable } from '@jhuler/components'
+import {
+    JdModal,
+    JdInput,
+    JdCheckBox,
+    JdSelect,
+    JdSelectQuery,
+    JdButton,
+    JdTable,
+} from '@jhuler/components'
 import mProduccionInsumosDevolucion from '@/views/produccion/historial/mProduccionInsumosDevolucion.vue'
 
 import { useAuth } from '@/pinia/auth'
@@ -210,6 +218,8 @@ export default {
     }),
     created() {
         this.modal = this.useModals.mProduccionInsumos
+
+        this.modal.tableColAct = this.modal.produccion_orden.estado == 1 ? true : false
 
         this.initTransaccion()
         this.loadProduccionInsumos()

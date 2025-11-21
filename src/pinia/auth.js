@@ -278,6 +278,7 @@ export const useAuth = defineStore('auth', {
                             { id: 'vPrograma:eliminar', label: 'Eliminar' },
 
                             { id: 'vPrograma:terminar', label: 'Terminar' },
+                            { id: 'vPrograma:salidaInsumos', label: 'Salida insumos' },
                             { id: 'vPrograma:productosTerminados', label: 'Productos terminados' },
 
                             { id: 'vPrograma:verProductosPedidos', label: 'Ver productos pedidos' },
@@ -329,11 +330,11 @@ export const useAuth = defineStore('auth', {
                             { id: 'vProduccionHistorial:listar', label: 'Listar' },
                             { id: 'vProduccionHistorial:ver', label: 'Ver' },
 
+                            // { id: 'vProduccionHistorial:productosTerminados', label: 'Productos terminados' },
                             { id: 'vProduccionHistorial:salidaInsumos', label: 'Salida de insumos' },
-                            { id: 'vProduccionHistorial:productosTerminados', label: 'Productos terminados' },
+                            { id: 'vProduccionHistorial:trazabilidad', label: 'Ver trazabilidad' },
                             { id: 'vProduccionHistorial:controlPesos', label: 'Control de pesos' },
                             { id: 'vProduccionHistorial:controlPpc', label: 'Control del PPC' },
-                            { id: 'vProduccionHistorial:trazabilidad', label: 'Ver trazabilidad' },
                         ]
                     },
                     {

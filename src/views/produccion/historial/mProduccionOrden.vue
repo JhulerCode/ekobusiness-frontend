@@ -17,7 +17,7 @@
                 style="grid-column: 4/5"
             />
 
-            <template v-if="modal.produccion_orden.tipo != 2">
+            <template v-if="modal.maquinas && modal.maquinas.length > 0">
                 <JdSelect
                     label="Máquina"
                     :nec="true"
@@ -73,7 +73,10 @@
                 style="grid-column: 1/2"
             />
 
-            <p v-if="modal.produccion_orden.tipo != 2" style="grid-column: 4/5; text-align: right">
+            <p
+                v-if="modal.maquinas && modal.maquinas.length > 0"
+                style="grid-column: 4/5; text-align: right"
+            >
                 <small>Tiempo de producción:</small>
                 {{ setTiempo() }} <br />
             </p>
@@ -292,7 +295,9 @@ export default {
         checkDatos() {
             const props = ['fecha', 'tipo', 'articulo', 'cantidad']
 
-            if (this.modal.produccion_orden.tipo != 2) props.push('maquina', 'maquina_info')
+            if (this.modal.maquinas && this.modal.maquinas.length > 0) {
+                props.push('maquina', 'maquina_info')
+            }
 
             if (incompleteData(this.modal.produccion_orden, props)) {
                 jmsg('warning', 'Ingrese los datos necesarios')

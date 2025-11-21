@@ -60,7 +60,7 @@
 
                 <JdTable
                     :columns="columns"
-                    :datos="vista.produccion_ordenes || []"
+                    :datos="produccion_ordenes_hoy"
                     :seeker="false"
                     :colAct="true"
                     :colNro="false"
@@ -336,24 +336,35 @@ export default {
         ],
     }),
     computed: {
+        produccion_ordenes_hoy() {
+            if (!this.vista.produccion_ordenes) return []
+
+            return this.vista.produccion_ordenes.filter((a) => a.fecha == this.columns[0].val)
+        },
         maquinas_produccion() {
             if (!this.vista.produccion_ordenes || !this.vista.maquinas) return []
 
-            const mapaProducciones = this.vista.produccion_ordenes.reduce((acc, prod) => {
-                if (!acc[prod.maquina]) {
-                    acc[prod.maquina] = []
-                }
+            const mapaProducciones = this.vista.produccion_ordenes
+                .filter((a) => a.fecha == this.columns[0].val)
+                .reduce((acc, prod) => {
+                    if (!acc[prod.maquina]) {
+                        acc[prod.maquina] = []
+                    }
 
-                const tiempo =
-                    (prod.cantidad * prod.articulo_info?.filtrantes) / prod.maquina_info?.velocidad
+                    const tiempo =
+                        (prod.cantidad * prod.articulo_info?.filtrantes) /
+                        prod.maquina_info?.velocidad
 
-                acc[prod.maquina].push({
-                    ...prod,
-                    tiempo,
-                    tiempo_produccion: dayjs().startOf('day').add(tiempo, 'minute').format('HH:mm'),
-                })
-                return acc
-            }, {})
+                    acc[prod.maquina].push({
+                        ...prod,
+                        tiempo,
+                        tiempo_produccion: dayjs()
+                            .startOf('day')
+                            .add(tiempo, 'minute')
+                            .format('HH:mm'),
+                    })
+                    return acc
+                }, {})
 
             const arr =
                 this.columns[1].val == null
@@ -668,8 +679,8 @@ export default {
             }
 
             if (maquina) {
-                send.maquina = maquina.id
-                send.maquina_info = {
+                send.produccion_orden.maquina = maquina.id
+                send.produccion_orden.maquina_info = {
                     id: maquina.id,
                     velocidad: maquina.velocidad,
                     limpieza_tiempo: maquina.limpieza_tiempo,

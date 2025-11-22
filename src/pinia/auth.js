@@ -12,70 +12,9 @@ export const useAuth = defineStore('auth', {
 
         menu: [
             {
-                label: 'Logística de entrada', icon: 'fa-solid fa-cart-shopping', children: [
-                    { label: 'Proveedores', goto: 'vProveedores' },
-                    { label: 'Categorías de artículos', goto: 'vArticuloCategorias' },
-                    { label: 'Artículos', goto: 'vArticulos' },
-                    { label: 'Listas de precios', goto: 'vPrecioListas' },
-                    { label: 'Pedidos de compra', goto: 'vCompraPedidos' },
-                    { label: 'Compras', goto: 'vCompras' },
-                    { label: 'Compras detalle', goto: 'vCompraItems' },
-                    { label: 'Inventario', goto: 'vInventarioArticulos' },
-                ]
-            },
-            {
-                label: 'Logística de salida', icon: 'fa-solid fa-truck', children: [
-                    { label: 'Clientes', goto: 'vClientes' },
-                    { label: 'Líneas de productos', goto: 'vProductoLineas' },
-                    { label: 'Categorías de productos', goto: 'vProductoCategorias' },
-                    { label: 'Productos terminados', goto: 'vProductosTerminados' },
-                    { label: 'Ingreso de productos', goto: 'vPtsIngresos' },
-                    { label: 'Pedidos de venta', goto: 'vVentaPedidos' },
-                    { label: 'Pedidos de venta detalle', goto: 'vVentaPedidoItems' },
-                    { label: 'Ventas', goto: 'vVentas' },
-                    { label: 'Ventas detalle', goto: 'vVentaItems' },
-                    { label: 'Inventario', goto: 'vInventarioProductos' },
-                ]
-            },
-            {
-                label: 'Producción', icon: 'fa-solid fa-oil-well', children: [
-                    // { label: 'Programa filtrantes', goto: 'vProgramaFiltrantes' },
-                    // { label: 'Programa granel', goto: 'vProgramaGranel' },
-                    // { label: 'Programa luxury', goto: 'vProgramaLuxury' },
-                    { label: 'Programa', goto: 'vPrograma' },
-                    { label: 'Órdenes de producción', goto: 'vProduccionHistorial' },
-                    { label: 'Productos terminados', goto: 'vProductosCuarentena' },
-                    { label: 'Reporte', goto: 'vReporteProduccion' },
-                ]
-            },
-            {
-                label: 'Calidad', icon: 'fa-solid fa-magnifying-glass', children: [
-                    { label: 'Formatos BPM', goto: 'vFormatosBpm' },
-                    { label: 'Formatos PHS', goto: 'vFormatosPhs' },
-                    { label: 'Formatos HACCP', goto: 'vFormatosHaccp' },
-                    { label: 'Registros sanitarios', goto: 'vRegistrosSanitarios' },
-                    { label: 'Inspecciones de clientes', goto: 'vInspecciones' },
-                ]
-            },
-            {
-                label: 'Operaciones', icon: 'fa-solid fa-gears', children: [
-                    { label: 'Documentos clave', goto: 'vDocumentos' },
-                    { label: 'Caja chica', goto: 'vCajaAperturas' },
-                    { label: 'Monedas', goto: 'vMonedas' },
-                    { label: 'Máquinas', goto: 'vMaquinas' },
-                    { label: 'Equipos', goto: 'vEquipos' },
-                    { label: 'Colaboradores', goto: 'vColaboradores' },
-                    { label: 'Asistencias', goto: 'vAsistencias' },
-                    { label: 'Usuarios conectados', goto: 'vSessions' },
-                    { label: 'Activity logs', goto: 'vActivityLogs' },
-                ]
-            }
-        ],
-        listaPermisos: [
-            {
-                id: 'logistica_entrada', label: 'Logistica de entrada', vistas: [
+                id: 'logistica_entrada', label: 'Logística de entrada', icon: 'fa-solid fa-cart-shopping', children: [
                     {
-                        id: 'vProveedores', label: 'Proveedores', permisos: [
+                        label: 'Proveedores', goto: 'vProveedores', permisos: [
                             { id: 'vProveedores:listar', label: 'Listar' },
                             { id: 'vProveedores:crear', label: 'Crear' },
                             { id: 'vProveedores:ver', label: 'Ver' },
@@ -87,7 +26,7 @@ export const useAuth = defineStore('auth', {
                         ]
                     },
                     {
-                        id: 'vArticuloCategorias', label: 'Categorías de artículos', permisos: [
+                        label: 'Categorías de artículos', goto: 'vArticuloCategorias', permisos: [
                             { id: 'vArticuloCategorias:listar', label: 'Listar' },
                             { id: 'vArticuloCategorias:crear', label: 'Crear' },
                             { id: 'vArticuloCategorias:editar', label: 'Editar' },
@@ -95,7 +34,7 @@ export const useAuth = defineStore('auth', {
                         ]
                     },
                     {
-                        id: 'vArticulos', label: 'Artículos', permisos: [
+                        label: 'Artículos', goto: 'vArticulos', permisos: [
                             { id: 'vArticulos:listar', label: 'Listar' },
                             { id: 'vArticulos:crear', label: 'Crear' },
                             { id: 'vArticulos:editar', label: 'Editar' },
@@ -113,23 +52,20 @@ export const useAuth = defineStore('auth', {
                         ]
                     },
                     {
-                        id: 'vPrecioListas', label: 'Listas de precios', permisos: [
+                        label: 'Listas de precios', goto: 'vPrecioListas', permisos: [
                             { id: 'vPrecioListas:listar', label: 'Listar' },
                             { id: 'vPrecioListas:crear', label: 'Crear' },
                             { id: 'vPrecioListas:editar', label: 'Editar' },
                             { id: 'vPrecioListas:eliminar', label: 'Eliminar' },
+
+                            { id: 'vPrecioListaItems:listar', label: 'Listar precios' },
+                            { id: 'vPrecioListaItems:crear', label: 'Crear precio' },
+                            { id: 'vPrecioListaItems:editar', label: 'Editar precio' },
+                            { id: 'vPrecioListaItems:eliminar', label: 'Eliminar precio' },
                         ]
                     },
                     {
-                        id: 'vPrecioListaItems', label: 'Items de lista de precios', permisos: [
-                            { id: 'vPrecioListaItems:listar', label: 'Listar' },
-                            { id: 'vPrecioListaItems:crear', label: 'Crear' },
-                            { id: 'vPrecioListaItems:editar', label: 'Editar' },
-                            { id: 'vPrecioListaItems:eliminar', label: 'Eliminar' },
-                        ]
-                    },
-                    {
-                        id: 'vCompraPedidos', label: 'Pedidos de compra', permisos: [
+                        label: 'Pedidos de compra', goto: 'vCompraPedidos', permisos: [
                             { id: 'vCompraPedidos:listar', label: 'Listar' },
                             { id: 'vCompraPedidos:crear', label: 'Crear' },
                             { id: 'vCompraPedidos:ver', label: 'Ver' },
@@ -143,7 +79,7 @@ export const useAuth = defineStore('auth', {
                         ]
                     },
                     {
-                        id: 'vCompras', label: 'Compras', permisos: [
+                        label: 'Compras', goto: 'vCompras', permisos: [
                             { id: 'vCompras:listar', label: 'Listar' },
                             { id: 'vCompras:crear', label: 'Crear' },
                             { id: 'vCompras:ver', label: 'Ver' },
@@ -152,22 +88,22 @@ export const useAuth = defineStore('auth', {
                         ]
                     },
                     {
-                        id: 'vCompraItems', label: 'Compras detalle', permisos: [
+                        label: 'Compras detalle', goto: 'vCompraItems', permisos: [
                             { id: 'vCompraItems:listar', label: 'Listar' },
                             { id: 'vCompraItems:inspeccion', label: 'Inspeccionar' },
                         ]
                     },
                     {
-                        id: 'vInventarioArticulos', label: 'Inventario', permisos: [
+                        label: 'Inventario', goto: 'vInventarioArticulos', permisos: [
                             { id: 'vInventarioArticulos:listar', label: 'Listar' },
                         ]
                     },
                 ]
             },
             {
-                id: 'logistica_salida', label: 'Logistica de salida', vistas: [
+                id: 'logistica_salida', label: 'Logística de salida', icon: 'fa-solid fa-truck', children: [
                     {
-                        id: 'vClientes', label: 'Clientes', permisos: [
+                        label: 'Clientes', goto: 'vClientes', permisos: [
                             { id: 'vClientes:listar', label: 'Listar' },
                             { id: 'vClientes:crear', label: 'Crear' },
                             { id: 'vClientes:ver', label: 'Ver' },
@@ -176,7 +112,7 @@ export const useAuth = defineStore('auth', {
                         ]
                     },
                     {
-                        id: 'vProductoLineas', label: 'Líneas de productos', permisos: [
+                        label: 'Líneas de productos', goto: 'vProductoLineas', permisos: [
                             { id: 'vProductoLineas:listar', label: 'Listar' },
                             { id: 'vProductoLineas:crear', label: 'Crear' },
                             { id: 'vProductoLineas:editar', label: 'Editar' },
@@ -185,7 +121,7 @@ export const useAuth = defineStore('auth', {
                         ]
                     },
                     {
-                        id: 'vProductoCategorias', label: 'Categorías de productos', permisos: [
+                        label: 'Categorías de productos', goto: 'vProductoCategorias', permisos: [
                             { id: 'vProductoCategorias:listar', label: 'Listar' },
                             { id: 'vProductoCategorias:crear', label: 'Crear' },
                             { id: 'vProductoCategorias:editar', label: 'Editar' },
@@ -194,7 +130,7 @@ export const useAuth = defineStore('auth', {
                         ]
                     },
                     {
-                        id: 'vProductosTerminados', label: 'Productos', permisos: [
+                        label: 'Productos terminados', goto: 'vProductosTerminados', permisos: [
                             { id: 'vProductosTerminados:listar', label: 'Listar' },
                             { id: 'vProductosTerminados:crear', label: 'Crear' },
                             { id: 'vProductosTerminados:editar', label: 'Editar' },
@@ -210,25 +146,22 @@ export const useAuth = defineStore('auth', {
                             { id: 'vProductosTerminados:importar', label: 'Importar' },
                             { id: 'vProductosTerminados:editarBulk', label: 'Editar masivo' },
                             { id: 'vProductosTerminados:eliminarBulk', label: 'Eliminar masivo' },
+
+                            { id: 'vReceta:listar', label: 'Listar receta' },
+                            { id: 'vReceta:crear', label: 'Crear receta' },
+                            { id: 'vReceta:editar', label: 'Editar receta' },
+                            { id: 'vReceta:eliminar', label: 'Eliminar receta' },
                         ]
                     },
                     {
-                        id: 'vReceta', label: 'Receta', permisos: [
-                            { id: 'vReceta:listar', label: 'Listar' },
-                            { id: 'vReceta:crear', label: 'Crear' },
-                            { id: 'vReceta:editar', label: 'Editar' },
-                            { id: 'vReceta:eliminar', label: 'Eliminar' },
-                        ]
-                    },
-                    {
-                        id: 'vPtsIngresos', label: 'Ingreso de productos', permisos: [
+                        label: 'Ingreso de productos', goto: 'vPtsIngresos', permisos: [
                             { id: 'vPtsIngresos:listar', label: 'Listar' },
                             { id: 'vPtsIngresos:verCuarentena', label: 'Ver cuarentena' },
                             { id: 'vPtsIngresos:ingresarPts', label: 'Ingresar productos terminados' },
                         ]
                     },
                     {
-                        id: 'vVentaPedidos', label: 'Pedidos de venta', permisos: [
+                        label: 'Pedidos de venta', goto: 'vVentaPedidos', permisos: [
                             { id: 'vVentaPedidos:listar', label: 'Listar' },
                             { id: 'vVentaPedidos:crear', label: 'Crear' },
                             { id: 'vVentaPedidos:ver', label: 'Ver' },
@@ -243,12 +176,12 @@ export const useAuth = defineStore('auth', {
                         ]
                     },
                     {
-                        id: 'vVentaPedidoItems', label: 'Pedidos de venta detalle', permisos: [
+                        label: 'Pedidos de venta detalle', goto: 'vVentaPedidoItems', permisos: [
                             { id: 'vVentaPedidoItems:listar', label: 'Listar' },
                         ]
                     },
                     {
-                        id: 'vVentas', label: 'Ventas', permisos: [
+                        label: 'Ventas', goto: 'vVentas', permisos: [
                             { id: 'vVentas:listar', label: 'Listar' },
                             { id: 'vVentas:crear', label: 'Crear' },
                             { id: 'vVentas:ver', label: 'Ver' },
@@ -257,21 +190,21 @@ export const useAuth = defineStore('auth', {
                         ]
                     },
                     {
-                        id: 'vVentaItems', label: 'Ventas detalle', permisos: [
+                        label: 'Ventas detalle', goto: 'vVentaItems', permisos: [
                             { id: 'vVentaItems:listar', label: 'Listar' },
                         ]
                     },
                     {
-                        id: 'vInventarioProductos', label: 'Inventario', permisos: [
+                        label: 'Inventario', goto: 'vInventarioProductos', permisos: [
                             { id: 'vInventarioProductos:listar', label: 'Listar' },
                         ]
                     },
                 ]
             },
             {
-                id: 'produccion', label: 'Producción', vistas: [
+                id: 'produccion', label: 'Producción', icon: 'fa-solid fa-oil-well', children: [
                     {
-                        id: 'vPrograma', label: 'Programa', permisos: [
+                        label: 'Programa', goto: 'vPrograma', permisos: [
                             { id: 'vPrograma:listar', label: 'Listar' },
                             { id: 'vPrograma:crear', label: 'Crear' },
                             { id: 'vPrograma:ver', label: 'Ver' },
@@ -286,76 +219,34 @@ export const useAuth = defineStore('auth', {
                             { id: 'vPrograma:salidaInsumosCompartidos', label: 'Salida de insumos compartidos' },
                         ]
                     },
-                    // {
-                    //     id: 'vProgramaFiltrantes', label: 'Programa de filtrantes', permisos: [
-                    //         { id: 'vProgramaFiltrantes:listar', label: 'Listar' },
-                    //         { id: 'vProgramaFiltrantes:crear', label: 'Crear' },
-                    //         { id: 'vProgramaFiltrantes:ver', label: 'Ver' },
-                    //         { id: 'vProgramaFiltrantes:editar', label: 'Editar' },
-                    //         { id: 'vProgramaFiltrantes:eliminar', label: 'Eliminar' },
-
-                    //         { id: 'vProgramaFiltrantes:terminar', label: 'Terminar' },
-                    //         { id: 'vProgramaFiltrantes:productosTerminados', label: 'Productos terminados' },
-                    //         { id: 'vProgramaFiltrantes:verProductosPedidos', label: 'Ver productos pedidos' },
-                    //         { id: 'vProgramaFiltrantes:salidaInsumosCompartidos', label: 'Salida de insumos compartidos' },
-                    //     ]
-                    // },
-                    // {
-                    //     id: 'vProgramaGranel', label: 'Programa de granel', permisos: [
-                    //         { id: 'vProgramaGranel:listar', label: 'Listar' },
-                    //         { id: 'vProgramaGranel:crear', label: 'Crear' },
-                    //         { id: 'vProgramaGranel:ver', label: 'Ver' },
-                    //         { id: 'vProgramaGranel:editar', label: 'Editar' },
-                    //         { id: 'vProgramaGranel:eliminar', label: 'Eliminar' },
-
-                    //         { id: 'vProgramaGranel:terminar', label: 'Terminar' },
-                    //         { id: 'vProgramaGranel:productosTerminados', label: 'Productos terminados' },
-                    //         { id: 'vProgramaGranel:verProductosPedidos', label: 'Ver productos pedidos' },
-                    //     ]
-                    // },
-                    // {
-                    //     id: 'vProgramaLuxury', label: 'Programa de luxury', permisos: [
-                    //         { id: 'vProgramaLuxury:listar', label: 'Listar' },
-                    //         { id: 'vProgramaLuxury:crear', label: 'Crear' },
-                    //         { id: 'vProgramaLuxury:ver', label: 'Ver' },
-                    //         { id: 'vProgramaLuxury:editar', label: 'Editar' },
-                    //         { id: 'vProgramaLuxury:eliminar', label: 'Eliminar' },
-
-                    //         { id: 'vProgramaLuxury:terminar', label: 'Terminar' },
-                    //         { id: 'vProgramaLuxury:productosTerminados', label: 'Productos terminados' },
-                    //         { id: 'vProgramaLuxury:verProductosPedidos', label: 'Ver productos pedidos' },
-                    //     ]
-                    // },
                     {
-                        id: 'vProduccionHistorial', label: 'Órdenes de producción', permisos: [
+                        label: 'Órdenes de producción', goto: 'vProduccionHistorial', permisos: [
                             { id: 'vProduccionHistorial:listar', label: 'Listar' },
                             { id: 'vProduccionHistorial:ver', label: 'Ver' },
 
-                            // { id: 'vProduccionHistorial:productosTerminados', label: 'Productos terminados' },
-                            { id: 'vProduccionHistorial:salidaInsumos', label: 'Salida de insumos' },
                             { id: 'vProduccionHistorial:trazabilidad', label: 'Ver trazabilidad' },
                             { id: 'vProduccionHistorial:controlPesos', label: 'Control de pesos' },
                             { id: 'vProduccionHistorial:controlPpc', label: 'Control del PPC' },
                         ]
                     },
                     {
-                        id: 'vProductosCuarentena', label: 'Productos terminados', permisos: [
+                        label: 'Productos terminados', goto: 'vProductosCuarentena', permisos: [
                             { id: 'vProductosCuarentena:listar', label: 'Listar' },
                             { id: 'vProductosCuarentena:liberar_lote', label: 'Liberar lote' },
                             { id: 'vProductosCuarentena:trazabilidad', label: 'Ver trazabilidad' },
                         ]
                     },
                     {
-                        id: 'vReporteProduccion', label: 'Reporte', permisos: [
+                        label: 'Reporte', goto: 'vReporteProduccion', permisos: [
                             { id: 'vReporteProduccion:listar', label: 'Listar' },
                         ]
                     },
                 ]
             },
             {
-                id: 'calidad', label: 'Calidad', vistas: [
+                id: 'calidad', label: 'Calidad', icon: 'fa-solid fa-magnifying-glass', children: [
                     {
-                        id: 'vFormatosBpm', label: 'Formatos BPM', permisos: [
+                        label: 'Formatos BPM', goto: 'vFormatosBpm', permisos: [
                             { id: 'vFormatosBpm:listar', label: 'Listar' },
                             { id: 'vFormatosBpm:crear', label: 'Crear' },
                             { id: 'vFormatosBpm:ver', label: 'Ver' },
@@ -364,7 +255,7 @@ export const useAuth = defineStore('auth', {
                         ]
                     },
                     {
-                        id: 'vFormatosPhs', label: 'Formatos PHS', permisos: [
+                        label: 'Formatos PHS', goto: 'vFormatosPhs', permisos: [
                             { id: 'vFormatosPhs:listar', label: 'Listar' },
                             { id: 'vFormatosPhs:crear', label: 'Crear' },
                             { id: 'vFormatosPhs:ver', label: 'Ver' },
@@ -373,7 +264,7 @@ export const useAuth = defineStore('auth', {
                         ]
                     },
                     {
-                        id: 'vFormatosHaccp', label: 'Formatos HACCP', permisos: [
+                        label: 'Formatos HACCP', goto: 'vFormatosHaccp', permisos: [
                             { id: 'vFormatosHaccp:listar', label: 'Listar' },
                             { id: 'vFormatosHaccp:crear', label: 'Crear' },
                             { id: 'vFormatosHaccp:ver', label: 'Ver' },
@@ -382,7 +273,7 @@ export const useAuth = defineStore('auth', {
                         ]
                     },
                     {
-                        id: 'vRegistrosSanitarios', label: 'Registros sanitarios', permisos: [
+                        label: 'Registros sanitarios', goto: 'vRegistrosSanitarios', permisos: [
                             { id: 'vRegistrosSanitarios:listar', label: 'Listar' },
                             { id: 'vRegistrosSanitarios:crear', label: 'Crear' },
                             { id: 'vRegistrosSanitarios:editar', label: 'Editar' },
@@ -390,7 +281,7 @@ export const useAuth = defineStore('auth', {
                         ]
                     },
                     {
-                        id: 'vInspecciones', label: 'Inspecciones', permisos: [
+                        label: 'Inspecciones de clientes', goto: 'vInspecciones', permisos: [
                             { id: 'vInspecciones:listar', label: 'Listar' },
                             { id: 'vInspecciones:crear', label: 'Crear' },
                             { id: 'vInspecciones:ver', label: 'Ver' },
@@ -401,9 +292,9 @@ export const useAuth = defineStore('auth', {
                 ]
             },
             {
-                id: 'operaciones', label: 'Operaciones', vistas: [
+                id: 'operaciones', label: 'Operaciones', icon: 'fa-solid fa-gears', children: [
                     {
-                        id: 'vDocumentos', label: 'Documentos', permisos: [
+                        label: 'Documentos clave', goto: 'vDocumentos', permisos: [
                             { id: 'vDocumentos:listar', label: 'Listar' },
                             { id: 'vDocumentos:crear', label: 'Crear' },
                             { id: 'vDocumentos:editar', label: 'Editar' },
@@ -411,40 +302,34 @@ export const useAuth = defineStore('auth', {
                         ]
                     },
                     {
-                        id: 'vCajaAperturas', label: 'Caja', permisos: [
+                        label: 'Caja chica', goto: 'vCajaAperturas', permisos: [
                             { id: 'vCajaAperturas:listar', label: 'Listar' },
                             { id: 'vCajaAperturas:aperturarCaja', label: 'Aperturar caja' },
                             { id: 'vCajaAperturas:ver', label: 'Ver' },
                             { id: 'vCajaAperturas:cerrarCaja', label: 'Cerrar caja' },
                             { id: 'vCajaAperturas:eliminar', label: 'Eliminar' },
+
+                            { id: 'vCajaMovimientos:listar', label: 'Listar movimientos' },
+                            { id: 'vCajaMovimientos:crear', label: 'Crear movimiento' },
+                            { id: 'vCajaMovimientos:editar', label: 'Editar movimiento' },
+                            { id: 'vCajaMovimientos:eliminar', label: 'Eliminar movimiento' },
                         ]
                     },
                     {
-                        id: 'vCajaMovimientos', label: 'Movimientos de caja', permisos: [
-                            { id: 'vCajaMovimientos:listar', label: 'Listar' },
-                            { id: 'vCajaMovimientos:crear', label: 'Crear' },
-                            { id: 'vCajaMovimientos:editar', label: 'Editar' },
-                            { id: 'vCajaMovimientos:eliminar', label: 'Eliminar' },
-                        ]
-                    },
-                    {
-                        id: 'vMonedas', label: 'Monedas', permisos: [
+                        label: 'Monedas', goto: 'vMonedas', permisos: [
                             { id: 'vMonedas:listar', label: 'Listar' },
                             { id: 'vMonedas:crear', label: 'Crear' },
                             { id: 'vMonedas:editar', label: 'Editar' },
                             { id: 'vMonedas:eliminar', label: 'Eliminar' },
+
+                            { id: 'vTipoCambios:listar', label: 'Listar tc' },
+                            { id: 'vTipoCambios:crear', label: 'Crear tc' },
+                            { id: 'vTipoCambios:editar', label: 'Editar tc' },
+                            { id: 'vTipoCambios:eliminar', label: 'Eliminar tc' },
                         ]
                     },
                     {
-                        id: 'vTipoCambios', label: 'Tipos de cambio', permisos: [
-                            { id: 'vTipoCambios:listar', label: 'Listar' },
-                            { id: 'vTipoCambios:crear', label: 'Crear' },
-                            { id: 'vTipoCambios:editar', label: 'Editar' },
-                            { id: 'vTipoCambios:eliminar', label: 'Eliminar' },
-                        ]
-                    },
-                    {
-                        id: 'vMaquinas', label: 'Máquinas', permisos: [
+                        label: 'Máquinas', goto: 'vMaquinas', permisos: [
                             { id: 'vMaquinas:listar', label: 'Listar' },
                             { id: 'vMaquinas:crear', label: 'Crear' },
                             { id: 'vMaquinas:editar', label: 'Editar' },
@@ -452,7 +337,7 @@ export const useAuth = defineStore('auth', {
                         ]
                     },
                     {
-                        id: 'vEquipos', label: 'Equipos', permisos: [
+                        label: 'Equipos', goto: 'vEquipos', permisos: [
                             { id: 'vEquipos:listar', label: 'Listar' },
                             { id: 'vEquipos:crear', label: 'Crear' },
                             { id: 'vEquipos:editar', label: 'Editar' },
@@ -460,7 +345,7 @@ export const useAuth = defineStore('auth', {
                         ]
                     },
                     {
-                        id: 'vColaboradores', label: 'Colaboradores', permisos: [
+                        label: 'Colaboradores', goto: 'vColaboradores', permisos: [
                             { id: 'vColaboradores:listar', label: 'Listar' },
                             { id: 'vColaboradores:crear', label: 'Crear' },
                             { id: 'vColaboradores:ver', label: 'Ver' },
@@ -469,7 +354,7 @@ export const useAuth = defineStore('auth', {
                         ]
                     },
                     {
-                        id: 'vAsistencias', label: 'Asistencias', permisos: [
+                        label: 'Asistencias', goto: 'vAsistencias', permisos: [
                             { id: 'vAsistencias:listar', label: 'Listar' },
                             { id: 'vAsistencias:crear', label: 'Crear' },
                             { id: 'vAsistencias:editar', label: 'Editar' },
@@ -477,17 +362,17 @@ export const useAuth = defineStore('auth', {
                         ]
                     },
                     {
-                        id: 'vSessions', label: 'Usuarios conectados', permisos: [
+                        label: 'Usuarios conectados', goto: 'vSessions', permisos: [
                             { id: 'vSessions:listar', label: 'Listar' },
                         ]
                     },
                     {
-                        id: 'vActivityLogs', label: 'Activity logs', permisos: [
+                        label: 'Activity logs', goto: 'vActivityLogs', permisos: [
                             { id: 'vActivityLogs:listar', label: 'Listar' },
                         ]
                     },
                 ]
-            },
+            }
         ],
 
         showNavbar: true,

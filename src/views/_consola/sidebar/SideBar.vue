@@ -2,12 +2,13 @@
     <div class="side-bar" :class="`${useAuth.showNavbar ? 'visible' : 'no-visible'}`">
         <aside>
             <div v-for="(a, i) in menu" :key="i">
-
-                <div class="option" @click="this.toggleList(a.label)"
-                    :class="{ 'active': a.children.some(b => useVistas.show?.[b.goto]) }">
-
+                <div
+                    class="option"
+                    @click="this.toggleList(a.label)"
+                    :class="{ active: a.children.some((b) => useVistas.show?.[b.goto]) }"
+                >
                     <div class="left" :class="{ 'has-icon': a.icon }">
-                        <i v-if="a.icon" :class=a.icon></i>
+                        <i v-if="a.icon" :class="a.icon"></i>
                         <span>{{ a.label }}</span>
                     </div>
 
@@ -18,8 +19,13 @@
                 </div>
 
                 <div v-if="a.children && grupoExpandido === a.label" class="items-container">
-                    <div v-for="(b, j) in a.children" :key="j" class="option2"
-                        :class="{ 'active2': useVistas.show?.[b.goto] }" @click="useVistas.showVista(b.goto, b.label)">
+                    <div
+                        v-for="(b, j) in a.children"
+                        :key="j"
+                        class="option2"
+                        :class="{ active2: useVistas.show?.[b.goto] }"
+                        @click="useVistas.showVista(b.goto, b.label)"
+                    >
                         {{ b.label }}
                     </div>
                 </div>
@@ -42,31 +48,25 @@ export default {
     computed: {
         menu() {
             return this.useAuth.menu
-                .map(seccion => {
-                    const hijosFiltrados = seccion.children.filter(a =>
-                        (this.useAuth.usuario.permisos || []).some(p => p.startsWith(a.goto + ':'))
+                .map((seccion) => {
+                    const hijosFiltrados = seccion.children.filter((a) =>
+                        (this.useAuth.usuario.permisos || []).some((p) =>
+                            p.startsWith(a.goto + ':'),
+                        ),
                     )
 
                     return hijosFiltrados.length > 0
                         ? { ...seccion, children: hijosFiltrados }
                         : null
                 })
-                .filter(seccion => seccion !== null)
+                .filter((seccion) => seccion !== null)
         },
     },
     methods: {
         toggleList(label) {
             this.grupoExpandido = this.grupoExpandido === label ? null : label
-        }
+        },
     },
-    created() {
-        // for (const a of this.menu) {
-        //     const asd = a.children.some(b => useVistas.show?.[b.goto])
-        //     if (asd) {
-        //         this.grupoExpandido = a.label
-        //     }
-        // }
-    }
 }
 </script>
 

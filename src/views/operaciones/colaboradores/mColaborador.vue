@@ -2,6 +2,21 @@
     <JdModal modal="mColaborador" :buttons="buttons" @button-click="(action) => this[action]()">
         <div class="container-todo">
             <div class="container-datos">
+                <JdSelect
+                    label="Tipo documento"
+                    :nec="true"
+                    v-model="colaborador.doc_tipo"
+                    :lista="modal.documentos_identidad || []"
+                    :disabled="modal.mode == 3"
+                />
+
+                <JdInput
+                    label="Nro documento"
+                    :nec="true"
+                    v-model="colaborador.doc_numero"
+                    :disabled="modal.mode == 3"
+                />
+
                 <JdInput
                     label="Nombres"
                     :nec="true"
@@ -12,20 +27,6 @@
                     label="Apellidos"
                     :nec="true"
                     v-model="colaborador.apellidos"
-                    :disabled="modal.mode == 3"
-                />
-
-                <JdSelect
-                    label="Tipo documento"
-                    :nec="true"
-                    v-model="colaborador.doc_tipo"
-                    :lista="modal.documentos_identidad || []"
-                    :disabled="modal.mode == 3"
-                />
-                <JdInput
-                    label="Nro documento"
-                    :nec="true"
-                    v-model="colaborador.doc_numero"
                     :disabled="modal.mode == 3"
                 />
 
@@ -59,7 +60,9 @@
                     v-model="colaborador.cargo"
                     :disabled="modal.mode == 3"
                 />
+
                 <JdSwitch label="Activo" v-model="colaborador.activo" :disabled="modal.mode == 3" />
+
                 <JdSwitch
                     label="Tiene usuario?"
                     v-model="colaborador.has_signin"
@@ -76,6 +79,7 @@
                         :lista="vistas"
                         mostrar="label"
                         :disabled="modal.mode == 3"
+                        groupBy="menu"
                     />
 
                     <JdInput
@@ -101,7 +105,7 @@
                         <strong>--- Permisos ---</strong>
                     </div>
 
-                    <div v-for="a in useAuth.listaPermisos || []" :key="a.id">
+                    <div v-for="a in useAuth.menu || []" :key="a.id">
                         <div class="grupo-header" @click="toggleGrupo(a.id)">
                             {{ a.label }}
 
@@ -114,15 +118,15 @@
                             </span>
                         </div>
 
-                        <div v-if="a.vistas && modal.grupoExpandido === a.id">
-                            <div v-for="b in a.vistas" :key="b.id" class="vistas">
-                                <div class="vista-header" @click="toggleVista(b.id)">
+                        <div v-if="a.children && modal.grupoExpandido === a.id">
+                            <div v-for="b in a.children" :key="b.id" class="vistas">
+                                <div class="vista-header" @click="toggleVista(b.goto)">
                                     {{ b.label }}
 
                                     <span class="icono-expand">
                                         <i
                                             class="fa-solid fa-caret-down"
-                                            v-if="modal.vistaExpandida === b.id"
+                                            v-if="modal.vistaExpandida === b.goto"
                                         ></i>
                                         <i class="fa-solid fa-caret-right" v-else></i>
                                     </span>
@@ -130,18 +134,18 @@
 
                                 <div
                                     class="permisos"
-                                    v-if="b.permisos && modal.vistaExpandida === b.id"
+                                    v-if="b.permisos && modal.vistaExpandida === b.goto"
                                 >
                                     <div class="permisos-acciones">
                                         <JdButton
                                             text="Sel. todo"
                                             tipo="3"
-                                            @click="selectAll(b.id)"
+                                            @click="selectAll(b.goto)"
                                         />
                                         <JdButton
                                             text="Sel. ninguno"
                                             tipo="3"
-                                            @click="selectNone(b.id)"
+                                            @click="selectNone(b.goto)"
                                         />
                                     </div>
 
@@ -192,11 +196,10 @@ export default {
         colaborador: {},
 
         buttons: [
-            { text: 'Grabar', action: 'crear', spin: false, permiso: 'vColaboradores:crear' },
+            { text: 'Grabar', action: 'crear', permiso: 'vColaboradores:crear' },
             {
                 text: 'Actualizar',
                 action: 'modificar',
-                spin: false,
                 permiso: 'vColaboradores:editar',
             },
         ],
@@ -204,7 +207,7 @@ export default {
     computed: {
         vistas() {
             return this.useAuth.menu
-                .map((a) => a.children.map((b) => ({ id: b.goto, label: b.label })))
+                .map((a) => a.children.map((b) => ({ id: b.goto, label: b.label, menu: a.label })))
                 .flat()
         },
     },
@@ -243,25 +246,14 @@ export default {
                 return true
             }
 
-            this.colaborador.permisos = this.recolectarPermisosSeleccionados()
-
-            // if (this.colaborador.has_signin) {
-            //     const asd = this.colaborador.permisos.includes(this.colaborador.vista_inicial)
-
-            //     if (!asd) {
-            //         jmsg('error', 'Seleccione una vista inicial que tenga permiso')
-            //         return true
-            //     }
-            // }
-
             return false
         },
-        // shapeDatos() {
-        //     this.colaborador.permisos = this.recolectarPermisosSeleccionados()
-        // },
+        shapeDatos() {
+            this.colaborador.permisos = this.recolectarPermisosSeleccionados()
+        },
         async crear() {
             if (this.checkDatos()) return
-            // this.shapeDatos()
+            this.shapeDatos()
 
             this.useAuth.setLoading(true, 'Creando...')
             const res = await post(urls.colaboradores, this.colaborador)
@@ -275,7 +267,7 @@ export default {
         },
         async modificar() {
             if (this.checkDatos()) return
-            // this.shapeDatos()
+            this.shapeDatos()
 
             this.useAuth.setLoading(true, 'Actualizando...')
             const res = await patch(urls.colaboradores, this.colaborador)
@@ -303,9 +295,9 @@ export default {
         sincronizarChecksConPermisos() {
             const permisos = this.colaborador.permisos || []
 
-            for (const a of this.useAuth.listaPermisos) {
-                if (a.vistas) {
-                    for (const b of a.vistas) {
+            for (const a of this.useAuth.menu) {
+                if (a.children) {
+                    for (const b of a.children) {
                         if (b.permisos) {
                             for (const c of b.permisos) {
                                 c.val = permisos.includes(c.id)
@@ -318,9 +310,9 @@ export default {
         recolectarPermisosSeleccionados() {
             const permisos = []
 
-            for (const a of this.useAuth.listaPermisos) {
-                if (a.vistas) {
-                    for (const b of a.vistas) {
+            for (const a of this.useAuth.menu) {
+                if (a.children) {
+                    for (const b of a.children) {
                         if (b.permisos) {
                             for (const c of b.permisos) {
                                 if (c.val) permisos.push(c.id)
@@ -339,10 +331,10 @@ export default {
         },
 
         selectAll(id) {
-            for (const a of this.useAuth.listaPermisos) {
-                if (a.vistas) {
-                    for (const b of a.vistas) {
-                        if (b.id == id) {
+            for (const a of this.useAuth.menu) {
+                if (a.children) {
+                    for (const b of a.children) {
+                        if (b.goto == id) {
                             for (const c of b.permisos) {
                                 c.val = true
                             }
@@ -352,10 +344,10 @@ export default {
             }
         },
         selectNone(id) {
-            for (const a of this.useAuth.listaPermisos) {
-                if (a.vistas) {
-                    for (const b of a.vistas) {
-                        if (b.id == id) {
+            for (const a of this.useAuth.menu) {
+                if (a.children) {
+                    for (const b of a.children) {
+                        if (b.goto == id) {
                             for (const c of b.permisos) {
                                 c.val = false
                             }

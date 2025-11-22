@@ -31,7 +31,7 @@ import { useModals } from '@/pinia/modals'
 import { useVistas } from '@/pinia/vistas'
 
 import { urls, get, post, patch, delet } from '@/utils/crud'
-import { incompleteData, getItemFromArray } from '@/utils/mine'
+import { incompleteData } from '@/utils/mine'
 import { jmsg } from '@/utils/swal'
 
 export default {
@@ -46,7 +46,6 @@ export default {
         useAuth: useAuth(),
         useModals: useModals(),
         useVistas: useVistas(),
-        getItemFromArray,
 
         modal: {},
         nuevo: {},

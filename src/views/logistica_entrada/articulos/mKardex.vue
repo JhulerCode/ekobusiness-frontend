@@ -53,7 +53,7 @@ import { useVistas } from '@/pinia/vistas'
 
 import { urls, get, delet } from '@/utils/crud'
 import { jqst } from '@/utils/swal'
-import { redondear, getItemFromArray } from '@/utils/mine'
+import { redondear } from '@/utils/mine'
 
 import dayjs from 'dayjs'
 
@@ -68,7 +68,6 @@ export default {
         useModals: useModals(),
         useVistas: useVistas(),
         redondear,
-        getItemFromArray,
         dayjs,
 
         modal: {},

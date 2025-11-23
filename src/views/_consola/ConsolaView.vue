@@ -18,12 +18,12 @@
 <script>
 import { mLogin } from '@jhuler/components'
 
-import MainHead from '@/views/_consola/header/MainHead.vue'
-import SideBar from '@/views/_consola/sidebar/SideBar.vue'
-import MainCenter from '@/views/_consola/center/MainCenter.vue'
+import MainHead from '@/views/_consola/MainHead.vue'
+import SideBar from '@/views/_consola/SideBar.vue'
+import MainCenter from '@/views/_consola/MainCenter.vue'
 
-import mUserMenu from './header/mUserMenu.vue'
-import mUserPreferences from './header/mUserPreferences.vue'
+import mUserMenu from './mUserMenu.vue'
+import mUserPreferences from './mUserPreferences.vue'
 
 import { useAuth } from '@/pinia/auth.js'
 import { useVistas } from '@/pinia/vistas.js'

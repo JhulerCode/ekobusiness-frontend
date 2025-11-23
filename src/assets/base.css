@@ -3,9 +3,10 @@
 :root {
 	--primary-color: #2492c2;
 	--primary-color-dark: #2083ae;
-	--verde: #3b973b;
-	--amarillo: #f0f046;
+	--verde: #34d16e;
+    --amarillo: #ffb22b;
 	--rojo: #e94343;
+    --morado: #A855F7;
 
 	--bg-color: #ffffff;
 	--bg-color-hover: whitesmoke;
@@ -15,7 +16,6 @@
 	--bg-color-transparent: rgba(0, 0, 0, 0.5);
 
 	--text-color: black;
-	/* --text-color2: #828282; */
 	--text-color2: rgba(60, 60, 60, 0.66);
 
 	--border: solid 1px #dfdfdf;
@@ -52,8 +52,8 @@ body.dark-mode {
 	font-size: 14px;
 }
 
-html {
-	overflow: hidden;
+body {
+    background-color: var(--bg-color);
 }
 
 p,

@@ -175,7 +175,7 @@ export default {
             },
             // { label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar', permiso: 'vCompras:ver' },
             // { label: 'Anular', icon: 'fa-solid fa-ban', action: 'anular', permiso: 'vCompras:anular', ocultar: { estado: 0 } },
-            // { label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar', permiso: 'vCompras:anular' },
+            // { label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar', permiso: 'vCompras:eliminar' },
         ],
     }),
     async created() {
@@ -297,16 +297,16 @@ export default {
 
             this.useModals.setModal('mTransaccion', 'Ver compra', 3, send, true)
         },
-        anular(item) {
-            const send = {
-                url: 'transacciones',
-                item,
-                vista: 'vCompras',
-                array: 'transacciones',
-            }
+        // anular(item) {
+        //     const send = {
+        //         url: 'transacciones',
+        //         item,
+        //         vista: 'vCompras',
+        //         array: 'transacciones',
+        //     }
 
-            this.useModals.setModal('mAnular', `Anular compra Nro ${item.codigo}`, null, send, true)
-        },
+        //     this.useModals.setModal('mAnular', `Anular compra Nro ${item.codigo}`, null, send, true)
+        // },
         async eliminar(item) {
             const resQst = await jqst('¿Está seguro de eliminar?')
             if (resQst.isConfirmed == false) return

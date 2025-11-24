@@ -155,18 +155,19 @@ function setBody(item) {
 }
 
 async function process(response, ms) {
-    const res = await response.json()
-
-    if ([401, 403, 404, 426].includes(response.status)) {
-        jmsg('error', res.msg)
-
-        if (response.status == 401) useModals().setModal('mLogin', 'Sesión terminada', null, null)
-
-        return { code: response.status }
-    }
-
     const contentType = response.headers.get("Content-Type")
+
     if (contentType && contentType.includes("application/json")) {
+        const res = await response.json()
+
+        if ([401, 403, 404, 426].includes(response.status)) {
+            jmsg('error', res.msg)
+
+            if (response.status == 401) useModals().setModal('mLogin', 'Sesión terminada', null, null)
+
+            return { code: response.status }
+        }
+
         if (res.code == -1) jmsg('error', 'Algo salió mal')
 
         if (res.code > 0) jmsg('error', res.msg)

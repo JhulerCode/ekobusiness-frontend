@@ -8,12 +8,12 @@
             :name="tableName"
             :columns="columns"
             :datos="vista.transaccion_items || []"
-            :colAct="true"
             :configFiltros="openConfigFiltros"
             :reload="loadTransaccionItems"
-            :rowOptions="tableRowOptions"
-            @rowOptionSelected="runMethod"
         >
+            <!-- :colAct="true" -->
+            <!-- :rowOptions="tableRowOptions" -->
+            <!-- @rowOptionSelected="runMethod" -->
         </JdTable>
     </div>
 
@@ -145,15 +145,15 @@ export default {
                 sort: true,
             },
         ],
-        tableRowOptions: [
-            // {
-            //     id: 1,
-            //     label: 'Inspeccionar',
-            //     icon: 'fa-solid fa-star',
-            //     action: 'crearFormatoValue',
-            //     permiso: 'vVentaItems:inspeccion',
-            // },
-        ],
+        // tableRowOptions: [
+        //     {
+        //         id: 1,
+        //         label: 'Inspeccionar',
+        //         icon: 'fa-solid fa-star',
+        //         action: 'crearFormatoValue',
+        //         permiso: 'vVentaItems:inspeccion',
+        //     },
+        // ],
     }),
     async created() {
         this.vista = this.useVistas.vVentaItems

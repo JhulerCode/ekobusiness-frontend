@@ -182,24 +182,6 @@ export default {
                 action: 'ver',
                 permiso: 'vProduccionHistorial:ver',
             },
-            // {
-            //     label: 'Editar',
-            //     icon: 'fa-solid fa-pen-to-square',
-            //     action: 'editar',
-            //     permiso: 'vProduccionHistorial:ver',
-            // },
-            // {
-            //     label: 'Salida de insumos',
-            //     icon: 'fa-regular fa-circle-down',
-            //     action: 'salidaInsumos',
-            //     permiso: 'vProduccionHistorial:salidaInsumos',
-            // },
-            // {
-            //     label: 'Productos terminados',
-            //     icon: 'fa-solid fa-boxes-stacked',
-            //     action: 'productosTerminados',
-            //     permiso: 'vProduccionHistorial:productosTerminados',
-            // },
             {
                 label: 'Ver trazabilidad',
                 icon: 'fa-solid fa-diagram-project',

@@ -8,12 +8,12 @@
             :name="tableName"
             :columns="columns"
             :datos="vista.transaccion_items || []"
-            :colAct="true"
             :configFiltros="openConfigFiltros"
             :reload="loadTransaccionItems"
-            :rowOptions="tableRowOptions"
-            @rowOptionSelected="runMethod"
         >
+            <!-- :colAct="true" -->
+            <!-- :rowOptions="tableRowOptions" -->
+            <!-- @rowOptionSelected="runMethod" -->
         </JdTable>
     </div>
 
@@ -145,15 +145,15 @@ export default {
                 sort: true,
             },
         ],
-        tableRowOptions: [
-            {
-                id: 1,
-                label: 'Inspeccionar',
-                icon: 'fa-solid fa-star',
-                action: 'crearFormatoValue',
-                permiso: 'vCompraItems:inspeccion',
-            },
-        ],
+        // tableRowOptions: [
+        //     {
+        //         id: 1,
+        //         label: 'Inspeccionar',
+        //         icon: 'fa-solid fa-star',
+        //         action: 'crearFormatoValue',
+        //         permiso: 'vCompraItems:inspeccion',
+        //     },
+        // ],
     }),
     async created() {
         this.vista = this.useVistas.vCompraItems
@@ -177,7 +177,7 @@ export default {
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
-            this.vista.qry.cols.push('calidad_revisado')
+            // this.vista.qry.cols.push('calidad_revisado')
         },
         async loadTransaccionItems() {
             this.setQuery()

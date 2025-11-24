@@ -8,7 +8,7 @@ export const useAuth = defineStore('auth', {
     state: () => ({
         token: null,
         usuario: {},
-        app_version: '1.5.0',
+        app_version: '1.6.0',
 
         menu: [
             {
@@ -73,7 +73,7 @@ export const useAuth = defineStore('auth', {
                             { id: 'vCompraPedidos:eliminar', label: 'Eliminar' },
 
                             { id: 'vCompraPedidos:terminar', label: 'Terminar' },
-                            { id: 'vCompraPedidos:anular', label: 'Anular' },
+                            // { id: 'vCompraPedidos:anular', label: 'Anular' },
                             { id: 'vCompraPedidos:generarPdf', label: 'Generar PDF' },
                             { id: 'vCompraPedidos:ingresarMercaderia', label: 'Ingresar mercadería' },
                         ]
@@ -84,7 +84,7 @@ export const useAuth = defineStore('auth', {
                             { id: 'vCompras:crear', label: 'Crear' },
                             { id: 'vCompras:ver', label: 'Ver' },
 
-                            { id: 'vCompras:anular', label: 'Anular' },
+                            // { id: 'vCompras:anular', label: 'Anular' },
                         ]
                     },
                     {
@@ -169,7 +169,7 @@ export const useAuth = defineStore('auth', {
                             { id: 'vVentaPedidos:eliminar', label: 'Eliminar' },
 
                             { id: 'vVentaPedidos:terminar', label: 'Terminar' },
-                            { id: 'vVentaPedidos:anular', label: 'Anular' },
+                            // { id: 'vVentaPedidos:anular', label: 'Anular' },
                             { id: 'vVentaPedidos:generarPdf', label: 'Generar PDF' },
                             { id: 'vVentaPedidos:entregarMercaderia', label: 'Entregar mercadería' },
                             { id: 'vVentaPedidos:verProductosPedidos', label: 'Ver productos pedidos' },
@@ -185,7 +185,8 @@ export const useAuth = defineStore('auth', {
                             { id: 'vVentas:listar', label: 'Listar' },
                             { id: 'vVentas:crear', label: 'Crear' },
                             { id: 'vVentas:ver', label: 'Ver' },
-                            { id: 'vVentas:anular', label: 'Anular' },
+
+                            // { id: 'vVentas:anular', label: 'Anular' },
                             { id: 'vVentas:controlDespacho', label: 'Control despacho' },
                         ]
                     },
@@ -227,6 +228,8 @@ export const useAuth = defineStore('auth', {
                             { id: 'vProduccionHistorial:trazabilidad', label: 'Ver trazabilidad' },
                             { id: 'vProduccionHistorial:controlPesos', label: 'Control de pesos' },
                             { id: 'vProduccionHistorial:controlPpc', label: 'Control del PPC' },
+
+                            { id: 'vProduccionHistorial:salidaInsumos', label: 'Salida de insumos' },
                         ]
                     },
                     {

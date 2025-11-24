@@ -130,7 +130,7 @@ export const useAuth = defineStore('auth', {
                         ]
                     },
                     {
-                        label: 'Productos terminados', goto: 'vProductosTerminados', permisos: [
+                        label: 'Productos', goto: 'vProductosTerminados', permisos: [
                             { id: 'vProductosTerminados:listar', label: 'Listar' },
                             { id: 'vProductosTerminados:crear', label: 'Crear' },
                             { id: 'vProductosTerminados:editar', label: 'Editar' },

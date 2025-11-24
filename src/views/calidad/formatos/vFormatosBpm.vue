@@ -150,8 +150,8 @@ export default {
             const hasTransaccion = this.columns1.some(a => a.relacion == 'transacciones')
             if (hasTransaccion) qry.cols.push('transaccion')
 
-            const hasCuarentenaProducto = this.columns1.some(a => a.relacion == 'cuarentena_productos')
-            if (hasCuarentenaProducto) qry.cols.push('cuarentena_producto')
+            // const hasCuarentenaProducto = this.columns1.some(a => a.relacion == 'cuarentena_productos')
+            // if (hasCuarentenaProducto) qry.cols.push('cuarentena_producto')
 
             const hasMaquina = this.columns1.some(a => a.relacion == 'maquinas')
             if (hasMaquina) qry.cols.push('maquina')

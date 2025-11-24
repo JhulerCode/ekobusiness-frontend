@@ -1,7 +1,7 @@
 <template>
     <div class="vista vista-fill">
         <div class="head">
-            <strong>Productos terminados</strong>
+            <strong>Productos</strong>
 
             <div class="buttons">
                 <input
@@ -418,11 +418,13 @@ export default {
                 }
 
                 await this.loadDatosSistema()
-                const produccion_tiposMap = this.vista.produccion_tipos.reduce(
+                const igv_afectacionesMap = this.vista.igv_afectaciones.reduce(
                     (obj, a) => ((obj[a.id] = a), obj),
                     {},
                 )
-                const igv_afectacionesMap = this.vista.igv_afectaciones.reduce(
+
+                await this.loadLineas()
+                const produccion_tiposMap = this.vista.articulo_lineas.reduce(
                     (obj, a) => ((obj[a.id] = a), obj),
                     {},
                 )
@@ -477,6 +479,7 @@ export default {
         async openConfigFiltros() {
             await this.loadDatosSistema()
             await this.loadCategorias()
+            await this.loadLineas()
 
             const cols = this.columns.filter((a) => a.id != 'stock')
             cols.find((a) => a.id == 'unidad').lista = this.vista.unidades
@@ -484,7 +487,7 @@ export default {
             cols.find((a) => a.id == 'activo').lista = this.vista.estados
             cols.find((a) => a.id == 'igv_afectacion').lista = this.vista.igv_afectaciones
             cols.find((a) => a.id == 'categoria').lista = this.vista.articulo_categorias
-            cols.find((a) => a.id == 'produccion_tipo').lista = this.vista.produccion_tipos
+            cols.find((a) => a.id == 'produccion_tipo').lista = this.vista.articulo_lineas
 
             const send = {
                 table: this.tableName,
@@ -521,7 +524,7 @@ export default {
             cols.find((a) => a.id == 'activo').lista = this.vista.estados
             cols.find((a) => a.id == 'igv_afectacion').lista = this.vista.igv_afectaciones
             cols.find((a) => a.id == 'categoria').lista = this.vista.articulo_categorias
-            cols.find((a) => a.id == 'produccion_tipo').lista = this.vista.produccion_tipos
+            cols.find((a) => a.id == 'produccion_tipo').lista = this.vista.articulo_lineas
 
             const ids = this.vista.articulos.filter((a) => a.selected).map((b) => b.id)
 
@@ -652,6 +655,20 @@ export default {
             this.useModals.setModal('mAjusteStock', 'Ajuste de stock', null, send, true)
         },
 
+        async loadLineas() {
+            const qry = {
+                fltr: {},
+            }
+
+            this.vista.articulo_lineas = []
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.articulo_lineas}?qry=${JSON.stringify(qry)}`)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            this.vista.articulo_lineas = res.data
+        },
         async loadCategorias() {
             const qry = {
                 fltr: { tipo: { op: 'Es', val: 2 }, activo: { op: 'Es', val: true } },
@@ -667,7 +684,7 @@ export default {
             this.vista.articulo_categorias = res.data
         },
         async loadDatosSistema() {
-            const qry = ['produccion_tipos', 'igv_afectaciones', 'unidades', 'estados']
+            const qry = ['igv_afectaciones', 'unidades', 'estados']
             const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
 
             if (res.code != 0) return

@@ -4,14 +4,25 @@
             <strong>Maquinas</strong>
 
             <div class="buttons">
-                <JdButton text="Nuevo" title="Crear nuevo" @click="nuevo()"
-                    v-if="useAuth.verifyPermiso('vMaquinas:crear')" />
+                <JdButton
+                    text="Nuevo"
+                    title="Crear nuevo"
+                    @click="nuevo()"
+                    v-if="useAuth.verifyPermiso('vMaquinas:crear')"
+                />
             </div>
         </div>
 
-        <JdTable :name="tableName" :columns="columns" :datos="vista.maquinas || []" :colAct="true"
-            :configFiltros="openConfigFiltros" :reload="loadMaquinas" :rowOptions="tableRowOptions"
-            @rowOptionSelected="runMethod">
+        <JdTable
+            :name="tableName"
+            :columns="columns"
+            :datos="vista.maquinas || []"
+            :colAct="true"
+            :configFiltros="openConfigFiltros"
+            :reload="loadMaquinas"
+            :rowOptions="tableRowOptions"
+            @rowOptionSelected="runMethod"
+        >
         </JdTable>
     </div>
 
@@ -57,7 +68,7 @@ export default {
                 width: '15rem',
                 show: true,
                 seek: true,
-                sort: true
+                sort: true,
             },
             {
                 id: 'produccion_tipo',
@@ -67,7 +78,7 @@ export default {
                 width: '15rem',
                 show: true,
                 seek: true,
-                sort: true
+                sort: true,
             },
             {
                 id: 'velocidad',
@@ -76,7 +87,7 @@ export default {
                 width: '8rem',
                 show: true,
                 seek: true,
-                sort: true
+                sort: true,
             },
             {
                 id: 'limpieza_tiempo',
@@ -85,12 +96,24 @@ export default {
                 width: '8rem',
                 show: true,
                 seek: true,
-                sort: true
+                sort: true,
             },
         ],
         tableRowOptions: [
-            { id: 1, label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar', permiso: 'vMaquinas:editar' },
-            { id: 2, label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar', permiso: 'vMaquinas:eliminar' },
+            {
+                id: 1,
+                label: 'Editar',
+                icon: 'fa-solid fa-pen-to-square',
+                action: 'editar',
+                permiso: 'vMaquinas:editar',
+            },
+            {
+                id: 2,
+                label: 'Eliminar',
+                icon: 'fa-solid fa-trash-can',
+                action: 'eliminar',
+                permiso: 'vMaquinas:eliminar',
+            },
         ],
     }),
     created() {
@@ -130,15 +153,15 @@ export default {
         },
 
         async openConfigFiltros() {
-            await this.loadDatosSistema()
+            await this.loadLineas()
 
             const cols = this.columns
-            cols.find(a => a.id == 'produccion_tipo').lista = this.vista.produccion_tipos
+            cols.find((a) => a.id == 'produccion_tipo').lista = this.vista.articulo_lineas
 
             const send = {
                 table: this.tableName,
                 cols,
-                reload: this.loadMaquinas
+                reload: this.loadMaquinas,
             }
 
             this.useModals.setModal('mConfigFiltros', 'Filtros', null, send, true)
@@ -169,13 +192,19 @@ export default {
             this.useVistas.removeItem('vMaquinas', 'maquinas', item)
         },
 
-        async loadDatosSistema() {
-            const qry = ['produccion_tipos']
-            const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
+        async loadLineas() {
+            const qry = {
+                fltr: {},
+            }
+
+            this.vista.articulo_lineas = []
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.articulo_lineas}?qry=${JSON.stringify(qry)}`)
+            this.useAuth.setLoading(false)
 
             if (res.code != 0) return
 
-            Object.assign(this.vista, res.data)
+            this.vista.articulo_lineas = res.data
         },
     },
 }

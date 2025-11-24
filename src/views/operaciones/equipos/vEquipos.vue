@@ -4,14 +4,25 @@
             <strong>Equipos</strong>
 
             <div class="buttons">
-                <JdButton text="Nuevo" title="Crear nuevo" @click="nuevo()"
-                    v-if="useAuth.verifyPermiso('vEquipos:crear')" />
+                <JdButton
+                    text="Nuevo"
+                    title="Crear nuevo"
+                    @click="nuevo()"
+                    v-if="useAuth.verifyPermiso('vEquipos:crear')"
+                />
             </div>
         </div>
 
-        <JdTable :name="tableName" :columns="columns" :datos="vista.maquinas || []" :colAct="true"
-            :configFiltros="openConfigFiltros" :reload="loadMaquinas" :rowOptions="tableRowOptions"
-            @rowOptionSelected="runMethod">
+        <JdTable
+            :name="tableName"
+            :columns="columns"
+            :datos="vista.maquinas || []"
+            :colAct="true"
+            :configFiltros="openConfigFiltros"
+            :reload="loadMaquinas"
+            :rowOptions="tableRowOptions"
+            @rowOptionSelected="runMethod"
+        >
         </JdTable>
     </div>
 
@@ -57,7 +68,7 @@ export default {
                 width: '8rem',
                 show: true,
                 seek: true,
-                sort: true
+                sort: true,
             },
             {
                 id: 'nombre',
@@ -66,7 +77,7 @@ export default {
                 width: '20rem',
                 show: true,
                 seek: true,
-                sort: true
+                sort: true,
             },
             {
                 id: 'fecha_compra',
@@ -76,12 +87,24 @@ export default {
                 width: '8rem',
                 show: true,
                 seek: true,
-                sort: true
+                sort: true,
             },
         ],
         tableRowOptions: [
-            { id: 1, label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar', permiso: 'vEquipos:editar' },
-            { id: 2, label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar', permiso: 'vEquipos:eliminar' },
+            {
+                id: 1,
+                label: 'Editar',
+                icon: 'fa-solid fa-pen-to-square',
+                action: 'editar',
+                permiso: 'vEquipos:editar',
+            },
+            {
+                id: 2,
+                label: 'Eliminar',
+                icon: 'fa-solid fa-trash-can',
+                action: 'eliminar',
+                permiso: 'vEquipos:eliminar',
+            },
         ],
     }),
     created() {
@@ -124,12 +147,11 @@ export default {
             await this.loadDatosSistema()
 
             const cols = this.columns
-            // cols.find(a => a.id == 'produccion_tipo').lista = this.vista.produccion_tipos
 
             const send = {
                 table: this.tableName,
                 cols,
-                reload: this.loadMaquinas
+                reload: this.loadMaquinas,
             }
 
             this.useModals.setModal('mConfigFiltros', 'Filtros', null, send, true)
@@ -158,15 +180,6 @@ export default {
             if (res.code != 0) return
 
             this.useVistas.removeItem('vEquipos', 'maquinas', item)
-        },
-
-        async loadDatosSistema() {
-            const qry = ['produccion_tipos']
-            const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
-
-            if (res.code != 0) return
-
-            Object.assign(this.vista, res.data)
         },
     },
 }

@@ -18,7 +18,6 @@ const urls = {
     caja_aperturas: `${host}/api/caja_aperturas`,
     caja_movimientos: `${host}/api/caja_movimientos`,
     colaboradores: `${host}/api/colaboradores`,
-    cuarentena_productos: `${host}/api/cuarentena_productos`,
     documentos: `${host}/api/documentos`,
     formatos: `${host}/api/formatos`,
     formato_values: `${host}/api/formato_values`,

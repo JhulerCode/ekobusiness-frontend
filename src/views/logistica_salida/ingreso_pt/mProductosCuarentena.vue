@@ -37,7 +37,6 @@ import { useVistas } from '@/pinia/vistas'
 import { urls, get, post } from '@/utils/crud'
 import { jmsg } from '@/utils/swal'
 import { redondear } from '@/utils/mine'
-// import { produccion_tipos, maquinas } from '@/data/sistema_listas'
 
 import dayjs from 'dayjs'
 

@@ -3,13 +3,32 @@
         <div class="container-datos">
             <JdInput label="Código" :nec="true" v-model="maquina.codigo" v-if="maquina.tipo == 2" />
             <JdInput label="Nombre" :nec="true" v-model="maquina.nombre" />
-            <JdInput label="Fecha de compra" type="date" :nec="true" v-model="maquina.fecha_compra" />
+            <JdInput
+                label="Fecha de compra"
+                type="date"
+                :nec="true"
+                v-model="maquina.fecha_compra"
+            />
 
             <template v-if="maquina.tipo == 1">
-                <JdSelect label="Tipo de producción" :nec="true" :lista="modal.produccion_tipos || []"
-                    v-model="maquina.produccion_tipo" />
-                <JdInput label="Velocidad (und/min)" :nec="true" type="number" v-model="maquina.velocidad" />
-                <JdInput label="Tiempo de limpieza (min)" :nec="true" type="number" v-model="maquina.limpieza_tiempo" />
+                <JdSelect
+                    label="Tipo de producción"
+                    :nec="true"
+                    :lista="modal.articulo_lineas || []"
+                    v-model="maquina.produccion_tipo"
+                />
+                <JdInput
+                    label="Velocidad (und/min)"
+                    :nec="true"
+                    type="number"
+                    v-model="maquina.velocidad"
+                />
+                <JdInput
+                    label="Tiempo de limpieza (min)"
+                    :nec="true"
+                    type="number"
+                    v-model="maquina.limpieza_tiempo"
+                />
             </template>
         </div>
     </JdModal>
@@ -50,14 +69,13 @@ export default {
         this.maquina = this.useModals.mMaquina.item
 
         this.showButtons()
-        this.loadDatosSistema()
+        this.loadLineas()
     },
     methods: {
         showButtons() {
             if (this.useModals.mMaquina.mode == 1) {
                 this.buttons[0].show = true
-            }
-            else {
+            } else {
                 this.buttons[1].show = true
             }
         },
@@ -65,7 +83,8 @@ export default {
         checkDatos() {
             const props = ['nombre']
 
-            if (this.maquina.tipo == 1) props.push('produccion_tipo', 'velocidad', 'limpieza_tiempo')
+            if (this.maquina.tipo == 1)
+                props.push('produccion_tipo', 'velocidad', 'limpieza_tiempo')
             if (this.maquina.tipo == 2) props.push('codigo')
 
             if (incompleteData(this.maquina, props)) {
@@ -102,15 +121,21 @@ export default {
             this.useModals.show.mMaquina = false
         },
 
-        async loadDatosSistema() {
-            const qry = ['produccion_tipos']
-            const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
+        async loadLineas() {
+            const qry = {
+                fltr: {},
+            }
+
+            this.modal.articulo_lineas = []
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.articulo_lineas}?qry=${JSON.stringify(qry)}`)
+            this.useAuth.setLoading(false)
 
             if (res.code != 0) return
 
-            Object.assign(this.modal, res.data)
+            this.modal.articulo_lineas = res.data
         },
-    }
+    },
 }
 </script>
 

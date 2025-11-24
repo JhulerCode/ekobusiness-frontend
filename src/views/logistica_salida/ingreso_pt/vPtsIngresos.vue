@@ -37,8 +37,6 @@ import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
 
 import { urls, get } from '@/utils/crud'
-// import { jmsg } from '@/utils/swal'
-// import { produccion_tipos, maquinas } from '@/data/sistema_listas'
 
 import dayjs from 'dayjs'
 
@@ -193,11 +191,11 @@ export default {
         },
 
         async openConfigFiltros() {
-            await this.loadDatosSistema()
+            await this.loadLineas()
             await this.loadMaquinas()
 
             const cols = this.columns
-            cols.find((a) => a.id == 'produccion_orden_tipo').lista = this.vista.produccion_tipos
+            cols.find((a) => a.id == 'produccion_orden_tipo').lista = this.vista.articulo_lineas
             cols.find((a) => a.id == 'produccion_orden_maquina').lista = this.vista.maquinas
 
             const send = {
@@ -209,13 +207,19 @@ export default {
             this.useModals.setModal('mConfigFiltros', 'Filtros', null, send, true)
         },
 
-        async loadDatosSistema() {
-            const qry = ['produccion_tipos']
-            const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
+        async loadLineas() {
+            const qry = {
+                fltr: {},
+            }
+
+            this.vista.articulo_lineas = []
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.articulo_lineas}?qry=${JSON.stringify(qry)}`)
+            this.useAuth.setLoading(false)
 
             if (res.code != 0) return
 
-            Object.assign(this.vista, res.data)
+            this.vista.articulo_lineas = res.data
         },
         async loadMaquinas() {
             const qry = {

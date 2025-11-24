@@ -109,7 +109,7 @@ export default {
                 sort: true,
             },
             {
-                id: 'articulo',
+                id: 'articulo1.nombre',
                 title: 'Producto',
                 prop: 'articulo1.nombre',
                 type: 'text',
@@ -220,10 +220,11 @@ export default {
         setQuery() {
             this.vista.qry = {
                 fltr: {},
-                incl: ['maquina1', 'articulo1'],
+                incl: ['tipo1', 'maquina1', 'articulo1'],
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
+            this.vista.qry.cols.push('articulo')
         },
         async loadProduccionOrdenes() {
             this.setQuery()
@@ -241,12 +242,26 @@ export default {
             this.vista.produccion_ordenes = res.data
         },
         async loadDatosSistema() {
-            const qry = ['produccion_tipos', 'produccion_orden_estados']
+            const qry = ['produccion_orden_estados']
             const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
 
             if (res.code != 0) return
 
             Object.assign(this.vista, res.data)
+        },
+        async loadLineas() {
+            const qry = {
+                fltr: {},
+            }
+
+            this.vista.articulo_lineas = []
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.articulo_lineas}?qry=${JSON.stringify(qry)}`)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            this.vista.articulo_lineas = res.data
         },
         async loadMaquinas() {
             const qry = {
@@ -269,7 +284,7 @@ export default {
             await this.loadMaquinas()
 
             const cols = this.columns
-            cols.find((a) => a.id == 'tipo').lista = this.vista.produccion_tipos
+            cols.find((a) => a.id == 'tipo').lista = this.vista.articulo_lineas
             cols.find((a) => a.id == 'maquina').lista = this.vista.maquinas
             cols.find((a) => a.id == 'estado').lista = this.vista.produccion_orden_estados
 

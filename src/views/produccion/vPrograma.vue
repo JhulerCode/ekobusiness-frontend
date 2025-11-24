@@ -257,7 +257,7 @@ export default {
                 show: true,
             },
             {
-                id: 'articulo',
+                id: 'articulo1.nombre',
                 title: 'Producto',
                 prop: 'articulo1.nombre',
                 width: '25rem',
@@ -268,34 +268,29 @@ export default {
                 title: 'Cantidad',
                 format: 'number',
                 slot: 'cCantidad',
-                // toRight: true,
-                // input: true,
-                // type: 'number',
-                // oninput: 'calcularProducto',
-                // onchange: 'modificarProduccionOrden',
                 width: '7rem',
                 show: true,
             },
             {
                 id: 'tiempo_produccion',
                 title: 'Tiempo',
-                width: '7rem',
+                width: '5rem',
                 show: true,
             },
-            // {
-            //     id: 'productos_terminados',
-            //     title: 'Productos terminados',
-            //     type: 'number',
-            //     format: 'number',
-            //     toRight: true,
-            //     width: '8rem',
-            //     show: true,
-            // },
             {
                 id: 'tipo',
                 title: 'Línea',
                 width: '10rem',
                 show: false,
+            },
+            {
+                id: 'productos_terminados',
+                title: 'PTs',
+                type: 'number',
+                format: 'number',
+                toRight: true,
+                width: '5rem',
+                show: true,
             },
         ],
         tableRowOptions: [
@@ -552,12 +547,20 @@ export default {
                 // fltr: { tipo: { op: 'Es', val: this.columns[6].val } },
                 fltr: {},
                 incl: ['articulo1'],
+                sqls: ['productos_terminados'],
             }
 
             // if (this.vista.maquina != null)
             //     this.vista.qry.fltr.maquina = { op: 'Es', val: this.vista.maquina }
             this.useAuth.updateQuery(this.columns, this.vista.qry)
-            this.vista.qry.cols.push('fecha', 'maquina', 'maquina_info', 'articulo_info', 'estado')
+            this.vista.qry.cols.push(
+                'fecha',
+                'maquina',
+                'articulo',
+                'maquina_info',
+                'articulo_info',
+                'estado',
+            )
         },
         async loadProduccionOrdenes() {
             if (!this.columns[0].val) {

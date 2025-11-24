@@ -60,7 +60,7 @@ function incompleteData(obj, p) {
 function redondear(num, dec = 2) {
     if (num === null || num === undefined) return num
 
-    return num.toLocaleString('en-US', {
+    return Number(num).toLocaleString('en-US', {
         minimumFractionDigits: dec,
         maximumFractionDigits: dec
     })

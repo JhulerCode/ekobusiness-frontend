@@ -112,23 +112,9 @@ export default {
             this.modal.valor = 0
 
             for (const a of this.modal.lotes) {
-                // if (a.is_lote_padre && a.transaccion1.estado != 0) {
-                if (a.is_lote_padre) {
-                    this.modal.stock += a.stock
-                    this.modal.valor += a.stock * a.vu_real
-                }
+                this.modal.stock += Number(a.stock)
+                this.modal.valor += Number(a.stock) * a.pu
             }
-        },
-        calculateStockFiltered() {
-            let stockf = 0
-            // let valorf = 0
-
-            for (const a of this.$refs['TableKardex']?.datosFiltrados || []) {
-                stockf += a.cantidad * 1
-                // valorf += a.cantidad * a.vu_real
-            }
-
-            return redondear(stockf)
         },
     },
 }

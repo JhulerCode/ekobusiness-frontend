@@ -4,16 +4,31 @@
             <strong>Ventas</strong>
 
             <div class="buttons">
-                <JdButton text="Recuperar guardado" tipo="2" @click="recuperarGuardado()"
-                    v-if="useAuth.verifyPermiso('vVentas:crear') && useAuth.avances.mVenta" />
+                <JdButton
+                    text="Recuperar guardado"
+                    tipo="2"
+                    @click="recuperarGuardado()"
+                    v-if="useAuth.verifyPermiso('vVentas:crear') && useAuth.avances.mVenta"
+                />
 
-                <JdButton text="Nuevo" @click="nuevo()" v-if="useAuth.verifyPermiso('vVentas:crear')" />
+                <JdButton
+                    text="Nuevo"
+                    @click="nuevo()"
+                    v-if="useAuth.verifyPermiso('vVentas:crear')"
+                />
             </div>
         </div>
 
-        <JdTable :name="tableName" :columns="columns" :datos="vista.transacciones || []" :colAct="true"
-            :configFiltros="openConfigFiltros" :reload="loadTransacciones" :rowOptions="tableRowOptions"
-            @rowOptionSelected="runMethod">
+        <JdTable
+            :name="tableName"
+            :columns="columns"
+            :datos="vista.transacciones || []"
+            :colAct="true"
+            :configFiltros="openConfigFiltros"
+            :reload="loadTransacciones"
+            :rowOptions="tableRowOptions"
+            @rowOptionSelected="runMethod"
+        >
         </JdTable>
     </div>
 
@@ -64,7 +79,6 @@ export default {
         tableName: 'vVentas',
         columns: [
             {
-
                 id: 'fecha',
                 title: 'Fecha',
                 type: 'date',
@@ -138,11 +152,23 @@ export default {
             },
         ],
         tableRowOptions: [
-            { id: 1, label: 'Ver', icon: 'fa-regular fa-folder-open', action: 'ver', permiso: 'vVentas:ver' },
+            {
+                id: 1,
+                label: 'Ver',
+                icon: 'fa-regular fa-folder-open',
+                action: 'ver',
+                permiso: 'vVentas:ver',
+            },
             // { id: 2, label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar' },
             // { id: 3, label: 'Anular', icon: 'fa-solid fa-ban', action: 'anular', permiso: 'vVentas:anular', ocultar: { estado: 0 } },
             // { id: 4, label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar', permiso: 'vVentas:anular' },
-            { id: 5, label: 'Control de despacho', icon: 'fa-solid fa-star', action: 'controlDespacho', permiso: 'vVentas:controlDespacho' },
+            {
+                id: 5,
+                label: 'Control de despacho',
+                icon: 'fa-solid fa-star',
+                action: 'controlDespacho',
+                permiso: 'vVentas:controlDespacho',
+            },
         ],
     }),
     async created() {
@@ -188,7 +214,7 @@ export default {
                     fecha: dayjs().format('YYYY-MM-DD'),
                     estado: 1,
                     transaccion_items: [],
-                }
+                },
             }
 
             this.useModals.setModal('mTransaccion', 'Nueva venta', 1, send, true)
@@ -200,7 +226,9 @@ export default {
 
             if (this.useAuth.avances.mVenta.socio_pedido) {
                 this.useAuth.setLoading(true, 'Cargando...')
-                const res = await get(`${urls.socio_pedidos}/uno/${this.useAuth.avances.mVenta.socio_pedido}`)
+                const res = await get(
+                    `${urls.socio_pedidos}/uno/${this.useAuth.avances.mVenta.socio_pedido}`,
+                )
                 this.useAuth.setLoading(false)
 
                 if (res.code != 0) return
@@ -210,10 +238,12 @@ export default {
                 //     id: res.data.id,
                 //     codigo: res.data.codigo,
                 // }
-                send.pedidos = [{
-                    id: res.data.id,
-                    codigo: res.data.codigo,
-                }]
+                send.pedidos = [
+                    {
+                        id: res.data.id,
+                        codigo: res.data.codigo,
+                    },
+                ]
             }
 
             this.useModals.setModal('mTransaccion', 'Nueva venta', 1, send, true)
@@ -225,15 +255,15 @@ export default {
             await this.loadMonedas()
 
             const cols = this.columns
-            cols.find(a => a.id == 'socio').lista = this.vista.socios
-            cols.find(a => a.id == 'pago_condicion').lista = this.vista.pago_condiciones
-            cols.find(a => a.id == 'moneda').lista = this.vista.monedas
-            cols.find(a => a.id == 'estado').lista = this.vista.transaccion_estados
+            cols.find((a) => a.id == 'socio').lista = this.vista.socios
+            cols.find((a) => a.id == 'pago_condicion').lista = this.vista.pago_condiciones
+            cols.find((a) => a.id == 'moneda').lista = this.vista.monedas
+            cols.find((a) => a.id == 'estado').lista = this.vista.transaccion_estados
 
             const send = {
                 table: this.tableName,
                 cols,
-                reload: this.loadTransacciones
+                reload: this.loadTransacciones,
             }
 
             this.useModals.setModal('mConfigFiltros', 'Filtros', null, send, true)
@@ -255,7 +285,7 @@ export default {
                 socios: [{ ...res.data.socio1 }],
                 monedas: [{ ...res.data.moneda1 }],
                 // pedido: res.data.socio_pedido ? { ...res.data.socio_pedido1 } : null,
-                pedidos: res.data.socio_pedido ? [{ ...res.data.socio_pedido1 }] : []
+                pedidos: res.data.socio_pedido ? [{ ...res.data.socio_pedido1 }] : [],
             }
             // console.log(send)
 
@@ -305,13 +335,12 @@ export default {
                     formato: {
                         codigo: res.data.id,
                         columns: res.data.columns,
-                        instructivo: res.data.instructivo
-                    }
+                        instructivo: res.data.instructivo,
+                    },
                 }
 
                 this.useModals.setModal('mFormato', formato_id, 1, send, true)
-            }
-            else {
+            } else {
                 for (const a of res.data.columns) {
                     a.value = res1.data[a.id]
                 }
@@ -323,22 +352,22 @@ export default {
                         id: res1.data.id,
                         codigo: res.data.id,
                         columns: res.data.columns,
-                        instructivo: res.data.instructivo
-                    }
+                        instructivo: res.data.instructivo,
+                    },
                 }
 
                 this.useModals.setModal('mFormato', formato_id, 2, send, true)
             }
         },
         setTransaccionDespachoRevisado(item) {
-            const transaccion = this.vista.transacciones.find(a => a.id == item.transaccion)
+            const transaccion = this.vista.transacciones.find((a) => a.id == item.transaccion)
             if (transaccion) transaccion.calidad_revisado_despacho = item.id
         },
 
         async loadSocios() {
             const qry = {
                 fltr: { tipo: { op: 'Es', val: 2 }, activo: { op: 'Es', val: true } },
-                cols: ['nombres', 'apellidos', 'nombres_apellidos']
+                cols: ['nombres', 'apellidos', 'nombres_apellidos'],
             }
 
             this.vista.socios = []

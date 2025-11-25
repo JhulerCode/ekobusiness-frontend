@@ -129,6 +129,7 @@ function setHeaders(item) {
 }
 
 function setBody(item) {
+    if (!item) return null
     if (!item.formData) return JSON.stringify(item)
 
     const formData = new FormData()

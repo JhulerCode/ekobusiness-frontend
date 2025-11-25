@@ -5,7 +5,16 @@
 
             <div class="buttons">
                 <JdInput type="date" v-model="vista.f2" style="width: 10rem" />
-                <JdButton @click="loadInventario" text="Buscar" />
+                <JdButton
+                    @click="recalcularInventario"
+                    text="Recalcular stock"
+                    v-if="useAuth.verifyPermiso('vInventarioProductos:recalcularStock')"
+                />
+                <JdButton
+                    @click="loadInventario"
+                    text="Buscar"
+                    v-if="useAuth.verifyPermiso('vInventarioProductos:listar')"
+                />
             </div>
         </div>
 
@@ -20,7 +29,7 @@ import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
 import { useVistas } from '@/pinia/vistas'
 
-import { urls, get } from '@/utils/crud'
+import { urls, get, post } from '@/utils/crud'
 import { redondear } from '@/utils/mine'
 
 import dayjs from 'dayjs'
@@ -104,6 +113,13 @@ export default {
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
+        },
+        async recalcularInventario() {
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await post(`${urls.kardex}/recalcular-stock`)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
         },
         async loadInventario() {
             if (this.checkDatos()) return

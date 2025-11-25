@@ -5,7 +5,11 @@
 
             <div class="buttons">
                 <JdInput type="date" v-model="vista.f2" style="width: 10rem" />
-                <JdButton @click="loadInventario" text="Buscar" />
+                <JdButton
+                    @click="loadInventario"
+                    text="Buscar"
+                    v-if="useAuth.verifyPermiso('vInventarioArticulos:listar')"
+                />
             </div>
         </div>
 

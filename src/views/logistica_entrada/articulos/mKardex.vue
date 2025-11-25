@@ -176,9 +176,9 @@ export default {
         await this.loadKardex()
     },
     computed: {
-        stock() {
-            return this.$refs['TableKardex']?.datosFiltrados
-        },
+        // stock() {
+        //     return this.$refs['TableKardex']?.datosFiltrados
+        // },
     },
     methods: {
         async loadKardex() {
@@ -223,8 +223,8 @@ export default {
             for (const a of this.modal.kardex) {
                 // if (a.is_lote_padre && a.transaccion1.estado != 0) {
                 if (a.is_lote_padre) {
-                    this.modal.stock += a.stock
-                    this.modal.valor += a.stock * a.vu_real
+                    this.modal.stock += Number(a.stock)
+                    this.modal.valor += Number(a.stock) * a.vu_real
                 }
             }
         },

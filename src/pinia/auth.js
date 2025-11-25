@@ -198,6 +198,7 @@ export const useAuth = defineStore('auth', {
                     {
                         label: 'Inventario', goto: 'vInventarioProductos', permisos: [
                             { id: 'vInventarioProductos:listar', label: 'Listar' },
+                            { id: 'vInventarioProductos:recalcularStock', label: 'Recalcular stock' },
                         ]
                     },
                 ]

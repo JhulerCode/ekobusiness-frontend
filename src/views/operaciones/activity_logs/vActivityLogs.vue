@@ -106,6 +106,7 @@ export default {
         setQuery() {
             this.vista.qry = {
                 fltr: {},
+                incl: ['colaborador1'],
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)

@@ -161,7 +161,13 @@ export default {
             },
             // { id: 2, label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar' },
             // { id: 3, label: 'Anular', icon: 'fa-solid fa-ban', action: 'anular', permiso: 'vVentas:anular', ocultar: { estado: 0 } },
-            // { id: 4, label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar', permiso: 'vVentas:anular' },
+            // {
+            //     id: 4,
+            //     label: 'Eliminar',
+            //     icon: 'fa-solid fa-trash-can',
+            //     action: 'eliminar',
+            //     permiso: 'vVentas:eliminar',
+            // },
             {
                 id: 5,
                 label: 'Control de despacho',
@@ -192,6 +198,7 @@ export default {
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
+            this.vista.qry.cols.push('tipo')
         },
         async loadTransacciones() {
             this.setQuery()

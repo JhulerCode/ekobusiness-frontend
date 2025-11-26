@@ -10,16 +10,17 @@
                 :disabled="modal.transaccion.maquina != null"
             />
 
-            <template v-if="modal.transaccion.maquina">
-                <JdSelect
-                    label="Máquina"
-                    :nec="true"
-                    v-model="modal.transaccion.maquina"
-                    :lista="modal.maquinas || []"
-                    style="grid-column: 2/3"
-                    :disabled="true"
-                />
+            <JdSelect
+                label="Máquina"
+                :nec="true"
+                v-model="modal.transaccion.maquina"
+                :lista="modal.maquinas || []"
+                style="grid-column: 2/3"
+                :disabled="true"
+                v-if="modal.transaccion.maquina"
+            />
 
+            <template v-if="modal.transaccion.maquina">
                 <JdSelect
                     label="Insumo"
                     :nec="true"
@@ -61,6 +62,12 @@
                 :nec="true"
                 v-model="modal.transaccion.cantidad"
                 style="grid-column: 1/2"
+            />
+
+            <JdTextArea
+                label="Observación"
+                v-model="modal.transaccion.observacion"
+                style="grid-column: 1/3"
             />
 
             <JdButton text="Grabar" tipo="2" @click="grabar" style="grid-column: 3/4" />
@@ -109,7 +116,15 @@
 </template>
 
 <script>
-import { JdModal, JdInput, JdSelect, JdSelectQuery, JdButton, JdTable } from '@jhuler/components'
+import {
+    JdModal,
+    JdInput,
+    JdSelect,
+    JdSelectQuery,
+    JdTextArea,
+    JdButton,
+    JdTable,
+} from '@jhuler/components'
 import mProduccionInsumosDevolucion from '@/views/produccion/historial/mProduccionInsumosDevolucion.vue'
 
 import { useAuth } from '@/pinia/auth'
@@ -128,6 +143,7 @@ export default {
         JdInput,
         JdSelect,
         JdSelectQuery,
+        JdTextArea,
         JdButton,
         JdTable,
         mProduccionInsumosDevolucion,
@@ -215,6 +231,12 @@ export default {
                 show: true,
                 seek: true,
                 sort: true,
+            },
+            {
+                id: 'observacion',
+                title: 'Observacion',
+                width: '8rem',
+                show: true,
             },
         ],
     }),
@@ -442,7 +464,7 @@ export default {
     // margin-bottom: 2rem;
     display: grid;
     grid-template-columns: repeat(3, 15rem);
-    gap: 0.5rem;
+    gap: 0.5rem 1rem;
     height: fit-content;
 }
 </style>

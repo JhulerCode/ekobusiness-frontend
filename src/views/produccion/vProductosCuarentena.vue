@@ -178,7 +178,7 @@ export default {
                 fltr: {
                     tipo: { op: 'Es', val: 4 },
                 },
-                incl: ['articulo1', 'produccion_orden1'],
+                incl: ['articulo1', 'produccion_orden1', 'maquina1'],
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)

@@ -29,15 +29,7 @@
             maxHeight="70vh"
             @rowOptionSelected="runMethod"
             ref="TableKardex"
-        >
-            <template v-slot:cMoreInfo="{ item }">
-                {{ item.transaccion1?.socio1?.nombres }}
-                {{ item.transaccion1?.guia }}
-                {{ item.produccion_orden1?.maquina1?.nombre }}
-                {{ item.maquina1?.nombre }}
-                {{ item.observacion }}
-            </template>
-        </JdTable>
+        />
     </JdModal>
 
     <mTransaccion v-if="useModals.show.mTransaccion" />
@@ -117,8 +109,6 @@ export default {
                 toRight: true,
                 width: '8rem',
                 show: true,
-                seek: true,
-                sort: true,
             },
             {
                 id: 'pu',
@@ -126,8 +116,6 @@ export default {
                 toRight: true,
                 width: '8rem',
                 show: true,
-                seek: true,
-                sort: true,
             },
             {
                 id: 'cantidad',
@@ -136,18 +124,43 @@ export default {
                 toRight: true,
                 width: '8rem',
                 show: true,
-                seek: true,
-                sort: true,
             },
             {
-                id: 'more_info',
-                title: '...',
-                slot: 'cMoreInfo',
-                width: '20rem',
+                id: 'maquina',
+                title: 'Máquina',
+                prop: 'maquina1.nombre',
+                width: '8rem',
                 show: true,
-                seek: false,
-                sort: false,
             },
+            {
+                id: 'transaccion1.socio',
+                title: 'Socio comercial',
+                prop: 'transaccion1.socio1.nombres',
+                width: '8rem',
+                show: true,
+            },
+            {
+                id: 'transaccion1.guia',
+                title: 'Guía',
+                prop: 'transaccion1.guia',
+                width: '8rem',
+                show: true,
+            },
+            {
+                id: 'observacion',
+                title: 'Observación',
+                width: '8rem',
+                show: true,
+            },
+            // {
+            //     id: 'more_info',
+            //     title: '...',
+            //     slot: 'cMoreInfo',
+            //     width: '20rem',
+            //     show: true,
+            //     seek: false,
+            //     sort: false,
+            // },
         ],
         tableRowOptions: [
             {
@@ -175,40 +188,31 @@ export default {
 
         await this.loadKardex()
     },
-    computed: {
-        // stock() {
-        //     return this.$refs['TableKardex']?.datosFiltrados
-        // },
-    },
     methods: {
-        async loadKardex() {
-            const qry = {
+        setQuery() {
+            this.modal.qry = {
                 fltr: {
                     articulo: { op: 'Es', val: this.modal.articulo.id },
                 },
-                cols: [
-                    'fecha',
-                    'tipo',
-                    'cantidad',
-                    'moneda',
-                    'tipo_cambio',
-                    'pu',
-                    'igv_afectacion',
-                    'igv_porcentaje',
-                    'lote',
-                    'fv',
-                    'stock',
-                    'lote_padre',
-                    'is_lote_padre',
-                ],
-                incl: ['lote_padre1', 'transaccion1', 'produccion_orden1', 'maquina1'],
+                incl: ['lote_padre1', 'transaccion1', 'maquina1'],
             }
 
-            qry.cols.push('observacion')
+            this.useAuth.updateQuery(this.columns, this.modal.qry)
+            this.modal.qry.cols.push(
+                'tipo_cambio',
+                'igv_afectacion',
+                'igv_porcentaje',
+                'lote_padre',
+                'is_lote_padre',
+                'stock',
+            )
+        },
+        async loadKardex() {
+            this.setQuery()
 
             this.modal.kardex = []
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.kardex}?qry=${JSON.stringify(qry)}`)
+            const res = await get(`${urls.kardex}?qry=${JSON.stringify(this.modal.qry)}`)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
@@ -221,7 +225,6 @@ export default {
             this.modal.valor = 0
 
             for (const a of this.modal.kardex) {
-                // if (a.is_lote_padre && a.transaccion1.estado != 0) {
                 if (a.is_lote_padre) {
                     this.modal.stock += Number(a.stock)
                     this.modal.valor += Number(a.stock) * a.vu_real
@@ -233,7 +236,7 @@ export default {
             // let valorf = 0
 
             for (const a of this.$refs['TableKardex']?.datosFiltrados || []) {
-                stockf += a.cantidad * 1
+                stockf += Number(a.cantidad)
                 // valorf += a.cantidad * a.vu_real
             }
 

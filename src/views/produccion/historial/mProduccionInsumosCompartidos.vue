@@ -311,9 +311,30 @@ export default {
 
             if (this.modal.transaccion.articulo == null) return
 
+            const qry = {
+                incl: ['articulo1'],
+                cols: [
+                    'fecha',
+                    'moneda',
+                    'tipo_cambio',
+                    'pu',
+                    'igv_afectacion',
+                    'igv_porcentaje',
+                    'fv',
+                    'lote',
+                    'stock',
+                    'lote_fv_stock',
+                ],
+                fltr: {
+                    articulo: { op: 'Es', val: this.modal.transaccion.articulo },
+                    is_lote_padre: { op: 'Es', val: true },
+                },
+                ordr: [['lote', 'DESC']],
+            }
+
             this.useAuth.setLoading(true, 'Cargando...')
             this.modal.lotesLoaded = false
-            const res = await get(`${urls.kardex}/lotes/${this.modal.transaccion.articulo}`)
+            const res = await get(`${urls.kardex}?qry=${JSON.stringify(qry)}`)
             this.modal.lotesLoaded = true
             this.useAuth.setLoading(false)
 

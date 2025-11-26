@@ -9,7 +9,7 @@
             :columns="columns"
             :datos="vista.transaccion_items || []"
             :configFiltros="openConfigFiltros"
-            :reload="loadTransaccionItems"
+            :reload="loadPedidoItems"
         >
             <!-- :colAct="true"
             :rowOptions="tableRowOptions"
@@ -111,15 +111,15 @@ export default {
                 sort: true,
             },
         ],
-        tableRowOptions: [
-            // {
-            //     id: 1,
-            //     label: 'Inspeccionar',
-            //     icon: 'fa-solid fa-star',
-            //     action: 'crearFormatoValue',
-            //     permiso: 'vVentaPedidoItems:inspeccion',
-            // },
-        ],
+        // tableRowOptions: [
+        //     {
+        //         id: 1,
+        //         label: 'Inspeccionar',
+        //         icon: 'fa-solid fa-star',
+        //         action: 'crearFormatoValue',
+        //         permiso: 'vVentaPedidoItems:inspeccion',
+        //     },
+        // ],
     }),
     async created() {
         this.vista = this.useVistas.vVentaPedidoItems
@@ -129,7 +129,7 @@ export default {
         if (this.vista.loaded) return
 
         if (this.useAuth.verifyPermiso('vVentaPedidoItems:listar') == true)
-            this.loadTransaccionItems()
+            this.loadPedidoItems()
     },
     methods: {
         initFiltros() {
@@ -145,7 +145,7 @@ export default {
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
         },
-        async loadTransaccionItems() {
+        async loadPedidoItems() {
             this.setQuery()
 
             this.vista.transaccion_items = []
@@ -170,7 +170,7 @@ export default {
             const send = {
                 table: this.tableName,
                 cols,
-                reload: this.loadTransaccionItems,
+                reload: this.loadPedidoItems,
             }
 
             this.useModals.setModal('mConfigFiltros', 'Filtros', null, send, true)

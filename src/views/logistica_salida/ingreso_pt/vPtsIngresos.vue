@@ -70,7 +70,7 @@ export default {
                 sort: true,
             },
             {
-                id: 'produccion_orden_tipo',
+                id: 'produccion_orden1.tipo',
                 title: 'Tipo',
                 type: 'select',
                 prop: 'produccion_orden1.tipo1.nombre',
@@ -80,17 +80,17 @@ export default {
                 sort: true,
             },
             {
-                id: 'produccion_orden_maquina',
+                id: 'maquina',
                 title: 'Máquina',
                 type: 'select',
-                prop: 'produccion_orden1.maquina1.nombre',
+                prop: 'maquina1.nombre',
                 width: '8rem',
                 show: true,
                 seek: true,
                 sort: true,
             },
             {
-                id: 'articulo_nombre',
+                id: 'articulo1.nombre',
                 title: 'Producto',
                 type: 'text',
                 prop: 'articulo1.nombre',
@@ -195,8 +195,8 @@ export default {
             await this.loadMaquinas()
 
             const cols = this.columns
-            cols.find((a) => a.id == 'produccion_orden_tipo').lista = this.vista.articulo_lineas
-            cols.find((a) => a.id == 'produccion_orden_maquina').lista = this.vista.maquinas
+            cols.find((a) => a.id == 'produccion_orden1.tipo').lista = this.vista.articulo_lineas
+            cols.find((a) => a.id == 'maquina').lista = this.vista.maquinas
 
             const send = {
                 table: this.tableName,

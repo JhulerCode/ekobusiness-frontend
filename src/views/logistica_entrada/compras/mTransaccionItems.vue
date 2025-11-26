@@ -252,9 +252,30 @@ export default {
             return `${obtenerNumeroJuliano(this.modal.transaccion.fecha)}-${Math.floor(Math.random() * 90 + 10)}`
         },
         async loadLotes(item) {
+            const qry = {
+                incl: ['articulo1'],
+                cols: [
+                    'fecha',
+                    'moneda',
+                    'tipo_cambio',
+                    'pu',
+                    'igv_afectacion',
+                    'igv_porcentaje',
+                    'fv',
+                    'lote',
+                    'stock',
+                    'lote_fv_stock',
+                ],
+                fltr: {
+                    articulo: { op: 'Es', val: item.articulo },
+                    is_lote_padre: { op: 'Es', val: true },
+                },
+                ordr: [['lote', 'DESC']],
+            }
+
             item.lotesLoades = false
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.kardex}/lotes/${item.articulo}`)
+            const res = await get(`${urls.kardex}?qry=${JSON.stringify(qry)}`)
             this.useAuth.setLoading(false)
             item.lotesLoades = true
 

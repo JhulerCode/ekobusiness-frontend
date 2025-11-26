@@ -133,6 +133,8 @@ export default {
                 tipo: 4,
                 fecha: this.modal.produccion_orden.fecha,
                 produccion_orden: this.modal.produccion_orden.id,
+                maquina: this.modal.produccion_orden.maquina,
+
                 articulo: this.modal.produccion_orden.articulo,
                 lote: this.obtenerNumeroJuliano(this.modal.produccion_orden.fecha),
 

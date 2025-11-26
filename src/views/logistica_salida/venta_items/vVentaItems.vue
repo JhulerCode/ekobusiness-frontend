@@ -65,7 +65,7 @@ export default {
                 sort: true,
             },
             {
-                id: 'transaccion_guia',
+                id: 'transaccion1.guia',
                 title: 'Guía',
                 type: 'text',
                 prop: 'transaccion1.guia',
@@ -75,7 +75,7 @@ export default {
                 sort: true,
             },
             {
-                id: 'transaccion_factura',
+                id: 'transaccion1.factura',
                 title: 'Factura',
                 type: 'text',
                 prop: 'transaccion1.factura',
@@ -85,7 +85,7 @@ export default {
                 sort: true,
             },
             {
-                id: 'transaccion_socio',
+                id: 'transaccion1.socio',
                 title: 'Cliente',
                 prop: 'transaccion1.socio1.nombres',
                 type: 'select',
@@ -96,7 +96,7 @@ export default {
                 sort: true,
             },
             {
-                id: 'articulo_nombre',
+                id: 'articulo1.nombre',
                 title: 'Artículo',
                 type: 'text',
                 prop: 'articulo1.nombre',
@@ -196,7 +196,7 @@ export default {
             await this.loadSocios()
 
             const cols = this.columns
-            cols.find((a) => a.id == 'transaccion_socio').lista = this.vista.socios
+            cols.find((a) => a.id == 'transaccion1.socio').lista = this.vista.socios
 
             const send = {
                 table: this.tableName,
@@ -213,7 +213,7 @@ export default {
 
         async loadSocios() {
             const qry = {
-                fltr: { tipo: { op: 'Es', val: 1 }, activo: { op: 'Es', val: true } },
+                fltr: { tipo: { op: 'Es', val: 2 }, activo: { op: 'Es', val: true } },
                 cols: ['nombres', 'apellidos', 'nombres_apellidos'],
             }
 

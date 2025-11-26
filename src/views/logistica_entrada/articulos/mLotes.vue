@@ -97,9 +97,30 @@ export default {
     },
     methods: {
         async loadLotes() {
+            const qry = {
+                incl: ['articulo1'],
+                cols: [
+                    'fecha',
+                    'moneda',
+                    'tipo_cambio',
+                    'pu',
+                    'igv_afectacion',
+                    'igv_porcentaje',
+                    'fv',
+                    'lote',
+                    'stock',
+                    'lote_fv_stock',
+                ],
+                fltr: {
+                    articulo: { op: 'Es', val: this.modal.articulo.id },
+                    is_lote_padre: { op: 'Es', val: true },
+                },
+                ordr: [['lote', 'DESC']],
+            }
+
             this.modal.lotes = []
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.kardex}/lotes/${this.modal.articulo.id}`)
+            const res = await get(`${urls.kardex}?qry=${JSON.stringify(qry)}`)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return

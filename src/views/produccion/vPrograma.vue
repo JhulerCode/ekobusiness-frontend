@@ -292,6 +292,12 @@ export default {
                 width: '5rem',
                 show: true,
             },
+            {
+                id: 'observacion',
+                title: 'Observación',
+                width: '15rem',
+                show: true,
+            },
         ],
         tableRowOptions: [
             {

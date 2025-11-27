@@ -80,6 +80,12 @@
                 <small>Tiempo de producción:</small>
                 {{ setTiempo() }} <br />
             </p>
+
+            <JdTextArea
+                label="Observación"
+                v-model="modal.produccion_orden.observacion"
+                style="grid-column: 1/4"
+            />
         </div>
 
         <JdTable
@@ -103,7 +109,7 @@
 </template>
 
 <script>
-import { JdModal, JdInput, JdSelect, JdSelectQuery, JdTable } from '@jhuler/components'
+import { JdModal, JdInput, JdSelect, JdSelectQuery, JdTextArea, JdTable } from '@jhuler/components'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
@@ -121,6 +127,7 @@ export default {
         JdInput,
         JdSelect,
         JdSelectQuery,
+        JdTextArea,
         JdTable,
     },
     data: () => ({

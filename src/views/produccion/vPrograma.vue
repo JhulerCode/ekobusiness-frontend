@@ -788,6 +788,7 @@ export default {
                     'Hierba',
                     'Sobre',
                     'Etiqueta',
+                    'Observación',
                 ])
 
                 headerRow.eachCell((cell) => {
@@ -811,7 +812,8 @@ export default {
                 })
 
                 for (const b of a.produccion_ordenes) {
-                    const fila = [b.articulo_info.nombre, b.cantidad, '', '', '']
+                    const fila = [b.articulo_info.nombre, b.cantidad, '', '', '', b.observacion]
+                    console.log(fila)
 
                     const receta = b.receta
                         .filter((x) => !x.articulo1.nombre.includes('CAJA'))
@@ -832,6 +834,7 @@ export default {
                         }
                     }
 
+                    //--- Fila de insumos calculados ---//
                     const dataRow = worksheet.addRow(fila)
 
                     dataRow.eachCell((cell) => {
@@ -843,6 +846,7 @@ export default {
                         }
                     })
 
+                    //--- Fila de insumos para escribir ---//
                     const realRow = worksheet.addRow(['', '', '', '', ''])
                     realRow.eachCell((cell) => {
                         cell.border = {

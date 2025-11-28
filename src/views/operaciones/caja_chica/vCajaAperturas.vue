@@ -115,6 +115,14 @@ export default {
                 seek: false,
                 sort: false,
             },
+            // {
+            //     id: 'createdBy',
+            //     title: 'Solicitado por',
+            //     prop: 'createdBy1.nombres',
+            //     width: '10rem',
+            //     filtrable: false,
+            //     show: true,
+            // },
         ],
         tableRowOptions: [
             {
@@ -160,7 +168,10 @@ export default {
     methods: {
         setQuery() {
             this.vista.qry = {
-                fltr: {},
+                fltr: {
+                    createdBy: { op: 'Es', val: this.useAuth.usuario.colaborador },
+                },
+                // incl: ['createdBy1'],
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)

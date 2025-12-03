@@ -139,6 +139,8 @@
                     placeholder="CAJA"
                 />
 
+                <JdSwitch label="Es destacado?" v-model="articulo.is_destacado" />
+
                 <div>
                     <div class="container-anadir">
                         <JdButton text="Añadir" tipo="2" :small="true" @click="addNewIngrediente" />

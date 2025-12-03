@@ -152,7 +152,7 @@ export default {
                     tipo: { op: 'Es', val: 4 },
                     is_lote_padre: { op: 'No es', val: null },
                 },
-                incl: ['articulo1', 'produccion_orden1'],
+                incl: ['articulo1', 'maquina1', 'produccion_orden1'],
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)

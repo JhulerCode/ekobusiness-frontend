@@ -195,6 +195,7 @@ export default {
                     articulo: { op: 'Es', val: this.modal.articulo.id },
                 },
                 incl: ['lote_padre1', 'transaccion1', 'maquina1'],
+                ordr: [['fecha', 'DESC']],
             }
 
             this.useAuth.updateQuery(this.columns, this.modal.qry)

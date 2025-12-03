@@ -328,6 +328,13 @@ export default {
                 ocultar: { estado: 2 },
             },
             {
+                label: 'Abrir',
+                icon: 'fa-solid fa-check-double',
+                action: 'abrir',
+                permiso: 'vPrograma:terminar',
+                ocultar: { estado: 1 },
+            },
+            {
                 label: 'Salida de insumos',
                 icon: 'fa-regular fa-circle-down',
                 action: 'salidaInsumos',
@@ -672,6 +679,25 @@ export default {
             this.useVistas.updateItem('vPrograma', 'produccion_ordenes', {
                 ...item,
                 estado: 2,
+            })
+        },
+        async abrir(item) {
+            const resQst = await jqst('¿Está seguro de abrir la orden de producción?')
+            if (resQst.isConfirmed == false) return
+
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await patch(
+                `${urls.produccion_ordenes}/abrir`,
+                item,
+                'Orden de producción abierta',
+            )
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            this.useVistas.updateItem('vPrograma', 'produccion_ordenes', {
+                ...item,
+                estado: 1,
             })
         },
         async salidaInsumos(item) {

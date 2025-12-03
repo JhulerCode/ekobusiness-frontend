@@ -338,6 +338,7 @@ export default {
         setQuery() {
             this.vista.qry = {
                 fltr: { tipo: { op: 'Es', val: 2 } },
+                incl: ['produccion_tipo1']
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
@@ -671,7 +672,11 @@ export default {
         },
         async loadCategorias() {
             const qry = {
-                fltr: { tipo: { op: 'Es', val: 2 }, activo: { op: 'Es', val: true } },
+                cols: ['nombre'],
+                fltr: {
+                    tipo: { op: 'Es', val: 2 },
+                    activo: { op: 'Es', val: true },
+                },
             }
 
             this.vista.articulo_categorias = []

@@ -510,7 +510,11 @@ export default {
 
         async loadCategorias() {
             const qry = {
-                fltr: { tipo: { op: 'Es', val: 1 }, activo: { op: 'Es', val: true } },
+                cols: ['nombre'],
+                fltr: {
+                    tipo: { op: 'Es', val: 1 },
+                    activo: { op: 'Es', val: true },
+                },
             }
 
             this.vista.articulo_categorias = []

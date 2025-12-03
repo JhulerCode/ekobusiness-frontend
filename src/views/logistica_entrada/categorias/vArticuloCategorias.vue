@@ -4,14 +4,25 @@
             <strong>Categorías de artículos</strong>
 
             <div class="buttons">
-                <JdButton text="Nuevo" title="Crear nuevo" @click="nuevo()"
-                    v-if="useAuth.verifyPermiso('vArticuloCategorias:crear')" />
+                <JdButton
+                    text="Nuevo"
+                    title="Crear nuevo"
+                    @click="nuevo()"
+                    v-if="useAuth.verifyPermiso('vArticuloCategorias:crear')"
+                />
             </div>
         </div>
 
-        <JdTable :name="tableName" :columns="columns" :datos="vista.articulo_categorias || []" :colAct="true"
-            :configFiltros="openConfigFiltros" :reload="loadCategorias" :rowOptions="tableRowOptions"
-            @rowOptionSelected="runMethod">
+        <JdTable
+            :name="tableName"
+            :columns="columns"
+            :datos="vista.articulo_categorias || []"
+            :colAct="true"
+            :configFiltros="openConfigFiltros"
+            :reload="loadCategorias"
+            :rowOptions="tableRowOptions"
+            @rowOptionSelected="runMethod"
+        >
         </JdTable>
     </div>
 
@@ -59,7 +70,7 @@ export default {
                 width: '15rem',
                 show: true,
                 seek: true,
-                sort: true
+                sort: true,
             },
             {
                 id: 'activo',
@@ -70,7 +81,7 @@ export default {
                 width: '10rem',
                 show: true,
                 seek: false,
-                sort: false
+                sort: false,
             },
             {
                 id: 'descripcion',
@@ -79,13 +90,28 @@ export default {
                 width: '20rem',
                 show: true,
                 seek: false,
-                sort: false
+                sort: false,
             },
         ],
         tableRowOptions: [
-            { label: 'Ver', icon: 'fa-regular fa-folder-open', action: 'ver', permiso: 'vArticuloCategorias_ver' },
-            { label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar', permiso: 'vArticuloCategorias:editar' },
-            { label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar', permiso: 'vArticuloCategorias:eliminar' },
+            {
+                label: 'Ver',
+                icon: 'fa-regular fa-folder-open',
+                action: 'ver',
+                permiso: 'vArticuloCategorias_ver',
+            },
+            {
+                label: 'Editar',
+                icon: 'fa-solid fa-pen-to-square',
+                action: 'editar',
+                permiso: 'vArticuloCategorias:editar',
+            },
+            {
+                label: 'Eliminar',
+                icon: 'fa-solid fa-trash-can',
+                action: 'eliminar',
+                permiso: 'vArticuloCategorias:eliminar',
+            },
         ],
     }),
     created() {
@@ -108,7 +134,9 @@ export default {
 
             this.vista.articulo_categorias = []
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.articulo_categorias}?qry=${JSON.stringify(this.vista.qry)}`)
+            const res = await get(
+                `${urls.articulo_categorias}?qry=${JSON.stringify(this.vista.qry)}`,
+            )
             this.useAuth.setLoading(false)
             this.vista.loaded = true
 
@@ -127,12 +155,12 @@ export default {
             await this.loadDatosSistema()
 
             const cols = this.columns
-            cols.find(a => a.id == 'activo').lista = this.vista.estados
+            cols.find((a) => a.id == 'activo').lista = this.vista.estados
 
             const send = {
                 table: this.tableName,
                 cols,
-                reload: this.loadCategorias
+                reload: this.loadCategorias,
             }
 
             this.useModals.setModal('mConfigFiltros', 'Filtros', null, send, true)
@@ -181,7 +209,6 @@ export default {
             Object.assign(this.vista, res.data)
         },
     },
-
 }
 </script>
 

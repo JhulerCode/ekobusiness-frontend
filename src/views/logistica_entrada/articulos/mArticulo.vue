@@ -292,6 +292,7 @@ export default {
         },
         async loadCategorias() {
             const qry = {
+                cols: ['nombre'],
                 fltr: {
                     tipo: { op: 'Es', val: this.articulo.tipo },
                     activo: { op: 'Es', val: true },

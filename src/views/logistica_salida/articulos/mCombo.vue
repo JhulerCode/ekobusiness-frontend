@@ -1,46 +1,105 @@
 <template>
     <JdModal modal="mCombo" :buttons="buttons" @button-click="(action) => this[action]()">
         <div class="container-datos">
-            <JdSelect label="Categoria" :nec="true" :lista="modal.articulo_categorias || []"
-                v-model="articulo.categoria" style="grid-column: 1/4;" />
+            <JdSelect
+                label="Categoria"
+                :nec="true"
+                :lista="modal.articulo_categorias || []"
+                v-model="articulo.categoria"
+                style="grid-column: 1/4"
+            />
 
             <!-- <JdInput label="Código interno" v-model="articulo.codigo" style="grid-column: 1/4;" /> -->
 
-            <JdInput label="EAN" :nec="true" v-model="articulo.codigo_barra" style="grid-column: 1/4;"
-                v-if="articulo.tipo == 2" />
+            <JdInput
+                label="EAN"
+                :nec="true"
+                v-model="articulo.codigo_barra"
+                style="grid-column: 1/4"
+                v-if="articulo.tipo == 2"
+            />
 
-            <JdInput label="Nombre" :nec="true" v-model="articulo.nombre" style="grid-column: 1/5;" />
+            <JdInput
+                label="Nombre"
+                :nec="true"
+                v-model="articulo.nombre"
+                style="grid-column: 1/5"
+            />
 
-            <JdSelect label="Unidad" :nec="true" v-model="articulo.unidad" :lista="modal.unidades"
-                mostrar="nombre_completo" style="grid-column: 1/3;" />
+            <JdSelect
+                label="Unidad"
+                :nec="true"
+                v-model="articulo.unidad"
+                :lista="modal.unidades"
+                mostrar="nombre_completo"
+                style="grid-column: 1/3"
+            />
 
-            <JdSelect label="Tributo" :nec="true" v-model="articulo.igv_afectacion"
-                :lista="modal.igv_afectaciones || []" style="grid-column: 1/4;" />
+            <JdSelect
+                label="Tributo"
+                :nec="true"
+                v-model="articulo.igv_afectacion"
+                :lista="modal.igv_afectaciones || []"
+                style="grid-column: 1/4"
+            />
 
-            <JdSwitch label="Activo?" v-model="articulo.activo" style="grid-column: 1/3;" />
+            <JdSwitch label="Activo?" v-model="articulo.activo" style="grid-column: 1/3" />
         </div>
 
         <div class="agregar">
             <strong style="grid-column: 1/5">--- Componentes ---</strong>
-            <JdSelectQuery label="Artículo" :nec="true" v-model="nuevo.articulo" :spin="spinArticulos"
-                :lista="modal.articulos" @search="searchArticulos" @elegir="setArticulo" style="grid-column: 1/5" />
+            <JdSelectQuery
+                label="Artículo"
+                :nec="true"
+                v-model="nuevo.articulo"
+                :spin="spinArticulos"
+                :lista="modal.articulos"
+                @search="searchArticulos"
+                @elegir="setArticulo"
+                style="grid-column: 1/5"
+            />
 
-            <JdInput type="number" label="Cantidad" :nec="true" v-model="nuevo.cantidad" style="grid-column: 1/3" />
+            <JdInput
+                type="number"
+                label="Cantidad"
+                :nec="true"
+                v-model="nuevo.cantidad"
+                style="grid-column: 1/3"
+            />
 
             <JdButton text="Agregar" tipo="2" @click="addArticulo" />
         </div>
 
-        <JdTable :columns="columns" :datos="articulo.combo_articulos || []" :seeker="false" :colAct="true"
-            :download="false">
+        <JdTable
+            :columns="columns"
+            :datos="articulo.combo_articulos || []"
+            :seeker="false"
+            :colAct="true"
+            :download="false"
+        >
             <template v-slot:cAction="{ item }">
-                <JdButton tipo="2" :small="true" icon="fa-solid fa-trash-can" title="Eliminar" @click="quitar(item)" />
+                <JdButton
+                    tipo="2"
+                    :small="true"
+                    icon="fa-solid fa-trash-can"
+                    title="Eliminar"
+                    @click="quitar(item)"
+                />
             </template>
         </JdTable>
     </JdModal>
 </template>
 
 <script>
-import { JdModal, JdInput, JdSelect, JdSwitch, JdSelectQuery, JdTable, JdButton } from '@jhuler/components'
+import {
+    JdModal,
+    JdInput,
+    JdSelect,
+    JdSwitch,
+    JdSelectQuery,
+    JdTable,
+    JdButton,
+} from '@jhuler/components'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
@@ -107,15 +166,18 @@ export default {
         showButtons() {
             if (this.useModals.mCombo.mode == 1) {
                 this.buttons[0].show = true
-            }
-            else {
+            } else {
                 this.buttons[1].show = true
             }
         },
 
         async loadCategorias() {
             const qry = {
-                fltr: { tipo: { op: 'Es', val: this.articulo.tipo }, activo: { op: 'Es', val: true } },
+                cols: ['nombre'],
+                fltr: {
+                    tipo: { op: 'Es', val: this.articulo.tipo },
+                    activo: { op: 'Es', val: true },
+                },
             }
 
             this.modal.articulo_categorias = []
@@ -148,7 +210,7 @@ export default {
                     activo: { op: 'Es', val: true },
                     nombre: { op: 'Contiene', val: txtBuscar },
                 },
-                cols: ['unidad', 'igv_afectacion', 'has_fv']
+                cols: ['unidad', 'igv_afectacion', 'has_fv'],
             }
 
             this.spinArticulos = true
@@ -162,29 +224,31 @@ export default {
         setArticulo(a) {
             if (a == null) {
                 this.nuevo = {}
-            }
-            else {
+            } else {
                 this.nuevo.nombre = a.nombre
                 this.nuevo.unidad = a.unidad
             }
         },
         async addArticulo() {
-            if (this.nuevo.articulo == null || this.nuevo.cantidad == null) return jmsg('warning', 'Selecciona un artículo e ingrese la cantidad')
+            if (this.nuevo.articulo == null || this.nuevo.cantidad == null)
+                return jmsg('warning', 'Selecciona un artículo e ingrese la cantidad')
 
-            const i = this.articulo.combo_articulos.findIndex(a => a.articulo == this.nuevo.articulo)
+            const i = this.articulo.combo_articulos.findIndex(
+                (a) => a.articulo == this.nuevo.articulo,
+            )
             if (i !== -1) return jmsg('warning', 'El artículo ya está agregado')
 
             this.articulo.combo_articulos.push({
                 id: genId(this.articulo.combo_articulos),
                 articulo: this.nuevo.articulo,
                 articulo1: { nombre: this.nuevo.nombre },
-                cantidad: this.nuevo.cantidad
+                cantidad: this.nuevo.cantidad,
             })
 
             this.nuevo = {}
         },
         async quitar(item) {
-            const i = this.articulo.combo_articulos.findIndex(a => a.articulo == item.articulo)
+            const i = this.articulo.combo_articulos.findIndex((a) => a.articulo == item.articulo)
             this.articulo.combo_articulos.splice(i, 1)
         },
 
@@ -234,7 +298,7 @@ export default {
             this.useVistas.updateItem('vProductosTerminados', 'articulos', res.data)
             this.useModals.show.mCombo = false
         },
-    }
+    },
 }
 </script>
 
@@ -257,7 +321,7 @@ export default {
     .container-datos {
         grid-template-columns: minmax(100%, 33.5rem) !important;
 
-        >* {
+        > * {
             grid-column: 1/2 !important;
         }
     }

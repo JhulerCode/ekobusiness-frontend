@@ -84,6 +84,7 @@
             <JdTextArea
                 label="Observación"
                 v-model="modal.produccion_orden.observacion"
+                :disabled="modal.mode == 3"
                 style="grid-column: 1/4"
             />
         </div>

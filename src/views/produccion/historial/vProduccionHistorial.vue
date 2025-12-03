@@ -174,6 +174,14 @@ export default {
                 seek: true,
                 sort: true,
             },
+            {
+                id: 'createdBy',
+                title: 'Creado por',
+                prop: 'createdBy1.nombres_apellidos',
+                filtrable: false,
+                width: '10rem',
+                show: true,
+            },
         ],
         tableRowOptions: [
             {
@@ -220,7 +228,7 @@ export default {
         setQuery() {
             this.vista.qry = {
                 fltr: {},
-                incl: ['tipo1', 'maquina1', 'articulo1'],
+                incl: ['tipo1', 'maquina1', 'articulo1', 'createdBy1'],
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
@@ -282,6 +290,7 @@ export default {
         async openConfigFiltros() {
             await this.loadDatosSistema()
             await this.loadMaquinas()
+            await this.loadLineas()
 
             const cols = this.columns
             cols.find((a) => a.id == 'tipo').lista = this.vista.articulo_lineas

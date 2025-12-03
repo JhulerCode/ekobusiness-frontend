@@ -155,7 +155,7 @@ export default {
                     tipo: { op: 'Es', val: 4 },
                     is_lote_padre: { op: 'Es', val: null },
                 },
-                incl: ['articulo1', 'produccion_orden1'],
+                incl: ['articulo1', 'produccion_orden1', 'maquina1'],
             }
 
             this.useAuth.updateQuery(this.columns, this.modal.qry)
@@ -173,20 +173,20 @@ export default {
 
             this.modal.produccion_productos = res.data
         },
-        // async grabar1() {
-        //     const send = this.modal.produccion_productos.filter(
-        //         (a) => a.cantidad_real != null && a.cantidad_real != '',
-        //     )
+        async grabar1() {
+            const send = this.modal.produccion_productos.filter(
+                (a) => a.cantidad_real != null && a.cantidad_real != '',
+            )
 
-        //     if (send.length == 0) {
-        //         jmsg('error', 'No se ha ingresado ninguna cantidad real')
-        //         return
-        //     }
+            if (send.length == 0) {
+                jmsg('error', 'No se ha ingresado ninguna cantidad real')
+                return
+            }
 
-        //     this.modal.transaccion.transaccion_items = send
+            this.modal.transaccion.transaccion_items = send
 
-        //     console.log(this.modal.transaccion)
-        // },
+            console.log(this.modal.transaccion)
+        },
         async grabar() {
             const send = this.modal.produccion_productos.filter(
                 (a) => a.cantidad_real != null && a.cantidad_real != '',

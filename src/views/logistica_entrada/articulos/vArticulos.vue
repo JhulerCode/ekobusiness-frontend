@@ -194,6 +194,23 @@ export default {
                 seek: false,
                 sort: true,
             },
+            {
+                id: 'is_ecommerce',
+                title: 'Ecommerce',
+                type: 'text',
+                // prop: 'igv_afectacion1.nombre',
+                width: '10rem',
+                show: true,
+            },
+            {
+                id: 'precio',
+                title: 'Precio',
+                type: 'number',
+                editable: true,
+                // prop: 'igv_afectacion1.nombre',
+                width: '10rem',
+                show: true,
+            },
         ],
         tableActions: [
             {

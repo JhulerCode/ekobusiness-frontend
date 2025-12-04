@@ -174,16 +174,16 @@ export default {
                 seek: true,
                 sort: true,
             },
-            {
-                id: 'stock',
-                title: 'Stock',
-                format: 'number',
-                toRight: true,
-                width: '10rem',
-                show: false,
-                seek: true,
-                sort: true,
-            },
+            // {
+            //     id: 'stock',
+            //     title: 'Stock',
+            //     format: 'number',
+            //     toRight: true,
+            //     width: '10rem',
+            //     show: false,
+            //     seek: true,
+            //     sort: true,
+            // },
             // {
             //     id: 'valor',
             //     title: 'Valor',
@@ -256,6 +256,24 @@ export default {
                 show: true,
                 seek: false,
                 sort: true,
+            },
+            {
+                id: 'is_ecommerce',
+                title: 'Ecommerce',
+                prop: 'is_ecommerce1.nombre',
+                type: 'select',
+                format: 'yesno',
+                editable: true,
+                width: '10rem',
+                show: false,
+            },
+            {
+                id: 'precio',
+                title: 'Precio',
+                type: 'number',
+                editable: true,
+                width: '10rem',
+                show: false,
             },
         ],
         tableActions: [
@@ -486,6 +504,7 @@ export default {
             cols.find((a) => a.id == 'unidad').lista = this.vista.unidades
             cols.find((a) => a.id == 'has_fv').lista = this.vista.estados
             cols.find((a) => a.id == 'activo').lista = this.vista.estados
+            cols.find((a) => a.id == 'is_ecommerce').lista = this.vista.estados
             cols.find((a) => a.id == 'igv_afectacion').lista = this.vista.igv_afectaciones
             cols.find((a) => a.id == 'categoria').lista = this.vista.articulo_categorias
             cols.find((a) => a.id == 'produccion_tipo').lista = this.vista.articulo_lineas
@@ -523,6 +542,7 @@ export default {
             cols.find((a) => a.id == 'unidad').lista = this.vista.unidades
             cols.find((a) => a.id == 'has_fv').lista = this.vista.estados
             cols.find((a) => a.id == 'activo').lista = this.vista.estados
+            cols.find((a) => a.id == 'is_ecommerce').lista = this.vista.estados
             cols.find((a) => a.id == 'igv_afectacion').lista = this.vista.igv_afectaciones
             cols.find((a) => a.id == 'categoria').lista = this.vista.articulo_categorias
             cols.find((a) => a.id == 'produccion_tipo').lista = this.vista.articulo_lineas

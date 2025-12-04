@@ -151,26 +151,26 @@ export default {
                 seek: true,
                 sort: true,
             },
-            {
-                id: 'stock',
-                title: 'Stock',
-                format: 'decimal',
-                toRight: true,
-                width: '10rem',
-                show: false,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'valor',
-                title: 'Valor',
-                format: 'decimal',
-                toRight: true,
-                width: '10rem',
-                show: false,
-                seek: true,
-                sort: true,
-            },
+            // {
+            //     id: 'stock',
+            //     title: 'Stock',
+            //     format: 'decimal',
+            //     toRight: true,
+            //     width: '10rem',
+            //     show: false,
+            //     seek: true,
+            //     sort: true,
+            // },
+            // {
+            //     id: 'valor',
+            //     title: 'Valor',
+            //     format: 'decimal',
+            //     toRight: true,
+            //     width: '10rem',
+            //     show: false,
+            //     seek: true,
+            //     sort: true,
+            // },
             {
                 id: 'has_fv',
                 title: 'Tiene fecha de vencimiento?',
@@ -180,8 +180,6 @@ export default {
                 format: 'yesno',
                 width: '8rem',
                 show: true,
-                seek: false,
-                sort: true,
             },
             {
                 id: 'igv_afectacion',
@@ -191,16 +189,16 @@ export default {
                 editable: true,
                 width: '10rem',
                 show: true,
-                seek: false,
-                sort: true,
             },
             {
                 id: 'is_ecommerce',
                 title: 'Ecommerce',
-                type: 'text',
-                // prop: 'igv_afectacion1.nombre',
+                prop: 'is_ecommerce1.nombre',
+                type: 'select',
+                format: 'yesno',
+                editable: true,
                 width: '10rem',
-                show: true,
+                show: false,
             },
             {
                 id: 'precio',
@@ -209,7 +207,7 @@ export default {
                 editable: true,
                 // prop: 'igv_afectacion1.nombre',
                 width: '10rem',
-                show: true,
+                show: false,
             },
         ],
         tableActions: [
@@ -385,6 +383,7 @@ export default {
             cols.find((a) => a.id == 'unidad').lista = this.vista.unidades
             cols.find((a) => a.id == 'has_fv').lista = this.vista.estados
             cols.find((a) => a.id == 'activo').lista = this.vista.estados
+            cols.find((a) => a.id == 'is_ecommerce').lista = this.vista.estados
             cols.find((a) => a.id == 'igv_afectacion').lista = this.vista.igv_afectaciones
             cols.find((a) => a.id == 'categoria').lista = this.vista.articulo_categorias
 
@@ -424,6 +423,7 @@ export default {
             cols.find((a) => a.id == 'unidad').lista = this.vista.unidades
             cols.find((a) => a.id == 'has_fv').lista = this.vista.estados
             cols.find((a) => a.id == 'activo').lista = this.vista.estados
+            cols.find((a) => a.id == 'is_ecommerce').lista = this.vista.estados
             cols.find((a) => a.id == 'igv_afectacion').lista = this.vista.igv_afectaciones
             cols.find((a) => a.id == 'categoria').lista = this.vista.articulo_categorias
 

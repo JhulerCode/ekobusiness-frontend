@@ -176,14 +176,37 @@ export default {
             },
             {
                 id: 'pagado',
-                title: 'Pagado',
+                title: 'Pagado?',
                 prop: 'pagado1.nombre',
                 type: 'select',
                 format: 'yesno',
                 width: '8rem',
                 show: true,
-                seek: false,
-                sort: true,
+            },
+            {
+                id: 'listo',
+                title: 'Listo para entrega?',
+                prop: 'listo1.nombre',
+                type: 'select',
+                format: 'yesno',
+                width: '8rem',
+                show: true,
+            },
+            {
+                id: 'entregado',
+                title: 'Entregado?',
+                prop: 'entregado1.nombre',
+                type: 'select',
+                format: 'yesno',
+                width: '8rem',
+                show: true,
+            },
+            {
+                id: 'origin',
+                title: 'Origen',
+                width: '10rem',
+                type: 'text',
+                show: true,
             },
             {
                 id: 'createdBy',
@@ -211,14 +234,6 @@ export default {
                 ocultar: { estado: ['0', '2'] },
             },
             {
-                label: 'Terminar',
-                icon: 'fa-solid fa-check-double',
-                action: 'terminar',
-                permiso: 'vVentaPedidos:terminar',
-                ocultar: { estado: ['0', '2'] },
-            },
-            // { label: 'Anular', icon: 'fa-solid fa-ban', action: 'anular', permiso: 'vVentaPedidos:anular', ocultar: { estado: ['0', '2'] } },
-            {
                 label: 'Eliminar',
                 icon: 'fa-solid fa-trash-can',
                 action: 'eliminar',
@@ -232,12 +247,40 @@ export default {
                 permiso: 'vVentaPedidos:generarPdf',
             },
             {
+                label: 'Confirmar pago',
+                icon: 'fa-solid fa-hand-holding-dollar',
+                action: 'confirmarPago',
+                permiso: 'vVentaPedidos:confirmarPago',
+                ocultar: { pagado: true },
+            },
+            {
+                label: 'Marcar como listo',
+                icon: 'fa-solid fa-check-double',
+                action: 'confirmarListo',
+                permiso: 'vVentaPedidos:confirmarListo',
+                ocultar: { listo: true, pagado: false },
+            },
+            {
+                label: 'Confirmar entrega',
+                icon: 'fa-regular fa-truck',
+                action: 'confirmarEntrega',
+                permiso: 'vVentaPedidos:confirmarEntrega',
+                ocultar: { entregado: true, listo: false },
+            },
+            {
                 label: 'Entregar mercadería',
                 icon: 'fa-regular fa-circle-down',
                 action: 'entregarMercaderia',
                 permiso: 'vVentaPedidos:entregarMercaderia',
                 ocultar: { estado: ['0', '2'] },
             },
+            // {
+            //     label: 'Terminar',
+            //     icon: 'fa-solid fa-check-double',
+            //     action: 'terminar',
+            //     permiso: 'vVentaPedidos:terminar',
+            //     ocultar: { estado: ['0', '2'] },
+            // },
         ],
     }),
     async created() {
@@ -354,28 +397,6 @@ export default {
             this.useModals.mSocioPedido.socios = [{ ...res.data.socio1 }]
             this.useModals.mSocioPedido.monedas = [{ ...res.data.moneda1 }]
         },
-        async terminar(item) {
-            const resQst = await jqst('¿Está seguro de terminar el pedido?')
-            if (resQst.isConfirmed == false) return
-
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await patch(`${urls.socio_pedidos}/terminar`, item, 'Pedido terminado')
-            this.useAuth.setLoading(false)
-
-            if (res.code != 0) return
-
-            this.useVistas.updateItem('vVentaPedidos', 'pedidos', { ...item, estado: 2 })
-        },
-        anular(item) {
-            const send = {
-                url: 'socio_pedidos',
-                item,
-                vista: this.tableName,
-                array: 'pedidos',
-            }
-
-            this.useModals.setModal('mAnular', `Anular pedido Nro ${item.codigo}`, null, send, true)
-        },
         async eliminar(item) {
             const resQst = await jqst('¿Está seguro de eliminar?')
             if (resQst.isConfirmed == false) return
@@ -396,6 +417,68 @@ export default {
             if (res.code != 0) return
 
             this.useModals.setModal('mSocioPedidoPdf', 'Orden de compra', null, res.data)
+        },
+        // anular(item) {
+        //     const send = {
+        //         url: 'socio_pedidos',
+        //         item,
+        //         vista: this.tableName,
+        //         array: 'pedidos',
+        //     }
+
+        //     this.useModals.setModal('mAnular', `Anular pedido Nro ${item.codigo}`, null, send, true)
+        // },
+        async confirmarPago(item) {
+            const resQst = await jqst('¿Está seguro de confirmar el pago?')
+            if (resQst.isConfirmed == false) return
+
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await patch(
+                `${urls.socio_pedidos}/confirmar-pago`,
+                item,
+                'Pago confirmado del pedido',
+            )
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            this.useVistas.updateItem('vVentaPedidos', 'pedidos', { ...item, pagado: true })
+        },
+        async confirmarListo(item) {
+            const resQst = await jqst('¿Está seguro de marcar como listo para entrega?')
+            if (resQst.isConfirmed == false) return
+
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await patch(
+                `${urls.socio_pedidos}/confirmar-listo`,
+                item,
+                'Pedido listo para entrega',
+            )
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            this.useVistas.updateItem('vVentaPedidos', 'pedidos', { ...item, listo: true })
+        },
+        async confirmarEntrega(item) {
+            const resQst = await jqst('¿Está seguro de confirmar la entrega?')
+            if (resQst.isConfirmed == false) return
+
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await patch(
+                `${urls.socio_pedidos}/confirmar-entrega`,
+                item,
+                'Pedido entregado',
+            )
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            this.useVistas.updateItem('vVentaPedidos', 'pedidos', {
+                ...item,
+                entregado: true,
+                estado: 2,
+            })
         },
         async entregarMercaderia(item) {
             this.useAuth.setLoading(true, 'Cargando...')
@@ -433,6 +516,18 @@ export default {
 
             this.useModals.setModal('mTransaccion', 'Nueva venta', 1, send, true)
         },
+        // async terminar(item) {
+        //     const resQst = await jqst('¿Está seguro de terminar el pedido?')
+        //     if (resQst.isConfirmed == false) return
+
+        //     this.useAuth.setLoading(true, 'Cargando...')
+        //     const res = await patch(`${urls.socio_pedidos}/terminar`, item, 'Pedido terminado')
+        //     this.useAuth.setLoading(false)
+
+        //     if (res.code != 0) return
+
+        //     this.useVistas.updateItem('vVentaPedidos', 'pedidos', { ...item, estado: 2 })
+        // },
 
         async loadSocios() {
             const qry = {

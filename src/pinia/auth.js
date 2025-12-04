@@ -168,10 +168,14 @@ export const useAuth = defineStore('auth', {
                             { id: 'vVentaPedidos:editar', label: 'Editar' },
                             { id: 'vVentaPedidos:eliminar', label: 'Eliminar' },
 
-                            { id: 'vVentaPedidos:terminar', label: 'Terminar' },
                             // { id: 'vVentaPedidos:anular', label: 'Anular' },
                             { id: 'vVentaPedidos:generarPdf', label: 'Generar PDF' },
+                            { id: 'vVentaPedidos:confirmarPago', label: 'Confirmar pago' },
+                            { id: 'vVentaPedidos:confirmarListo', label: 'Marcar como listo' },
+                            { id: 'vVentaPedidos:confirmarEntrega', label: 'Confirmar entrega' },
                             { id: 'vVentaPedidos:entregarMercaderia', label: 'Entregar mercadería' },
+                            // { id: 'vVentaPedidos:terminar', label: 'Terminar' },
+
                             { id: 'vVentaPedidos:verProductosPedidos', label: 'Ver productos pedidos' },
                         ]
                     },

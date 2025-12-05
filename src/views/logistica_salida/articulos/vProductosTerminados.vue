@@ -679,6 +679,7 @@ export default {
         async loadLineas() {
             const qry = {
                 fltr: {},
+                ordr: [['nombre', 'ASC']],
             }
 
             this.vista.articulo_lineas = []
@@ -697,6 +698,7 @@ export default {
                     tipo: { op: 'Es', val: 2 },
                     activo: { op: 'Es', val: true },
                 },
+                ordr: [['nombre', 'ASC']],
             }
 
             this.vista.articulo_categorias = []

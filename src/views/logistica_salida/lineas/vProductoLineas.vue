@@ -1,7 +1,7 @@
 <template>
     <div class="vista vista-fill">
         <div class="head">
-            <strong>Categorías de productos terminados</strong>
+            <strong>Líneas de productos</strong>
 
             <div class="buttons">
                 <JdButton
@@ -125,7 +125,10 @@ export default {
     },
     methods: {
         setQuery() {
-            this.vista.qry = {}
+            this.vista.qry = {
+                fltr: {},
+                ordr: [['nombre', 'ASC']],
+            }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
             this.vista.qry.cols.push('fotos')

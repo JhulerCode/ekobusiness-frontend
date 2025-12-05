@@ -178,6 +178,7 @@ export default {
                     tipo: { op: 'Es', val: this.articulo.tipo },
                     activo: { op: 'Es', val: true },
                 },
+                ordr: [['nombre', 'ASC']],
             }
 
             this.modal.articulo_categorias = []

@@ -8,7 +8,7 @@ export const useAuth = defineStore('auth', {
     state: () => ({
         token: null,
         usuario: {},
-        app_version: '1.7.5',
+        app_version: '1.7.6',
 
         menu: [
             {

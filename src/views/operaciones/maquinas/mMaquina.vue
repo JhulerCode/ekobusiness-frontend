@@ -124,6 +124,7 @@ export default {
         async loadLineas() {
             const qry = {
                 fltr: {},
+                ordr: [['nombre', 'ASC']],
             }
 
             this.modal.articulo_lineas = []

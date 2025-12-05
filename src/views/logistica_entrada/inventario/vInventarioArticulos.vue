@@ -165,6 +165,7 @@ export default {
                     tipo: { op: 'Es', val: 1 },
                     activo: { op: 'Es', val: true },
                 },
+                ordr: [['nombre', 'ASC']],
             }
 
             this.vista.articulo_categorias = []

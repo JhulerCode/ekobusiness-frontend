@@ -3,6 +3,7 @@ import { useModals } from '@/pinia/modals'
 import { jmsg } from '@/utils/swal'
 
 const host = import.meta.env.VITE_API_HOST
+const subdominio_prueba = 'app'
 
 const urls = {
     signin: `${host}/signin`,
@@ -125,6 +126,8 @@ function setHeaders(item) {
 
     headers['x-app-version'] = useAuth().app_version
 
+    headers['x-empresa'] = getSubdominio()
+
     return headers
 }
 
@@ -180,6 +183,16 @@ async function process(response, ms) {
         const blob = await response.blob()
         return blob
     }
+}
+
+function getSubdominio() {
+    const hostname = window.location.hostname
+
+    const parts = hostname.split(".")
+
+    if (parts.length > 2) return parts[0]
+
+    return subdominio_prueba
 }
 
 export {

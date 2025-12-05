@@ -519,6 +519,7 @@ export default {
             const qry = {
                 fltr: { activo: { op: 'Es', val: true } },
                 cols: ['nombre'],
+                ordr: [['nombre', 'ASC']],
             }
 
             this.vista.articulo_lineas = []

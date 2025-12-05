@@ -161,7 +161,9 @@ export default {
                     tipo: { op: 'Es', val: 1 },
                     activo: { op: 'Es', val: true },
                     nombre: { op: 'Contiene', val: txtBuscar },
-                }
+                },
+                cols: ['nombre', 'unidad'],
+                ordr: [['nombre', 'ASC']],
             }
 
             this.spinArticulos = true

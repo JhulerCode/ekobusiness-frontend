@@ -166,7 +166,8 @@ export default {
                     activo: { op: 'Es', val: true },
                     nombre: { op: 'Contiene', val: txtBuscar },
                 },
-                cols: ['unidad', 'igv_afectacion', 'has_fv'],
+                cols: ['nombre', 'unidad', 'igv_afectacion', 'has_fv'],
+                ordr: [['nombre', 'ASC']],
             }
 
             this.spinArticulos = true

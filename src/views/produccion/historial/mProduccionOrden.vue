@@ -248,8 +248,8 @@ export default {
                     tipo: { op: 'Es', val: 2 },
                     produccion_tipo: { op: 'Es', val: this.modal.produccion_orden.tipo },
                 },
-                cols: ['produccion_tipo', 'filtrantes'],
-                incl: ['receta_insumos'],
+                cols: ['nombre', 'produccion_tipo', 'filtrantes'],
+                ordr: [['nombre', 'ASC']],
             }
 
             this.spinArticulos = true
@@ -266,10 +266,31 @@ export default {
             } else {
                 this.modal.produccion_orden.articulo_info = a
 
-                this.modal.produccion_orden.articulo_info.receta_insumos.sort(
-                    (a, b) => a.orden - b.orden,
-                )
+                // this.modal.produccion_orden.articulo_info.receta_insumos.sort(
+                //     (a, b) => a.orden - b.orden,
+                // )
+                this.calcularInsumosNecesarios()
             }
+        },
+        async calcularInsumosNecesarios() {
+            const send = {
+                articulos: [
+                    {
+                        articulo: this.modal.produccion_orden.articulo,
+                        cantidad: this.modal.produccion_orden.cantidad,
+                    },
+                ],
+            }
+
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await post(`${urls.receta_insumos}/calcular-necesidad`, send, false)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            this.modal.produccion_orden.articulo_info.receta_insumos = res.data[0].receta.sort(
+                (a, b) => a.orden - b.orden,
+            )
         },
 
         setMaquina(a) {

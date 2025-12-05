@@ -101,8 +101,6 @@ export default {
         this.vista = this.useVistas.vInventarioArticulos
         this.initFiltros()
         this.useAuth.setColumns(this.tableName, this.columns)
-
-        if (this.vista.loaded) return
     },
     methods: {
         initFiltros() {
@@ -157,7 +155,6 @@ export default {
 
             this.useModals.setModal('mConfigFiltros', 'Filtros', null, send, true)
         },
-
         async loadCategorias() {
             const qry = {
                 cols: ['nombre'],

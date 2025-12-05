@@ -304,6 +304,7 @@ export default {
         async loadLineas() {
             const qry = {
                 fltr: {},
+                cols: ['nombre'],
                 ordr: [['nombre', 'ASC']],
             }
 

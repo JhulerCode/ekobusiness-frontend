@@ -356,7 +356,8 @@ export default {
         setQuery() {
             this.vista.qry = {
                 fltr: { tipo: { op: 'Es', val: 2 } },
-                incl: ['categoria1', 'produccion_tipo1']
+                incl: ['categoria1', 'produccion_tipo1'],
+                ordr: [['nombre', 'ASC']],
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)

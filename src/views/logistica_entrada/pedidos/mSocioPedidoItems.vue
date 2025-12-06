@@ -276,7 +276,8 @@ export default {
                         activo: { op: 'Es', val: true },
                         codigo_barra: { op: 'Son', val: res.data.map((a) => a.EAN) },
                     },
-                    cols: ['unidad', 'codigo_barra', 'has_fv', 'igv_afectacion'],
+                    cols: ['nombre', 'unidad', 'codigo_barra', 'has_fv', 'igv_afectacion'],
+                    ordr: [['nombre', 'ASC']],
                 }
 
                 this.useAuth.setLoading(true, 'Cargando productos...')

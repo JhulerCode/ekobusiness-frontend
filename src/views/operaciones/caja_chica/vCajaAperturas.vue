@@ -133,14 +133,6 @@ export default {
                 permiso: 'vCajaAperturas:ver',
             },
             {
-                id: 2,
-                label: 'Cerrar caja',
-                icon: 'fa-solid fa-check-double',
-                action: 'cerrarCaja',
-                permiso: 'vCajaAperturas:cerrarCaja',
-                ocultar: { estado: 2 },
-            },
-            {
                 id: 3,
                 label: 'Eliminar',
                 icon: 'fa-solid fa-trash-can',
@@ -154,6 +146,14 @@ export default {
                 icon: 'fa-solid fa-right-left',
                 action: 'agregarMovimientos',
                 permiso: 'vCajaMovimientos:listar',
+                ocultar: { estado: 2 },
+            },
+            {
+                id: 2,
+                label: 'Cerrar caja',
+                icon: 'fa-solid fa-check-double',
+                action: 'cerrarCaja',
+                permiso: 'vCajaAperturas:cerrarCaja',
                 ocultar: { estado: 2 },
             },
         ],
@@ -171,7 +171,6 @@ export default {
                 fltr: {
                     createdBy: { op: 'Es', val: this.useAuth.usuario.colaborador },
                 },
-                // incl: ['createdBy1'],
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
@@ -215,8 +214,14 @@ export default {
             this[method](item)
         },
         async ver(item) {
+            const qry = {
+                incl: ['caja_movimientos'],
+            }
+
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.caja_aperturas}/uno/${item.id}`)
+            const res = await get(
+                `${urls.caja_aperturas}/uno/${item.id}?qry=${JSON.stringify(qry)}`,
+            )
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return

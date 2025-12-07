@@ -41,7 +41,7 @@ import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
 import { useModals } from '@/pinia/modals'
 
-import { urls, get, delet } from '@/utils/crud'
+import { urls, get, delet, patch } from '@/utils/crud'
 import { jqst } from '@/utils/swal'
 import dayjs from 'dayjs'
 
@@ -94,16 +94,16 @@ export default {
                 seek: true,
                 sort: true,
             },
-            {
-                id: 'monto_cierre',
-                title: 'Monto cierre',
-                type: 'number',
-                format: 'decimal',
-                width: '12rem',
-                show: true,
-                seek: false,
-                sort: false,
-            },
+            // {
+            //     id: 'monto_cierre',
+            //     title: 'Monto cierre',
+            //     type: 'number',
+            //     format: 'decimal',
+            //     width: '12rem',
+            //     show: true,
+            //     seek: false,
+            //     sort: false,
+            // },
             {
                 id: 'estado',
                 title: 'Estado',
@@ -214,37 +214,13 @@ export default {
             this[method](item)
         },
         async ver(item) {
-            const qry = {
-                incl: ['caja_movimientos'],
-            }
-
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(
-                `${urls.caja_aperturas}/uno/${item.id}?qry=${JSON.stringify(qry)}`,
-            )
+            const res = await get(`${urls.caja_aperturas}/uno/${item.id}`)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
 
             this.useModals.setModal('mCajaApertura', 'Caja', 3, res.data)
-        },
-        async agregarMovimientos(item) {
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.caja_aperturas}/uno/${item.id}`)
-            this.useAuth.setLoading(false)
-
-            if (res.code != 0) return
-
-            this.useModals.setModal('mCajaApertura', 'Caja', 4, res.data)
-        },
-        async cerrarCaja(item) {
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.caja_aperturas}/uno/${item.id}`)
-            this.useAuth.setLoading(false)
-
-            if (res.code != 0) return
-
-            this.useModals.setModal('mCajaApertura', 'Caja', 2, res.data)
         },
         async eliminar(item) {
             const resQst = await jqst('¿Está seguro de eliminar?')
@@ -257,6 +233,27 @@ export default {
             if (res.code != 0) return
 
             this.useVistas.removeItem('vCajaAperturas', 'caja_aperturas', item)
+        },
+        async agregarMovimientos(item) {
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.caja_aperturas}/uno/${item.id}`)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            this.useModals.setModal('mCajaApertura', 'Caja', 4, res.data)
+        },
+        async cerrarCaja(item) {
+            const resQst = await jqst('¿Está seguro de cerrar la caja?')
+            if (resQst.isConfirmed == false) return
+
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await patch(`${urls.caja_aperturas}/cerrar`, { id: item.id })
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            this.useVistas.updateItem('vCajaAperturas', 'caja_aperturas', res.data)
         },
 
         async loadDatosSistema() {

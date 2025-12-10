@@ -181,7 +181,7 @@ export default {
             if (!this.vista.colaboradores) await this.loadColaboradores()
 
             const cols = this.columns
-            cols.find((a) => a.id == 'colaborador').lista = this.vista.asistencias
+            cols.find((a) => a.id == 'colaborador').lista = this.vista.colaboradores
 
             const send = {
                 table: this.tableName,
@@ -203,14 +203,12 @@ export default {
             if (res.code != 0) return
 
             if (!this.vista.colaboradores) await this.loadColaboradores()
-            console.log(this.vista.colaboradores)
 
             const send = {
                 asistencia: res.data,
                 colaboradores: this.vista.colaboradores,
             }
 
-            console.log(send)
             this.useModals.setModal('mAsistencia', 'Editar asistencia', 2, send, true)
         },
         async eliminar(item) {
@@ -228,14 +226,15 @@ export default {
 
         async loadColaboradores() {
             const qry = {
+                fltr: {},
                 cols: ['nombres', 'apellidos', 'nombres_apellidos'],
+                ordr: [['nombres', 'ASC']],
             }
 
             this.vista.colaboradores = []
             this.useAuth.setLoading(true, 'Cargando...')
             const res = await get(`${urls.colaboradores}?qry=${JSON.stringify(qry)}`)
             this.useAuth.setLoading(false)
-            this.vista.loaded = true
 
             if (res.code != 0) return
 

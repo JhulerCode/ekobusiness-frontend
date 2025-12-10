@@ -330,6 +330,7 @@ export default {
             const qry = {
                 fltr: {},
                 cols: ['nombres', 'apellidos', 'nombres_apellidos'],
+                ordr: [['nombres', 'ASC']],
             }
 
             this.vista.colaboradores = []

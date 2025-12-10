@@ -97,6 +97,7 @@ export default {
             this.useAuth.token = token
 
             await this.useAuth.login()
+            localStorage.setItem('remember-usuario', this.usuario)
             this.$router.replace({ name: 'ConsolaView' })
             this.useVistas.showVista(this.useAuth.usuario.vista_inicial)
         },

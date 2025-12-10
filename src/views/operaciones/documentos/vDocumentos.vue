@@ -4,24 +4,36 @@
             <strong>Documentos clave</strong>
 
             <div class="buttons">
-                <JdButton text="Nuevo" title="Crear nuevo" @click="nuevo()"
-                    v-if="useAuth.verifyPermiso('vDocumentos:crear')" />
+                <JdButton
+                    text="Nuevo"
+                    @click="nuevo()"
+                    v-if="useAuth.verifyPermiso('vDocumentos:crear')"
+                />
             </div>
         </div>
 
-        <JdTable :name="tableName" :columns="columns" :datos="vista.documentos || []" :colAct="true"
-            :configFiltros="openConfigFiltros" :reload="loadDocumentos" :rowOptions="tableRowOptions"
-            @rowOptionSelected="runMethod">
+        <JdTable
+            :name="tableName"
+            :columns="columns"
+            :datos="vista.documentos || []"
+            :colAct="true"
+            :configFiltros="openConfigFiltros"
+            :reload="loadDocumentos"
+            :rowOptions="tableRowOptions"
+            @rowOptionSelected="runMethod"
+        >
         </JdTable>
     </div>
 
     <mDocumento v-if="useModals.show.mDocumento" />
 
     <mConfigFiltros v-if="useModals.show.mConfigFiltros" />
+
+    <mPdfViewer v-if="useModals.show.mPdfViewer" />
 </template>
 
 <script>
-import { JdButton, JdTable, mConfigFiltros } from '@jhuler/components'
+import { JdButton, JdTable, mConfigFiltros, mPdfViewer } from '@jhuler/components'
 
 import mDocumento from './mDocumento.vue'
 
@@ -40,6 +52,8 @@ export default {
         mConfigFiltros,
 
         mDocumento,
+
+        mPdfViewer,
     },
     data: () => ({
         useAuth: useAuth(),
@@ -57,7 +71,7 @@ export default {
                 width: '20rem',
                 show: true,
                 seek: true,
-                sort: true
+                sort: true,
             },
             {
                 id: 'fecha_emision',
@@ -67,7 +81,7 @@ export default {
                 width: '12rem',
                 show: true,
                 seek: true,
-                sort: true
+                sort: true,
             },
             {
                 id: 'fecha_vencimiento',
@@ -77,7 +91,7 @@ export default {
                 width: '12rem',
                 show: true,
                 seek: true,
-                sort: true
+                sort: true,
             },
             {
                 id: 'recordar_dias',
@@ -86,7 +100,7 @@ export default {
                 width: '8rem',
                 show: true,
                 seek: true,
-                sort: true
+                sort: true,
             },
             {
                 id: 'estado',
@@ -97,13 +111,29 @@ export default {
                 width: '10rem',
                 show: true,
                 seek: true,
-                sort: true
+                sort: true,
             },
         ],
         tableRowOptions: [
-            { label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar', permiso: 'vDocumentos:editar' },
-            { label: 'Ver pdf', icon: 'fa-regular fa-file-pdf', action: 'verFile', permiso: 'vRegistrosSanitarios:editar', ocultar: { file_name: null } },
-            { label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar', permiso: 'vDocumentos:eliminar' },
+            {
+                label: 'Editar',
+                icon: 'fa-solid fa-pen-to-square',
+                action: 'editar',
+                permiso: 'vDocumentos:editar',
+            },
+            {
+                label: 'Ver pdf',
+                icon: 'fa-regular fa-file-pdf',
+                action: 'verFile',
+                permiso: 'vRegistrosSanitarios:editar',
+                ocultar: { file: {} },
+            },
+            {
+                label: 'Eliminar',
+                icon: 'fa-solid fa-trash-can',
+                action: 'eliminar',
+                permiso: 'vDocumentos:eliminar',
+            },
         ],
     }),
     created() {
@@ -120,6 +150,7 @@ export default {
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
+            this.vista.qry.cols.push('file')
         },
         async loadDocumentos() {
             this.setQuery()
@@ -145,12 +176,12 @@ export default {
             await this.loadDatosSistema()
 
             const cols = this.columns
-            cols.find(a => a.id == 'estado').lista = this.vista.documentos_estados
+            cols.find((a) => a.id == 'estado').lista = this.vista.documentos_estados
 
             const send = {
                 table: this.tableName,
-                cols: cols.filter(a => a.id !== 'estado'),
-                reload: this.loadDocumentos
+                cols: cols.filter((a) => a.id !== 'estado'),
+                reload: this.loadDocumentos,
             }
 
             this.useModals.setModal('mConfigFiltros', 'Filtros', null, send, true)
@@ -170,7 +201,7 @@ export default {
         },
         verFile(item) {
             console.log(item)
-            // getFile(`${urls.documentos}/uploads/${item.file_name}`)
+            this.useModals.setModal('mPdfViewer', 'Pdf', null, item.file.url)
         },
         async eliminar(item) {
             const resQst = await jqst('¿Está seguro de eliminar?')

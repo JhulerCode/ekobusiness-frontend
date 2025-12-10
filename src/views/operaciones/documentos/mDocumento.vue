@@ -7,17 +7,49 @@
             </template>
 
             <template v-if="documento.tipo == 2">
-                <JdTextArea label="Denominación legal" :nec="true" v-model="documento.denominacion_legal" />
-                <JdTextArea label="Denominación comercial" :nec="true" v-model="documento.denominacion_comercial" />
-                <JdInput label="Registro sanitario" :nec="true" v-model="documento.registro_sanitario" />
+                <JdTextArea
+                    label="Denominación legal"
+                    :nec="true"
+                    v-model="documento.denominacion_legal"
+                />
+                <JdTextArea
+                    label="Denominación comercial"
+                    :nec="true"
+                    v-model="documento.denominacion_comercial"
+                />
+                <JdInput
+                    label="Registro sanitario"
+                    :nec="true"
+                    v-model="documento.registro_sanitario"
+                />
             </template>
 
-            <JdInput label="Fecha de emisión" :nec="true" type="date" v-model="documento.fecha_emision" />
-            <JdInput label="Fecha de vencimiento" :nec="true" type="date" v-model="documento.fecha_vencimiento" />
-            <JdInput label="Recodar días antes" :nec="true" type="number" v-model="documento.recordar_dias" />
+            <JdInput
+                label="Fecha de emisión"
+                :nec="true"
+                type="date"
+                v-model="documento.fecha_emision"
+            />
+            <JdInput
+                label="Fecha de vencimiento"
+                :nec="true"
+                type="date"
+                v-model="documento.fecha_vencimiento"
+            />
+            <JdInput
+                label="Recodar días antes"
+                :nec="true"
+                type="number"
+                v-model="documento.recordar_dias"
+            />
 
-            <JdInputFile label="Documento" accept="application/pdf" v-model="documento.file_name"
-                @handleFile="(file) => documento.archivo = file" @deleteFile="documento.archivo = null" />
+            <JdInputFile
+                label="Documento"
+                accept="application/pdf"
+                v-model="documento.file_name"
+                @handleFile="(file) => (documento.archivo = file)"
+                @deleteFile="documento.archivo = null"
+            />
         </div>
     </JdModal>
 </template>
@@ -61,8 +93,7 @@ export default {
         showButtons() {
             if (this.useModals.mDocumento.mode == 1) {
                 this.buttons[0].show = true
-            }
-            else {
+            } else {
                 this.buttons[1].show = true
             }
         },
@@ -71,7 +102,8 @@ export default {
             const props = ['tipo', 'fecha_emision', 'fecha_vencimiento', 'recordar_dias']
 
             if (this.documento.tipo == 1) props.push('nombre')
-            if (this.documento.tipo == 2) props.push('denominacion_legal', 'denominacion_comercial', 'registro_sanitario')
+            if (this.documento.tipo == 2)
+                props.push('denominacion_legal', 'denominacion_comercial', 'registro_sanitario')
 
             if (incompleteData(this.documento, props)) {
                 jmsg('warning', 'Ingrese los datos necesarios')
@@ -120,7 +152,7 @@ export default {
             this.useVistas.updateItem(vista, 'documentos', res.data)
             this.useModals.show.mDocumento = false
         },
-    }
+    },
 }
 </script>
 

@@ -251,14 +251,14 @@ export default {
                 icon: 'fa-solid fa-hand-holding-dollar',
                 action: 'confirmarPago',
                 permiso: 'vVentaPedidos:confirmarPago',
-                ocultar: { pagado: true, pago_condicion: [2, 3] },
+                ocultar: { pagado: true, pago_condicion: ['2', '3'] },
             },
             {
-                label: 'Marcar como listo1',
+                label: 'Marcar como listo',
                 icon: 'fa-solid fa-check-double',
                 action: 'confirmarListo',
                 permiso: 'vVentaPedidos:confirmarListo',
-                ocultar: { listo: true, pagado: false, pago_condicion: [2, 3] },
+                ocultar: { listo: true, pagado: false, pago_condicion: ['2', '3'] },
             },
             {
                 label: 'Marcar como listo',

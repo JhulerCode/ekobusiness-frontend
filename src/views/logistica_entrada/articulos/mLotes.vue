@@ -115,7 +115,11 @@ export default {
                     articulo: { op: 'Es', val: this.modal.articulo.id },
                     is_lote_padre: { op: 'Es', val: true },
                 },
-                ordr: [['lote', 'DESC']],
+                ordr: [
+                    ['fv', 'DESC'],
+                    ['lote', 'DESC'],
+                    ['createdAt', 'ASC'],
+                ],
             }
 
             this.modal.lotes = []

@@ -4,14 +4,25 @@
             <strong>Inspecciones de clientes</strong>
 
             <div class="buttons">
-                <JdButton text="Nuevo" title="Crear nuevo" @click="nuevo()"
-                    v-if="useAuth.verifyPermiso('vInspecciones:crear')" />
+                <JdButton
+                    text="Nuevo"
+                    title="Crear nuevo"
+                    @click="nuevo()"
+                    v-if="useAuth.verifyPermiso('vInspecciones:crear')"
+                />
             </div>
         </div>
 
-        <JdTable :name="tableName" :columns="columns" :datos="vista.inspecciones || []" :colAct="true"
-            :configFiltros="openConfigFiltros" :reload="loadInspecciones" :rowOptions="tableRowOptions"
-            @rowOptionSelected="runMethod">
+        <JdTable
+            :name="tableName"
+            :columns="columns"
+            :datos="vista.inspecciones || []"
+            :colAct="true"
+            :configFiltros="openConfigFiltros"
+            :reload="loadInspecciones"
+            :rowOptions="tableRowOptions"
+            @rowOptionSelected="runMethod"
+        >
         </JdTable>
     </div>
 
@@ -58,7 +69,7 @@ export default {
                 width: '10rem',
                 show: true,
                 seek: true,
-                sort: true
+                sort: true,
             },
             {
                 id: 'socio',
@@ -69,7 +80,7 @@ export default {
                 width: '20rem',
                 show: true,
                 seek: true,
-                sort: true
+                sort: true,
             },
             {
                 id: 'puntuacion',
@@ -78,7 +89,7 @@ export default {
                 width: '10rem',
                 show: true,
                 seek: true,
-                sort: true
+                sort: true,
             },
             {
                 id: 'puntuacion_maxima',
@@ -87,7 +98,7 @@ export default {
                 width: '10rem',
                 show: true,
                 seek: true,
-                sort: true
+                sort: true,
             },
             // {
             //     id: 'documento',
@@ -100,9 +111,24 @@ export default {
             // },
         ],
         tableRowOptions: [
-            { label: 'Ver', icon: 'fa-regular fa-folder-open', action: 'ver', permiso: 'vInspecciones:ver' },
-            { label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar', permiso: 'vInspecciones:editar' },
-            { label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar', permiso: 'vInspecciones:eliminar' },
+            {
+                label: 'Ver',
+                icon: 'fa-regular fa-folder-open',
+                action: 'ver',
+                permiso: 'vInspecciones:ver',
+            },
+            {
+                label: 'Editar',
+                icon: 'fa-solid fa-pen-to-square',
+                action: 'editar',
+                permiso: 'vInspecciones:editar',
+            },
+            {
+                label: 'Eliminar',
+                icon: 'fa-solid fa-trash-can',
+                action: 'eliminar',
+                permiso: 'vInspecciones:eliminar',
+            },
         ],
     }),
     created() {
@@ -116,6 +142,7 @@ export default {
         setQuery() {
             this.vista.qry = {
                 fltr: {},
+                incl: ['socio1'],
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
@@ -148,12 +175,12 @@ export default {
             await this.loadSocios()
 
             const cols = this.columns
-            cols.find(a => a.id == 'socio').lista = this.vista.socios
+            cols.find((a) => a.id == 'socio').lista = this.vista.socios
 
             const send = {
                 table: this.tableName,
                 cols,
-                reload: this.loadInspecciones
+                reload: this.loadInspecciones,
             }
 
             this.useModals.setModal('mConfigFiltros', 'Filtros', null, send, true)
@@ -171,7 +198,7 @@ export default {
 
             const send = {
                 item: res.data,
-                socios: [{ ...res.data.socio1 }]
+                socios: [{ ...res.data.socio1 }],
             }
 
             this.useModals.setModal('mInspeccion', 'Ver inspección', 3, send, true)
@@ -214,7 +241,7 @@ export default {
         async loadSocios() {
             const qry = {
                 fltr: { tipo: { op: 'Es', val: 2 }, activo: { op: 'Es', val: true } },
-                cols: ['nombres', 'apellidos', 'nombres_apellidos']
+                cols: ['nombres', 'apellidos', 'nombres_apellidos'],
             }
 
             this.vista.socios = []

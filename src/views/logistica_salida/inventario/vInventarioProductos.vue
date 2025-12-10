@@ -7,6 +7,7 @@
                 <JdButton
                     @click="recalcularInventario"
                     text="Recalcular stock"
+                    tipo="2"
                     v-if="useAuth.verifyPermiso('vInventarioProductos:recalcularStock')"
                 />
             </div>
@@ -52,7 +53,7 @@ export default {
 
         columns: [
             {
-                id: 'fecha',
+                id: 'kardexes.fecha',
                 title: 'Fecha',
                 type: 'date',
                 show: false,
@@ -116,10 +117,13 @@ export default {
         },
         setQuery() {
             this.vista.qry = {
+                incl: ['categoria1', 'kardexes'],
+                sqls: ['articulo_movimientos_cantidad'],
                 fltr: {
                     tipo: { op: 'Es', val: 2 },
                 },
-                incl: ['categoria1'],
+                grop: ['id'],
+                ordr: [['nombre', 'ASC']],
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)

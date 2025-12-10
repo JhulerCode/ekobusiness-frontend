@@ -3,13 +3,7 @@
         <div class="head">
             <strong>Inventario</strong>
 
-            <div class="buttons">
-                <JdButton
-                    @click="loadInventario"
-                    text="Buscar"
-                    v-if="useAuth.verifyPermiso('vInventarioArticulos:listar')"
-                />
-            </div>
+            <div class="buttons"></div>
         </div>
 
         <JdTable
@@ -23,7 +17,7 @@
 </template>
 
 <script>
-import { JdTable, JdButton, mConfigFiltros } from '@jhuler/components'
+import { JdTable, mConfigFiltros } from '@jhuler/components'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
@@ -38,7 +32,6 @@ import { jmsg } from '@/utils/swal'
 export default {
     components: {
         JdTable,
-        JdButton,
         mConfigFiltros,
     },
     data: () => ({
@@ -88,7 +81,7 @@ export default {
             {
                 id: 'cantidad',
                 title: 'Stock',
-                format: 'number',
+                format: 'decimal',
                 toRight: true,
                 width: '7rem',
                 show: true,

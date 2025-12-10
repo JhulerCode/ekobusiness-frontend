@@ -92,6 +92,7 @@ export default {
             {
                 id: 'cantidad',
                 title: 'Cantidad',
+                format: 'number',
                 width: '8rem',
                 show: true,
             },

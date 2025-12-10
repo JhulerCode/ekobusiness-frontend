@@ -6,6 +6,8 @@
             <div class="buttons">
                 <JdSelect
                     :lista="vista.articulo_lineas"
+                    :loaded="vista.lineasLoaded"
+                    :reload="loadLineas"
                     v-model="vista.linea"
                     style="width: 10rem"
                 />

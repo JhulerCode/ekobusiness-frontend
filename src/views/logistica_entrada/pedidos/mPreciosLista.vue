@@ -4,8 +4,14 @@
             {{ modal.precio_lista.nombre }} - {{ modal.precio_lista.moneda }}
         </div>
 
-        <JdTable :columns="columns" :datos="modal.articulos || []" :rowSelectable="true" maxHeight="30rem"
-            :reload="loadPrecioListaItems" :download="false">
+        <JdTable
+            :columns="columns"
+            :datos="modal.articulos || []"
+            :rowSelectable="true"
+            maxHeight="30rem"
+            :reload="loadPrecioListaItems"
+            :download="false"
+        >
         </JdTable>
     </JdModal>
 </template>
@@ -32,9 +38,7 @@ export default {
 
         modal: {},
 
-        buttons: [
-            { text: 'Agregar articulos', action: 'sendItems', spin: false, show: true },
-        ],
+        buttons: [{ text: 'Agregar articulos', action: 'sendItems', spin: false, show: true }],
 
         columns: [
             {
@@ -60,7 +64,7 @@ export default {
                 width: '7rem',
                 show: true,
                 sort: true,
-            }
+            },
         ],
     }),
     created() {
@@ -71,7 +75,9 @@ export default {
         async loadPrecioListaItems() {
             const qry = {
                 fltr: { precio_lista: { op: 'Es', val: this.modal.precio_lista.id } },
-                cols: ['articulo', 'precio']
+                cols: ['articulo', 'precio'],
+                incl: ['articulo1'],
+                ordr: [['articulo1', 'nombre', 'ASC']],
             }
 
             this.useAuth.setLoading(true, 'Cargando...')
@@ -83,14 +89,14 @@ export default {
             this.modal.articulos = res.data
         },
         sendItems() {
-            const items = this.modal.articulos.filter(a => a.selected == true)
+            const items = this.modal.articulos.filter((a) => a.selected == true)
 
             if (items.length == 0) return jmsg('warning', 'Selecciona al menos un artículo')
 
             this.$emit('sendItems', items)
             this.useModals.show.mPreciosLista = false
-        }
-    }
+        },
+    },
 }
 </script>
 

@@ -91,7 +91,9 @@ export default {
         async loadPrecioListaItems() {
             const qry = {
                 fltr: { precio_lista: { op: 'Es', val: this.modal.precio_lista } },
-                cols: ['articulo', 'precio']
+                cols: ['articulo', 'precio'],
+                incl: ['articulo1'],
+                ordr: [['articulo1', 'nombre', 'ASC']],
             }
 
             this.useAuth.setLoading(true, 'Cargando...')

@@ -4,14 +4,25 @@
             <strong>Monedas</strong>
 
             <div class="buttons">
-                <JdButton text="Nuevo" title="Crear nuevo" @click="nuevo()"
-                    v-if="useAuth.verifyPermiso('vMonedas:crear')" />
+                <JdButton
+                    text="Nuevo"
+                    title="Crear nuevo"
+                    @click="nuevo()"
+                    v-if="useAuth.verifyPermiso('vMonedas:crear')"
+                />
             </div>
         </div>
 
-        <JdTable :name="tableName" :columns="columns" :datos="vista.monedas || []" :colAct="true"
-            :configFiltros="openConfigFiltros" :reload="loadMonedas" :rowOptions="tableRowOptions"
-            @rowOptionSelected="runMethod">
+        <JdTable
+            :name="tableName"
+            :columns="columns"
+            :datos="vista.monedas || []"
+            :colAct="true"
+            :configFiltros="openConfigFiltros"
+            :reload="loadMonedas"
+            :rowOptions="tableRowOptions"
+            @rowOptionSelected="runMethod"
+        >
         </JdTable>
     </div>
 
@@ -60,7 +71,7 @@ export default {
                 width: '10rem',
                 show: true,
                 seek: true,
-                sort: true
+                sort: true,
             },
             {
                 id: 'codigo',
@@ -69,7 +80,7 @@ export default {
                 width: '8rem',
                 show: true,
                 seek: true,
-                sort: true
+                sort: true,
             },
             {
                 id: 'simbolo',
@@ -78,7 +89,7 @@ export default {
                 width: '5rem',
                 show: true,
                 seek: true,
-                sort: true
+                sort: true,
             },
             {
                 id: 'plural',
@@ -87,13 +98,33 @@ export default {
                 width: '10rem',
                 show: true,
                 seek: true,
-                sort: true
+                sort: true,
             },
         ],
         tableRowOptions: [
-            { id: 1, label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar', permiso: 'vMonedas:editar' },
-            { id: 2, label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar', permiso: 'vMonedas:eliminar', ocultar: { estandar: true } },
-            { id: 3, label: 'Tipos de cambio', icon: 'fa-solid fa-dollar-sign', action: 'openTiposCambio', permiso: 'vTipoCambios:listar', ocultar: { estandar: true } },
+            {
+                id: 1,
+                label: 'Editar',
+                icon: 'fa-solid fa-pen-to-square',
+                action: 'editar',
+                permiso: 'vMonedas:editar',
+            },
+            {
+                id: 2,
+                label: 'Eliminar',
+                icon: 'fa-solid fa-trash-can',
+                action: 'eliminar',
+                permiso: 'vMonedas:eliminar',
+                ocultar: { estandar: true },
+            },
+            {
+                id: 3,
+                label: 'Tipos de cambio',
+                icon: 'fa-solid fa-dollar-sign',
+                action: 'openTiposCambio',
+                permiso: 'vTipoCambios:listar',
+                ocultar: { estandar: true },
+            },
         ],
     }),
     created() {
@@ -109,6 +140,7 @@ export default {
             this.vista.qry = {
                 fltr: {},
                 cols: ['nombre', 'codigo', 'simbolo', 'plural', 'estandar'],
+                ordr: [['nombre', 'ASC']],
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
@@ -142,7 +174,7 @@ export default {
             const send = {
                 table: this.tableName,
                 cols,
-                reload: this.loadMonedas
+                reload: this.loadMonedas,
             }
 
             this.useModals.setModal('mConfigFiltros', 'Filtros', null, send, true)
@@ -177,7 +209,7 @@ export default {
             const send = {
                 moneda: {
                     id: item.id,
-                    nombre: item.nombre
+                    nombre: item.nombre,
                 },
             }
 

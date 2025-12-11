@@ -190,6 +190,10 @@ export default {
             const qry = {
                 fltr: {},
                 cols: ['id', 'nombre', 'simbolo', 'estandar'],
+                ordr: [
+                    ['estandar', 'DESC'],
+                    ['nombre', 'ASC'],
+                ],
             }
 
             this.useAuth.setLoading(true, 'Cargando...')

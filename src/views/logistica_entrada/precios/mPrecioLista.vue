@@ -113,6 +113,10 @@ export default {
             const qry = {
                 fltr: {},
                 cols: ['id', 'nombre', 'simbolo', 'estandar'],
+                ordr: [
+                    ['estandar', 'DESC'],
+                    ['nombre', 'ASC'],
+                ],
             }
 
             this.modal.monedasLoaded = false

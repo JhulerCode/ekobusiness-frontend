@@ -379,6 +379,10 @@ export default {
                     'direcciones',
                     'precio_lista',
                 ],
+                ordr: [
+                    ['nombres', 'ASC'],
+                    ['apellidos', 'ASC'],
+                ],
             }
 
             this.modal.socios = []

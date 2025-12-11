@@ -184,6 +184,10 @@ export default {
             const qry = {
                 fltr: { tipo: { op: 'Es', val: 1 }, activo: { op: 'Es', val: true } },
                 cols: ['nombres', 'apellidos', 'nombres_apellidos'],
+                ordr: [
+                    ['nombres', 'ASC'],
+                    ['apellidos', 'ASC'],
+                ],
             }
 
             this.vista.socios = []

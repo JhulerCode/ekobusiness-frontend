@@ -1,26 +1,65 @@
 <template>
     <JdModal modal="mInspeccion" :buttons="buttons" @button-click="(action) => this[action]()">
         <div class="container-datos">
-            <JdInput label="Fecha" :nec="true" type="date" v-model="inspeccion.fecha" :disabled="modal.mode == 3" />
-            <JdSelect label="Cliente" :nec="true" :lista="modal.socios" mostrar="nombres_apellidos"
-                v-model="inspeccion.socio" :disabled="modal.mode == 3" />
-            <JdInput label="Puntuación" :nec="true" type="number" v-model="inspeccion.puntuacion"
-                :disabled="modal.mode == 3" />
-            <JdInput label="Puntuación máxima" :nec="true" type="number" v-model="inspeccion.puntuacion_maxima"
-                :disabled="modal.mode == 3" />
+            <JdInput
+                label="Fecha"
+                :nec="true"
+                type="date"
+                v-model="inspeccion.fecha"
+                :disabled="modal.mode == 3"
+            />
+            <JdSelect
+                label="Cliente"
+                :nec="true"
+                :lista="modal.socios"
+                mostrar="nombres_apellidos"
+                v-model="inspeccion.socio"
+                :disabled="modal.mode == 3"
+            />
+            <JdInput
+                label="Puntuación"
+                :nec="true"
+                type="number"
+                v-model="inspeccion.puntuacion"
+                :disabled="modal.mode == 3"
+            />
+            <JdInput
+                label="Puntuación máxima"
+                :nec="true"
+                type="number"
+                v-model="inspeccion.puntuacion_maxima"
+                :disabled="modal.mode == 3"
+            />
         </div>
 
         <div>
             <div class="agregar">
                 <strong>--- Correcciones ---</strong>
-                <JdButton icon="fa-solid fa-plus" text="Agregar" tipo="2" @click="addNew()" v-if="modal.mode != 3" />
+                <JdButton
+                    icon="fa-solid fa-plus"
+                    text="Agregar"
+                    tipo="2"
+                    @click="addNew()"
+                    v-if="modal.mode != 3"
+                />
             </div>
 
-            <JdTable :columns="columns" :datos="inspeccion.correcciones" :seeker="false" :colAct="modal.mode != 3"
-                :download="false" :inputsDisabled="modal.mode == 3">
+            <JdTable
+                :columns="columns"
+                :datos="inspeccion.correcciones"
+                :seeker="false"
+                :colAct="modal.mode != 3"
+                :download="false"
+                :inputsDisabled="modal.mode == 3"
+            >
                 <template v-slot:cAction="{ item }">
-                    <JdButton icon="fa-solid fa-trash" title="Eliminar" tipo="2" :small="true"
-                        @click="removeItem(item)" />
+                    <JdButton
+                        icon="fa-solid fa-trash"
+                        title="Eliminar"
+                        tipo="2"
+                        :small="true"
+                        @click="removeItem(item)"
+                    />
                 </template>
             </JdTable>
         </div>
@@ -75,7 +114,7 @@ export default {
                 type: 'check',
                 width: '5rem',
                 show: true,
-            }
+            },
         ],
     }),
     created() {
@@ -92,8 +131,7 @@ export default {
         showButtons() {
             if (this.modal.mode == 1) {
                 this.buttons[0].show = true
-            }
-            else if (this.modal.mode == 2) {
+            } else if (this.modal.mode == 2) {
                 this.buttons[1].show = true
             }
         },
@@ -102,11 +140,13 @@ export default {
             this.inspeccion.correcciones.push({
                 id: genId(),
                 correccion: '',
-                estado: false
+                estado: false,
             })
         },
         removeItem(item) {
-            this.inspeccion.correcciones = this.inspeccion.correcciones.filter(a => a.id != item.id)
+            this.inspeccion.correcciones = this.inspeccion.correcciones.filter(
+                (a) => a.id != item.id,
+            )
         },
 
         checkDatos() {
@@ -147,7 +187,11 @@ export default {
         async loadSocios() {
             const qry = {
                 fltr: { tipo: { op: 'Es', val: 2 }, activo: { op: 'Es', val: true } },
-                cols: ['nombres', 'apellidos', 'nombres_apellidos']
+                cols: ['nombres', 'apellidos', 'nombres_apellidos'],
+                ordr: [
+                    ['nombres', 'ASC'],
+                    ['apellidos', 'ASC'],
+                ],
             }
 
             this.modal.socios = []
@@ -159,7 +203,7 @@ export default {
 
             this.modal.socios = res.data
         },
-    }
+    },
 }
 </script>
 

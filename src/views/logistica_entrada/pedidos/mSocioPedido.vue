@@ -398,6 +398,10 @@ export default {
                     'pago_condicion',
                 ],
                 incl: ['precio_lista1'],
+                ordr: [
+                    ['nombres', 'ASC'],
+                    ['apellidos', 'ASC'],
+                ],
             }
 
             this.modal.socios = []

@@ -4,13 +4,28 @@
             <strong>Clientes</strong>
 
             <div class="buttons">
-                <JdButton text="Nuevo" @click="nuevo()" v-if="useAuth.verifyPermiso('vClientes:crear')" />
+                <JdButton
+                    text="Nuevo"
+                    @click="nuevo()"
+                    v-if="useAuth.verifyPermiso('vClientes:crear')"
+                />
             </div>
         </div>
 
-        <JdTable :name="tableName" :columns="columns" :datos="vista.socios || []" :colAct="true"
-            :configFiltros="openConfigFiltros" :configCols="true" :reload="loadSocios" :actions="tableActions"
-            @actionClick="runMethod" :rowOptions="tableRowOptions" @rowOptionSelected="runMethod" ref="jdtable">
+        <JdTable
+            :name="tableName"
+            :columns="columns"
+            :datos="vista.socios || []"
+            :colAct="true"
+            :configFiltros="openConfigFiltros"
+            :configCols="true"
+            :reload="loadSocios"
+            :actions="tableActions"
+            @actionClick="runMethod"
+            :rowOptions="tableRowOptions"
+            @rowOptionSelected="runMethod"
+            ref="jdtable"
+        >
         </JdTable>
     </div>
 
@@ -60,18 +75,18 @@ export default {
                 type: 'select',
                 editable: true,
                 width: '10rem',
-                show: false,
-                seek: false,
-                sort: false,
+                show: true,
+                seek: true,
+                sort: true,
             },
             {
                 id: 'doc_numero',
                 title: 'Nro documento',
                 type: 'text',
                 width: '10rem',
-                show: false,
-                seek: false,
-                sort: false,
+                show: true,
+                seek: true,
+                sort: true,
             },
             {
                 id: 'nombres',
@@ -87,8 +102,8 @@ export default {
                 title: 'E-mail',
                 type: 'text',
                 width: '10rem',
-                show: false,
-                seek: false,
+                show: true,
+                seek: true,
                 sort: false,
             },
             {
@@ -96,8 +111,8 @@ export default {
                 title: 'Teléfono',
                 type: 'text',
                 width: '10rem',
-                show: false,
-                seek: false,
+                show: true,
+                seek: true,
                 sort: false,
             },
             {
@@ -108,19 +123,34 @@ export default {
                 type: 'select',
                 editable: true,
                 width: '10rem',
-                show: false,
+                show: true,
                 seek: false,
                 sort: false,
-            }
+            },
         ],
         tableActions: [
-            { icon: 'fa-solid fa-pen-to-square', text: "Editar", action: "editarBulk" },
-            { icon: 'fa-solid fa-trash-can', text: "Eliminar", action: "eliminarBulk" },
+            { icon: 'fa-solid fa-pen-to-square', text: 'Editar', action: 'editarBulk' },
+            { icon: 'fa-solid fa-trash-can', text: 'Eliminar', action: 'eliminarBulk' },
         ],
         tableRowOptions: [
-            { label: 'Ver', icon: 'fa-regular fa-folder-open', action: 'ver', permiso: 'vClientes:ver' },
-            { label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar', permiso: 'vClientes:editar' },
-            { label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar', permiso: 'vClientes:eliminar' },
+            {
+                label: 'Ver',
+                icon: 'fa-regular fa-folder-open',
+                action: 'ver',
+                permiso: 'vClientes:ver',
+            },
+            {
+                label: 'Editar',
+                icon: 'fa-solid fa-pen-to-square',
+                action: 'editar',
+                permiso: 'vClientes:editar',
+            },
+            {
+                label: 'Eliminar',
+                icon: 'fa-solid fa-trash-can',
+                action: 'eliminar',
+                permiso: 'vClientes:eliminar',
+            },
         ],
     }),
     created() {
@@ -135,6 +165,10 @@ export default {
         setQuery() {
             this.vista.qry = {
                 fltr: { tipo: { op: 'Es', val: 2 } },
+                ordr: [
+                    ['nombres', 'ASC'],
+                    ['apellidos', 'ASC'],
+                ],
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
@@ -161,7 +195,7 @@ export default {
                 contactos: [],
                 bancos: [],
                 documentos: [],
-                activo: true
+                activo: true,
             }
 
             this.useModals.setModal('mSocio', 'Nuevo cliente', 1, item)
@@ -171,20 +205,20 @@ export default {
             await this.loadDatosSistema()
 
             const cols = this.columns
-            cols.find(a => a.id = 'doc_tipo').lista = this.vista.documentos_identidad
-            cols.find(a => a.id == 'activo').lista = this.vista.estados
+            cols.find((a) => (a.id = 'doc_tipo')).lista = this.vista.documentos_identidad
+            cols.find((a) => a.id == 'activo').lista = this.vista.estados
 
             const send = {
                 table: this.tableName,
                 cols,
-                reload: this.loadSocios
+                reload: this.loadSocios,
             }
 
             this.useModals.setModal('mConfigFiltros', 'Filtros', null, send, true)
         },
 
         async eliminarBulk() {
-            const ids = this.vista.socios.filter(a => a.selected).map(b => b.id)
+            const ids = this.vista.socios.filter((a) => a.selected).map((b) => b.id)
 
             const resQst = await jqst(`¿Está seguro de eliminar ${ids.length} registros?`)
             if (resQst.isConfirmed == false) return
@@ -196,19 +230,19 @@ export default {
 
             if (res.code != 0) return
 
-            this.vista.socios = this.vista.socios.filter(a => !a.selected)
+            this.vista.socios = this.vista.socios.filter((a) => !a.selected)
             this.$refs['jdtable'].toogleSelectItems()
         },
         async editarBulk() {
             await this.loadDatosSistema()
             // await this.loadListasPrecios()
 
-            const cols = this.columns.filter(a => a.editable == true)
-            cols.find(a => a.id = 'doc_tipo').lista = this.vista.documentos_identidad
-            cols.find(a => a.id == 'activo').lista = this.vista.estados
-            cols.find(a => a.id == 'precio_lista').lista = this.vista.precios_listas
+            const cols = this.columns.filter((a) => a.editable == true)
+            cols.find((a) => (a.id = 'doc_tipo')).lista = this.vista.documentos_identidad
+            cols.find((a) => a.id == 'activo').lista = this.vista.estados
+            cols.find((a) => a.id == 'precio_lista').lista = this.vista.precios_listas
 
-            const ids = this.vista.socios.filter(a => a.selected).map(b => b.id)
+            const ids = this.vista.socios.filter((a) => a.selected).map((b) => b.id)
 
             const send = {
                 uri: 'socios',

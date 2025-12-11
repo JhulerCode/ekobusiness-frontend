@@ -46,7 +46,7 @@ export default {
         tableName: 'vInventarioArticulos',
         columns: [
             {
-                id: 'fecha',
+                id: 'kardexes.fecha',
                 title: 'Fecha',
                 type: 'date',
                 show: false,
@@ -110,10 +110,13 @@ export default {
         },
         setQuery() {
             this.vista.qry = {
+                incl: ['categoria1', 'kardexes'],
+                sqls: ['articulo_movimientos_cantidad'],
                 fltr: {
                     tipo: { op: 'Es', val: 1 },
                 },
-                incl: ['categoria1'],
+                grop: ['id'],
+                ordr: [['nombre', 'ASC']],
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)

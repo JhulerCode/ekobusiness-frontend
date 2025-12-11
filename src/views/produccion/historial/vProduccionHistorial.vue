@@ -53,6 +53,7 @@ import { useVistas } from '@/pinia/vistas'
 import { urls, get } from '@/utils/crud'
 
 import dayjs from 'dayjs'
+import { jmsg } from '@/utils/swal'
 
 export default {
     components: {
@@ -229,6 +230,10 @@ export default {
             this.vista.qry = {
                 fltr: {},
                 incl: ['tipo1', 'maquina1', 'articulo1', 'createdBy1'],
+                ordr: [
+                    ['fecha', 'DESC'],
+                    ['createdAt', 'DESC'],
+                ],
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
@@ -384,11 +389,12 @@ export default {
         //     )
         // },
         async verTrazabilidad(item) {
-            this.useAuth.setLoading(true, 'Cargando trazabilidad...')
-            const res = await get(`${urls.produccion_ordenes}/trazabilidad/${item.id}`)
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.produccion_ordenes}/uno/${item.id}`)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
+            if (res.data == null) return jmsg('warning', 'La órden de producción no existe')
 
             const send = {
                 produccion_orden: res.data,
@@ -406,7 +412,7 @@ export default {
                 ],
             }
 
-            this.useModals.setModal('mProduccionTrazabilidad', 'Trazabilidad', 3, send, true)
+            this.useModals.setModal('mProduccionTrazabilidad', 'Trazabilidad', null, send, true)
         },
         async controlPesos(item) {
             let formato_id = 'RE-BPM-06'

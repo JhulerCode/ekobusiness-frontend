@@ -197,7 +197,7 @@ import { JdTable, JdButton, JdSelect, JdInput } from '@jhuler/components'
 import mProduccionOrden from '@/views/produccion/historial/mProduccionOrden.vue'
 import mProduccionInsumos from '@/views/produccion/historial/mProduccionInsumos.vue'
 import mProduccionProductos from '@/views/produccion/historial/mProduccionProductos.vue'
-import mProductosFaltantes from '@/views/produccion/filtrante/mProductosFaltantes.vue'
+import mProductosFaltantes from '@/views/produccion/mProductosFaltantes.vue'
 import mProduccionInsumosCompartidos from '@/views/produccion/historial/mProduccionInsumosCompartidos.vue'
 
 import { useModals } from '@/pinia/modals'

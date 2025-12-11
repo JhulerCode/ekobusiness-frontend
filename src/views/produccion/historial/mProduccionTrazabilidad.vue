@@ -13,43 +13,43 @@
                 <JdInput
                     type="date"
                     label="Fecha"
-                    :nec="true"
                     v-model="modal.produccion_orden.fecha"
-                    :disabled="modal.mode == 3"
+                    :disabled="true"
                     style="grid-column: 1/3"
                 />
 
                 <template v-if="modal.produccion_orden.tipo != 2">
                     <JdSelect
                         label="Máquina"
-                        :nec="true"
                         v-model="modal.produccion_orden.maquina"
-                        :lista="
-                            modal.maquinas?.filter(
-                                (a) => a.produccion_tipo == modal.produccion_orden.tipo,
-                            ) || []
-                        "
-                        :disabled="modal.mode == 3"
+                        :lista="modal.maquinas"
+                        :disabled="true"
                         style="grid-column: 3/5"
                     />
                 </template>
 
                 <JdSelectQuery
                     label="Producto"
-                    :nec="true"
                     v-model="modal.produccion_orden.articulo"
                     :lista="modal.articulos"
-                    :disabled="modal.mode == 3"
+                    :disabled="true"
                     style="grid-column: 1/4"
                 />
 
                 <JdInput
                     type="number"
                     label="Cantidad planificada"
-                    :nec="true"
                     v-model="modal.produccion_orden.cantidad"
-                    :disabled="modal.mode == 3"
+                    :disabled="true"
                     style="grid-column: 1/3"
+                />
+
+                <JdButton
+                    tipo="2"
+                    :small="true"
+                    icon="fa-solid fa-rotate-right"
+                    :disabled="true"
+                    @click="loadTrazabilidad"
                 />
             </div>
 
@@ -59,12 +59,12 @@
                 </p>
                 <JdTable
                     :columns="columns1"
-                    :datos="modal.produccion_orden.insumos || []"
+                    :datos="modal.insumos || []"
                     :seeker="false"
                     :download="false"
                 >
                     <!-- <template v-slot:cAction="{ item }">
-                    <JdButton tipo="2" :small="true" icon="fa-regular fa-folder-open" :disabled="modal.mode == 3"
+                    <JdButton tipo="2" :small="true" icon="fa-regular fa-folder-open" :disabled="true"
                         @click="verCompra(item)" />
                 </template> -->
                 </JdTable>
@@ -76,7 +76,7 @@
                 </p>
                 <JdTable
                     :columns="columns2"
-                    :datos="modal.produccion_orden.productos_terminados || []"
+                    :datos="modal.productos_terminados || []"
                     :seeker="false"
                     :download="false"
                 >
@@ -87,7 +87,7 @@
 </template>
 
 <script>
-import { JdModal, JdInput, JdSelect, JdSelectQuery, JdTable } from '@jhuler/components'
+import { JdModal, JdInput, JdSelect, JdSelectQuery, JdTable, JdButton } from '@jhuler/components'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
@@ -103,7 +103,7 @@ export default {
         JdSelectQuery,
         JdSelect,
         JdTable,
-        // JdButton,
+        JdButton,
     },
     data: () => ({
         useAuth: useAuth(),
@@ -139,6 +139,7 @@ export default {
                 id: 'cantidad',
                 title: 'Cantidad',
                 toRight: true,
+                format: 'decimal',
                 width: '8rem',
                 show: true,
             },
@@ -168,6 +169,8 @@ export default {
     }),
     created() {
         this.modal = this.useModals.mProduccionTrazabilidad
+
+        this.loadTrazabilidad()
     },
     methods: {
         async verCompra(item) {
@@ -199,6 +202,21 @@ export default {
             }
 
             html2pdf().set(opciones).from(element).save()
+        },
+        async loadTrazabilidad() {
+            this.modal.insumos = []
+            this.modal.productos_terminados = []
+
+            this.useAuth.setLoading(true, 'Cargando trazabilidad...')
+            const res = await get(
+                `${urls.produccion_ordenes}/trazabilidad/${this.modal.produccion_orden.id}`,
+            )
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            this.modal.insumos = res.data.insumos
+            this.modal.productos_terminados = res.data.productos_terminados
         },
     },
 }

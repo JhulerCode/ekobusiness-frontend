@@ -92,6 +92,7 @@
         <JdTable
             :columns="columns1"
             :datos="insumos_necesitados"
+            :reload="calcularInsumosNecesarios"
             :seeker="false"
             :download="false"
             class="jd-table"
@@ -99,10 +100,10 @@
             <template v-slot:colStock="{ item }">
                 <span
                     :class="{
-                        falta: item.articulo1.stock < item.cantidad_necesitada,
+                        falta: item.stock < item.cantidad_necesitada,
                     }"
                 >
-                    {{ redondear(item.articulo1.stock) }}
+                    {{ redondear(item.stock) }}
                 </span>
             </template>
         </JdTable>
@@ -276,7 +277,7 @@ export default {
             const send = {
                 articulos: [
                     {
-                        articulo: this.modal.produccion_orden.articulo,
+                        id: this.modal.produccion_orden.articulo,
                         cantidad: this.modal.produccion_orden.cantidad,
                     },
                 ],

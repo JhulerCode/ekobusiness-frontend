@@ -2,15 +2,6 @@
     <JdModal modal="mSocioPedido" :buttons="buttons" @button-click="(action) => this[action]()">
         <div class="container-datos">
             <div class="left">
-                <JdInput
-                    type="date"
-                    label="Fecha"
-                    :nec="true"
-                    v-model="modal.item.fecha"
-                    :disabled="modal.mode == 3"
-                    style="grid-column: 1/3"
-                />
-
                 <JdSelect
                     :label="modal.item.tipo == 1 ? 'Proveedor' : 'Cliente'"
                     :nec="true"
@@ -33,31 +24,6 @@
                     style="grid-column: 1/5"
                 />
 
-                <JdInput
-                    label="Nro pedido"
-                    v-model="modal.item.codigo"
-                    :disabled="modal.mode == 3"
-                    style="grid-column: 1/4"
-                />
-            </div>
-
-            <div class="right">
-                <JdSelect
-                    label="Estado"
-                    v-model="modal.item.estado"
-                    :lista="modal.pedido_estados || []"
-                    :disabled="true"
-                    style="grid-column: 1/3"
-                />
-
-                <JdInput
-                    type="date"
-                    label="Fecha de entrega"
-                    v-model="modal.item.fecha_entrega"
-                    :disabled="modal.mode == 3"
-                    style="grid-column: 1/5"
-                />
-
                 <JdSelect
                     label="Moneda"
                     :nec="true"
@@ -68,8 +34,6 @@
                     style="grid-column: 1/4"
                 />
 
-                <!-- <small v-if="modal.item.moneda">TC: {{ modal.item.tipo_cambio }}</small> -->
-
                 <JdSelect
                     label="Condición de pago"
                     :nec="true"
@@ -78,6 +42,42 @@
                     :disabled="modal.mode == 3"
                     style="grid-column: 1/5"
                 />
+            </div>
+
+            <div class="right">
+                <JdInput
+                    type="date"
+                    label="Fecha de emisión"
+                    :nec="true"
+                    v-model="modal.item.fecha"
+                    :disabled="modal.mode == 3"
+                    style="grid-column: 1/5"
+                />
+
+                <JdInput
+                    type="date"
+                    label="Fecha de entrega"
+                    v-model="modal.item.fecha_entrega"
+                    :disabled="modal.mode == 3"
+                    style="grid-column: 1/5"
+                />
+
+                <JdInput
+                    label="Nro pedido"
+                    v-model="modal.item.codigo"
+                    :disabled="modal.mode == 3"
+                    style="grid-column: 1/5"
+                />
+
+                <JdSelect
+                    label="Estado"
+                    v-model="modal.item.estado"
+                    :lista="modal.pedido_estados || []"
+                    :disabled="true"
+                    style="grid-column: 1/3"
+                />
+
+                <!-- <small v-if="modal.item.moneda">TC: {{ modal.item.tipo_cambio }}</small> -->
 
                 <JdSwitch
                     label="Pagado?"

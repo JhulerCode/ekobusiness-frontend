@@ -139,11 +139,11 @@ export default {
         setQuery() {
             this.vista.qry = {
                 fltr: {},
-                cols: ['nombre', 'codigo', 'simbolo', 'plural', 'estandar'],
                 ordr: [['nombre', 'ASC']],
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
+            this.vista.qry.cols.push('estandar')
         },
         async loadMonedas() {
             this.setQuery()

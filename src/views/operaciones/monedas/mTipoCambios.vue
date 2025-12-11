@@ -98,7 +98,8 @@ export default {
         async loadTipoCambios() {
             const qry = {
                 fltr: {},
-                cols: ['fecha', 'compra', 'venta', 'moneda']
+                cols: ['fecha', 'compra', 'venta', 'moneda'],
+                ordr: [['fecha', 'DESC']]
             }
 
             this.useAuth.setLoading(true, 'Cargando...')

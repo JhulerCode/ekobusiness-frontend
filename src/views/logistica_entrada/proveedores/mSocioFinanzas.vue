@@ -134,6 +134,7 @@ export default {
         async loadPrecioLista() {
             const qry = {
                 fltr: { activo: { op: 'Es', val: true } },
+                ordr: [['nombre', 'ASC']],
             }
 
             this.useAuth.setLoading(true, 'Cargando...')

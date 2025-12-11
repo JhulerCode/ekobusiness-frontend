@@ -4,14 +4,25 @@
             <strong>Listas de precios</strong>
 
             <div class="buttons">
-                <JdButton text="Nuevo" title="Crear nuevo" @click="nuevo()"
-                    v-if="useAuth.verifyPermiso('vPrecioListas:crear')" />
+                <JdButton
+                    text="Nuevo"
+                    title="Crear nuevo"
+                    @click="nuevo()"
+                    v-if="useAuth.verifyPermiso('vPrecioListas:crear')"
+                />
             </div>
         </div>
 
-        <JdTable :name="tableName" :columns="columns" :datos="vista.precio_listas || []" :colAct="true"
-            :configFiltros="openConfigFiltros" :reload="loadListaPrecios" :rowOptions="tableRowOptions"
-            @rowOptionSelected="runMethod">
+        <JdTable
+            :name="tableName"
+            :columns="columns"
+            :datos="vista.precio_listas || []"
+            :colAct="true"
+            :configFiltros="openConfigFiltros"
+            :reload="loadListaPrecios"
+            :rowOptions="tableRowOptions"
+            @rowOptionSelected="runMethod"
+        >
         </JdTable>
     </div>
 
@@ -62,7 +73,7 @@ export default {
                 width: '20rem',
                 show: true,
                 seek: true,
-                sort: true
+                sort: true,
             },
             {
                 id: 'moneda',
@@ -72,7 +83,7 @@ export default {
                 width: '10rem',
                 show: true,
                 seek: false,
-                sort: false
+                sort: false,
             },
             {
                 id: 'activo',
@@ -83,7 +94,7 @@ export default {
                 width: '10rem',
                 show: true,
                 seek: false,
-                sort: false
+                sort: false,
             },
             {
                 id: 'descripcion',
@@ -92,13 +103,31 @@ export default {
                 width: '20rem',
                 show: true,
                 seek: false,
-                sort: false
+                sort: false,
             },
         ],
         tableRowOptions: [
-            { id: 1, label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar', permiso: 'vPrecioListas:editar' },
-            { id: 2, label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar', permiso: 'vPrecioListas:eliminar' },
-            { id: 3, label: 'Artículos', icon: 'fa-solid fa-tags', action: 'verArticulos', permiso: 'vPrecioListaItems:listar' },
+            {
+                id: 1,
+                label: 'Editar',
+                icon: 'fa-solid fa-pen-to-square',
+                action: 'editar',
+                permiso: 'vPrecioListas:editar',
+            },
+            {
+                id: 2,
+                label: 'Eliminar',
+                icon: 'fa-solid fa-trash-can',
+                action: 'eliminar',
+                permiso: 'vPrecioListas:eliminar',
+            },
+            {
+                id: 3,
+                label: 'Artículos',
+                icon: 'fa-solid fa-tags',
+                action: 'verArticulos',
+                permiso: 'vPrecioListaItems:listar',
+            },
         ],
     }),
     created() {
@@ -113,6 +142,8 @@ export default {
         setQuery() {
             this.vista.qry = {
                 fltr: {},
+                incl: ['moneda1'],
+                ordr: [['nombre', 'ASC']],
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
@@ -142,13 +173,13 @@ export default {
             await this.loadMonedas()
 
             const cols = this.columns
-            cols.find(a => a.id == 'moneda').lista = this.vista.monedas
-            cols.find(a => a.id == 'activo').lista = this.vista.estados
+            cols.find((a) => a.id == 'moneda').lista = this.vista.monedas
+            cols.find((a) => a.id == 'activo').lista = this.vista.estados
 
             const send = {
                 table: this.tableName,
                 cols,
-                reload: this.loadListaPrecios
+                reload: this.loadListaPrecios,
             }
 
             this.useModals.setModal('mConfigFiltros', 'Filtros', null, send, true)

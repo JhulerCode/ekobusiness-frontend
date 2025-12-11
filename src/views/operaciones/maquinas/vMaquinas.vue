@@ -129,6 +129,7 @@ export default {
                 fltr: { tipo: { op: 'Es', val: 1 } },
                 cols: ['codigo', 'nombre', 'produccion_tipo', 'velocidad', 'limpieza_tiempo'],
                 ordr: [['nombre', 'ASC']],
+                incl: ['produccion_tipo1'],
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)

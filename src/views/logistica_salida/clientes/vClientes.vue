@@ -268,6 +268,7 @@ export default {
         // async loadListasPrecios() {
         //     const qry = {
         //         fltr: { activo: { op: 'Es', val: true } },
+        //         ordr: [['nombre', 'ASC']],
         //     }
 
         //     this.vista.precios_listas = []

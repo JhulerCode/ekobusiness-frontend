@@ -387,6 +387,7 @@ export default {
             const qry = {
                 fltr: {},
                 cols: ['codigo', 'nombre', 'produccion_tipo', 'velocidad', 'limpieza_tiempo'],
+                ordr: [['nombre', 'ASC']],
             }
 
             this.modal.maquinas = []

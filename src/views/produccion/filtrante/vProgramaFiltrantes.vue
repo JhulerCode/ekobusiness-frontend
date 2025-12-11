@@ -282,6 +282,7 @@ export default {
             const qry = {
                 fltr: { produccion_tipo: { op: 'Es', val: 1 } },
                 cols: ['codigo', 'nombre', 'produccion_tipo', 'velocidad', 'limpieza_tiempo'],
+                ordr: [['nombre', 'ASC']],
             }
 
             this.vista.maquinas = []

@@ -128,6 +128,7 @@ export default {
             this.vista.qry = {
                 fltr: { tipo: { op: 'Es', val: 1 } },
                 cols: ['codigo', 'nombre', 'produccion_tipo', 'velocidad', 'limpieza_tiempo'],
+                ordr: [['nombre', 'ASC']],
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)

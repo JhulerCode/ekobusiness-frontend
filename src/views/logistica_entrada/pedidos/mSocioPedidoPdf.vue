@@ -361,10 +361,23 @@ export default {
 .pdfall {
     width: 7.27in;
     // height: 10.69in;
+    background-color: white;
 
     * {
         font-family: 'Roboto', sans-serif;
         font-size: 0.9rem;
+        --bg-color: #ffffff;
+        --bg-color-hover: whitesmoke;
+        --bg-color-selected: #def8f2;
+
+        --bg-color2: #f2f2f2;
+        --bg-color-transparent: rgba(0, 0, 0, 0.5);
+
+        --text-color: black;
+        --text-color2: rgba(60, 60, 60, 0.66);
+
+        --border: solid 1px #dfdfdf;
+        --shadow-color: #d1d0d0;
     }
 }
 

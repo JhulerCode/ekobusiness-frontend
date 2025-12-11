@@ -219,6 +219,8 @@ export default {
         setQuery() {
             this.vista.qry = {
                 fltr: { tipo: { op: 'Es', val: 1 } },
+                incl: ['socio1', 'moneda1', 'createdBy1'],
+                ordr: [['fecha', 'DESC']],
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
@@ -280,8 +282,12 @@ export default {
             this[method](item)
         },
         async ver(item) {
+            const qry = {
+                incl: ['socio_pedido_items', 'moneda1', 'socio2'],
+            }
+
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.socio_pedidos}/uno/${item.id}`)
+            const res = await get(`${urls.socio_pedidos}/uno/${item.id}?qry=${JSON.stringify(qry)}`)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
@@ -292,8 +298,12 @@ export default {
             this.useModals.mSocioPedido.monedas = [{ ...res.data.moneda1 }]
         },
         async editar(item) {
+            const qry = {
+                incl: ['socio_pedido_items', 'moneda1', 'socio2'],
+            }
+
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.socio_pedidos}/uno/${item.id}`)
+            const res = await get(`${urls.socio_pedidos}/uno/${item.id}?qry=${JSON.stringify(qry)}`)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
@@ -338,8 +348,12 @@ export default {
             this.useVistas.removeItem('vCompraPedidos', 'pedidos', item)
         },
         async generarPdf(item) {
+            const qry = {
+                incl: ['socio_pedido_items', 'moneda1', 'socio2', 'createdBy1'],
+            }
+
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.socio_pedidos}/uno/${item.id}`)
+            const res = await get(`${urls.socio_pedidos}/uno/${item.id}?qry=${JSON.stringify(qry)}`)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
@@ -349,8 +363,12 @@ export default {
             // asd.download(`OC_${res.data.codigo}.pdf`)
         },
         async ingresarMercaderia(item) {
+            const qry = {
+                incl: ['socio_pedido_items', 'moneda1', 'socio2'],
+            }
+
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.socio_pedidos}/uno/${item.id}`)
+            const res = await get(`${urls.socio_pedidos}/uno/${item.id}?qry=${JSON.stringify(qry)}`)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return

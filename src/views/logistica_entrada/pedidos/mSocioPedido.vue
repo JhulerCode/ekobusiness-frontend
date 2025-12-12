@@ -315,11 +315,11 @@ export default {
                     'articulo',
                     'nombre',
                     'unidad',
-                    // 'has_fv',
+                    'has_fv',
                     'cantidad',
                     'pu',
-                    // 'igv_afectacion',
-                    // 'igv_porcentaje',
+                    'igv_afectacion',
+                    'igv_porcentaje',
                 ]
                 // console.log(a.nombre)
                 if (incompleteData(a, props1)) {

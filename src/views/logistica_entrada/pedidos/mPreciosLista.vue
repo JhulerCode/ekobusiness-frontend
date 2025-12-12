@@ -78,6 +78,11 @@ export default {
                 cols: ['articulo', 'precio'],
                 incl: ['articulo1'],
                 ordr: [['articulo1', 'nombre', 'ASC']],
+                iccl: {
+                    articulo1: {
+                        cols: ['has_fv', 'igv_afectacion'],
+                    },
+                }
             }
 
             this.useAuth.setLoading(true, 'Cargando...')

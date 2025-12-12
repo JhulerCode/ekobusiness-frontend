@@ -79,6 +79,11 @@ export const useAuth = defineStore('auth', {
                         ]
                     },
                     {
+                        label: 'Pedidos de compra detalle', goto: 'vCompraPedidoItems', permisos: [
+                            { id: 'vCompraPedidoItems:listar', label: 'Listar' },
+                        ]
+                    },
+                    {
                         label: 'Compras', goto: 'vCompras', permisos: [
                             { id: 'vCompras:listar', label: 'Listar' },
                             { id: 'vCompras:crear', label: 'Crear' },
@@ -168,13 +173,11 @@ export const useAuth = defineStore('auth', {
                             { id: 'vVentaPedidos:editar', label: 'Editar' },
                             { id: 'vVentaPedidos:eliminar', label: 'Eliminar' },
 
-                            // { id: 'vVentaPedidos:anular', label: 'Anular' },
                             { id: 'vVentaPedidos:generarPdf', label: 'Generar PDF' },
                             { id: 'vVentaPedidos:confirmarPago', label: 'Confirmar pago' },
                             { id: 'vVentaPedidos:confirmarListo', label: 'Marcar como listo' },
                             { id: 'vVentaPedidos:confirmarEntrega', label: 'Confirmar entrega' },
                             { id: 'vVentaPedidos:entregarMercaderia', label: 'Entregar mercadería' },
-                            // { id: 'vVentaPedidos:terminar', label: 'Terminar' },
 
                             { id: 'vVentaPedidos:verProductosPedidos', label: 'Ver productos pedidos' },
                         ]

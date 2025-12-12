@@ -7,6 +7,7 @@
         <vArticulos v-if="useVistas.show.vArticulos" />
         <vPrecioListas v-if="useVistas.show.vPrecioListas" />
         <vCompraPedidos v-if="useVistas.show.vCompraPedidos" />
+        <vCompraPedidoItems v-if="useVistas.show.vCompraPedidoItems" />
         <vCompras v-if="useVistas.show.vCompras" />
         <vCompraItems v-if="useVistas.show.vCompraItems" />
         <vInventarioArticulos v-if="useVistas.show.vInventarioArticulos" />
@@ -58,6 +59,7 @@ import vArticuloCategorias from '@/views/logistica_entrada/categorias/vArticuloC
 import vArticulos from '@/views/logistica_entrada/articulos/vArticulos.vue'
 import vPrecioListas from '@/views/logistica_entrada/precios/vPrecioListas.vue'
 import vCompraPedidos from '@/views/logistica_entrada/pedidos/vCompraPedidos.vue'
+import vCompraPedidoItems from '@/views/logistica_entrada/pedido_items/vCompraPedidoItems.vue'
 import vCompras from '@/views/logistica_entrada/compras/vCompras.vue'
 import vCompraItems from '@/views/logistica_entrada/compra_items/vCompraItems.vue'
 import vInventarioArticulos from '@/views/logistica_entrada/inventario/vInventarioArticulos.vue'
@@ -112,6 +114,7 @@ export default {
         vArticulos,
         vPrecioListas,
         vCompraPedidos,
+        vCompraPedidoItems,
         vCompras,
         vCompraItems,
         vInventarioArticulos,
@@ -262,6 +265,5 @@ export default {
             margin-bottom: 2rem;
         }
     }
-
 }
 </style>

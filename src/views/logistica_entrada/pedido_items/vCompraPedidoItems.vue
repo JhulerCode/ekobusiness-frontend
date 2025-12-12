@@ -1,7 +1,7 @@
 <template>
     <div class="vista vista-fill">
         <div class="head">
-            <strong>Productos pedidos</strong>
+            <strong>Artículos pedidos</strong>
         </div>
 
         <JdTable
@@ -45,7 +45,7 @@ export default {
 
         vista: {},
 
-        tableName: 'vVentaPedidoItems',
+        tableName: 'vCompraPedidoItems',
         columns: [
             {
                 id: 'socio_pedido1.fecha',
@@ -103,7 +103,7 @@ export default {
                 id: 'cantidad',
                 title: 'Cantidad',
                 type: 'number',
-                format: 'number',
+                format: 'decimal',
                 toRight: true,
                 width: '8rem',
                 show: true,
@@ -114,7 +114,7 @@ export default {
                 id: 'entregado',
                 title: 'Entregado',
                 type: 'number',
-                format: 'number',
+                format: 'decimal',
                 toRight: true,
                 width: '8rem',
                 show: true,
@@ -128,18 +128,18 @@ export default {
         //         label: 'Inspeccionar',
         //         icon: 'fa-solid fa-star',
         //         action: 'crearFormatoValue',
-        //         permiso: 'vVentaPedidoItems:inspeccion',
+        //         permiso: 'vCompraPedidoItems:inspeccion',
         //     },
         // ],
     }),
     async created() {
-        this.vista = this.useVistas.vVentaPedidoItems
+        this.vista = this.useVistas.vCompraPedidoItems
         this.initFiltros()
         this.useAuth.setColumns(this.tableName, this.columns)
 
         if (this.vista.loaded) return
 
-        if (this.useAuth.verifyPermiso('vVentaPedidoItems:listar') == true) this.loadPedidoItems()
+        if (this.useAuth.verifyPermiso('vCompraPedidoItems:listar') == true) this.loadPedidoItems()
     },
     methods: {
         initFiltros() {
@@ -149,7 +149,7 @@ export default {
         },
         setQuery() {
             this.vista.qry = {
-                fltr: { 'socio_pedido1.tipo': { op: 'Es', val: 2 } },
+                fltr: { 'socio_pedido1.tipo': { op: 'Es', val: 1 } },
                 incl: ['socio_pedido1', 'articulo1'],
             }
 
@@ -192,7 +192,7 @@ export default {
 
         async loadSocios() {
             const qry = {
-                fltr: { tipo: { op: 'Es', val: 2 }, activo: { op: 'Es', val: true } },
+                fltr: { tipo: { op: 'Es', val: 1 }, activo: { op: 'Es', val: true } },
                 cols: ['nombres', 'apellidos', 'nombres_apellidos'],
                 ordr: [
                     ['nombres', 'ASC'],

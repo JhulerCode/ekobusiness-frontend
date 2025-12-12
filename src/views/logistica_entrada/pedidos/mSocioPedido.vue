@@ -29,6 +29,8 @@
                     :nec="true"
                     v-model="modal.item.moneda"
                     :lista="modal.monedas || []"
+                    :loaded="modal.monedasLoaded"
+                    @reload="loadMonedas"
                     @elegir="setTipoCambio"
                     :disabled="modal.mode == 3 || modal.item.moneda != null"
                     style="grid-column: 1/4"
@@ -37,6 +39,8 @@
                 <JdSelect
                     label="Condición de pago"
                     :nec="true"
+                    :loaded="modal.datosSistemaLoaded"
+                    @reload="loadDatosSistema"
                     v-model="modal.item.pago_condicion"
                     :lista="modal.pago_condiciones || []"
                     :disabled="modal.mode == 3"
@@ -79,12 +83,12 @@
 
                 <!-- <small v-if="modal.item.moneda">TC: {{ modal.item.tipo_cambio }}</small> -->
 
-                <JdSwitch
+                <!-- <JdSwitch
                     label="Pagado?"
                     v-model="modal.item.pagado"
                     :disabled="modal.mode == 3"
                     style="grid-column: 1/5"
-                />
+                /> -->
             </div>
         </div>
 
@@ -148,7 +152,7 @@
 </template>
 
 <script>
-import { JdModal, JdInput, JdSelect, JdTextArea, JdSwitch } from '@jhuler/components'
+import { JdModal, JdInput, JdSelect, JdTextArea } from '@jhuler/components'
 
 import mSocioPedidoItems from './mSocioPedidoItems.vue'
 
@@ -168,7 +172,6 @@ export default {
         JdInput,
         JdSelect,
         JdTextArea,
-        JdSwitch,
 
         mSocioPedidoItems,
     },
@@ -312,11 +315,11 @@ export default {
                     'articulo',
                     'nombre',
                     'unidad',
-                    'has_fv',
+                    // 'has_fv',
                     'cantidad',
                     'pu',
-                    'igv_afectacion',
-                    'igv_porcentaje',
+                    // 'igv_afectacion',
+                    // 'igv_porcentaje',
                 ]
                 // console.log(a.nombre)
                 if (incompleteData(a, props1)) {
@@ -428,9 +431,12 @@ export default {
                 ],
             }
 
+            this.modal.monedas = []
             this.useAuth.setLoading(true, 'Cargando...')
+            this.modal.monedasLoaded = false
             const res = await get(`${urls.monedas}?qry=${JSON.stringify(qry)}`)
             this.useAuth.setLoading(false)
+            this.modal.monedasLoaded = true
 
             if (res.code != 0) return
 
@@ -438,7 +444,12 @@ export default {
         },
         async loadDatosSistema() {
             const qry = ['empresa', 'unidades', 'pedido_estados', 'pago_condiciones']
+
+            this.useAuth.setLoading(true, 'Cargando...')
+            this.modal.datosSistemaLoaded = false
             const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
+            this.useAuth.setLoading(false)
+            this.modal.datosSistemaLoaded = true
 
             if (res.code != 0) return
 

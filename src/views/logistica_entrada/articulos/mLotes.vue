@@ -116,9 +116,9 @@ export default {
                     is_lote_padre: { op: 'Es', val: true },
                 },
                 ordr: [
+                    ['createdAt', 'DESC'],
                     ['fv', 'DESC'],
                     ['lote', 'DESC'],
-                    ['createdAt', 'ASC'],
                 ],
             }
 

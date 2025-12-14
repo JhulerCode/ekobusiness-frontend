@@ -100,12 +100,10 @@ export default {
     },
     methods: {
         async loadPedidos() {
-            const qry = {
-                produccion_tipo: this.modal.produccion_tipo,
-            }
-
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.socio_pedidos}/pendientes?qry=${JSON.stringify(qry)}`)
+            const res = await get(
+                `${urls.socio_pedidos}/pendientes?produccion_tipo=${this.modal.produccion_tipo}`,
+            )
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return

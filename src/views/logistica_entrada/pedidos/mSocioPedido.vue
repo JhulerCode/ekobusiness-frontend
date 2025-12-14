@@ -3,23 +3,22 @@
         <div class="container-datos">
             <div class="left">
                 <JdSelect
-                    :label="modal.item.tipo == 1 ? 'Proveedor' : 'Cliente'"
+                    :label="modal.socio_pedido.tipo == 1 ? 'Proveedor' : 'Cliente'"
                     :nec="true"
-                    v-model="modal.item.socio"
+                    v-model="modal.socio_pedido.socio"
                     :lista="modal.socios || []"
                     mostrar="nombres_apellidos"
                     @elegir="setSocio"
                     :loaded="modal.sociosLoaded"
-                    @reload="loadSocios()"
-                    :disabled="modal.mode == 3 || modal.socio?.id != null"
+                    @reload="loadSocios"
+                    :disabled="modal.mode == 3 || modal.socio_elegido?.id != null"
                     style="grid-column: 1/5"
                 />
 
                 <JdSelect
                     label="Contacto"
-                    :nec="modal.item.tipo == 1"
-                    v-model="modal.item.contacto"
-                    :lista="modal.socio?.contactos || []"
+                    v-model="modal.socio_pedido.contacto"
+                    :lista="modal.socio_elegido?.contactos || []"
                     :disabled="modal.mode == 3"
                     style="grid-column: 1/5"
                 />
@@ -27,25 +26,14 @@
                 <JdSelect
                     label="Moneda"
                     :nec="true"
-                    v-model="modal.item.moneda"
+                    v-model="modal.socio_pedido.moneda"
                     :lista="modal.monedas || []"
                     :loaded="modal.monedasLoaded"
                     @reload="loadMonedas"
-                    @elegir="setTipoCambio"
-                    :disabled="modal.mode == 3 || modal.item.moneda != null"
+                    :disabled="modal.mode == 3 || modal.socio_pedido.moneda != null"
                     style="grid-column: 1/4"
                 />
-
-                <JdSelect
-                    label="Condición de pago"
-                    :nec="true"
-                    :loaded="modal.datosSistemaLoaded"
-                    @reload="loadDatosSistema"
-                    v-model="modal.item.pago_condicion"
-                    :lista="modal.pago_condiciones || []"
-                    :disabled="modal.mode == 3"
-                    style="grid-column: 1/5"
-                />
+                <!-- @elegir="setTipoCambio" -->
             </div>
 
             <div class="right">
@@ -53,7 +41,7 @@
                     type="date"
                     label="Fecha de emisión"
                     :nec="true"
-                    v-model="modal.item.fecha"
+                    v-model="modal.socio_pedido.fecha"
                     :disabled="modal.mode == 3"
                     style="grid-column: 1/5"
                 />
@@ -61,68 +49,51 @@
                 <JdInput
                     type="date"
                     label="Fecha de entrega"
-                    v-model="modal.item.fecha_entrega"
+                    v-model="modal.socio_pedido.fecha_entrega"
                     :disabled="modal.mode == 3"
                     style="grid-column: 1/5"
                 />
 
                 <JdInput
                     label="Nro pedido"
-                    v-model="modal.item.codigo"
+                    v-model="modal.socio_pedido.codigo"
                     :disabled="modal.mode == 3"
                     style="grid-column: 1/5"
                 />
 
                 <JdSelect
                     label="Estado"
-                    v-model="modal.item.estado"
+                    v-model="modal.socio_pedido.estado"
                     :lista="modal.pedido_estados || []"
                     :disabled="true"
                     style="grid-column: 1/3"
                 />
-
-                <!-- <small v-if="modal.item.moneda">TC: {{ modal.item.tipo_cambio }}</small> -->
-
-                <!-- <JdSwitch
-                    label="Pagado?"
-                    v-model="modal.item.pagado"
-                    :disabled="modal.mode == 3"
-                    style="grid-column: 1/5"
-                /> -->
             </div>
         </div>
 
-        <mSocioPedidoItems />
+        <div class="extra-datos">
+            <ul class="pestanas">
+                <li @click="pestana = 1" :class="{ 'pestana-activo': pestana == 1 }">Contenido</li>
+                <li @click="pestana = 2" :class="{ 'pestana-activo': pestana == 2 }">Logística</li>
+                <li @click="pestana = 3" :class="{ 'pestana-activo': pestana == 3 }">Finanzas</li>
+            </ul>
+
+            <div class="pestana-body">
+                <mSocioPedidoItems v-if="pestana == 1" />
+                <mSocioPedidoLogistica v-if="pestana == 2" />
+                <mSocioPedidoFinanzas v-if="pestana == 3" />
+            </div>
+        </div>
 
         <div class="botom">
             <div class="left">
-                <JdSelect
-                    label="Direcciones"
-                    :nec="true"
-                    v-model="modal.direccion_entrega"
-                    :lista="
-                        (modal.item.tipo == 1
-                            ? modal.empresa?.direcciones
-                            : modal.socio?.direcciones) || []
-                    "
-                    :disabled="modal.mode == 3"
-                    @elegir="setDireccionEntrega"
-                    v-if="modal.mode != 3"
-                />
-
-                <JdTextArea
-                    label="Dirección de entrega"
-                    v-model="modal.item.direccion_entrega"
-                    :disabled="modal.mode == 3"
-                />
-
                 <JdTextArea
                     label="Observaciones"
-                    v-model="modal.item.observacion"
+                    v-model="modal.socio_pedido.observacion"
                     :disabled="modal.mode == 3"
                 />
 
-                <small>{{ modal.item.id }}</small>
+                <small>{{ modal.socio_pedido.id }}</small>
             </div>
 
             <div class="totales">
@@ -143,7 +114,7 @@
 
                 <strong>Importe total:</strong>
                 <strong class="total">
-                    {{ getItemFromArray(modal.item.moneda, modal.monedas, 'simbolo') }}
+                    {{ getItemFromArray(modal.socio_pedido.moneda, modal.monedas, 'simbolo') }}
                     {{ redondear(modal.mtoImpVenta) }}
                 </strong>
             </div>
@@ -155,6 +126,8 @@
 import { JdModal, JdInput, JdSelect, JdTextArea } from '@jhuler/components'
 
 import mSocioPedidoItems from './mSocioPedidoItems.vue'
+import mSocioPedidoLogistica from './mSocioPedidoLogistica.vue'
+import mSocioPedidoFinanzas from './mSocioPedidoFinanzas.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
@@ -174,6 +147,8 @@ export default {
         JdTextArea,
 
         mSocioPedidoItems,
+        mSocioPedidoLogistica,
+        mSocioPedidoFinanzas,
     },
     data: () => ({
         useAuth: useAuth(),
@@ -183,6 +158,7 @@ export default {
         redondear,
 
         modal: {},
+        pestana: 1,
 
         buttons: [
             { text: 'Guardar avance', action: 'guardarAvance', tipo: '2' },
@@ -195,14 +171,15 @@ export default {
         this.modal = this.useModals.mSocioPedido
 
         this.showButtons()
+
         if (this.modal.mode == 1) {
             this.setTotalesCero()
             this.loadSocios()
             this.loadMonedas()
+            this.loadEmpresa()
         }
 
         await this.loadDatosSistema()
-        this.setMiDireccion()
     },
     methods: {
         showButtons() {
@@ -211,28 +188,6 @@ export default {
                 this.buttons[2].show = true
             } else if (this.modal.mode == 2) {
                 this.buttons[3].show = true
-            }
-        },
-
-        setMiDireccion() {
-            if (this.modal.mode == 1) {
-                if (this.modal.item.tipo == 1) {
-                    if (this.modal.item.direccion_entrega) return
-                    const direccion_principal = this.modal.empresa.direcciones.find(
-                        (a) => a.principal == true,
-                    )
-                    this.modal.direccion_entrega = direccion_principal.id
-                    this.modal.item.direccion_entrega = direccion_principal.direccion
-                }
-            }
-        },
-        setDireccionEntrega(item) {
-            if (item == null) return
-
-            if (this.modal.item.tipo == 1) {
-                this.modal.item.direccion_entrega = item.direccion
-            } else if (this.modal.item.tipo == 2) {
-                this.modal.item.direccion_entrega = item.direccion
             }
         },
 
@@ -245,20 +200,22 @@ export default {
             this.modal.mtoImpVenta = 0
         },
         initPedido() {
-            this.modal.item = {
-                tipo: this.modal.item.tipo,
+            this.modal.socio_pedido = {
+                tipo: this.modal.socio_pedido.tipo,
                 fecha: dayjs().format('YYYY-MM-DD'),
                 estado: 1,
                 socio_pedido_items: [],
+                entrega_tipo: 'envio',
+                entrega_direccion_datos: {},
             }
 
             this.modal.mode = 1
-            this.modal.socio = {}
+            this.modal.socio_elegido = {}
             this.setTotalesCero()
-            this.setMiDireccion()
+            // this.setMiDireccion()
         },
         async nuevo() {
-            if (this.modal.mode == 3 || this.modal.item.socio_pedido_items.length == 0) {
+            if (this.modal.mode == 3 || this.modal.socio_pedido.socio_pedido_items.length == 0) {
                 this.initPedido()
             } else {
                 const resQst = await jqst('¿Está seguro de generar un nuevo pedido?')
@@ -268,49 +225,45 @@ export default {
             if (this.modal.mode != 1) this.loadSocios()
         },
 
-        setTipoCambio() {
-            // this.modal.item.tipo_cambio = getItemFromArray(this.modal.item.moneda, this.modal.monedas, 'tipo_cambio')
-            this.modal.item.tipo_cambio = null
-        },
+        // setTipoCambio() {
+        //     // this.modal.socio_pedido.tipo_cambio = getItemFromArray(this.modal.socio_pedido.moneda, this.modal.monedas, 'tipo_cambio')
+        //     this.modal.socio_pedido.tipo_cambio = null
+        // },
         setSocio(item) {
-            this.modal.socio = { ...item }
+            this.modal.socio_elegido = { ...item }
 
-            this.modal.item.contacto = this.modal.socio.contactos.find(
+            //--- Contacto principal ---//
+            this.modal.socio_pedido.contacto = this.modal.socio_elegido.contactos.find(
                 (a) => a.principal == true,
             )?.id
-            this.modal.item.pago_condicion = this.modal.socio.pago_condicion
+            this.modal.socio_pedido.pago_condicion = this.modal.socio_elegido.pago_condicion
 
-            if (this.modal.item.tipo == 2) {
-                const direccion_principal = this.modal.socio.direcciones.find(
+            //--- Dirección principal ---//
+            if (this.modal.socio_pedido.tipo == 2) {
+                const direccion_principal = this.modal.socio_elegido.direcciones.find(
                     (a) => a.principal == true,
                 )
-                this.modal.direccion_entrega = direccion_principal.id
-                this.modal.item.direccion_entrega = direccion_principal.direccion
+
+                this.modal.direccion_elegida = direccion_principal.id
+                this.modal.socio_pedido.entrega_ubigeo = direccion_principal.ubigeo
+                this.modal.socio_pedido.direccion_entrega = direccion_principal.direccion
+                this.modal.socio_pedido.entrega_direccion_datos = {
+                    numero: direccion_principal.numero,
+                    piso: direccion_principal.piso,
+                    referencia: direccion_principal.referencia,
+                }
             }
         },
 
         checkDatos() {
-            const props = ['tipo', 'fecha', 'socio', 'moneda', 'pago_condicion']
+            const props = ['tipo', 'fecha', 'socio', 'moneda', 'entrega_tipo', 'pago_condicion']
 
-            if (this.modal.item.tipo == 1) {
-                props.push('contacto')
-
-                const contacto_datos = this.modal.socio.contactos.find(
-                    (a) => a.id == this.modal.item.contacto,
-                )
-
-                if (contacto_datos == undefined) {
-                    jmsg('warning', 'Seleccione un contacto')
-                    return true
-                }
-            }
-
-            if (incompleteData(this.modal.item, props)) {
+            if (incompleteData(this.modal.socio_pedido, props)) {
                 jmsg('warning', 'Ingrese los datos necesarios')
                 return true
             }
 
-            for (const a of this.modal.item.socio_pedido_items) {
+            for (const a of this.modal.socio_pedido.socio_pedido_items) {
                 const props1 = [
                     'articulo',
                     'nombre',
@@ -332,63 +285,75 @@ export default {
         },
         shapeDatos() {
             if (this.modal.mode == 1) {
-                if (this.modal.item.codigo == '' || this.modal.item.codigo == null) {
-                    this.modal.item.codigo = genId()
+                if (
+                    this.modal.socio_pedido.codigo == '' ||
+                    this.modal.socio_pedido.codigo == null
+                ) {
+                    this.modal.socio_pedido.codigo = genId()
                 }
             }
 
-            this.modal.item.socio_datos = {
-                doc_numero: this.modal.socio.doc_numero,
-                nombres: this.modal.socio.nombres,
+            this.modal.socio_pedido.socio_datos = {
+                doc_numero: this.modal.socio_elegido.doc_numero,
+                nombres: this.modal.socio_elegido.nombres,
             }
 
-            this.modal.item.contacto_datos = this.modal.socio.contactos.find(
-                (a) => a.id == this.modal.item.contacto,
+            this.modal.socio_pedido.contacto_datos = this.modal.socio_elegido.contactos.find(
+                (a) => a.id == this.modal.socio_pedido.contacto,
             )
 
-            this.modal.item.monto = this.modal.mtoImpVenta.toFixed(2)
-            this.setTipoCambio()
+            this.modal.socio_pedido.monto = this.modal.mtoImpVenta.toFixed(2)
+            // this.setTipoCambio()
         },
         async grabar() {
             if (this.checkDatos()) return
             this.shapeDatos()
 
             this.useAuth.setLoading(true, 'Grabando...')
-            const res = await post(urls.socio_pedidos, this.modal.item)
+            const res = await post(urls.socio_pedidos, this.modal.socio_pedido)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
 
-            const vista = this.modal.item.tipo == 1 ? 'vCompraPedidos' : 'vVentaPedidos'
-            this.useVistas.addItem(vista, 'pedidos', res.data)
+            const vista = this.modal.socio_pedido.tipo == 1 ? 'vCompraPedidos' : 'vVentaPedidos'
+            this.useVistas.addItem(vista, 'pedidos', res.data, 'first')
             this.useModals.show.mSocioPedido = false
         },
         async modificar() {
             if (this.checkDatos()) return
             this.shapeDatos()
             this.useAuth.setLoading(true, 'Actualizando...')
-            const res = await patch(urls.socio_pedidos, this.modal.item)
+            const res = await patch(urls.socio_pedidos, this.modal.socio_pedido)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
 
-            const vista = this.modal.item.tipo == 1 ? 'vCompraPedidos' : 'vVentaPedidos'
+            const vista = this.modal.socio_pedido.tipo == 1 ? 'vCompraPedidos' : 'vVentaPedidos'
             this.useVistas.updateItem(vista, 'pedidos', res.data)
             this.useModals.show.mSocioPedido = false
         },
         async guardarAvance() {
             const resQst = await jqst('¿Está seguro de guardar y reemplazar el guardado anterior?')
             if (resQst.isConfirmed) {
-                const card = this.modal.item.tipo == 1 ? 'mCompraPedido' : 'mVentaPedido'
-                this.useAuth.avances[card] = this.modal.item
+                const card = this.modal.socio_pedido.tipo == 1 ? 'mCompraPedido' : 'mVentaPedido'
+                this.useAuth.avances[card] = this.modal.socio_pedido
                 this.useModals.show.mSocioPedido = false
             }
         },
 
+        async loadEmpresa() {
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.empresas}/uno/${this.useAuth.usuario.empresa}`)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            this.modal.empresa = res.data
+        },
         async loadSocios() {
             const qry = {
                 fltr: {
-                    tipo: { op: 'Es', val: this.modal.item.tipo },
+                    tipo: { op: 'Es', val: this.modal.socio_pedido.tipo },
                     activo: { op: 'Es', val: true },
                 },
                 cols: [
@@ -417,8 +382,12 @@ export default {
             if (res.code !== 0) return
 
             this.modal.socios = res.data
-            if (this.modal.item.socio) {
-                this.modal.socio = this.modal.socios.find((a) => a.id == this.modal.item.socio)
+
+            //--- Cuando se recupera del guardado ---//
+            if (this.modal.socio_pedido.socio) {
+                this.modal.socio_elegido = this.modal.socios.find(
+                    (a) => a.id == this.modal.socio_pedido.socio,
+                )
             }
         },
         async loadMonedas() {
@@ -443,7 +412,13 @@ export default {
             this.modal.monedas = res.data
         },
         async loadDatosSistema() {
-            const qry = ['empresa', 'unidades', 'pedido_estados', 'pago_condiciones']
+            const qry = [
+                'pedido_estados',
+                'entrega_tipos',
+                'pago_condiciones',
+                'pago_metodos',
+                'comprobante_tipos',
+            ]
 
             this.useAuth.setLoading(true, 'Cargando...')
             this.modal.datosSistemaLoaded = false
@@ -481,10 +456,36 @@ export default {
     }
 }
 
+.extra-datos {
+    border: var(--border);
+
+    .pestanas {
+        display: flex;
+        background-color: var(--bg-color2);
+
+        li {
+            padding: 0.3rem 0.5rem;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+
+        .pestana-activo {
+            background-color: var(--bg-color);
+        }
+    }
+
+    .pestana-body {
+        padding: 1rem;
+        height: 20rem;
+        width: 60rem;
+        overflow-y: auto;
+    }
+}
+
 .botom {
     display: flex;
     justify-content: space-between;
-    margin-top: 1rem;
+    margin-top: 2rem;
     gap: 2rem;
 
     .left {

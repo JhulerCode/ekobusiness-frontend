@@ -55,12 +55,10 @@
 
     <mConfigCols v-if="useModals.show.mConfigCols" />
     <mConfigFiltros v-if="useModals.show.mConfigFiltros" />
-
-    <mAnular v-if="useModals.show.mAnular" />
 </template>
 
 <script>
-import { JdButton, JdTable, mConfigFiltros, mConfigCols, mAnular } from '@jhuler/components'
+import { JdButton, JdTable, mConfigFiltros, mConfigCols } from '@jhuler/components'
 
 import mPedidosClientes from './mPedidosClientes.vue'
 import mSocioPedido from '@/views/logistica_entrada/pedidos/mSocioPedido.vue'
@@ -82,7 +80,6 @@ export default {
     components: {
         JdButton,
         JdTable,
-        mAnular,
 
         mConfigCols,
         mConfigFiltros,
@@ -323,21 +320,24 @@ export default {
 
         nuevo() {
             const send = {
-                tipo: 2,
-                fecha: dayjs().format('YYYY-MM-DD'),
-                estado: 1,
-                socio_pedido_items: [],
+                socio_pedido: {
+                    tipo: 2,
+                    fecha: dayjs().format('YYYY-MM-DD'),
+                    estado: 1,
+                    socio_pedido_items: [],
+                    entrega_tipo: 'envio',
+                    entrega_direccion_datos: {},
+                },
             }
 
-            this.useModals.setModal('mSocioPedido', 'Nuevo pedido de venta', 1, send)
+            this.useModals.setModal('mSocioPedido', 'Nuevo pedido de venta', 1, send, true)
         },
         recuperarGuardado() {
-            this.useModals.setModal(
-                'mSocioPedido',
-                'Nuevo pedido de venta',
-                1,
-                this.useAuth.avances.mVentaPedido,
-            )
+            const send = {
+                socio_pedido: this.useAuth.avances.mCompraPedido,
+            }
+
+            this.useModals.setModal('mSocioPedido', 'Nuevo pedido de compra', 1, send, true)
         },
         verPedidos() {
             this.useModals.setModal('mPedidosClientes', 'Productos pedidos')
@@ -386,10 +386,14 @@ export default {
 
             if (res.code != 0) return
 
-            this.useModals.setModal('mSocioPedido', 'Ver pedido de venta', 3, res.data)
-            this.useModals.mSocioPedido.socio = { ...res.data.socio1 }
-            this.useModals.mSocioPedido.socios = [{ ...res.data.socio1 }]
-            this.useModals.mSocioPedido.monedas = [{ ...res.data.moneda1 }]
+            const send = {
+                socio_pedido: res.data,
+                socio_elegido: { ...res.data.socio1 },
+                socios: [{ ...res.data.socio1 }],
+                monedas: [{ ...res.data.moneda1 }],
+            }
+
+            this.useModals.setModal('mSocioPedido', 'Ver pedido de venta', 3, send, true)
         },
         async editar(item) {
             const qry = {
@@ -402,10 +406,14 @@ export default {
 
             if (res.code != 0) return
 
-            this.useModals.setModal('mSocioPedido', 'Editar pedido de venta', 2, res.data)
-            this.useModals.mSocioPedido.socio = { ...res.data.socio1 }
-            this.useModals.mSocioPedido.socios = [{ ...res.data.socio1 }]
-            this.useModals.mSocioPedido.monedas = [{ ...res.data.moneda1 }]
+            const send = {
+                socio_pedido: res.data,
+                socio_elegido: { ...res.data.socio1 },
+                socios: [{ ...res.data.socio1 }],
+                monedas: [{ ...res.data.moneda1 }],
+            }
+
+            this.useModals.setModal('mSocioPedido', 'Editar pedido de venta', 2, send, true)
         },
         async eliminar(item) {
             const resQst = await jqst('¿Está seguro de eliminar?')
@@ -432,16 +440,6 @@ export default {
 
             this.useModals.setModal('mSocioPedidoPdf', 'Orden de compra', null, res.data)
         },
-        // anular(item) {
-        //     const send = {
-        //         url: 'socio_pedidos',
-        //         item,
-        //         vista: this.tableName,
-        //         array: 'pedidos',
-        //     }
-
-        //     this.useModals.setModal('mAnular', `Anular pedido Nro ${item.codigo}`, null, send, true)
-        // },
         async confirmarPago(item) {
             const resQst = await jqst('¿Está seguro de confirmar el pago?')
             if (resQst.isConfirmed == false) return
@@ -534,18 +532,6 @@ export default {
 
             this.useModals.setModal('mTransaccion', 'Nueva venta', 1, send, true)
         },
-        // async terminar(item) {
-        //     const resQst = await jqst('¿Está seguro de terminar el pedido?')
-        //     if (resQst.isConfirmed == false) return
-
-        //     this.useAuth.setLoading(true, 'Cargando...')
-        //     const res = await patch(`${urls.socio_pedidos}/terminar`, item, 'Pedido terminado')
-        //     this.useAuth.setLoading(false)
-
-        //     if (res.code != 0) return
-
-        //     this.useVistas.updateItem('vVentaPedidos', 'pedidos', { ...item, estado: 2 })
-        // },
 
         async loadSocios() {
             const qry = {
@@ -585,7 +571,7 @@ export default {
             this.vista.monedas = res.data
         },
         async loadDatosSistema() {
-            const qry = ['monedas', 'pedido_estados', 'pago_condiciones']
+            const qry = ['pedido_estados', 'pago_condiciones']
             const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
 
             if (res.code != 0) return

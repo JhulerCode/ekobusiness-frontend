@@ -200,7 +200,7 @@ export default {
             this.useModals.setModal('mDocumento', 'Editar documento', 2, res.data)
         },
         verFile(item) {
-            console.log(item)
+            // console.log(item)
             this.useModals.setModal('mPdfViewer', 'Pdf', null, item.file.url)
         },
         async eliminar(item) {

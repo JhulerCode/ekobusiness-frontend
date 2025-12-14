@@ -2,7 +2,11 @@
     <div class="pedido-items">
         <div
             class="agregar"
-            v-if="modal.mode != 3 && modal.socio?.id != null && modal.item.moneda != null"
+            v-if="
+                modal.mode != 3 &&
+                modal.socio_elegido?.id != null &&
+                modal.socio_pedido.moneda != null
+            "
         >
             <JdSelectQuery
                 label="🔍︎"
@@ -19,7 +23,7 @@
                 text="Lista de precios"
                 tipo="3"
                 @click="openPreciosLista()"
-                v-if="modal.socio.precio_lista"
+                v-if="modal.socio_elegido.precio_lista"
             />
 
             <JdButton
@@ -27,7 +31,7 @@
                 text="Importar"
                 tipo="3"
                 @click="this.$refs.excel.click()"
-                v-if="modal.item.tipo == 2"
+                v-if="modal.socio_pedido.tipo == 2"
             />
 
             <input type="file" ref="excel" accept=".xlsx, .xls" hidden @change="importar" />
@@ -35,13 +39,11 @@
 
         <JdTable
             :columns="columns"
-            :datos="modal.item.socio_pedido_items || []"
+            :datos="modal.socio_pedido.socio_pedido_items || []"
             :colAct="modal.mode != 3"
             :download="false"
             :seeker="false"
-            minHeight="10rem"
-            maxHeight="30rem"
-            width="60rem"
+            maxHeight="14.5rem"
             :inputsDisabled="modal.mode == 3"
             @onInput="(action, a) => this[action](a)"
         >
@@ -162,7 +164,7 @@ export default {
 
             const qry = {
                 fltr: {
-                    tipo: { op: 'Es', val: this.modal.item.tipo },
+                    tipo: { op: 'Es', val: this.modal.socio_pedido.tipo },
                     activo: { op: 'Es', val: true },
                     nombre: { op: 'Contiene', val: txtBuscar },
                 },
@@ -183,10 +185,12 @@ export default {
             this.nuevo = null
             this.modal.articulos = []
 
-            const i = this.modal.item.socio_pedido_items.findIndex((a) => a.articulo == item.id)
+            const i = this.modal.socio_pedido.socio_pedido_items.findIndex(
+                (a) => a.articulo == item.id,
+            )
             if (i !== -1) return jmsg('warning', 'El artículo ya está agregado')
 
-            this.modal.item.socio_pedido_items.push({
+            this.modal.socio_pedido.socio_pedido_items.push({
                 articulo: item.id,
                 nombre: item.nombre,
                 unidad: item.unidad,
@@ -205,7 +209,7 @@ export default {
         },
 
         async openPreciosLista() {
-            if (this.modal.socio.precio_lista1.moneda != this.modal.item.moneda) {
+            if (this.modal.socio_elegido.precio_lista1.moneda != this.modal.socio_pedido.moneda) {
                 jmsg(
                     'warning',
                     'La moneda de la lista de precios no es igual a la moneda del pedido',
@@ -215,10 +219,10 @@ export default {
 
             const send = {
                 precio_lista: {
-                    id: this.modal.socio.precio_lista,
-                    ...this.modal.socio.precio_lista1,
+                    id: this.modal.socio_elegido.precio_lista,
+                    ...this.modal.socio_elegido.precio_lista1,
                     moneda: getItemFromArray(
-                        this.modal.socio.precio_lista1.moneda,
+                        this.modal.socio_elegido.precio_lista1.moneda,
                         this.modal.monedas,
                     ),
                 },
@@ -227,12 +231,12 @@ export default {
         },
         agregarArticulos(items) {
             for (const a of items) {
-                const i = this.modal.item.socio_pedido_items.findIndex(
+                const i = this.modal.socio_pedido.socio_pedido_items.findIndex(
                     (b) => b.articulo == a.articulo,
                 )
                 if (i !== -1) continue
 
-                this.modal.item.socio_pedido_items.push({
+                this.modal.socio_pedido.socio_pedido_items.push({
                     articulo: a.articulo,
                     nombre: a.articulo1.nombre,
                     unidad: a.articulo1.unidad,
@@ -292,7 +296,7 @@ export default {
                 )
                 // return sistemaData[array].reduce((obj, a) => (obj[a.id] = a, obj), {})
 
-                this.modal.item.socio_pedido_items = res.data.map((a) => {
+                this.modal.socio_pedido.socio_pedido_items = res.data.map((a) => {
                     const matchedItem = articulosMap[a.EAN] || {}
                     return {
                         articulo: matchedItem?.id,
@@ -336,7 +340,7 @@ export default {
             this.modal.mtoOperInafectas = 0
             this.modal.mtoIGV = 0
 
-            for (const a of this.modal.item.socio_pedido_items) {
+            for (const a of this.modal.socio_pedido.socio_pedido_items) {
                 if (a.igv_afectacion == '10') {
                     this.modal.mtoOperGravadas += a.mtoValorVenta
                     this.modal.mtoIGV += a.igv
@@ -366,7 +370,7 @@ export default {
         //     this.modal.mtoOperInafectas = 0
         //     this.modal.mtoIGV = 0
 
-        //     for (const a of this.modal.item.socio_pedido_items) {
+        //     for (const a of this.modal.socio_pedido.socio_pedido_items) {
         //         if (a.igv_afectacion == '10') {
         //             this.modal.mtoOperGravadas += a.mtoValorVenta
         //             this.modal.mtoIGV += a.igv
@@ -388,17 +392,17 @@ export default {
             this.calcularTotales()
         },
         sumarItems() {
-            for (const a of this.modal.item.socio_pedido_items) this.calcularUno(a)
+            for (const a of this.modal.socio_pedido.socio_pedido_items) this.calcularUno(a)
 
             this.calcularTotales()
         },
         quitar(item) {
             if (item.entregado > 0) return jmsg('error', 'El artículo ya tiene ingresos')
 
-            const i = this.modal.item.socio_pedido_items.findIndex(
+            const i = this.modal.socio_pedido.socio_pedido_items.findIndex(
                 (a) => a.articulo == item.articulo,
             )
-            this.modal.item.socio_pedido_items.splice(i, 1)
+            this.modal.socio_pedido.socio_pedido_items.splice(i, 1)
 
             this.calcularTotales()
         },

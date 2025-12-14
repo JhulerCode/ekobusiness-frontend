@@ -912,7 +912,7 @@ export default {
         },
         async verPedidos() {
             const send = {
-                produccion_tipo: 1,
+                produccion_tipo: this.columns[6].val,
             }
 
             this.useModals.setModal('mProductosFaltantes', 'Productos pedidos', null, send, true)

@@ -102,6 +102,7 @@ export default {
                 ordr: [['fecha', 'DESC']]
             }
 
+            this.modal.tipo_cambios = []
             this.useAuth.setLoading(true, 'Cargando...')
             const res = await get(`${urls.tipo_cambios}?qry=${JSON.stringify(qry)}`)
             this.useAuth.setLoading(false)

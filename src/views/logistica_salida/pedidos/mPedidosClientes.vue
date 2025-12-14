@@ -134,13 +134,9 @@ export default {
             this.modal.clientes = res.data
         },
         async loadPedidos() {
-            const qry = {
-                socio: this.modal.socio,
-            }
-
             this.modal.articulos = []
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.socio_pedidos}/pendientes?qry=${JSON.stringify(qry)}`)
+            const res = await get(`${urls.socio_pedidos}/pendientes?socio=${this.modal.socio}`)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return

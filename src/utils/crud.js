@@ -7,9 +7,9 @@ const subdominio_prueba = 'app'
 
 const urls = {
     signin: `${host}/signin`,
-    uploads: `${host}/uploads`,
 
     sistema: `${host}/api/sistema`,
+    empresas: `${host}/api/empresas`,
 
     activity_logs: `${host}/api/activity_logs`,
     articulo_lineas: `${host}/api/articulo_lineas`,
@@ -36,6 +36,7 @@ const urls = {
     socio_pedido_items: `${host}/api/socio_pedido_items`,
     tipo_cambios: `${host}/api/tipo_cambios`,
     transacciones: `${host}/api/transacciones`,
+    ubigeos: `${host}/api/ubigeos`,
 }
 
 async function get(url) {

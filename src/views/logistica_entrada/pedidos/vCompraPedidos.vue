@@ -41,12 +41,10 @@
 
     <mConfigCols v-if="useModals.show.mConfigCols" />
     <mConfigFiltros v-if="useModals.show.mConfigFiltros" />
-
-    <mAnular v-if="useModals.show.mAnular" />
 </template>
 
 <script>
-import { JdButton, JdTable, mConfigFiltros, mConfigCols, mAnular } from '@jhuler/components'
+import { JdButton, JdTable, mConfigFiltros, mConfigCols } from '@jhuler/components'
 
 import mSocioPedido from '@/views/logistica_entrada/pedidos/mSocioPedido.vue'
 import mSocioPedidoPdf from '@/views/logistica_entrada/pedidos/mSocioPedidoPdf.vue'
@@ -66,7 +64,6 @@ export default {
     components: {
         JdButton,
         JdTable,
-        mAnular,
 
         mConfigCols,
         mConfigFiltros,
@@ -183,14 +180,6 @@ export default {
                 ocultar: { estado: ['0', '2'] },
             },
             {
-                label: 'Terminar',
-                icon: 'fa-solid fa-check-double',
-                action: 'terminar',
-                permiso: 'vCompraPedidos:terminar',
-                ocultar: { estado: ['0', '2'] },
-            },
-            // { label: 'Anular', icon: 'fa-solid fa-ban', action: 'anular', permiso: 'vCompraPedidos:anular', ocultar: { estado: ['0', '2'] } },
-            {
                 label: 'Eliminar',
                 icon: 'fa-solid fa-trash-can',
                 action: 'eliminar',
@@ -201,6 +190,13 @@ export default {
                 icon: 'fa-regular fa-file-pdf',
                 action: 'generarPdf',
                 permiso: 'vCompraPedidos:generarPdf',
+            },
+            {
+                label: 'Terminar',
+                icon: 'fa-solid fa-check-double',
+                action: 'terminar',
+                permiso: 'vCompraPedidos:terminar',
+                ocultar: { estado: ['0', '2'] },
             },
             {
                 label: 'Ingresar mercadería',
@@ -251,21 +247,24 @@ export default {
 
         nuevo() {
             const send = {
-                tipo: 1,
-                fecha: dayjs().format('YYYY-MM-DD'),
-                estado: 1,
-                socio_pedido_items: [],
+                socio_pedido: {
+                    tipo: 1,
+                    fecha: dayjs().format('YYYY-MM-DD'),
+                    estado: 1,
+                    socio_pedido_items: [],
+                    entrega_tipo: 'envio',
+                    entrega_direccion_datos: {},
+                },
             }
 
-            this.useModals.setModal('mSocioPedido', 'Nuevo pedido de compra', 1, send)
+            this.useModals.setModal('mSocioPedido', 'Nuevo pedido de compra', 1, send, true)
         },
         recuperarGuardado() {
-            this.useModals.setModal(
-                'mSocioPedido',
-                'Nuevo pedido de compra',
-                1,
-                this.useAuth.avances.mCompraPedido,
-            )
+            const send = {
+                socio_pedido: this.useAuth.avances.mCompraPedido,
+            }
+
+            this.useModals.setModal('mSocioPedido', 'Nuevo pedido de compra', 1, send, true)
         },
 
         async openConfigFiltros() {
@@ -302,10 +301,14 @@ export default {
 
             if (res.code != 0) return
 
-            this.useModals.setModal('mSocioPedido', 'Ver pedido de compra', 3, res.data)
-            this.useModals.mSocioPedido.socio = { ...res.data.socio1 }
-            this.useModals.mSocioPedido.socios = [{ ...res.data.socio1 }]
-            this.useModals.mSocioPedido.monedas = [{ ...res.data.moneda1 }]
+            const send = {
+                socio_pedido: res.data,
+                socio_elegido: { ...res.data.socio1 },
+                socios: [{ ...res.data.socio1 }],
+                monedas: [{ ...res.data.moneda1 }],
+            }
+
+            this.useModals.setModal('mSocioPedido', 'Ver pedido de compra', 3, send, true)
         },
         async editar(item) {
             const qry = {
@@ -318,32 +321,14 @@ export default {
 
             if (res.code != 0) return
 
-            this.useModals.setModal('mSocioPedido', 'Editar pedido de compra', 2, res.data)
-            this.useModals.mSocioPedido.socio = { ...res.data.socio1 }
-            this.useModals.mSocioPedido.socios = [{ ...res.data.socio1 }]
-            this.useModals.mSocioPedido.monedas = [{ ...res.data.moneda1 }]
-        },
-        async terminar(item) {
-            const resQst = await jqst('¿Está seguro de terminar el pedido?')
-            if (resQst.isConfirmed == false) return
-
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await patch(`${urls.socio_pedidos}/terminar`, item, 'Pedido terminado')
-            this.useAuth.setLoading(false)
-
-            if (res.code != 0) return
-
-            this.useVistas.updateItem('vCompraPedidos', 'pedidos', res.data)
-        },
-        anular(item) {
             const send = {
-                url: 'socio_pedidos',
-                item,
-                vista: this.tableName,
-                array: 'pedidos',
+                socio_pedido: res.data,
+                socio_elegido: { ...res.data.socio1 },
+                socios: [{ ...res.data.socio1 }],
+                monedas: [{ ...res.data.moneda1 }],
             }
 
-            this.useModals.setModal('mAnular', `Anular pedido Nro ${item.codigo}`, null, send, true)
+            this.useModals.setModal('mSocioPedido', 'Editar pedido de compra', 2, send, true)
         },
         async eliminar(item) {
             const resQst = await jqst('¿Está seguro de eliminar?')
@@ -371,6 +356,18 @@ export default {
             this.useModals.setModal('mSocioPedidoPdf', 'Orden de compra', null, res.data)
             // const asd = await generarOcPDF(res.data)
             // asd.download(`OC_${res.data.codigo}.pdf`)
+        },
+        async terminar(item) {
+            const resQst = await jqst('¿Está seguro de terminar el pedido?')
+            if (resQst.isConfirmed == false) return
+
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await patch(`${urls.socio_pedidos}/terminar`, item, 'Pedido terminado')
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            this.useVistas.updateItem('vCompraPedidos', 'pedidos', res.data)
         },
         async ingresarMercaderia(item) {
             const qry = {
@@ -461,5 +458,3 @@ export default {
     },
 }
 </script>
-
-<style lang="scss" scoped></style>

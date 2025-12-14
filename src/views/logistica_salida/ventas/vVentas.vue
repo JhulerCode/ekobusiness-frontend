@@ -158,6 +158,12 @@ export default {
                 action: 'ver',
                 permiso: 'vVentas:ver',
             },
+            // {
+            //     label: 'Eliminar',
+            //     icon: 'fa-regular fa-trash-can',
+            //     action: 'eliminar',
+            //     permiso: 'vVentas:eliminar',
+            // },
 
             {
                 label: 'Control de despacho',

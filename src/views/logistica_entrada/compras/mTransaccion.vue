@@ -342,7 +342,7 @@ export default {
             if (res.code != 0) return
 
             const vista = this.modal.transaccion.tipo == 1 ? 'vCompras' : 'vVentas'
-            this.useVistas.addItem(vista, 'transacciones', res.data)
+            this.useVistas.addItem(vista, 'transacciones', res.data, 'first')
             this.useModals.show.mTransaccion = false
         },
         async guardarAvance() {

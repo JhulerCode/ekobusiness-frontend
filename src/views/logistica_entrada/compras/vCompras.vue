@@ -173,6 +173,12 @@ export default {
                 action: 'ver',
                 permiso: 'vCompras:ver',
             },
+            // {
+            //     label: 'Eliminar',
+            //     icon: 'fa-regular fa-trash-can',
+            //     action: 'eliminar',
+            //     permiso: 'vCompras:eliminar',
+            // },
         ],
     }),
     async created() {

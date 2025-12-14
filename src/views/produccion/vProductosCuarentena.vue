@@ -179,6 +179,11 @@ export default {
                     tipo: { op: 'Es', val: 4 },
                 },
                 incl: ['articulo1', 'produccion_orden1', 'maquina1'],
+                iccl: {
+                    produccion_orden1: {
+                        incl: ['tipo1'],
+                    }
+                }
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)

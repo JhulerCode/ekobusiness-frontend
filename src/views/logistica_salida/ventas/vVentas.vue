@@ -145,7 +145,7 @@ export default {
                 type: 'select',
                 prop: 'estado1.nombre',
                 format: 'estado',
-                width: '8rem',
+                width: '7rem',
                 show: true,
                 seek: false,
                 sort: true,
@@ -153,23 +153,13 @@ export default {
         ],
         tableRowOptions: [
             {
-                id: 1,
                 label: 'Ver',
                 icon: 'fa-regular fa-folder-open',
                 action: 'ver',
                 permiso: 'vVentas:ver',
             },
-            // { id: 2, label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar' },
-            // { id: 3, label: 'Anular', icon: 'fa-solid fa-ban', action: 'anular', permiso: 'vVentas:anular', ocultar: { estado: 0 } },
-            // {
-            //     id: 4,
-            //     label: 'Eliminar',
-            //     icon: 'fa-solid fa-trash-can',
-            //     action: 'eliminar',
-            //     permiso: 'vVentas:eliminar',
-            // },
+
             {
-                id: 5,
                 label: 'Control de despacho',
                 icon: 'fa-solid fa-star',
                 action: 'controlDespacho',
@@ -195,10 +185,11 @@ export default {
         setQuery() {
             this.vista.qry = {
                 fltr: { tipo: { op: 'Es', val: 5 } },
+                incl: ['socio1', 'moneda1', 'socio_pedido1'],
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
-            this.vista.qry.cols.push('tipo')
+            this.vista.qry.cols.push('tipo', 'calidad_revisado_despacho')
         },
         async loadTransacciones() {
             this.setQuery()
@@ -280,8 +271,17 @@ export default {
             this[method](item)
         },
         async ver(item) {
+            const qry = {
+                incl: ['socio1', 'moneda1', 'transaccion_items'],
+                iccl: {
+                    transaccion_items: {
+                        incl: ['articulo1'],
+                    },
+                },
+            }
+
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.transacciones}/uno/${item.id}`)
+            const res = await get(`${urls.transacciones}/uno/${item.id}?qry=${JSON.stringify(qry)}`)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
@@ -291,22 +291,10 @@ export default {
                 socio: { ...res.data.socio1 },
                 socios: [{ ...res.data.socio1 }],
                 monedas: [{ ...res.data.moneda1 }],
-                // pedido: res.data.socio_pedido ? { ...res.data.socio_pedido1 } : null,
                 pedidos: res.data.socio_pedido ? [{ ...res.data.socio_pedido1 }] : [],
             }
-            // console.log(send)
 
             this.useModals.setModal('mTransaccion', 'Ver venta', 3, send, true)
-        },
-        anular(item) {
-            const send = {
-                url: 'transacciones',
-                item,
-                vista: 'vVentas',
-                array: 'transacciones',
-            }
-
-            this.useModals.setModal('mAnular', `Anular venta Nro ${item.codigo}`, null, send, true)
         },
         async eliminar(item) {
             const resQst = await jqst('¿Está seguro de eliminar?')
@@ -419,5 +407,3 @@ export default {
     },
 }
 </script>
-
-<style lang="scss" scoped></style>

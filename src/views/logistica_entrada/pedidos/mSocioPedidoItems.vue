@@ -94,8 +94,9 @@ export default {
 
         columns: [
             {
-                id: 'nombre',
+                id: 'articulo',
                 title: 'Artículo',
+                prop: 'articulo1.nombre',
                 width: '23rem',
                 show: true,
                 sort: true,

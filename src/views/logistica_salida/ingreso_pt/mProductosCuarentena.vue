@@ -156,6 +156,11 @@ export default {
                     is_lote_padre: { op: 'Es', val: null },
                 },
                 incl: ['articulo1', 'produccion_orden1', 'maquina1'],
+                iccl: {
+                    produccion_orden1: {
+                        incl: ['tipo1'],
+                    }
+                }
             }
 
             this.useAuth.updateQuery(this.columns, this.modal.qry)

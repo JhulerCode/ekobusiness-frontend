@@ -128,7 +128,7 @@ export default {
                 title: 'Moneda',
                 prop: 'moneda1.nombre',
                 type: 'select',
-                width: '10rem',
+                width: '8rem',
                 show: true,
                 seek: false,
                 sort: true,
@@ -139,7 +139,7 @@ export default {
                 type: 'number',
                 format: 'decimal',
                 toRight: true,
-                width: '10rem',
+                width: '8rem',
                 show: true,
                 seek: true,
                 sort: true,
@@ -173,9 +173,6 @@ export default {
                 action: 'ver',
                 permiso: 'vCompras:ver',
             },
-            // { label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar', permiso: 'vCompras:ver' },
-            // { label: 'Anular', icon: 'fa-solid fa-ban', action: 'anular', permiso: 'vCompras:anular', ocultar: { estado: 0 } },
-            // { label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar', permiso: 'vCompras:eliminar' },
         ],
     }),
     async created() {
@@ -196,7 +193,7 @@ export default {
         setQuery() {
             this.vista.qry = {
                 fltr: { tipo: { op: 'Es', val: 1 } },
-                incl: ['socio_pedido1'],
+                incl: ['socio1', 'moneda1', 'socio_pedido1'],
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
@@ -281,8 +278,17 @@ export default {
             this[method](item)
         },
         async ver(item) {
+            const qry = {
+                incl: ['socio1', 'moneda1', 'transaccion_items'],
+                iccl: {
+                    transaccion_items: {
+                        incl: ['articulo1'],
+                    },
+                },
+            }
+
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.transacciones}/uno/${item.id}`)
+            const res = await get(`${urls.transacciones}/uno/${item.id}?qry=${JSON.stringify(qry)}`)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
@@ -297,16 +303,6 @@ export default {
 
             this.useModals.setModal('mTransaccion', 'Ver compra', 3, send, true)
         },
-        // anular(item) {
-        //     const send = {
-        //         url: 'transacciones',
-        //         item,
-        //         vista: 'vCompras',
-        //         array: 'transacciones',
-        //     }
-
-        //     this.useModals.setModal('mAnular', `Anular compra Nro ${item.codigo}`, null, send, true)
-        // },
         async eliminar(item) {
             const resQst = await jqst('¿Está seguro de eliminar?')
             if (resQst.isConfirmed == false) return
@@ -371,5 +367,3 @@ export default {
     },
 }
 </script>
-
-<style lang="scss" scoped></style>

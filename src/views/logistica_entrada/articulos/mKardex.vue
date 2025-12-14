@@ -195,6 +195,11 @@ export default {
                     articulo: { op: 'Es', val: this.modal.articulo.id },
                 },
                 incl: ['lote_padre1', 'transaccion1', 'maquina1'],
+                iccl: {
+                    transaccion1: {
+                        incl: ['socio1'],
+                    },
+                },
                 ordr: [['fecha', 'DESC']],
             }
 

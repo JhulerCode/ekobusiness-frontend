@@ -377,7 +377,16 @@ export default {
         },
         async ver(item) {
             const qry = {
-                incl: ['socio_pedido_items', 'moneda1', 'socio2'],
+                incl: ['socio1', 'moneda1', 'socio_pedido_items'],
+                iccl: {
+                    socio1: {
+                        incl: ['precio_lista1'],
+                        cols: ['doc_numero', 'contactos', 'direcciones', 'precio_lista'],
+                    },
+                    socio_pedido_items: {
+                        incl: ['articulo1'],
+                    },
+                },
             }
 
             this.useAuth.setLoading(true, 'Cargando...')
@@ -397,7 +406,16 @@ export default {
         },
         async editar(item) {
             const qry = {
-                incl: ['socio_pedido_items', 'moneda1', 'socio2'],
+                incl: ['socio1', 'moneda1', 'socio_pedido_items'],
+                iccl: {
+                    socio1: {
+                        incl: ['precio_lista1'],
+                        cols: ['doc_numero', 'contactos', 'direcciones', 'precio_lista'],
+                    },
+                    socio_pedido_items: {
+                        incl: ['articulo1'],
+                    },
+                },
             }
 
             this.useAuth.setLoading(true, 'Cargando...')
@@ -429,7 +447,16 @@ export default {
         },
         async generarPdf(item) {
             const qry = {
-                incl: ['socio_pedido_items', 'moneda1', 'socio2', 'createdBy1'],
+                incl: ['socio1', 'moneda1', 'socio_pedido_items', 'createdBy1'],
+                iccl: {
+                    socio1: {
+                        incl: ['precio_lista1'],
+                        cols: ['doc_numero', 'contactos', 'direcciones', 'precio_lista'],
+                    },
+                    socio_pedido_items: {
+                        incl: ['articulo1'],
+                    },
+                },
             }
 
             this.useAuth.setLoading(true, 'Cargando...')
@@ -494,7 +521,16 @@ export default {
         },
         async entregarMercaderia(item) {
             const qry = {
-                incl: ['socio_pedido_items', 'moneda1', 'socio2'],
+                incl: ['socio1', 'moneda1', 'socio_pedido_items'],
+                iccl: {
+                    socio1: {
+                        incl: ['precio_lista1'],
+                        cols: ['doc_numero', 'contactos', 'direcciones', 'precio_lista'],
+                    },
+                    socio_pedido_items: {
+                        incl: ['articulo1'],
+                    },
+                },
             }
 
             this.useAuth.setLoading(true, 'Cargando...')

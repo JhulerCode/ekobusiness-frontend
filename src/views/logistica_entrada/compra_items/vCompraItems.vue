@@ -174,6 +174,11 @@ export default {
             this.vista.qry = {
                 fltr: { tipo: { op: 'Es', val: 1 } },
                 incl: ['transaccion1', 'articulo1'],
+                iccl: {
+                    transaccion1: {
+                        incl: ['socio1'],
+                    },
+                },
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)

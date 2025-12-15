@@ -176,9 +176,9 @@ export default {
             this.setTotalesCero()
             this.loadSocios()
             this.loadMonedas()
-            this.loadEmpresa()
         }
 
+        this.loadEmpresa()
         await this.loadDatosSistema()
     },
     methods: {

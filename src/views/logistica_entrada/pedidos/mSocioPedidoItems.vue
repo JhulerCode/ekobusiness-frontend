@@ -45,7 +45,8 @@
             :seeker="false"
             maxHeight="14.5rem"
             :inputsDisabled="modal.mode == 3"
-            @onInput="(action, a) => this[action](a)"
+            @onInput="runMethod"
+            @onChange="runMethod"
         >
             <template v-slot:cAction="{ item }">
                 <JdButton
@@ -71,8 +72,8 @@ import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
 import { useVistas } from '@/pinia/vistas'
 
-import { urls, get } from '@/utils/crud'
-import { jmsg } from '@/utils/swal'
+import { urls, get, post, patch, delet } from '@/utils/crud'
+import { jmsg, jqst } from '@/utils/swal'
 import { tryOficialExcel, getItemFromArray } from '@/utils/mine'
 
 export default {
@@ -115,6 +116,7 @@ export default {
                 width: '6rem',
                 show: true,
                 oninput: 'sumarUno',
+                onchange: 'modificar',
             },
             {
                 id: 'pu',
@@ -124,6 +126,7 @@ export default {
                 width: '6rem',
                 show: true,
                 oninput: 'sumarUno',
+                onchange: 'modificar',
             },
             {
                 id: 'mtoValorVenta',
@@ -181,7 +184,7 @@ export default {
 
             this.modal.articulos = JSON.parse(JSON.stringify(res.data))
         },
-        addArticulo(item) {
+        async addArticulo(item) {
             if (this.nuevo == null) return
             this.nuevo = null
             this.modal.articulos = []
@@ -191,8 +194,12 @@ export default {
             )
             if (i !== -1) return jmsg('warning', 'El artículo ya está agregado')
 
-            this.modal.socio_pedido.socio_pedido_items.push({
+            const send = {
+                orden: this.setOrden(),
                 articulo: item.id,
+                articulo1: {
+                    nombre: item.nombre,
+                },
                 nombre: item.nombre,
                 unidad: item.unidad,
                 has_fv: item.has_fv,
@@ -206,7 +213,21 @@ export default {
                 mtoValorVenta: 0,
                 igv: 0,
                 total: 0,
-            })
+            }
+
+            if (this.modal.mode == 2) {
+                send.socio_pedido = this.modal.socio_pedido.id
+
+                this.useAuth.setLoading(true, 'Agregando...')
+                const res = await post(urls.socio_pedido_items, send, 'Agregado con éxito')
+                this.useAuth.setLoading(false)
+
+                if (res.code != 0) return
+
+                send.id = res.data.id
+            }
+
+            this.modal.socio_pedido.socio_pedido_items.push(send)
         },
 
         async openPreciosLista() {
@@ -230,15 +251,19 @@ export default {
             }
             this.useModals.setModal('mPreciosLista', 'Lista de precios', null, send, true)
         },
-        agregarArticulos(items) {
+        async agregarArticulos(items) {
             for (const a of items) {
                 const i = this.modal.socio_pedido.socio_pedido_items.findIndex(
                     (b) => b.articulo == a.articulo,
                 )
                 if (i !== -1) continue
 
-                this.modal.socio_pedido.socio_pedido_items.push({
+                const send = {
+                    orden: this.setOrden(),
                     articulo: a.articulo,
+                    articulo1: {
+                        nombre: a.articulo1.nombre,
+                    },
                     nombre: a.articulo1.nombre,
                     unidad: a.articulo1.unidad,
                     has_fv: a.articulo1.has_fv,
@@ -253,7 +278,21 @@ export default {
                     mtoValorVenta: 0,
                     igv: 0,
                     total: 0,
-                })
+                }
+
+                if (this.modal.mode == 2) {
+                    send.socio_pedido = this.modal.socio_pedido.id
+
+                    this.useAuth.setLoading(true, 'Agregando...')
+                    const res = await post(urls.socio_pedido_items, send, 'Agregado con éxito')
+                    this.useAuth.setLoading(false)
+
+                    if (res.code != 0) return
+
+                    send.id = res.data.id
+                }
+
+                this.modal.socio_pedido.socio_pedido_items.push(send)
             }
         },
 
@@ -300,10 +339,13 @@ export default {
                 this.modal.socio_pedido.socio_pedido_items = res.data.map((a) => {
                     const matchedItem = articulosMap[a.EAN] || {}
                     return {
+                        orden: this.setOrden(),
                         articulo: matchedItem?.id,
+                        articulo1: {
+                            nombre: matchedItem?.nombre,
+                        },
                         nombre: matchedItem?.nombre,
                         unidad: matchedItem?.unidad,
-
                         has_fv: matchedItem?.has_fv,
 
                         cantidad: a.Cantidad,
@@ -358,35 +400,6 @@ export default {
                 this.modal.mtoOperInafectas
             this.modal.mtoImpVenta = this.modal.valorVenta + this.modal.mtoIGV
         },
-        // calcularUno(item) {
-        //     item.vu = item.igv_afectacion == '10' ? item.pu / (1 + (item.igv_porcentaje / 100)) : item.pu
-
-        //     item.mtoValorVenta = item.cantidad * item.vu
-        //     item.igv = item.igv_afectacion == '10' ? item.mtoValorVenta * (item.igv_porcentaje / 100) : 0
-        //     item.total = item.mtoValorVenta + item.igv
-        // },
-        // calcularTotales() {
-        //     this.modal.mtoOperGravadas = 0
-        //     this.modal.mtoOperExoneradas = 0
-        //     this.modal.mtoOperInafectas = 0
-        //     this.modal.mtoIGV = 0
-
-        //     for (const a of this.modal.socio_pedido.socio_pedido_items) {
-        //         if (a.igv_afectacion == '10') {
-        //             this.modal.mtoOperGravadas += a.mtoValorVenta
-        //             this.modal.mtoIGV += a.igv
-        //         }
-        //         else if (a.igv_afectacion == '20') {
-        //             this.modal.mtoOperExoneradas += a.mtoValorVenta
-        //         }
-        //         else if (a.igv_afectacion == '30') {
-        //             this.modal.mtoOperInafectas += a.mtoValorVenta
-        //         }
-        //     }
-
-        //     this.modal.valorVenta = this.modal.mtoOperGravadas + this.modal.mtoOperExoneradas + this.modal.mtoOperInafectas
-        //     this.modal.mtoImpVenta = this.modal.valorVenta + this.modal.mtoIGV
-        // },
         sumarUno(item) {
             this.calcularUno(item)
 
@@ -397,15 +410,46 @@ export default {
 
             this.calcularTotales()
         },
-        quitar(item) {
+
+        async modificar(item) {
+            if (this.modal.mode != 2) return
+
+            this.useAuth.setLoading(true, 'Actualizando...')
+            const res = await patch(urls.socio_pedido_items, item)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+        },
+        async quitar(item) {
             if (item.entregado > 0) return jmsg('error', 'El artículo ya tiene ingresos')
 
-            const i = this.modal.socio_pedido.socio_pedido_items.findIndex(
-                (a) => a.articulo == item.articulo,
-            )
-            this.modal.socio_pedido.socio_pedido_items.splice(i, 1)
+            if (this.modal.mode == 2) {
+                const qst = await jqst('¿Está seguro de eliminar?')
+                if (!qst.isConfirmed) return
+
+                this.useAuth.setLoading(true, 'Eliminando...')
+                const res = await delet(urls.socio_pedido_items, item)
+                this.useAuth.setLoading(false)
+
+                if (res.code != 0) return
+            }
+
+            this.modal.socio_pedido.socio_pedido_items.splice(item.i, 1)
 
             this.calcularTotales()
+        },
+
+        runMethod(method, item) {
+            this[method](item)
+        },
+        setOrden() {
+            const max = this.modal.socio_pedido.socio_pedido_items.length
+                ? this.modal.socio_pedido.socio_pedido_items.reduce(
+                      (max, i) => Math.max(max, i.orden),
+                      -Infinity,
+                  )
+                : 0
+            return max + 1
         },
     },
 }

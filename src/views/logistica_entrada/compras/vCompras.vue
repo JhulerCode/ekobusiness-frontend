@@ -173,6 +173,13 @@ export default {
                 action: 'ver',
                 permiso: 'vCompras:ver',
             },
+            {
+                label: 'Editar',
+                icon: 'fa-solid fa-pen-to-square',
+                action: 'editar',
+                permiso: 'vCompras:editar',
+                ocultar: { estado: 2 },
+            },
             // {
             //     label: 'Eliminar',
             //     icon: 'fa-regular fa-trash-can',
@@ -285,7 +292,7 @@ export default {
         },
         async ver(item) {
             const qry = {
-                incl: ['socio1', 'moneda1', 'transaccion_items'],
+                incl: ['socio1', 'moneda1', 'socio_pedido1', 'transaccion_items'],
                 iccl: {
                     transaccion_items: {
                         incl: ['articulo1'],
@@ -308,6 +315,32 @@ export default {
             }
 
             this.useModals.setModal('mTransaccion', 'Ver compra', 3, send, true)
+        },
+        async editar(item) {
+            const qry = {
+                incl: ['socio1', 'moneda1', 'socio_pedido1', 'transaccion_items'],
+                iccl: {
+                    transaccion_items: {
+                        incl: ['articulo1'],
+                    },
+                },
+            }
+
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.transacciones}/uno/${item.id}?qry=${JSON.stringify(qry)}`)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            const send = {
+                transaccion: res.data,
+                socio: { ...res.data.socio1 },
+                socios: [{ ...res.data.socio1 }],
+                monedas: [{ ...res.data.moneda1 }],
+                pedidos: res.data.socio_pedido ? [{ ...res.data.socio_pedido1 }] : [],
+            }
+
+            this.useModals.setModal('mTransaccion', 'Editar compra', 2, send, true)
         },
         async eliminar(item) {
             const resQst = await jqst('¿Está seguro de eliminar?')

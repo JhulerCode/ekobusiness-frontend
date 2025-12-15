@@ -31,7 +31,9 @@
                 :disabled="modal.mode == 3"
             />
 
-            <template v-if="modal.socio_pedido.tipo == 2 && modal.socio_pedido.comprobante_tipo == '01'">
+            <template
+                v-if="modal.socio_pedido.tipo == 2 && modal.socio_pedido.comprobante_tipo == '01'"
+            >
                 <JdInput
                     label="RUC"
                     v-model="modal.socio_pedido.comprobante_ruc"
@@ -56,10 +58,6 @@ import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
 import { useVistas } from '@/pinia/vistas'
 
-import { urls, get } from '@/utils/crud'
-// import { jmsg } from '@/utils/swal'
-// import { tryOficialExcel, getItemFromArray } from '@/utils/mine'
-
 export default {
     components: {
         JdSelect,
@@ -75,42 +73,7 @@ export default {
     created() {
         this.modal = this.useModals.mSocioPedido
     },
-    methods: {
-        setDireccionEntrega(item) {
-            if (item == null) {
-                this.modal.socio_pedido.entrega_ubigeo = null
-                this.modal.socio_pedido.direccion_entrega = null
-                this.modal.socio_pedido.entrega_direccion_datos = {}
-                return
-            }
-
-            this.modal.socio_pedido.entrega_ubigeo = item.ubigeo
-            this.modal.socio_pedido.direccion_entrega = item.direccion
-            this.modal.socio_pedido.entrega_direccion_datos = { ...item.datos_adicionales }
-        },
-        async searchUbigeos(txtBuscar) {
-            if (!txtBuscar) {
-                this.modal.ubigeos.length = 0
-                return
-            }
-
-            const qry = {
-                fltr: {
-                    distrito: { op: 'Contiene', val: txtBuscar },
-                },
-                ordr: [['distrito', 'ASC']],
-                cols: ['departamento', 'provincia', 'distrito', 'nombre'],
-            }
-
-            this.modal.spinUbigeos = true
-            const res = await get(`${urls.ubigeos}?qry=${JSON.stringify(qry)}`)
-            this.modal.spinUbigeos = false
-
-            if (res.code !== 0) return
-
-            this.modal.ubigeos = JSON.parse(JSON.stringify(res.data))
-        },
-    },
+    methods: {},
 }
 </script>
 

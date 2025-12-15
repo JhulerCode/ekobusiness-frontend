@@ -158,6 +158,13 @@ export default {
                 action: 'ver',
                 permiso: 'vVentas:ver',
             },
+            {
+                label: 'Editar',
+                icon: 'fa-solid fa-pen-to-square',
+                action: 'editar',
+                permiso: 'vVentas:editar',
+                ocultar: { estado: 2 },
+            },
             // {
             //     label: 'Eliminar',
             //     icon: 'fa-regular fa-trash-can',
@@ -278,7 +285,7 @@ export default {
         },
         async ver(item) {
             const qry = {
-                incl: ['socio1', 'moneda1', 'transaccion_items'],
+                incl: ['socio1', 'moneda1', 'socio_pedido1', 'transaccion_items'],
                 iccl: {
                     transaccion_items: {
                         incl: ['articulo1'],

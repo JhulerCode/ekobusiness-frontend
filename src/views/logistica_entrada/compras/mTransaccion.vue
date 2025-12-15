@@ -2,6 +2,41 @@
     <JdModal modal="mTransaccion" :buttons="buttons" @button-click="(action) => this[action]()">
         <div class="container-datos">
             <div class="left">
+                <JdSelect
+                    :nec="true"
+                    :label="modal.transaccion.tipo == 1 ? 'Proveedor' : 'Cliente'"
+                    :lista="modal.socios || []"
+                    mostrar="nombres_apellidos"
+                    :loaded="modal.sociosLoaded"
+                    @reload="loadSocios()"
+                    @elegir="setSocio"
+                    v-model="modal.transaccion.socio"
+                    :disabled="modal.transaccion.socio != null"
+                    style="grid-column: 1/5"
+                />
+
+                <JdSelect
+                    label="Moneda"
+                    :nec="true"
+                    :lista="modal.monedas || []"
+                    :loaded="modal.monedasLoaded"
+                    @reload="loadMonedas"
+                    @elegir="setTipoCambio"
+                    v-model="modal.transaccion.moneda"
+                    :disabled="modal.transaccion.moneda != null"
+                    style="grid-column: 1/4"
+                />
+
+                <JdInput
+                    label="Guía de remisión"
+                    :nec="true"
+                    v-model="modal.transaccion.guia"
+                    style="grid-column: 1/4"
+                    :disabled="modal.mode == 3"
+                />
+            </div>
+
+            <div class="right">
                 <JdInput
                     type="date"
                     label="Fecha"
@@ -10,19 +45,6 @@
                     @change="changeDate"
                     :disabled="modal.mode == 3"
                     style="grid-column: 1/3"
-                />
-
-                <JdSelect
-                    :nec="true"
-                    :label="modal.transaccion.tipo == 1 ? 'Proveedor' : 'Cliente'"
-                    v-model="modal.transaccion.socio"
-                    :lista="modal.socios || []"
-                    mostrar="nombres_apellidos"
-                    :loaded="modal.sociosLoaded"
-                    @reload="loadSocios()"
-                    @elegir="setSocio"
-                    :disabled="modal.mode == 3 || modal.transaccion.socio != null"
-                    style="grid-column: 1/5"
                 />
 
                 <JdSelect
@@ -36,22 +58,6 @@
                     style="grid-column: 1/4"
                 />
 
-                <JdInput
-                    label="Guía de remisión"
-                    :nec="true"
-                    v-model="modal.transaccion.guia"
-                    style="grid-column: 1/4"
-                />
-                <!-- :disabled="modal.mode == 3" -->
-
-                <JdInput
-                    label="Factura"
-                    v-model="modal.transaccion.factura"
-                    style="grid-column: 1/4"
-                />
-            </div>
-
-            <div class="right">
                 <JdSelect
                     label="Estado"
                     v-model="modal.transaccion.estado"
@@ -59,38 +65,20 @@
                     :disabled="true"
                     style="grid-column: 1/3"
                 />
-
-                <JdSelect
-                    label="Moneda"
-                    :nec="true"
-                    v-model="modal.transaccion.moneda"
-                    :lista="modal.monedas || []"
-                    @elegir="setTipoCambio"
-                    :disabled="modal.mode == 3 || modal.transaccion.moneda != null"
-                    style="grid-column: 1/4"
-                />
-
-                <small
-                    v-if="
-                        modal.transaccion.moneda &&
-                        modal.monedas?.find((a) => a.id == modal.transaccion.moneda)?.estandar ==
-                            false
-                    "
-                    >TC: {{ modal.transaccion.tipo_cambio }}</small
-                >
-
-                <JdSelect
-                    label="Condición de pago"
-                    :nec="true"
-                    v-model="modal.transaccion.pago_condicion"
-                    :lista="modal.pago_condiciones || []"
-                    :disabled="modal.mode == 3"
-                    style="grid-column: 1/5"
-                />
             </div>
         </div>
 
-        <mTransaccionItems ref="vItems" />
+        <div class="extra-datos">
+            <ul class="pestanas">
+                <li @click="pestana = 1" :class="{ 'pestana-activo': pestana == 1 }">Contenido</li>
+                <li @click="pestana = 3" :class="{ 'pestana-activo': pestana == 3 }">Finanzas</li>
+            </ul>
+
+            <div class="pestana-body">
+                <mTransaccionItems v-if="pestana == 1" />
+                <mTransaccionFinanzas v-if="pestana == 3" />
+            </div>
+        </div>
 
         <div class="botom">
             <div class="left">
@@ -140,6 +128,7 @@
 import { JdModal, JdInput, JdSelect, JdTextArea } from '@jhuler/components'
 
 import mTransaccionItems from './mTransaccionItems.vue'
+import mTransaccionFinanzas from './mTransaccionFinanzas.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
@@ -157,7 +146,9 @@ export default {
         JdInput,
         JdSelect,
         JdTextArea,
+
         mTransaccionItems,
+        mTransaccionFinanzas,
     },
     data: () => ({
         useAuth: useAuth(),
@@ -167,6 +158,7 @@ export default {
         redondear,
 
         modal: {},
+        pestana: 1,
 
         buttons: [
             { text: 'Guardar avance', action: 'guardarAvance', tipo: '2' },
@@ -180,16 +172,13 @@ export default {
 
         this.showButtons()
 
+        this.loadEmpresa()
         this.loadDatosSistema()
 
         if (this.modal.mode == 1) {
             this.setTotalesCero()
             this.loadSocios()
-            await this.loadMonedas()
-
-            if (this.modal.transaccion.socio_pedido) {
-                this.setTipoCambio()
-            }
+            this.loadMonedas()
         }
     },
     methods: {
@@ -197,18 +186,11 @@ export default {
             if (this.modal.mode == 1) {
                 this.buttons[0].show = true
                 this.buttons[2].show = true
-            } else {
+            } else if (this.modal.mode == 2) {
                 this.buttons[3].show = true
             }
 
-            if (
-                this.useAuth.verifyPermiso(
-                    'vCompras:crear',
-                    'vCompras:ver',
-                    'vVentas:crear',
-                    'vVentas:ver',
-                )
-            ) {
+            if (this.useAuth.verifyPermiso('vCompras:crear', 'vVentas:crear')) {
                 this.buttons[1].show = true
             }
         },
@@ -225,7 +207,6 @@ export default {
             this.modal.transaccion = {
                 tipo: this.modal.transaccion.tipo,
                 fecha: dayjs().format('YYYY-MM-DD'),
-                has_pedido: true,
                 socio_pedido: null,
                 estado: 1,
                 transaccion_items: [],
@@ -236,14 +217,14 @@ export default {
             this.setTotalesCero()
         },
         async nuevo() {
-            if (this.modal.mode != 1) this.loadSocios()
-
             if (this.modal.mode == 3 || this.modal.transaccion.transaccion_items.length == 0) {
                 this.initPedido()
             } else {
                 const resQst = await jqst('¿Está seguro de generar un nuevo pedido?')
                 if (resQst.isConfirmed) this.initPedido()
             }
+
+            if (this.modal.mode != 1) this.loadSocios()
         },
 
         changeDate() {
@@ -285,9 +266,7 @@ export default {
         },
 
         checkDatos() {
-            const props = ['tipo', 'fecha', 'socio', 'moneda', 'pago_condicion', 'guia']
-
-            // if (this.modal.transaccion.has_pedido) props.push('socio_pedido')
+            const props = ['tipo', 'fecha', 'socio', 'moneda', 'guia', 'pago_condicion']
 
             if (incompleteData(this.modal.transaccion, props)) {
                 jmsg('warning', 'Ingrese los datos necesarios')
@@ -303,6 +282,7 @@ export default {
                 const props1 = ['articulo', 'cantidad', 'pu', 'igv_afectacion', 'igv_porcentaje']
 
                 if (this.modal.transaccion.tipo == 1) {
+                    props1.push('lote')
                     if (a.articulo1.has_fv) props1.push('fv')
                 } else if (this.modal.transaccion.tipo == 5) {
                     props1.push('lote_padre')
@@ -318,13 +298,6 @@ export default {
         },
         shapeDatos() {
             this.modal.transaccion.monto = this.modal.mtoImpVenta.toFixed(2)
-
-            if (this.modal.transaccion.tipo == 1) {
-                for (const a of this.modal.transaccion.transaccion_items) {
-                    a.moneda = this.modal.transaccion.moneda
-                    a.tipo_cambio = this.modal.transaccion.tipo_cambio
-                }
-            }
         },
         // async grabar1() {
         //     if (this.checkDatos()) return
@@ -345,6 +318,20 @@ export default {
             this.useVistas.addItem(vista, 'transacciones', res.data, 'first')
             this.useModals.show.mTransaccion = false
         },
+        async modificar() {
+            if (this.checkDatos()) return
+            this.shapeDatos()
+
+            this.useAuth.setLoading(true, 'Modificando...')
+            const res = await patch(urls.transacciones, this.modal.transaccion)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            const vista = this.modal.transaccion.tipo == 1 ? 'vCompras' : 'vVentas'
+            this.useVistas.updateItem(vista, 'transacciones', res.data)
+            this.useModals.show.mTransaccion = false
+        },
         async guardarAvance() {
             const resQst = await jqst('¿Está seguro de guardar y reemplazar el guardado anterior?')
             if (resQst.isConfirmed) {
@@ -353,18 +340,16 @@ export default {
                 this.useModals.show.mTransaccion = false
             }
         },
-        async modificar() {
-            this.useAuth.setLoading(true, 'Modificando...')
-            const res = await patch(urls.transacciones, this.modal.transaccion)
+
+        async loadEmpresa() {
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.empresas}/uno/${this.useAuth.usuario.empresa}`)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
 
-            // const vista = this.modal.transaccion.tipo == 1 ? 'vCompras' : 'vVentas'
-            // this.useVistas.updateItem(vista, 'transacciones', res.data)
-            this.useModals.show.mTransaccion = false
+            this.modal.empresa = res.data
         },
-
         async loadSocios() {
             const qry = {
                 fltr: {
@@ -379,6 +364,7 @@ export default {
                     'direcciones',
                     'precio_lista',
                 ],
+                incl: ['precio_lista1'],
                 ordr: [
                     ['nombres', 'ASC'],
                     ['apellidos', 'ASC'],
@@ -413,16 +399,23 @@ export default {
             }
 
             this.useAuth.setLoading(true, 'Cargando...')
+            this.modal.monedasLoaded = false
             const res = await get(`${urls.monedas}?qry=${JSON.stringify(qry)}`)
             this.useAuth.setLoading(false)
+            this.modal.monedasLoaded = true
 
             if (res.code != 0) return
 
             this.modal.monedas = res.data
         },
         async loadDatosSistema() {
-            const qry = ['empresa', 'unidades', 'transaccion_estados', 'pago_condiciones']
+            const qry = ['transaccion_estados', 'pago_condiciones']
+
+            this.useAuth.setLoading(true, 'Cargando...')
+            this.modal.datosSistemaLoaded = false
             const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
+            this.useAuth.setLoading(false)
+            this.modal.datosSistemaLoaded = true
 
             if (res.code != 0) return
 
@@ -451,6 +444,32 @@ export default {
         grid-template-columns: repeat(4, 5rem);
         gap: 0.5rem;
         height: fit-content;
+    }
+}
+
+.extra-datos {
+    border: var(--border);
+
+    .pestanas {
+        display: flex;
+        background-color: var(--bg-color2);
+
+        li {
+            padding: 0.3rem 0.5rem;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+
+        .pestana-activo {
+            background-color: var(--bg-color);
+        }
+    }
+
+    .pestana-body {
+        padding: 1rem;
+        height: 20rem;
+        width: 60rem;
+        overflow-y: auto;
     }
 }
 

@@ -26,10 +26,10 @@
                 <JdSelect
                     label="Moneda"
                     :nec="true"
-                    v-model="modal.socio_pedido.moneda"
                     :lista="modal.monedas || []"
                     :loaded="modal.monedasLoaded"
                     @reload="loadMonedas"
+                    v-model="modal.socio_pedido.moneda"
                     :disabled="modal.mode == 3 || modal.socio_pedido.moneda != null"
                     style="grid-column: 1/4"
                 />
@@ -162,7 +162,7 @@ export default {
 
         buttons: [
             { text: 'Guardar avance', action: 'guardarAvance', tipo: '2' },
-            { text: 'Nuevo', action: 'nuevo', show: true, tipo: '2' },
+            { text: 'Nuevo', action: 'nuevo', tipo: '2' },
             { text: 'Grabar', action: 'grabar' },
             { text: 'Actualizar', action: 'modificar' },
         ],
@@ -172,14 +172,14 @@ export default {
 
         this.showButtons()
 
+        this.loadEmpresa()
+        this.loadDatosSistema()
+
         if (this.modal.mode == 1) {
             this.setTotalesCero()
             this.loadSocios()
             this.loadMonedas()
         }
-
-        this.loadEmpresa()
-        await this.loadDatosSistema()
     },
     methods: {
         showButtons() {
@@ -188,6 +188,10 @@ export default {
                 this.buttons[2].show = true
             } else if (this.modal.mode == 2) {
                 this.buttons[3].show = true
+            }
+
+            if (this.useAuth.verifyPermiso('vCompraPedidos:crear', 'vVentaPedidos:crear')) {
+                this.buttons[1].show = true
             }
         },
 
@@ -212,7 +216,6 @@ export default {
             this.modal.mode = 1
             this.modal.socio_elegido = {}
             this.setTotalesCero()
-            // this.setMiDireccion()
         },
         async nuevo() {
             if (this.modal.mode == 3 || this.modal.socio_pedido.socio_pedido_items.length == 0) {
@@ -274,7 +277,7 @@ export default {
                     'igv_afectacion',
                     'igv_porcentaje',
                 ]
-                // console.log(a.nombre)
+
                 if (incompleteData(a, props1)) {
                     jmsg('warning', 'Ingrese los datos necesarios de los articulos')
                     return true
@@ -322,6 +325,7 @@ export default {
         async modificar() {
             if (this.checkDatos()) return
             this.shapeDatos()
+
             this.useAuth.setLoading(true, 'Actualizando...')
             const res = await patch(urls.socio_pedidos, this.modal.socio_pedido)
             this.useAuth.setLoading(false)

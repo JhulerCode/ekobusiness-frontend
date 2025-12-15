@@ -13,7 +13,7 @@
                 icon="fa-solid fa-magnifying-glass"
                 placeholder="Busca artículos"
                 v-model="nuevo"
-                :spin="spinArticulos"
+                :spin="modal.spinArticulos"
                 :lista="modal.articulos"
                 @search="searchArticulos"
                 @elegir="addArticulo"
@@ -37,19 +37,15 @@
         </div>
 
         <JdTable
-            name="mTransaccionItems"
             :columns="columns"
             :datos="modal.transaccion.transaccion_items || []"
             :colAct="modal.mode != 3"
             :download="false"
             :seeker="false"
-            minHeight="10rem"
-            maxHeight="30rem"
-            width="60rem"
-            :inputsDisabled="modal.mode == 3"
-            @onInput="(action, a) => this[action](a)"
-            class="jdTable"
+            maxHeight="14.5rem"
             colActWidth="4.5rem"
+            :inputsDisabled="modal.mode == 3"
+            @onInput="runMethod"
         >
             <!-- :rowOptions="tableRowOptions"
             @rowOptionSelected="runMethod" -->
@@ -109,7 +105,7 @@ import { useVistas } from '@/pinia/vistas'
 
 import { urls, get } from '@/utils/crud'
 import { jmsg } from '@/utils/swal'
-import { getItemFromArray, obtenerNumeroJuliano } from '@/utils/mine'
+import { getItemFromArray, obtenerNumeroJuliano, genId } from '@/utils/mine'
 
 export default {
     components: {
@@ -129,12 +125,11 @@ export default {
 
         modal: {},
 
-        spinArticulos: false,
         nuevo: null,
 
         columns: [
             {
-                id: 'nombre',
+                id: 'articulo',
                 title: 'Artículo',
                 prop: 'articulo1.nombre',
                 width: '23rem',
@@ -177,13 +172,6 @@ export default {
                 width: '6rem',
                 show: true,
             },
-            // {
-            //     id: 'pu',
-            //     title: 'Precio uni.',
-            //     toRight: true,
-            //     width: '6rem',
-            //     show: true,
-            // },
             {
                 id: 'pu',
                 title: 'Valor unitario',
@@ -235,18 +223,18 @@ export default {
     created() {
         this.modal = this.useModals.mTransaccion
 
-        if (this.modal.transaccion.tipo == 1) {
-            this.columns[2].show = false
-            // this.columns[6].show = false
-        } else {
-            this.columns[3].show = false
-            this.columns[4].show = false
-            // this.columns[7].show = false
-        }
-
+        this.setColumns()
         this.sumarItems()
     },
     methods: {
+        setColumns() {
+            if (this.modal.transaccion.tipo == 1) {
+                this.columns[2].show = false
+            } else {
+                this.columns[3].show = false
+                this.columns[4].show = false
+            }
+        },
         setLote() {
             if (this.modal.transaccion.tipo != 1) return null
             return `${obtenerNumeroJuliano(this.modal.transaccion.fecha)}-${Math.floor(Math.random() * 90 + 10)}`
@@ -308,9 +296,9 @@ export default {
                 ordr: [['nombre', 'ASC']],
             }
 
-            this.spinArticulos = true
+            this.modal.spinArticulos = true
             const res = await get(`${urls.articulos}?qry=${JSON.stringify(qry)}`)
-            this.spinArticulos = false
+            this.modal.spinArticulos = false
 
             if (res.code !== 0) return
 
@@ -325,6 +313,7 @@ export default {
             // if (i !== -1) return jmsg('warning', 'El artículo ya está agregado')
 
             this.modal.transaccion.transaccion_items.push({
+                id: genId(),
                 articulo: item.id,
                 articulo1: {
                     nombre: item.nombre,
@@ -372,6 +361,7 @@ export default {
                 // if (i !== -1) continue
 
                 this.modal.transaccion.transaccion_items.push({
+                    id: genId(),
                     articulo: a.articulo,
                     articulo1: {
                         nombre: a.articulo1.nombre,
@@ -380,8 +370,8 @@ export default {
                     },
 
                     cantidad: null,
-
                     lote: this.setLote(),
+
                     pu: a.precio,
                     igv_afectacion: a.articulo1.igv_afectacion,
                     igv_porcentaje:
@@ -494,7 +484,6 @@ export default {
         quitar(item) {
             if (item.entregado > 0) return jmsg('error', 'El artículo ya tiene ingresos')
 
-            // const i = this.modal.transaccion.transaccion_items.findIndex(a => a.articulo == item.articulo)
             this.modal.transaccion.transaccion_items.splice(item.i, 1)
 
             this.calcularTotales()

@@ -12,7 +12,7 @@
                 label="🔍︎"
                 placeholder="Busca artículos"
                 v-model="nuevo"
-                :spin="spinArticulos"
+                :spin="modal.spinArticulos"
                 :lista="modal.articulos"
                 @search="searchArticulos"
                 @elegir="addArticulo"
@@ -90,7 +90,6 @@ export default {
 
         modal: {},
 
-        spinArticulos: false,
         nuevo: null,
 
         columns: [
@@ -176,9 +175,9 @@ export default {
                 ordr: [['nombre', 'ASC']],
             }
 
-            this.spinArticulos = true
+            this.modal.spinArticulos = true
             const res = await get(`${urls.articulos}?qry=${JSON.stringify(qry)}`)
-            this.spinArticulos = false
+            this.modal.spinArticulos = false
 
             if (res.code !== 0) return
 

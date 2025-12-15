@@ -178,7 +178,9 @@ export default {
         if (this.modal.mode == 1) {
             this.setTotalesCero()
             this.loadSocios()
-            this.loadMonedas()
+            await this.loadMonedas()
+
+            if (this.modal.transaccion.socio_pedido) this.setTipoCambio()
         }
     },
     methods: {
@@ -237,6 +239,7 @@ export default {
         },
 
         async setTipoCambio() {
+            console.log('ASD')
             // this.modal.transaccion.tipo_cambio = getItemFromArray(this.modal.transaccion.moneda, this.modal.monedas, 'tipo_cambio')
             const money = this.modal.monedas.find((a) => a.id == this.modal.transaccion.moneda)
             if (money.estandar == true) {
@@ -299,12 +302,12 @@ export default {
         shapeDatos() {
             this.modal.transaccion.monto = this.modal.mtoImpVenta.toFixed(2)
         },
-        // async grabar1() {
-        //     if (this.checkDatos()) return
-        //     this.shapeDatos()
-        //     console.log(this.modal.transaccion)
-        // },
         async grabar() {
+            if (this.checkDatos()) return
+            this.shapeDatos()
+            console.log(this.modal.transaccion)
+        },
+        async grabar1() {
             if (this.checkDatos()) return
             this.shapeDatos()
 

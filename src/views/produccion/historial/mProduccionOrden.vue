@@ -24,7 +24,7 @@
                     v-model="modal.produccion_orden.maquina"
                     :lista="
                         modal.maquinas?.filter(
-                            (a) => a.linea == modal.produccion_orden.tipo,
+                            (a) => a.linea == modal.produccion_orden.linea,
                         ) || []
                     "
                     @elegir="setMaquina"
@@ -247,7 +247,7 @@ export default {
                     activo: { op: 'Es', val: true },
                     nombre: { op: 'Contiene', val: txtBuscar },
                     tipo: { op: 'Es', val: 2 },
-                    linea: { op: 'Es', val: this.modal.produccion_orden.tipo },
+                    linea: { op: 'Es', val: this.modal.produccion_orden.linea },
                 },
                 cols: ['nombre', 'linea', 'filtrantes'],
                 ordr: [['nombre', 'ASC']],
@@ -323,7 +323,7 @@ export default {
         },
 
         checkDatos() {
-            const props = ['fecha', 'tipo', 'articulo', 'cantidad']
+            const props = ['fecha', 'linea', 'articulo', 'cantidad']
 
             if (this.modal.maquinas && this.modal.maquinas.length > 0) {
                 props.push('maquina', 'maquina_info')
@@ -351,7 +351,7 @@ export default {
             if (res.code != 0) return
 
             this.useVistas.addItem(
-                // this.tipoPrograma[this.modal.produccion_orden.tipo],
+                // this.tipoPrograma[this.modal.produccion_orden.linea],
                 'vPrograma',
                 'produccion_ordenes',
                 { ...res.data, receta: this.insumos_necesitados },
@@ -368,7 +368,7 @@ export default {
             if (res.code != 0) return
 
             this.useVistas.updateItem(
-                // this.tipoPrograma[this.modal.produccion_orden.tipo],
+                // this.tipoPrograma[this.modal.produccion_orden.linea],
                 'vPrograma',
                 'produccion_ordenes',
                 { ...res.data, receta: this.insumos_necesitados },

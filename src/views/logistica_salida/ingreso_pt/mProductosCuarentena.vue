@@ -67,10 +67,10 @@ export default {
                 sort: true,
             },
             {
-                id: 'produccion_orden1.tipo',
+                id: 'produccion_orden1.linea',
                 title: 'Tipo',
                 type: 'select',
-                prop: 'produccion_orden1.tipo1.nombre',
+                prop: 'produccion_orden1.linea1.nombre',
                 width: '10rem',
                 show: true,
                 seek: true,
@@ -158,7 +158,7 @@ export default {
                 incl: ['articulo1', 'produccion_orden1', 'maquina1'],
                 iccl: {
                     produccion_orden1: {
-                        incl: ['tipo1'],
+                        incl: ['linea1'],
                     }
                 }
             }

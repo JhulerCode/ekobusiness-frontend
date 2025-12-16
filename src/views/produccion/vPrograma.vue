@@ -278,7 +278,7 @@ export default {
                 show: true,
             },
             {
-                id: 'tipo',
+                id: 'linea',
                 title: 'Línea',
                 width: '10rem',
                 show: false,
@@ -740,7 +740,7 @@ export default {
             const send = {
                 produccion_orden: {
                     fecha: this.columns[0].val,
-                    tipo: this.columns[6].val,
+                    linea: this.columns[6].val,
                     estado: 1,
                 },
                 maquinas: this.vista.maquinas,

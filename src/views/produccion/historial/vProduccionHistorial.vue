@@ -90,10 +90,10 @@ export default {
                 sort: true,
             },
             {
-                id: 'tipo',
+                id: 'linea',
                 title: 'Tipo de producción',
                 type: 'select',
-                prop: 'tipo1.nombre',
+                prop: 'linea1.nombre',
                 width: '10rem',
                 show: true,
                 seek: true,
@@ -229,7 +229,7 @@ export default {
         setQuery() {
             this.vista.qry = {
                 fltr: {},
-                incl: ['tipo1', 'maquina1', 'articulo1', 'createdBy1'],
+                incl: ['linea1', 'maquina1', 'articulo1', 'createdBy1'],
                 ordr: [
                     ['fecha', 'DESC'],
                     ['createdAt', 'DESC'],
@@ -301,7 +301,7 @@ export default {
             await this.loadLineas()
 
             const cols = this.columns
-            cols.find((a) => a.id == 'tipo').lista = this.vista.articulo_lineas
+            cols.find((a) => a.id == 'linea').lista = this.vista.articulo_lineas
             cols.find((a) => a.id == 'maquina').lista = this.vista.maquinas
             cols.find((a) => a.id == 'estado').lista = this.vista.produccion_orden_estados
 
@@ -417,9 +417,9 @@ export default {
         async controlPesos(item) {
             let formato_id = 'RE-BPM-06'
 
-            if (item.tipo == 2) {
+            if (item.linea == 2) {
                 formato_id = 'RE-BPM-08'
-            } else if (item.tipo == 3) {
+            } else if (item.linea == 3) {
                 formato_id = 'RE-BPM-07'
             }
 

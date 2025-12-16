@@ -71,9 +71,9 @@ export default {
                 sort: true,
             },
             {
-                id: 'produccion_tipo',
+                id: 'linea',
                 title: 'Tipo de producción',
-                prop: 'produccion_tipo1.nombre',
+                prop: 'linea1.nombre',
                 type: 'select',
                 width: '15rem',
                 show: true,
@@ -127,9 +127,9 @@ export default {
         setQuery() {
             this.vista.qry = {
                 fltr: { tipo: { op: 'Es', val: 1 } },
-                cols: ['codigo', 'nombre', 'produccion_tipo', 'velocidad', 'limpieza_tiempo'],
+                cols: ['codigo', 'nombre', 'linea', 'velocidad', 'limpieza_tiempo'],
                 ordr: [['nombre', 'ASC']],
-                incl: ['produccion_tipo1'],
+                incl: ['linea1'],
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
@@ -158,7 +158,7 @@ export default {
             await this.loadLineas()
 
             const cols = this.columns
-            cols.find((a) => a.id == 'produccion_tipo').lista = this.vista.articulo_lineas
+            cols.find((a) => a.id == 'linea').lista = this.vista.articulo_lineas
 
             const send = {
                 table: this.tableName,

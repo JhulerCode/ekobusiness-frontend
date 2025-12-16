@@ -541,8 +541,8 @@ export default {
             }
 
             const qry = {
-                fltr: { produccion_tipo: { op: 'Es', val: this.columns[6].val } },
-                cols: ['codigo', 'nombre', 'produccion_tipo', 'velocidad', 'limpieza_tiempo'],
+                fltr: { linea: { op: 'Es', val: this.columns[6].val } },
+                cols: ['codigo', 'nombre', 'linea', 'velocidad', 'limpieza_tiempo'],
                 ordr: [['nombre', 'ASC']],
             }
 
@@ -627,7 +627,7 @@ export default {
                     {
                         id: res.data.maquina,
                         ...res.data.maquina1,
-                        produccion_tipo: this.columns[6].val,
+                        linea: this.columns[6].val,
                     },
                 ],
             }
@@ -912,7 +912,7 @@ export default {
         },
         async verPedidos() {
             const send = {
-                produccion_tipo: this.columns[6].val,
+                linea: this.columns[6].val,
             }
 
             this.useModals.setModal('mProductosFaltantes', 'Productos pedidos', null, send, true)

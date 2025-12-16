@@ -24,7 +24,7 @@
                     v-model="modal.produccion_orden.maquina"
                     :lista="
                         modal.maquinas?.filter(
-                            (a) => a.produccion_tipo == modal.produccion_orden.tipo,
+                            (a) => a.linea == modal.produccion_orden.tipo,
                         ) || []
                     "
                     @elegir="setMaquina"
@@ -247,9 +247,9 @@ export default {
                     activo: { op: 'Es', val: true },
                     nombre: { op: 'Contiene', val: txtBuscar },
                     tipo: { op: 'Es', val: 2 },
-                    produccion_tipo: { op: 'Es', val: this.modal.produccion_orden.tipo },
+                    linea: { op: 'Es', val: this.modal.produccion_orden.tipo },
                 },
-                cols: ['nombre', 'produccion_tipo', 'filtrantes'],
+                cols: ['nombre', 'linea', 'filtrantes'],
                 ordr: [['nombre', 'ASC']],
             }
 
@@ -387,7 +387,7 @@ export default {
         async loadMaquinas() {
             const qry = {
                 fltr: {},
-                cols: ['codigo', 'nombre', 'produccion_tipo', 'velocidad', 'limpieza_tiempo'],
+                cols: ['codigo', 'nombre', 'linea', 'velocidad', 'limpieza_tiempo'],
                 ordr: [['nombre', 'ASC']],
             }
 

@@ -28,9 +28,9 @@ export default {
 
         columns: [
             { id: 'Nombre', show: true, width: '25rem', title: "Nombre" },
-            { id: 'Tipo_produccion', show: true, width: '8rem', title: "Tipo de producción", prop: "Tipo_produccion1.nombre" },
-            { id: 'Sobres_caja', show: true, width: '7rem', title: "Sobres en caja" },
+            { id: 'Linea', show: true, width: '8rem', title: "Tipo de producción", prop: "Tipo_produccion1.nombre" },
             { id: 'Categoria', show: true, width: '10rem', title: "Categoria", prop: "Categoria1.nombre" },
+            { id: 'Sobres_caja', show: true, width: '7rem', title: "Sobres en caja" },
             { id: 'EAN', show: true, width: '10rem', title: "EAN" },
             { id: 'Unidad', show: true, width: '5rem', title: "Unidad", prop: "Unidad" },
             { id: 'Marca', show: true, width: '8rem', title: "Marca" },

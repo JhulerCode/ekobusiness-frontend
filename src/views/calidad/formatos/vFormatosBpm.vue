@@ -296,7 +296,7 @@ export default {
         async loadMaquinas(tipo) {
             const qry = {
                 fltr: { tipo: { op: 'Es', val: tipo } },
-                cols: ['codigo', 'nombre', 'produccion_tipo', 'velocidad', 'limpieza_tiempo'],
+                cols: ['codigo', 'nombre', 'linea', 'velocidad', 'limpieza_tiempo'],
                 ordr: [['nombre', 'ASC']],
             }
 

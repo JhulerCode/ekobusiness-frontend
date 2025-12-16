@@ -195,23 +195,23 @@ export default {
             //     sort: true,
             // },
             {
+                id: 'linea',
+                title: 'Línea',
+                prop: 'linea1.nombre',
+                type: 'select',
+                editable: true,
+                width: '10rem',
+                show: true,
+                seek: true,
+                sort: true,
+            },
+            {
                 id: 'categoria',
                 title: 'Categoría',
                 prop: 'categoria1.nombre',
                 type: 'select',
                 editable: true,
                 width: '8rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'produccion_tipo',
-                title: 'Tipo producción',
-                prop: 'produccion_tipo1.nombre',
-                type: 'select',
-                editable: true,
-                width: '10rem',
                 show: true,
                 seek: true,
                 sort: true,
@@ -356,7 +356,7 @@ export default {
         setQuery() {
             this.vista.qry = {
                 fltr: { tipo: { op: 'Es', val: 2 } },
-                incl: ['categoria1', 'produccion_tipo1'],
+                incl: ['categoria1', 'linea1'],
                 ordr: [['nombre', 'ASC']],
             }
 
@@ -422,9 +422,9 @@ export default {
             reader.onload = async () => {
                 const headers = [
                     'Nombre',
-                    'Tipo_produccion',
-                    'Sobres_caja',
+                    'Linea',
                     'Categoria',
+                    'Sobres_caja',
                     'EAN',
                     'Unidad',
                     'Marca',
@@ -463,11 +463,11 @@ export default {
                         a.Categoria = null
                     }
 
-                    if (produccion_tiposMap[a.Tipo_produccion]) {
-                        a.Tipo_produccion = produccion_tiposMap[a.Tipo_produccion].id
-                        a.Tipo_produccion1 = { ...produccion_tiposMap[a.Tipo_produccion] }
+                    if (produccion_tiposMap[a.Linea]) {
+                        a.Linea = produccion_tiposMap[a.Linea].id
+                        a.Tipo_produccion1 = { ...produccion_tiposMap[a.Linea] }
                     } else {
-                        a.Tipo_produccion = null
+                        a.Linea = null
                     }
 
                     if (igv_afectacionesMap[a.Tributo]) {
@@ -508,7 +508,7 @@ export default {
             cols.find((a) => a.id == 'is_ecommerce').lista = this.vista.estados
             cols.find((a) => a.id == 'igv_afectacion').lista = this.vista.igv_afectaciones
             cols.find((a) => a.id == 'categoria').lista = this.vista.articulo_categorias
-            cols.find((a) => a.id == 'produccion_tipo').lista = this.vista.articulo_lineas
+            cols.find((a) => a.id == 'linea').lista = this.vista.articulo_lineas
 
             const send = {
                 table: this.tableName,
@@ -546,7 +546,7 @@ export default {
             cols.find((a) => a.id == 'is_ecommerce').lista = this.vista.estados
             cols.find((a) => a.id == 'igv_afectacion').lista = this.vista.igv_afectaciones
             cols.find((a) => a.id == 'categoria').lista = this.vista.articulo_categorias
-            cols.find((a) => a.id == 'produccion_tipo').lista = this.vista.articulo_lineas
+            cols.find((a) => a.id == 'linea').lista = this.vista.articulo_lineas
 
             const ids = this.vista.articulos.filter((a) => a.selected).map((b) => b.id)
 

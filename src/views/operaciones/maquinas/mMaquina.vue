@@ -15,7 +15,7 @@
                     label="Tipo de producción"
                     :nec="true"
                     :lista="modal.articulo_lineas || []"
-                    v-model="maquina.produccion_tipo"
+                    v-model="maquina.linea"
                 />
                 <JdInput
                     label="Velocidad (und/min)"
@@ -84,7 +84,7 @@ export default {
             const props = ['nombre']
 
             if (this.maquina.tipo == 1)
-                props.push('produccion_tipo', 'velocidad', 'limpieza_tiempo')
+                props.push('linea', 'velocidad', 'limpieza_tiempo')
             if (this.maquina.tipo == 2) props.push('codigo')
 
             if (incompleteData(this.maquina, props)) {

@@ -5,7 +5,7 @@
                 <JdSelect
                     label="Tipo de producción"
                     :nec="true"
-                    v-model="articulo.produccion_tipo"
+                    v-model="articulo.linea"
                     :lista="modal.articulo_lineas"
                     v-if="articulo.tipo == 2"
                     style="grid-column: 1/3"
@@ -16,7 +16,7 @@
                     type="number"
                     :nec="true"
                     v-model="articulo.filtrantes"
-                    v-if="articulo.tipo == 2 && [1, 3, '1', '3'].includes(articulo.produccion_tipo)"
+                    v-if="articulo.tipo == 2 && [1, 3, '1', '3'].includes(articulo.linea)"
                     style="grid-column: 3/5"
                 />
 
@@ -334,9 +334,9 @@ export default {
             }
 
             if (this.articulo.tipo == 2) {
-                props.push('codigo_barra', 'produccion_tipo', 'contenido_neto')
+                props.push('codigo_barra', 'linea', 'contenido_neto')
 
-                if (this.articulo.produccion_tipo == 1 || this.articulo.produccion_tipo == 3) {
+                if (this.articulo.linea == 1 || this.articulo.linea == 3) {
                     props.push('filtrantes')
                 }
 
@@ -365,11 +365,11 @@ export default {
         shapeDatos() {
             if (this.articulo.tipo == 1) {
                 this.articulo.codigo_barra = null
-                this.articulo.produccion_tipo = null
+                this.articulo.linea = null
                 this.articulo.filtrantes = null
             }
 
-            if (this.articulo.produccion_tipo == 2) {
+            if (this.articulo.linea == 2) {
                 this.articulo.filtrantes = null
             }
 

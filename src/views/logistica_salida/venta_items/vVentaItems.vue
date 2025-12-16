@@ -54,10 +54,10 @@ export default {
         tableName: 'vVentaItems',
         columns: [
             {
-                id: 'fecha',
+                id: 'transaccion1.fecha',
                 title: 'Fecha',
                 type: 'date',
-                prop: 'fecha',
+                prop: 'transaccion1.fecha',
                 format: 'date',
                 width: '8rem',
                 show: true,
@@ -172,7 +172,7 @@ export default {
         },
         setQuery() {
             this.vista.qry = {
-                fltr: { tipo: { op: 'Es', val: 5 } },
+                fltr: { 'transaccion1.tipo': { op: 'Es', val: 5 } },
                 incl: ['transaccion1', 'articulo1'],
                 iccl: {
                     transaccion1: {
@@ -188,7 +188,7 @@ export default {
 
             this.vista.transaccion_items = []
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.kardex}?qry=${JSON.stringify(this.vista.qry)}`)
+            const res = await get(`${urls.transaccion_items}?qry=${JSON.stringify(this.vista.qry)}`)
             this.useAuth.setLoading(false)
             this.vista.loaded = true
 

@@ -285,12 +285,13 @@ export default {
         },
         async ver(item) {
             const qry = {
-                incl: ['socio1', 'moneda1', 'socio_pedido1', 'transaccion_items'],
-                iccl: {
-                    transaccion_items: {
-                        incl: ['articulo1'],
-                    },
-                },
+                incl: ['socio1', 'moneda1', 'socio_pedido1'],
+                // incl: ['socio1', 'moneda1', 'socio_pedido1', 'transaccion_items'],
+                // iccl: {
+                //     transaccion_items: {
+                //         incl: ['articulo1'],
+                //     },
+                // },
             }
 
             this.useAuth.setLoading(true, 'Cargando...')
@@ -298,6 +299,27 @@ export default {
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
+
+            const qry2 = {
+                incl: ['articulo1', 'kardexes'],
+                iccl: {
+                    kardexes: {
+                        cols: ['cantidad', 'fv', 'lote', 'stock', 'lote_fv_stock'],
+                        incl: ['lote_padre1'],
+                    },
+                },
+                cols: { exclude: [] },
+                fltr: {
+                    transaccion: { op: 'Es', val: item.id },
+                },
+                ordr: [['orden', 'ASC']],
+            }
+
+            const res2 = await get(`${urls.transaccion_items}?qry=${JSON.stringify(qry2)}`)
+
+            if (res2.code != 0) return
+
+            res.data.transaccion_items = res2.data
 
             const send = {
                 transaccion: res.data,

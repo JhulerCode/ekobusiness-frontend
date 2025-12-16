@@ -75,7 +75,7 @@
             </ul>
 
             <div class="pestana-body">
-                <mTransaccionItems v-if="pestana == 1" />
+                <mTransaccionItems v-if="pestana == 1" ref="mTransaccionItems" />
                 <mTransaccionFinanzas v-if="pestana == 3" />
             </div>
         </div>
@@ -172,10 +172,22 @@ export default {
 
         this.showButtons()
 
-        this.loadEmpresa()
         this.loadDatosSistema()
 
         if (this.modal.mode == 1) {
+            this.loadEmpresa()
+
+            if (this.modal.transaccion.tipo == 5) {
+                if (this.modal.transaccion.socio_pedido) {
+                    setTimeout(() => {
+                        console.log(this.$refs.mTransaccionItems)
+                        this.$refs.mTransaccionItems.agregarPedidoItems(
+                            this.modal.socio_pedido_items,
+                        )
+                    }, 300)
+                }
+            }
+
             this.setTotalesCero()
             this.loadSocios()
             await this.loadMonedas()
@@ -239,8 +251,6 @@ export default {
         },
 
         async setTipoCambio() {
-            console.log('ASD')
-            // this.modal.transaccion.tipo_cambio = getItemFromArray(this.modal.transaccion.moneda, this.modal.monedas, 'tipo_cambio')
             const money = this.modal.monedas.find((a) => a.id == this.modal.transaccion.moneda)
             if (money.estandar == true) {
                 this.modal.transaccion.tipo_cambio = 1
@@ -288,7 +298,11 @@ export default {
                     props1.push('lote')
                     if (a.articulo1.has_fv) props1.push('fv')
                 } else if (this.modal.transaccion.tipo == 5) {
-                    props1.push('lote_padre')
+                    // props1.push('lote_padre')
+                    if (!a.kardexes || a.kardexes.length == 0) {
+                        jmsg('warning', 'Agregue al menos un lote')
+                        return true
+                    }
                 }
 
                 if (incompleteData(a, props1)) {
@@ -302,12 +316,12 @@ export default {
         shapeDatos() {
             this.modal.transaccion.monto = this.modal.mtoImpVenta.toFixed(2)
         },
-        async grabar() {
+        async grabar1() {
             if (this.checkDatos()) return
             this.shapeDatos()
             console.log(this.modal.transaccion)
         },
-        async grabar1() {
+        async grabar() {
             if (this.checkDatos()) return
             this.shapeDatos()
 

@@ -43,7 +43,7 @@
             :colAct="modal.mode != 3"
             :download="false"
             :seeker="false"
-            maxHeight="14.5rem"
+            :maxHeight="modal.mode == 3 ? '18rem' : '14.5rem'"
             :inputsDisabled="modal.mode == 3"
             @onInput="runMethod"
             @onChange="runMethod"

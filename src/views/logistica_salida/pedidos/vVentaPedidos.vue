@@ -521,15 +521,16 @@ export default {
         },
         async entregarMercaderia(item) {
             const qry = {
-                incl: ['socio1', 'moneda1', 'socio_pedido_items'],
+                // incl: ['socio1', 'moneda1', 'socio_pedido_items'],
+                incl: ['socio1', 'moneda1'],
                 iccl: {
                     socio1: {
                         incl: ['precio_lista1'],
                         cols: ['doc_numero', 'contactos', 'direcciones', 'precio_lista'],
                     },
-                    socio_pedido_items: {
-                        incl: ['articulo1'],
-                    },
+                    // socio_pedido_items: {
+                    //     incl: ['articulo1'],
+                    // },
                 },
             }
 
@@ -538,6 +539,26 @@ export default {
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
+
+            const qry2 = {
+                incl: ['articulo1'],
+                iccl: {
+                    articulo1: {
+                        cols: ['is_combo', 'combo_articulos'],
+                    },
+                },
+                cols: { exclude: [] },
+                fltr: {
+                    socio_pedido: { op: 'Es', val: item.id },
+                },
+                ordr: [['orden', 'ASC']],
+            }
+
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res2 = await get(`${urls.socio_pedido_items}?qry=${JSON.stringify(qry2)}`)
+            this.useAuth.setLoading(false)
+
+            if (res2.code != 0) return
 
             const send = {
                 transaccion: {
@@ -553,7 +574,7 @@ export default {
                     estado: 1,
                     transaccion_items: [],
                 },
-                socio_pedido_items: res.data.socio_pedido_items,
+                socio_pedido_items: res2.data,
                 pedido: {
                     id: res.data.id,
                     codigo: res.data.codigo,

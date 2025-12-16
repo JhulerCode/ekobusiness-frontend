@@ -80,9 +80,9 @@ export default {
                 ordr: [['articulo1', 'nombre', 'ASC']],
                 iccl: {
                     articulo1: {
-                        cols: ['has_fv', 'igv_afectacion'],
+                        cols: ['has_fv', 'igv_afectacion', 'is_combo', 'combo_articulos'],
                     },
-                }
+                },
             }
 
             this.useAuth.setLoading(true, 'Cargando...')

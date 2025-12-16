@@ -6,8 +6,7 @@
             :rowSelectable="true"
             :download="false"
             maxHeight="30rem"
-        >
-        </JdTable>
+        />
     </JdModal>
 </template>
 

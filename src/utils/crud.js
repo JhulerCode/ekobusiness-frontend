@@ -36,6 +36,7 @@ const urls = {
     socio_pedido_items: `${host}/api/socio_pedido_items`,
     tipo_cambios: `${host}/api/tipo_cambios`,
     transacciones: `${host}/api/transacciones`,
+    transaccion_items: `${host}/api/transaccion_items`,
     ubigeos: `${host}/api/ubigeos`,
 }
 

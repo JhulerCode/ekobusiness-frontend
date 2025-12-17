@@ -286,12 +286,6 @@ export default {
         async ver(item) {
             const qry = {
                 incl: ['socio1', 'moneda1', 'socio_pedido1'],
-                // incl: ['socio1', 'moneda1', 'socio_pedido1', 'transaccion_items'],
-                // iccl: {
-                //     transaccion_items: {
-                //         incl: ['articulo1'],
-                //     },
-                // },
             }
 
             this.useAuth.setLoading(true, 'Cargando...')
@@ -330,6 +324,48 @@ export default {
             }
 
             this.useModals.setModal('mTransaccion', 'Ver venta', 3, send, true)
+        },
+        async editar(item) {
+            const qry = {
+                incl: ['socio1', 'moneda1', 'socio_pedido1'],
+            }
+
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.transacciones}/uno/${item.id}?qry=${JSON.stringify(qry)}`)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            const qry2 = {
+                incl: ['articulo1', 'kardexes'],
+                iccl: {
+                    kardexes: {
+                        cols: ['cantidad', 'fv', 'lote', 'stock', 'lote_fv_stock'],
+                        incl: ['lote_padre1'],
+                    },
+                },
+                cols: { exclude: [] },
+                fltr: {
+                    transaccion: { op: 'Es', val: item.id },
+                },
+                ordr: [['orden', 'ASC']],
+            }
+
+            const res2 = await get(`${urls.transaccion_items}?qry=${JSON.stringify(qry2)}`)
+
+            if (res2.code != 0) return
+
+            res.data.transaccion_items = res2.data
+
+            const send = {
+                transaccion: res.data,
+                socio: { ...res.data.socio1 },
+                socios: [{ ...res.data.socio1 }],
+                monedas: [{ ...res.data.moneda1 }],
+                pedidos: res.data.socio_pedido ? [{ ...res.data.socio_pedido1 }] : [],
+            }
+
+            this.useModals.setModal('mTransaccion', 'Editar venta', 2, send, true)
         },
         async eliminar(item) {
             const resQst = await jqst('¿Está seguro de eliminar?')

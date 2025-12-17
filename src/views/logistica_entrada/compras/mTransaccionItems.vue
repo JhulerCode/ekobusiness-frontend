@@ -54,7 +54,7 @@
             :datos="modal.transaccion.transaccion_items || []"
             :colAct="modal.mode != 3"
             :download="false"
-            :seeker="false"
+            :seeker="modal.transaccion.socio_pedido != null"
             :maxHeight="modal.mode == 3 ? '18rem' : '14.5rem'"
             :inputsDisabled="modal.mode == 3"
             @onInput="runMethod"
@@ -171,6 +171,7 @@ export default {
                 width: '23rem',
                 show: true,
                 sort: true,
+                seek: true,
             },
             {
                 id: 'unidad',
@@ -428,40 +429,46 @@ export default {
         async openPedidoItems() {
             const send = {
                 articulos: this.modal.socio_pedido_items,
+                socio_pedido: this.modal.transaccion.socio_pedido,
             }
 
             this.useModals.setModal('mPedidoItems', 'Items del pedido', null, send, true)
         },
         agregarPedidoItems(items) {
             for (const a of items) {
-                // const i = this.modal.transaccion.transaccion_items.findIndex(b => b.articulo == a.articulo)
-                // if (i !== -1) continue
+                const i = this.modal.transaccion.transaccion_items.findIndex(
+                    (b) => b.articulo == a.articulo,
+                )
 
-                this.modal.transaccion.transaccion_items.push({
-                    id: crypto.randomUUID(),
-                    articulo: a.articulo,
-                    articulo1: {
-                        nombre: a.articulo1.nombre,
-                        unidad: a.articulo1.unidad,
-                        has_fv: a.has_fv,
-                        is_combo: a.articulo1.is_combo,
-                        combo_articulos: a.articulo1.combo_articulos,
-                    },
+                if (i === -1) {
+                    this.modal.transaccion.transaccion_items.push({
+                        id: crypto.randomUUID(),
+                        articulo: a.articulo,
+                        articulo1: {
+                            nombre: a.articulo1.nombre,
+                            unidad: a.articulo1.unidad,
+                            has_fv: a.has_fv,
+                            is_combo: a.articulo1.is_combo,
+                            combo_articulos: a.articulo1.combo_articulos,
+                        },
 
-                    cantidad: a.cantidad,
-                    entregado: a.entregado,
-                    faltante: a.cantidad - a.entregado,
+                        cantidad: a.cantidad,
+                        // entregado: a.entregado,
+                        // faltante: a.cantidad - a.entregado,
 
-                    lote: this.setLoteHoy(),
+                        lote: this.setLoteHoy(),
 
-                    pu: a.pu,
-                    igv_afectacion: a.igv_afectacion,
-                    igv_porcentaje: a.igv_porcentaje,
+                        pu: a.pu,
+                        igv_afectacion: a.igv_afectacion,
+                        igv_porcentaje: a.igv_porcentaje,
 
-                    mtoValorVenta: 0,
-                    igv: 0,
-                    total: 0,
-                })
+                        mtoValorVenta: 0,
+                        igv: 0,
+                        total: 0,
+                    })
+                } else {
+                    this.modal.transaccion.transaccion_items[i].cantidad += a.cantidad
+                }
             }
 
             this.sumarItems()
@@ -529,7 +536,8 @@ export default {
         quitar(item) {
             if (item.entregado > 0) return jmsg('error', 'El artículo ya tiene ingresos')
 
-            this.modal.transaccion.transaccion_items.splice(item.i, 1)
+            const i = this.modal.transaccion.transaccion_items.findIndex((a) => a.id == item.id)
+            this.modal.transaccion.transaccion_items.splice(i, 1)
 
             this.calcularTotales()
         },

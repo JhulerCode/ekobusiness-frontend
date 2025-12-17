@@ -334,7 +334,7 @@ export default {
         },
         recuperarGuardado() {
             const send = {
-                socio_pedido: this.useAuth.avances.mCompraPedido,
+                socio_pedido: this.useAuth.avances.mVentaPedido,
             }
 
             this.useModals.setModal('mSocioPedido', 'Nuevo pedido de compra', 1, send, true)
@@ -362,6 +362,9 @@ export default {
             cols.find((a) => a.id == 'pago_condicion').lista = this.vista.pago_condiciones
             cols.find((a) => a.id == 'moneda').lista = this.vista.monedas
             cols.find((a) => a.id == 'estado').lista = this.vista.pedido_estados
+            cols.find((a) => a.id == 'pagado').lista = this.vista.estados
+            cols.find((a) => a.id == 'listo').lista = this.vista.estados
+            cols.find((a) => a.id == 'entregado').lista = this.vista.estados
 
             const send = {
                 table: this.tableName,
@@ -628,7 +631,7 @@ export default {
             this.vista.monedas = res.data
         },
         async loadDatosSistema() {
-            const qry = ['pedido_estados', 'pago_condiciones']
+            const qry = ['pedido_estados', 'pago_condiciones', 'estados']
             const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
 
             if (res.code != 0) return

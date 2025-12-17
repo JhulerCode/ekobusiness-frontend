@@ -8,7 +8,7 @@ export const useAuth = defineStore('auth', {
     state: () => ({
         token: null,
         usuario: {},
-        app_version: '1.8.0',
+        app_version: '1.8.1',
 
         menu: [
             {
@@ -87,6 +87,7 @@ export const useAuth = defineStore('auth', {
                             { id: 'vCompras:listar', label: 'Listar' },
                             { id: 'vCompras:crear', label: 'Crear' },
                             { id: 'vCompras:ver', label: 'Ver' },
+                            { id: 'vCompras:editar', label: 'Editar' },
                         ]
                     },
                     {
@@ -189,6 +190,7 @@ export const useAuth = defineStore('auth', {
                             { id: 'vVentas:listar', label: 'Listar' },
                             { id: 'vVentas:crear', label: 'Crear' },
                             { id: 'vVentas:ver', label: 'Ver' },
+                            { id: 'vVentas:editar', label: 'Editar' },
 
                             { id: 'vVentas:controlDespacho', label: 'Control despacho' },
                         ]

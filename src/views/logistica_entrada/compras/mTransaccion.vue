@@ -180,7 +180,6 @@ export default {
             if (this.modal.transaccion.tipo == 5) {
                 if (this.modal.transaccion.socio_pedido) {
                     setTimeout(() => {
-                        console.log(this.$refs.mTransaccionItems)
                         this.$refs.mTransaccionItems.agregarPedidoItems(
                             this.modal.socio_pedido_items,
                         )
@@ -300,8 +299,36 @@ export default {
                 } else if (this.modal.transaccion.tipo == 5) {
                     // props1.push('lote_padre')
                     if (!a.kardexes || a.kardexes.length == 0) {
-                        jmsg('warning', 'Agregue al menos un lote')
+                        jmsg('warning', `Agregue al menos un lote en ${a.articulo1.nombre}`)
                         return true
+                    }
+
+                    if (!a.articulo1.is_combo) {
+                        const kardexesTotal = a.kardexes.reduce(
+                            (sum, a) => sum + (a.cantidad ?? 0),
+                            0,
+                        )
+
+                        if (kardexesTotal != a.cantidad) {
+                            jmsg('warning', `Cantidades diferentes en ${a.articulo1.nombre}`)
+                            return true
+                        }
+                    } else {
+                        const kardexesTotales = {}
+                        for (const b of a.kardexes) {
+                            if (!kardexesTotales[b.articulo]) {
+                                kardexesTotales[b.articulo] = 0
+                            }
+                            kardexesTotales[b.articulo] += b.cantidad
+                        }
+
+                        for (const b of a.articulo1.combo_articulos) {
+                            const cantidadComponente = b.cantidad * a.cantidad
+                            if (cantidadComponente != kardexesTotales[b.articulo]) {
+                                jmsg('warning', `Cantidades diferentes en ${b.articulo1.nombre}`)
+                                return true
+                            }
+                        }
                     }
                 }
 

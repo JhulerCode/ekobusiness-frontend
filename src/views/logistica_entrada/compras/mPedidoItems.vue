@@ -5,6 +5,7 @@
             :datos="modal.articulos || []"
             :rowSelectable="true"
             :download="false"
+            :reload="loadItems"
             maxHeight="30rem"
         />
     </JdModal>
@@ -17,6 +18,7 @@ import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
 import { useVistas } from '@/pinia/vistas'
 
+import { urls, get } from '@/utils/crud'
 import { jmsg } from '@/utils/swal'
 
 export default {
@@ -108,6 +110,29 @@ export default {
             }
 
             this.useModals.show.mPedidoItems = false
+        },
+        async loadItems() {
+            const qry = {
+                incl: ['articulo1'],
+                iccl: {
+                    articulo1: {
+                        cols: ['is_combo', 'combo_articulos'],
+                    },
+                },
+                cols: { exclude: [] },
+                fltr: {
+                    socio_pedido: { op: 'Es', val: this.modal.socio_pedido },
+                },
+                ordr: [['orden', 'ASC']],
+            }
+
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.socio_pedido_items}?qry=${JSON.stringify(qry)}`)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            this.modal.articulos = res.data
         },
     },
 }

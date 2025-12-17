@@ -44,6 +44,11 @@
                     <small>Cantidad:</small>
                     {{ totalCantidad }}
                 </p>
+
+                <p>
+                    <small>Dif:</small>
+                    {{ totalRequerido - totalCantidad }}
+                </p>
             </div>
         </div>
 

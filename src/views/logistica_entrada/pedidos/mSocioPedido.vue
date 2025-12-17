@@ -76,12 +76,18 @@
                 <li @click="pestana = 1" :class="{ 'pestana-activo': pestana == 1 }">Contenido</li>
                 <li @click="pestana = 2" :class="{ 'pestana-activo': pestana == 2 }">Logística</li>
                 <li @click="pestana = 3" :class="{ 'pestana-activo': pestana == 3 }">Finanzas</li>
+                <template v-if="modal.mode = 1">
+                    <li @click="pestana = 4" :class="{ 'pestana-activo': pestana == 4 }">
+                        {{ modal.socio_pedido.tipo == 1 ? 'Ingresos' : 'Entregas' }}
+                    </li>
+                </template>
             </ul>
 
             <div class="pestana-body">
                 <mSocioPedidoItems v-if="pestana == 1" />
                 <mSocioPedidoLogistica v-if="pestana == 2" />
                 <mSocioPedidoFinanzas v-if="pestana == 3" />
+                <mSocioPedidoTransacciones v-if="pestana == 4" />
             </div>
         </div>
 
@@ -128,6 +134,7 @@ import { JdModal, JdInput, JdSelect, JdTextArea } from '@jhuler/components'
 import mSocioPedidoItems from './mSocioPedidoItems.vue'
 import mSocioPedidoLogistica from './mSocioPedidoLogistica.vue'
 import mSocioPedidoFinanzas from './mSocioPedidoFinanzas.vue'
+import mSocioPedidoTransacciones from './mSocioPedidoTransacciones.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
@@ -149,6 +156,7 @@ export default {
         mSocioPedidoItems,
         mSocioPedidoLogistica,
         mSocioPedidoFinanzas,
+        mSocioPedidoTransacciones,
     },
     data: () => ({
         useAuth: useAuth(),

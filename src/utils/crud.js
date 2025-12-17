@@ -6,7 +6,7 @@ const host = import.meta.env.VITE_API_HOST
 const subdominio_prueba = 'app'
 
 const urls = {
-    signin: `${host}/signin`,
+    signin: `${host}/api/auth`,
 
     sistema: `${host}/api/sistema`,
     empresas: `${host}/api/empresas`,

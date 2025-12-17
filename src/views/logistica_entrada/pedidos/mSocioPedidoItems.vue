@@ -339,7 +339,6 @@ export default {
                     (obj, a) => ((obj[a.codigo_barra] = a), obj),
                     {},
                 )
-                // return sistemaData[array].reduce((obj, a) => (obj[a.id] = a, obj), {})
 
                 this.modal.socio_pedido.socio_pedido_items = res.data.map((a) => {
                     const matchedItem = articulosMap[a.EAN] || {}

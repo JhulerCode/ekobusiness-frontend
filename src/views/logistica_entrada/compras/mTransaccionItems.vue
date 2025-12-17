@@ -141,7 +141,7 @@ import { useVistas } from '@/pinia/vistas'
 
 import { urls, get } from '@/utils/crud'
 import { jmsg } from '@/utils/swal'
-import { getItemFromArray, obtenerNumeroJuliano, genId } from '@/utils/mine'
+import { getItemFromArray, obtenerNumeroJuliano } from '@/utils/mine'
 
 export default {
     components: {
@@ -350,7 +350,7 @@ export default {
             // if (i !== -1) return jmsg('warning', 'El artículo ya está agregado')
 
             this.modal.transaccion.transaccion_items.push({
-                id: genId(),
+                id: crypto.randomUUID(),
                 articulo: item.id,
                 articulo1: {
                     nombre: item.nombre,
@@ -400,7 +400,7 @@ export default {
                 // if (i !== -1) continue
 
                 this.modal.transaccion.transaccion_items.push({
-                    id: genId(),
+                    id: crypto.randomUUID(),
                     articulo: a.articulo,
                     articulo1: {
                         nombre: a.articulo1.nombre,
@@ -438,7 +438,7 @@ export default {
                 // if (i !== -1) continue
 
                 this.modal.transaccion.transaccion_items.push({
-                    id: genId(),
+                    id: crypto.randomUUID(),
                     articulo: a.articulo,
                     articulo1: {
                         nombre: a.articulo1.nombre,

@@ -207,7 +207,7 @@ import { useModals } from '@/pinia/modals'
 import { useVistas } from '@/pinia/vistas'
 
 import { urls, post, patch, get } from '@/utils/crud'
-import { incompleteData, genId } from '@/utils/mine'
+import { incompleteData } from '@/utils/mine'
 import { jmsg } from '@/utils/swal'
 
 export default {
@@ -414,7 +414,7 @@ export default {
 
         addNewIngrediente() {
             this.articulo.ingredientes.push({
-                id: genId(),
+                id: crypto.randomUUID(),
             })
         },
         removeIngrediente(item) {
@@ -422,7 +422,7 @@ export default {
         },
         addNewBeneficio() {
             this.articulo.beneficios.push({
-                id: genId(),
+                id: crypto.randomUUID(),
             })
         },
         removeBeneficio(item) {

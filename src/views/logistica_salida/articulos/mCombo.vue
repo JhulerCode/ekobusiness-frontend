@@ -106,7 +106,7 @@ import { useModals } from '@/pinia/modals'
 import { useVistas } from '@/pinia/vistas'
 
 import { urls, post, patch, get } from '@/utils/crud'
-import { incompleteData, genId } from '@/utils/mine'
+import { incompleteData } from '@/utils/mine'
 import { jmsg } from '@/utils/swal'
 
 export default {
@@ -241,7 +241,7 @@ export default {
             if (i !== -1) return jmsg('warning', 'El artículo ya está agregado')
 
             this.articulo.combo_articulos.push({
-                id: genId(this.articulo.combo_articulos),
+                id: crypto.randomUUID()(this.articulo.combo_articulos),
                 articulo: this.nuevo.articulo,
                 articulo1: { nombre: this.nuevo.nombre },
                 cantidad: this.nuevo.cantidad,

@@ -37,7 +37,7 @@ import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
 import { useVistas } from '@/pinia/vistas'
 
-import { genId, incompleteData } from '@/utils/mine'
+import { incompleteData } from '@/utils/mine'
 import { jmsg } from '@/utils/swal'
 
 export default {
@@ -112,7 +112,7 @@ export default {
             if (this.socio.contactos.length == 0) this.nuevo.principal = true
 
             this.socio.contactos.push({
-                id: genId(),
+                id: crypto.randomUUID(),
                 ...this.nuevo
             })
 

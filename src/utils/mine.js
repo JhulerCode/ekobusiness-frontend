@@ -14,26 +14,25 @@ function deepCopy(obj) {
     return JSON.parse(JSON.stringify(obj))
 }
 
-function generarId(array, prop) {
-    if (prop == undefined) prop = 'id'
-    let id
+function genCorrelativo(array, prop = 'id') {
+    const max = array.length
+        ? array.reduce(
+            (m, o) => Math.max(m, Number(o[prop]) || 0),
+            -Infinity
+        )
+        : 0
 
-    if (array.length == 0) {
-        id = 1
-    }
-    else {
-        const masAlto = array.reduce((max, objeto) => {
-            if (objeto[prop] > max) return objeto[prop]
-            return max
-        }, 0)
-        id = masAlto + 1
-    }
-
-    return id
+    return max + 1
 }
 
-function genId() {
-    return `${Date.now()}${Math.floor(Math.random() * 900) + 100}`
+function genId(arr = []) {
+    let id
+
+    do {
+        id = `${Date.now()}${Math.floor(Math.random() * 900) + 100}`
+    } while (arr.some(a => a.id == id))
+
+    return id
 }
 
 function incompleteData(obj, p) {
@@ -273,7 +272,7 @@ function getNestedProp(obj, prop) {
 export {
     playAudio,
     deepCopy,
-    generarId,
+    genCorrelativo,
     genId,
     incompleteData,
     redondear,

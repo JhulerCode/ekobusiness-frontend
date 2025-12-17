@@ -134,7 +134,7 @@ import { useModals } from '@/pinia/modals'
 import { useVistas } from '@/pinia/vistas'
 
 import { urls, get, post, patch } from '@/utils/crud'
-import { getItemFromArray, redondear, incompleteData, genId } from '@/utils/mine'
+import { getItemFromArray, redondear, incompleteData } from '@/utils/mine'
 import { jqst, jmsg } from '@/utils/swal'
 
 import dayjs from 'dayjs'
@@ -292,7 +292,7 @@ export default {
                     this.modal.socio_pedido.codigo == '' ||
                     this.modal.socio_pedido.codigo == null
                 ) {
-                    this.modal.socio_pedido.codigo = genId()
+                    this.modal.socio_pedido.codigo = crypto.randomUUID()
                 }
             }
 

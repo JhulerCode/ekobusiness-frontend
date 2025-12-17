@@ -74,7 +74,7 @@ import { useModals } from '@/pinia/modals'
 import { useVistas } from '@/pinia/vistas'
 
 import { urls, get, post, patch } from '@/utils/crud'
-import { genId, incompleteData } from '@/utils/mine'
+import { incompleteData } from '@/utils/mine'
 import { jmsg } from '@/utils/swal'
 
 export default {
@@ -138,7 +138,7 @@ export default {
 
         addNew() {
             this.inspeccion.correcciones.push({
-                id: genId(),
+                id: crypto.randomUUID(),
                 correccion: '',
                 estado: false,
             })

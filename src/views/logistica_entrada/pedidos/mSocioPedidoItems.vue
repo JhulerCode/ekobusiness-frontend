@@ -74,7 +74,7 @@ import { useVistas } from '@/pinia/vistas'
 
 import { urls, get, post, patch, delet } from '@/utils/crud'
 import { jmsg, jqst } from '@/utils/swal'
-import { tryOficialExcel, getItemFromArray } from '@/utils/mine'
+import { tryOficialExcel, getItemFromArray, genCorrelativo } from '@/utils/mine'
 
 export default {
     components: {
@@ -101,6 +101,12 @@ export default {
                 show: true,
                 sort: true,
             },
+            // {
+            //     id: 'orden',
+            //     title: 'Orden',
+            //     width: '5rem',
+            //     show: true,
+            // },
             {
                 id: 'unidad',
                 title: 'Unidad',
@@ -442,13 +448,7 @@ export default {
             this[method](item)
         },
         setOrden() {
-            const max = this.modal.socio_pedido.socio_pedido_items.length
-                ? this.modal.socio_pedido.socio_pedido_items.reduce(
-                      (max, i) => Math.max(max, i.orden),
-                      -Infinity,
-                  )
-                : 0
-            return max + 1
+            return genCorrelativo(this.modal.socio_pedido.socio_pedido_items, 'orden')
         },
     },
 }

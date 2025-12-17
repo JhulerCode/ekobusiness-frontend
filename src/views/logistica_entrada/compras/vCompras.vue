@@ -252,10 +252,6 @@ export default {
                 if (res.code != 0) return
 
                 send.socio_pedido_items = res.data.socio_pedido_items
-                // send.pedido = {
-                //     id: res.data.id,
-                //     codigo: res.data.codigo,
-                // }
                 send.pedidos = [
                     {
                         id: res.data.id,

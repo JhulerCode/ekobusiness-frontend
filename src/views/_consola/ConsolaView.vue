@@ -5,7 +5,7 @@
         <div class="main-body">
             <SideBar class="side-bar" />
 
-            <MainCenter />
+            <MainCenter v-if="useAuth?.usuario?.colaborador" />
         </div>
     </main>
 

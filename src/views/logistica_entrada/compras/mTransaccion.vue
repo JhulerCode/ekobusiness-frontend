@@ -380,7 +380,7 @@ export default {
             const resQst = await jqst('¿Está seguro de guardar y reemplazar el guardado anterior?')
             if (resQst.isConfirmed) {
                 const card = this.modal.transaccion.tipo == 1 ? 'mCompra' : 'mVenta'
-                this.useAuth.avances[card] = this.modal.transaccion
+                this.useAuth.saveAvances(card, this.modal.transaccion)
                 this.useModals.show.mTransaccion = false
             }
         },

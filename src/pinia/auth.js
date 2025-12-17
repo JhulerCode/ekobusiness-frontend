@@ -1,5 +1,5 @@
 import { defineStore } from "pinia"
-import { urls, get, post } from '@/utils/crud.js'
+import { urls, get, post, patch } from '@/utils/crud.js'
 import { deepCopy } from '@/utils/mine'
 import { useVistas } from '@/pinia/vistas.js'
 import { useModals } from '@/pinia/modals.js'
@@ -397,6 +397,7 @@ export const useAuth = defineStore('auth', {
             this.permisos = []
             this.usuario = {}
             this.tables = {}
+            this.avances = {}
         },
 
         // ----- LOGIN ----- //
@@ -414,6 +415,8 @@ export const useAuth = defineStore('auth', {
 
             this.setTheme(this.usuario.theme)
             this.setPrimaryColor(this.usuario.color)
+            this.setInicialTables(this.usuario.tables)
+            this.setInicialAvances(this.usuario.avances)
             // Formato de fecha
             this.showNavbar = this.usuario.menu_visible
 
@@ -445,7 +448,7 @@ export const useAuth = defineStore('auth', {
 
             qry.cols = columns.filter(a => a.show).map(b => b.id)
         },
-        saveTableColumns(tableName, columns) {
+        async saveTableColumns(tableName, columns) {
             if (!tableName) return
 
             this.tables[tableName] = columns.map((col) => {
@@ -462,6 +465,17 @@ export const useAuth = defineStore('auth', {
                     sortDirection: col.sortDirection
                 }
             })
+
+            const send = {
+                id: this.usuario.colaborador,
+                tables: this.tables
+            }
+
+            this.setLoading(true, 'Cargando...')
+            const res = await patch(`${urls.colaboradores}/tables`, send, false)
+            this.setLoading(false)
+
+            if (res.code != 0) return
         },
         setColumns(tableName, columns) {
             // ----- RECUPERA LAS COLUMNAS GUARDADAS ----- //
@@ -470,6 +484,28 @@ export const useAuth = defineStore('auth', {
                     Object.assign(a, this.tables[tableName].find(b => b.id === a.id))
                 }
             }
+        },
+        setInicialTables(tables) {
+            this.tables = tables
+        },
+
+        // ----- AVANCES ----- //
+        async saveAvances(card, data) {
+            this.avances[card] = data
+
+            const send = {
+                id: this.usuario.colaborador,
+                avances: this.avances
+            }
+
+            this.setLoading(true, 'Cargando...')
+            const res = await patch(`${urls.colaboradores}/avances`, send, false)
+            this.setLoading(false)
+
+            if (res.code != 0) return
+        },
+        setInicialAvances(avances) {
+            this.avances = avances
         },
 
         // ----- PREFERENCIAS ----- //
@@ -513,6 +549,6 @@ export const useAuth = defineStore('auth', {
     },
     persist: {
         storage: localStorage,
-        paths: ['token', 'isDarkMode', 'tables', 'avances']
+        paths: ['token', 'isDarkMode']
     }
 })

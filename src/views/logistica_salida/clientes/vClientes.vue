@@ -237,12 +237,12 @@ export default {
         },
         async editarBulk() {
             await this.loadDatosSistema()
-            // await this.loadListasPrecios()
 
-            const cols = this.columns.filter((a) => a.editable == true)
-            cols.find((a) => (a.id = 'doc_tipo')).lista = this.vista.documentos_identidad
-            cols.find((a) => a.id == 'activo').lista = this.vista.estados
-            cols.find((a) => a.id == 'precio_lista').lista = this.vista.precios_listas
+            const cols = this.columns
+            for (const a of this.columns) {
+                if (a.id == 'doc_tipo') a.lista = this.vista.documentos_identidad
+                if (a.id == 'activo') a.lista = this.vista.estados
+            }
 
             const ids = this.vista.socios.filter((a) => a.selected).map((b) => b.id)
 

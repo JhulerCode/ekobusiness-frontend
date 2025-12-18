@@ -59,7 +59,8 @@
 </template>
 
 <script>
-import { JdButton, JdTable, mConfigCols, mEditar, mConfigFiltros } from '@jhuler/components'
+import { JdButton, JdTable, mConfigFiltros, mConfigCols } from '@jhuler/components'
+import mEditar from '@/components/mEditar.vue'
 
 import mImportarArticulos from '@/views/logistica_entrada/articulos/mImportarArticulos.vue'
 import mArticulo from '@/views/logistica_entrada/articulos/mArticulo.vue'
@@ -420,15 +421,16 @@ export default {
         },
         async editarBulk() {
             await this.loadDatosSistema()
-            await this.loadCategorias()
 
-            const cols = this.columns.filter((a) => a.editable == true)
-            cols.find((a) => a.id == 'unidad').lista = this.vista.unidades
-            cols.find((a) => a.id == 'has_fv').lista = this.vista.estados
-            cols.find((a) => a.id == 'activo').lista = this.vista.estados
-            cols.find((a) => a.id == 'is_ecommerce').lista = this.vista.estados
-            cols.find((a) => a.id == 'igv_afectacion').lista = this.vista.igv_afectaciones
-            cols.find((a) => a.id == 'categoria').lista = this.vista.articulo_categorias
+            const cols = this.columns
+            for (const a of this.columns) {
+                if (a.id == 'unidad') a.lista = this.vista.unidades
+                if (a.id == 'has_fv') a.lista = this.vista.estados
+                if (a.id == 'activo') a.lista = this.vista.estados
+                if (a.id == 'is_ecommerce') a.lista = this.vista.estados
+                if (a.id == 'igv_afectacion') a.lista = this.vista.igv_afectaciones
+                if (a.id == 'categoria') a.reload = this.loadCategorias
+            }
 
             const ids = this.vista.articulos.filter((a) => a.selected).map((b) => b.id)
 

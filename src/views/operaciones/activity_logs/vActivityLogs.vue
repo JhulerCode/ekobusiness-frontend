@@ -4,8 +4,14 @@
             <strong>Activity Logs</strong>
         </div>
 
-        <JdTable :name="tableName" :columns="columns" :datos="vista.activity_logs || []" :reload="loadActivityLogs"
-            :configFiltros="openConfigFiltros" :colAct="true">
+        <JdTable
+            :name="tableName"
+            :columns="columns"
+            :datos="vista.activity_logs || []"
+            :reload="loadActivityLogs"
+            :configFiltros="openConfigFiltros"
+            :colAct="true"
+        >
         </JdTable>
     </div>
 
@@ -45,7 +51,7 @@ export default {
                 width: '15rem',
                 show: true,
                 seek: true,
-                sort: true
+                sort: true,
             },
             {
                 id: 'colaborador',
@@ -56,7 +62,7 @@ export default {
                 width: '15rem',
                 show: true,
                 seek: true,
-                sort: true
+                sort: true,
             },
             {
                 id: 'method',
@@ -65,7 +71,7 @@ export default {
                 width: '5rem',
                 show: true,
                 seek: false,
-                sort: false
+                sort: false,
             },
             {
                 id: 'baseUrl',
@@ -74,7 +80,7 @@ export default {
                 width: '15rem',
                 show: true,
                 seek: false,
-                sort: false
+                sort: false,
             },
             {
                 id: 'detail',
@@ -83,7 +89,7 @@ export default {
                 width: '15rem',
                 show: true,
                 seek: false,
-                sort: false
+                sort: false,
             },
         ],
     }),
@@ -125,15 +131,15 @@ export default {
             this.vista.activity_logs = res.data
         },
         async openConfigFiltros() {
-            await this.loadColaboradores()
-
             const cols = this.columns
-            cols.find(a => a.id == 'colaborador').lista = this.vista.colaboradores
+            for (const a of cols) {
+                if (a.id == 'colaborador') a.reload = this.loadColaboradores
+            }
 
             const send = {
                 table: this.tableName,
                 cols,
-                reload: this.loadActivityLogs
+                reload: this.loadActivityLogs,
             }
 
             this.useModals.setModal('mConfigFiltros', 'Filtros', null, send, true)
@@ -155,6 +161,7 @@ export default {
             if (res.code != 0) return
 
             this.vista.colaboradores = res.data
+            return res.data
         },
     },
 }

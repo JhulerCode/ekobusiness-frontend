@@ -80,6 +80,7 @@ export default {
             {
                 id: 'unidad',
                 title: 'Unidad',
+                filtrable: false,
                 width: '7rem',
                 show: true,
                 seek: true,
@@ -90,6 +91,7 @@ export default {
                 title: 'Stock',
                 format: 'number',
                 toRight: true,
+                filtrable: false,
                 width: '7rem',
                 show: true,
                 seek: true,
@@ -145,10 +147,10 @@ export default {
         },
 
         async openConfigFiltros() {
-            await this.loadCategorias()
-
-            const cols = this.columns.filter((a) => a.id != 'unidad' && a.id != 'cantidad')
-            cols.find((a) => a.id == 'categoria').lista = this.vista.articulo_categorias
+            const cols = this.columns
+            for (const a of cols) {
+                if (a.id == 'categoria') a.reload = this.loadCategorias
+            }
 
             const send = {
                 table: this.tableName,
@@ -176,6 +178,7 @@ export default {
             if (res.code != 0) return
 
             this.vista.articulo_categorias = res.data
+            return res.data
         },
         async recalcularInventario() {
             this.useAuth.setLoading(true, 'Cargando...')

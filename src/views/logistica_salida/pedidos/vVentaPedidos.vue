@@ -354,17 +354,17 @@ export default {
 
         async openConfigFiltros() {
             await this.loadDatosSistema()
-            await this.loadSocios()
-            await this.loadMonedas()
 
             const cols = this.columns
-            cols.find((a) => a.id == 'socio').lista = this.vista.socios
-            cols.find((a) => a.id == 'pago_condicion').lista = this.vista.pago_condiciones
-            cols.find((a) => a.id == 'moneda').lista = this.vista.monedas
-            cols.find((a) => a.id == 'estado').lista = this.vista.pedido_estados
-            cols.find((a) => a.id == 'pagado').lista = this.vista.estados
-            cols.find((a) => a.id == 'listo').lista = this.vista.estados
-            cols.find((a) => a.id == 'entregado').lista = this.vista.estados
+            for (const a of cols) {
+                if (a.id == 'socio') a.reload = this.loadSocios
+                if (a.id == 'pago_condicion') a.lista = this.vista.pago_condiciones
+                if (a.id == 'moneda') a.reload = this.loadMonedas
+                if (a.id == 'estado') a.lista = this.vista.pedido_estados
+                if (a.id == 'pagado') a.lista = this.vista.estados
+                if (a.id == 'listo') a.lista = this.vista.estados
+                if (a.id == 'entregado') a.lista = this.vista.estados
+            }
 
             const send = {
                 table: this.tableName,
@@ -611,6 +611,7 @@ export default {
             if (res.code !== 0) return
 
             this.vista.socios = res.data
+            return res.data
         },
         async loadMonedas() {
             const qry = {
@@ -629,6 +630,7 @@ export default {
             if (res.code != 0) return
 
             this.vista.monedas = res.data
+            return res.data
         },
         async loadDatosSistema() {
             const qry = ['pedido_estados', 'pago_condiciones', 'estados']

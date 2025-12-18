@@ -233,12 +233,12 @@ export default {
 
         async openConfigFiltros() {
             await this.loadDatosSistema()
-            // await this.loadListasPrecios()
 
             const cols = this.columns
-            cols.find((a) => (a.id = 'doc_tipo')).lista = this.vista.documentos_identidad
-            cols.find((a) => a.id == 'activo').lista = this.vista.estados
-            // cols.find((a) => a.id == 'precio_lista').lista = this.vista.precios_listas
+            for (const a of cols) {
+                if (a.id == 'doc_tipo') a.lista = this.vista.documentos_identidad
+                if (a.id == 'activo') a.lista = this.vista.estados
+            }
 
             const send = {
                 table: this.tableName,

@@ -549,6 +549,6 @@ export const useAuth = defineStore('auth', {
     },
     persist: {
         storage: localStorage,
-        paths: ['token', 'isDarkMode']
+        paths: ['token', 'isDarkMode', 'tables']
     }
 })

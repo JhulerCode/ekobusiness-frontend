@@ -157,7 +157,9 @@ export default {
             await this.loadDatosSistema()
 
             const cols = this.columns
-            cols.find((a) => a.id == 'activo').lista = this.vista.estados
+            for (const a of cols) {
+                if (a.id == 'activo') a.lista = this.vista.estados
+            }
 
             const send = {
                 table: this.tableName,

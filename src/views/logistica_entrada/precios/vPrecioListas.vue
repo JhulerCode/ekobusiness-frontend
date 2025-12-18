@@ -170,11 +170,12 @@ export default {
 
         async openConfigFiltros() {
             await this.loadDatosSistema()
-            await this.loadMonedas()
 
             const cols = this.columns
-            cols.find((a) => a.id == 'moneda').lista = this.vista.monedas
-            cols.find((a) => a.id == 'activo').lista = this.vista.estados
+            for (const a of cols) {
+                if (a.id == 'activo') a.lista = this.vista.estados
+                if (a.id == 'moneda') a.reload = this.loadMonedas
+            }
 
             const send = {
                 table: this.tableName,
@@ -234,9 +235,10 @@ export default {
             if (res.code != 0) return
 
             this.vista.monedas = res.data
+            return res.data
         },
         async loadDatosSistema() {
-            const qry = ['estados', 'monedas']
+            const qry = ['estados']
             const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
 
             if (res.code != 0) return

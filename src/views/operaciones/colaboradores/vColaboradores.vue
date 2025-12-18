@@ -241,9 +241,11 @@ export default {
             await this.loadDatosSistema()
 
             const cols = this.columns
-            cols.find((a) => a.id == 'sexo').lista = this.vista.generos
-            cols.find((a) => a.id == 'doc_tipo').lista = this.vista.documentos_identidad
-            cols.find((a) => a.id == 'activo').lista = this.vista.estados
+            for (const a of cols) {
+                if (a.id == 'sexo') a.lista = this.vista.generos
+                if (a.id == 'doc_tipo') a.lista = this.vista.documentos_identidad
+                if (a.id == 'activo') a.lista = this.vista.estados
+            }
 
             const send = {
                 table: this.tableName,

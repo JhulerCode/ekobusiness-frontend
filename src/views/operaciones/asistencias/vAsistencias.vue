@@ -178,10 +178,10 @@ export default {
         },
 
         async openConfigFiltros() {
-            if (!this.vista.colaboradores) await this.loadColaboradores()
-
             const cols = this.columns
-            cols.find((a) => a.id == 'colaborador').lista = this.vista.colaboradores
+            for (const a of cols) {
+                if (a.id == 'colaborador') a.reload = this.loadColaboradores
+            }
 
             const send = {
                 table: this.tableName,
@@ -239,6 +239,7 @@ export default {
             if (res.code != 0) return
 
             this.vista.colaboradores = res.data
+            return res.data
         },
     },
 }

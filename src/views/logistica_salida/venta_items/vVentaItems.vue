@@ -198,10 +198,10 @@ export default {
         },
 
         async openConfigFiltros() {
-            await this.loadSocios()
-
             const cols = this.columns
-            cols.find((a) => a.id == 'transaccion1.socio').lista = this.vista.socios
+            for (const a of cols) {
+                if (a.id == 'transaccion1.socio') a.reload = this.loadSocios
+            }
 
             const send = {
                 table: this.tableName,
@@ -234,6 +234,7 @@ export default {
             if (res.code !== 0) return
 
             this.vista.socios = res.data
+            return res.data
         },
     },
 }

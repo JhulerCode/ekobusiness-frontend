@@ -155,10 +155,10 @@ export default {
         },
 
         async openConfigFiltros() {
-            await this.loadLineas()
-
             const cols = this.columns
-            cols.find((a) => a.id == 'linea').lista = this.vista.articulo_lineas
+            for (const a of cols) {
+                if (a.id == 'linea') a.reload = this.loadLineas
+            }
 
             const send = {
                 table: this.tableName,
@@ -209,6 +209,7 @@ export default {
             if (res.code != 0) return
 
             this.vista.articulo_lineas = res.data
+            return res.data
         },
     },
 }

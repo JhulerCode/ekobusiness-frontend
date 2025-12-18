@@ -498,17 +498,17 @@ export default {
 
         async openConfigFiltros() {
             await this.loadDatosSistema()
-            await this.loadCategorias()
-            await this.loadLineas()
 
-            const cols = this.columns.filter((a) => a.id != 'stock')
-            cols.find((a) => a.id == 'unidad').lista = this.vista.unidades
-            cols.find((a) => a.id == 'has_fv').lista = this.vista.estados
-            cols.find((a) => a.id == 'activo').lista = this.vista.estados
-            cols.find((a) => a.id == 'is_ecommerce').lista = this.vista.estados
-            cols.find((a) => a.id == 'igv_afectacion').lista = this.vista.igv_afectaciones
-            cols.find((a) => a.id == 'categoria').lista = this.vista.articulo_categorias
-            cols.find((a) => a.id == 'linea').lista = this.vista.articulo_lineas
+            const cols = this.columns
+            for (const a of cols) {
+                if (a.id == 'unidad') a.lista = this.vista.unidades
+                if (a.id == 'has_fv') a.lista = this.vista.estados
+                if (a.id == 'activo') a.lista = this.vista.estados
+                if (a.id == 'is_ecommerce') a.lista = this.vista.estados
+                if (a.id == 'igv_afectacion') a.lista = this.vista.igv_afectaciones
+                if (a.id == 'categoria') a.reload = this.loadCategorias
+                if (a.id == 'linea') a.reload = this.loadLineas
+            }
 
             const send = {
                 table: this.tableName,
@@ -692,6 +692,7 @@ export default {
             if (res.code != 0) return
 
             this.vista.articulo_lineas = res.data
+            return res.data
         },
         async loadCategorias() {
             const qry = {
@@ -711,6 +712,7 @@ export default {
             if (res.code != 0) return
 
             this.vista.articulo_categorias = res.data
+            return res.data
         },
         async loadDatosSistema() {
             const qry = ['igv_afectaciones', 'unidades', 'estados']

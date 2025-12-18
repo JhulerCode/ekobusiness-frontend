@@ -205,12 +205,11 @@ export default {
         },
 
         async openConfigFiltros() {
-            await this.loadLineas()
-            await this.loadMaquinas()
-
             const cols = this.columns
-            cols.find((a) => a.id == 'produccion_orden1.linea').lista = this.vista.articulo_lineas
-            cols.find((a) => a.id == 'maquina').lista = this.vista.maquinas
+            for (const a of cols) {
+                if (a.id == 'produccion_orden1.linea') a.reload = this.loadLineas
+                if (a.id == 'maquina') a.reload = this.loadMaquinas
+            }
 
             const send = {
                 table: this.tableName,
@@ -321,6 +320,7 @@ export default {
             if (res.code != 0) return
 
             this.vista.articulo_lineas = res.data
+            return res.data
         },
         async loadMaquinas() {
             const qry = {
@@ -337,6 +337,7 @@ export default {
             if (res.code != 0) return
 
             this.vista.maquinas = res.data
+            return res.data
         },
     },
 }

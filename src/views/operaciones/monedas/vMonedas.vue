@@ -166,10 +166,7 @@ export default {
         },
 
         async openConfigFiltros() {
-            // await this.loadDatosSistema()
-
             const cols = this.columns
-            // cols.find(a => a.id == 'estado').lista = this.vista.estados
 
             const send = {
                 table: this.tableName,

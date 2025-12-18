@@ -171,11 +171,10 @@ export default {
         },
 
         async openConfigFiltros() {
-            // await this.loadDatosSistema()
-            await this.loadSocios()
-
             const cols = this.columns
-            cols.find((a) => a.id == 'socio').lista = this.vista.socios
+            for (const a of cols) {
+                if (a.id == 'socio') a.reload = this.loadSocios
+            }
 
             const send = {
                 table: this.tableName,
@@ -256,15 +255,8 @@ export default {
             if (res.code !== 0) return
 
             this.vista.socios = res.data
+            return res.data
         },
-        // async loadDatosSistema() {
-        //     const qry = ['documentos_estados']
-        //     const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
-
-        //     if (res.code != 0) return
-
-        //     Object.assign(this.vista, res.data)
-        // },
     },
 }
 </script>

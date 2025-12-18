@@ -4,14 +4,25 @@
             <strong>Registros sanitarios</strong>
 
             <div class="buttons">
-                <JdButton text="Nuevo" title="Crear nuevo" @click="nuevo()"
-                    v-if="useAuth.verifyPermiso('vRegistrosSanitarios:crear')" />
+                <JdButton
+                    text="Nuevo"
+                    title="Crear nuevo"
+                    @click="nuevo()"
+                    v-if="useAuth.verifyPermiso('vRegistrosSanitarios:crear')"
+                />
             </div>
         </div>
 
-        <JdTable :name="tableName" :columns="columns" :datos="vista.documentos || []" :colAct="true"
-            :configFiltros="openConfigFiltros" :reload="loadDocumentos" :rowOptions="tableRowOptions"
-            @rowOptionSelected="runMethod">
+        <JdTable
+            :name="tableName"
+            :columns="columns"
+            :datos="vista.documentos || []"
+            :colAct="true"
+            :configFiltros="openConfigFiltros"
+            :reload="loadDocumentos"
+            :rowOptions="tableRowOptions"
+            @rowOptionSelected="runMethod"
+        >
         </JdTable>
     </div>
 
@@ -57,7 +68,7 @@ export default {
                 width: '20rem',
                 show: true,
                 seek: true,
-                sort: true
+                sort: true,
             },
             {
                 id: 'denominacion_comercial',
@@ -66,7 +77,7 @@ export default {
                 width: '20rem',
                 show: true,
                 seek: true,
-                sort: true
+                sort: true,
             },
             {
                 id: 'registro_sanitario',
@@ -75,7 +86,7 @@ export default {
                 width: '12rem',
                 show: true,
                 seek: true,
-                sort: true
+                sort: true,
             },
             {
                 id: 'fecha_emision',
@@ -85,7 +96,7 @@ export default {
                 width: '12rem',
                 show: true,
                 seek: true,
-                sort: true
+                sort: true,
             },
             {
                 id: 'fecha_vencimiento',
@@ -95,7 +106,7 @@ export default {
                 width: '12rem',
                 show: true,
                 seek: true,
-                sort: true
+                sort: true,
             },
             {
                 id: 'recordar_dias',
@@ -104,7 +115,7 @@ export default {
                 width: '8rem',
                 show: true,
                 seek: true,
-                sort: true
+                sort: true,
             },
             {
                 id: 'estado',
@@ -115,14 +126,30 @@ export default {
                 width: '10rem',
                 show: true,
                 seek: true,
-                sort: true
+                sort: true,
             },
         ],
         tableRowOptions: [
-            { label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar', permiso: 'vRegistrosSanitarios:editar' },
-            { label: 'Ver pdf', icon: 'fa-regular fa-file-pdf', action: 'verFile', permiso: 'vRegistrosSanitarios:editar', ocultar: { file_name: null } },
-            { label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar', permiso: 'vRegistrosSanitarios:eliminar' },
-        ]
+            {
+                label: 'Editar',
+                icon: 'fa-solid fa-pen-to-square',
+                action: 'editar',
+                permiso: 'vRegistrosSanitarios:editar',
+            },
+            {
+                label: 'Ver pdf',
+                icon: 'fa-regular fa-file-pdf',
+                action: 'verFile',
+                permiso: 'vRegistrosSanitarios:editar',
+                ocultar: { file_name: null },
+            },
+            {
+                label: 'Eliminar',
+                icon: 'fa-solid fa-trash-can',
+                action: 'eliminar',
+                permiso: 'vRegistrosSanitarios:eliminar',
+            },
+        ],
     }),
     created() {
         this.vista = this.useVistas.vRegistrosSanitarios
@@ -163,12 +190,14 @@ export default {
             await this.loadDatosSistema()
 
             const cols = this.columns
-            cols.find(a => a.id == 'estado').lista = this.vista.documentos_estados
+            for (const a of cols) {
+                if (a.id == 'activo') a.lista = this.vista.documentos_estados
+            }
 
             const send = {
                 table: this.tableName,
-                cols: cols.filter(a => a.id !== 'estado'),
-                reload: this.loadDocumentos
+                cols: cols.filter((a) => a.id !== 'estado'),
+                reload: this.loadDocumentos,
             }
 
             this.useModals.setModal('mConfigFiltros', 'Filtros', null, send, true)

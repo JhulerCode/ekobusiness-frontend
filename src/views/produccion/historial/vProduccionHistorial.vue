@@ -277,6 +277,7 @@ export default {
             if (res.code != 0) return
 
             this.vista.articulo_lineas = res.data
+            return res.data
         },
         async loadMaquinas() {
             const qry = {
@@ -293,17 +294,18 @@ export default {
             if (res.code != 0) return
 
             this.vista.maquinas = res.data
+            return res.data
         },
 
         async openConfigFiltros() {
             await this.loadDatosSistema()
-            await this.loadMaquinas()
-            await this.loadLineas()
 
             const cols = this.columns
-            cols.find((a) => a.id == 'linea').lista = this.vista.articulo_lineas
-            cols.find((a) => a.id == 'maquina').lista = this.vista.maquinas
-            cols.find((a) => a.id == 'estado').lista = this.vista.produccion_orden_estados
+            for (const a of cols) {
+                if (a.id == 'linea') a.reload = this.loadLineas
+                if (a.id == 'maquina') a.reload = this.loadMaquinas
+                if (a.id == 'estado') a.lista = this.vista.produccion_orden_estados
+            }
 
             const send = {
                 table: this.tableName,

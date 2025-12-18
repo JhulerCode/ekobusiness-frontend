@@ -160,7 +160,8 @@ export default {
                     produccion_orden1: {
                         incl: ['linea1'],
                     }
-                }
+                },
+                ordr: [['fecha', 'ASC']]
             }
 
             this.useAuth.updateQuery(this.columns, this.modal.qry)

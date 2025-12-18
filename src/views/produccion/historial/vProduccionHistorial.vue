@@ -230,6 +230,7 @@ export default {
             this.vista.qry = {
                 fltr: {},
                 incl: ['linea1', 'maquina1', 'articulo1', 'createdBy1'],
+                sqls: ['productos_terminados'],
                 ordr: [
                     ['fecha', 'DESC'],
                     ['createdAt', 'DESC'],

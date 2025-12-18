@@ -161,7 +161,6 @@
 
                 <JdTable
                     :columns="columns_insumos"
-                    :seeker="false"
                     :colAct="false"
                     :download="false"
                     :datos="insumos_necesitados"
@@ -355,6 +354,7 @@ export default {
                 prop: 'articulo1.nombre',
                 width: '20rem',
                 show: true,
+                seek: true,
             },
             {
                 id: 'cantidad_necesitada',

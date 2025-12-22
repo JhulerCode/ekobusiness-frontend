@@ -76,7 +76,7 @@
                 <li @click="pestana = 1" :class="{ 'pestana-activo': pestana == 1 }">Contenido</li>
                 <li @click="pestana = 2" :class="{ 'pestana-activo': pestana == 2 }">Logística</li>
                 <li @click="pestana = 3" :class="{ 'pestana-activo': pestana == 3 }">Finanzas</li>
-                <template v-if="modal.mode = 1">
+                <template v-if="modal.mode == 1">
                     <li @click="pestana = 4" :class="{ 'pestana-activo': pestana == 4 }">
                         {{ modal.socio_pedido.tipo == 1 ? 'Ingresos' : 'Entregas' }}
                     </li>
@@ -183,11 +183,11 @@ export default {
         this.loadEmpresa()
         this.loadDatosSistema()
 
-        if (this.modal.mode == 1) {
-            this.setTotalesCero()
-            this.loadSocios()
-            this.loadMonedas()
-        }
+        // if (this.modal.mode == 1) {
+        //     this.setTotalesCero()
+        //     this.loadSocios()
+        //     this.loadMonedas()
+        // }
     },
     methods: {
         showButtons() {

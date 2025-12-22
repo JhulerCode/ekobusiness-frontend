@@ -154,7 +154,7 @@
 
             <div class="card" v-if="useAuth.verifyPermiso('vPrograma:crear')">
                 <div class="card-head">
-                    <p>Insumos</p>
+                    <p>Insumos requeridos</p>
 
                     <JdButton text="Calcular" tipo="2" @click="calcularInsumosNecesarios" />
                 </div>

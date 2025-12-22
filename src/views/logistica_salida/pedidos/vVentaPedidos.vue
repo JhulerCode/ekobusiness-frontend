@@ -228,14 +228,14 @@ export default {
                 icon: 'fa-solid fa-pen-to-square',
                 action: 'editar',
                 permiso: 'vVentaPedidos:editar',
-                ocultar: { estado: ['0', '2'] },
+                ocultar: { estado: ['0', '2'], origin: 'ecommerce' },
             },
             {
                 label: 'Eliminar',
                 icon: 'fa-solid fa-trash-can',
                 action: 'eliminar',
                 permiso: 'vVentaPedidos:eliminar',
-                ocultar: { pagado: true },
+                ocultar: { pagado: true, origin: 'ecommerce' },
             },
             {
                 label: 'Exportar en PDF',
@@ -405,7 +405,7 @@ export default {
                 monedas: [{ ...res.data.moneda1 }],
             }
 
-            this.useModals.setModal('mSocioPedido', 'Ver pedido de venta', 3, send, true)
+            this.useModals.setModal('mSocioPedido', 'Ver pedido de venta Q', 3, send, true)
         },
         async editar(item) {
             const qry = {

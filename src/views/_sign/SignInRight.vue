@@ -71,7 +71,7 @@ export default {
         },
         async darkLigthMode() {
             const send = {
-                id: this.useAuth.usuario.colaborador,
+                id: this.useAuth.usuario.id,
                 theme: this.useAuth.isDarkMode == true ? '1' : '2',
             }
 
@@ -96,6 +96,8 @@ export default {
 
             this.useAuth.token = token
             await this.useAuth.login()
+
+            this.useAuth.setLoading(true, 'Preparando vista...')
             localStorage.setItem('remember-usuario', this.usuario)
             this.$router.replace({ name: 'ConsolaView' })
             this.useVistas.showVista(this.useAuth.usuario.vista_inicial)

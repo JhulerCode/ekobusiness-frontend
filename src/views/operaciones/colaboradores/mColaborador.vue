@@ -277,7 +277,7 @@ export default {
 
             this.useVistas.updateItem('vColaboradores', 'colaboradores', res.data)
 
-            if (this.useAuth.usuario.colaborador == this.colaborador.id) {
+            if (this.useAuth.usuario.id == this.colaborador.id) {
                 this.useAuth.usuario.permisos = this.colaborador.permisos
             }
             this.useModals.show.mColaborador = false

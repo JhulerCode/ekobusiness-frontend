@@ -169,7 +169,7 @@ export default {
         setQuery() {
             this.vista.qry = {
                 fltr: {
-                    createdBy: { op: 'Es', val: this.useAuth.usuario.colaborador },
+                    createdBy: { op: 'Es', val: this.useAuth.usuario.id },
                 },
             }
 

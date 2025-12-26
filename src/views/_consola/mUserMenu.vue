@@ -31,6 +31,7 @@ import { JdModal } from '@jhuler/components'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
+import { urls, get } from '@/utils/crud'
 
 export default {
     components: {
@@ -50,8 +51,22 @@ export default {
             this.useModals.setModal('mUserPreferences', 'Preferencias', null, null, true)
             this.useModals.show.mUserMenu = false
         },
-        updateSession() {
-            this.useAuth.login()
+        async updateSession() {
+            // this.useAuth.login()
+            this.useAuth.setLoading(true, 'Actualizando...')
+            const res = await get(`${urls.colaboradores}/reload-user`)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            if (res.data == null) {
+                this.$router.replace({ name: 'SignIn' })
+                this.useAuth.initVars()
+                this.useVistas.initVars()
+                this.useModals.initVars()
+            } else {
+                this.useAuth.setSessionDatos(res)
+            }
         },
         async logout() {
             await this.useAuth.logout(this.$router)

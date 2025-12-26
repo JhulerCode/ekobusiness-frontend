@@ -76,7 +76,7 @@ export default {
         },
         async darkLigthMode() {
             const send = {
-                id: this.useAuth.usuario.colaborador,
+                id: this.useAuth.usuario.id,
                 theme: this.useAuth.isDarkMode == true ? '1' : '2',
             }
 

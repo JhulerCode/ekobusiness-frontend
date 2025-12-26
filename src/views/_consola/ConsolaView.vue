@@ -5,7 +5,7 @@
         <div class="main-body">
             <SideBar class="side-bar" />
 
-            <MainCenter v-if="useAuth?.usuario?.colaborador" />
+            <MainCenter v-if="useAuth?.usuario?.id" />
         </div>
     </main>
 
@@ -45,6 +45,9 @@ export default {
         useVistas: useVistas(),
         useModals: useModals(),
     }),
+    created() {
+        this.useAuth.setLoading(false)
+    },
     mounted() {
         window.addEventListener('keydown', this.shortCuts)
     },

@@ -183,11 +183,11 @@ export default {
         this.loadEmpresa()
         this.loadDatosSistema()
 
-        // if (this.modal.mode == 1) {
-        //     this.setTotalesCero()
-        //     this.loadSocios()
-        //     this.loadMonedas()
-        // }
+        if (this.modal.mode == 1) {
+            this.setTotalesCero()
+            this.loadSocios()
+            this.loadMonedas()
+        }
     },
     methods: {
         showButtons() {

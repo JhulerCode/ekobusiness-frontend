@@ -95,7 +95,6 @@ export default {
             if (code != 0) return
 
             this.useAuth.token = token
-
             await this.useAuth.login()
             localStorage.setItem('remember-usuario', this.usuario)
             this.$router.replace({ name: 'ConsolaView' })

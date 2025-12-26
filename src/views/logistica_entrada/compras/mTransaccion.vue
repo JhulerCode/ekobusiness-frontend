@@ -172,11 +172,10 @@ export default {
 
         this.showButtons()
 
+        this.loadEmpresa()
         this.loadDatosSistema()
 
         if (this.modal.mode == 1) {
-            this.loadEmpresa()
-
             if (this.modal.transaccion.tipo == 5) {
                 if (this.modal.transaccion.socio_pedido) {
                     setTimeout(() => {

@@ -162,7 +162,7 @@ export default {
                 prop: 'socio_pedido1.codigo',
                 width: '10rem',
                 show: true,
-                seek: false,
+                seek: true,
                 sort: true,
             },
         ],

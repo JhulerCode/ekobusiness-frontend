@@ -29,16 +29,25 @@
                 />
             </template>
 
-            <template v-else>
+            <template v-if="modal.transaccion.socio_pedido">
                 <JdButton
                     icon="fa-solid fa-list-ul"
                     text="Items del pedido"
                     tipo="3"
                     @click="openPedidoItems"
+                    v-if="modal.transaccion.tipo == 5 && modal.mode == 1"
+                />
+
+                <JdButton
+                    icon="fa-solid fa-list-ul"
+                    text="Items del pedido"
+                    tipo="3"
+                    @click="openPedidoItems"
+                    v-if="modal.transaccion.tipo == 1"
                 />
             </template>
 
-            <template v-if="modal.transaccion.tipo == 5">
+            <template v-if="modal.transaccion.tipo == 5 && modal.mode == 3">
                 <JdButton
                     icon="fa-solid fa-wrench"
                     text="Auto colocar lotes"
@@ -52,11 +61,11 @@
         <JdTable
             :columns="columns"
             :datos="modal.transaccion.transaccion_items || []"
-            :colAct="modal.mode != 3"
+            :colAct="modal.mode == 1 || (modal.mode == 2 && modal.transaccion.tipo != 5)"
             :download="false"
             :seeker="modal.transaccion.socio_pedido != null"
             :maxHeight="modal.mode == 3 ? '18rem' : '14.5rem'"
-            :inputsDisabled="modal.mode == 3"
+            :inputsDisabled="modal.mode == 3 || (modal.mode == 2 && modal.transaccion.tipo == 5)"
             @onInput="runMethod"
         >
             <!-- :rowOptions="tableRowOptions"
@@ -139,9 +148,9 @@ import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
 import { useVistas } from '@/pinia/vistas'
 
-import { urls, get } from '@/utils/crud'
-import { jmsg } from '@/utils/swal'
-import { getItemFromArray, obtenerNumeroJuliano } from '@/utils/mine'
+import { urls, get, post, patch, delet } from '@/utils/crud'
+import { jmsg, jqst } from '@/utils/swal'
+import { getItemFromArray, obtenerNumeroJuliano, genCorrelativo } from '@/utils/mine'
 
 export default {
     components: {
@@ -342,7 +351,7 @@ export default {
 
             this.modal.articulos = JSON.parse(JSON.stringify(res.data))
         },
-        addArticulo(item) {
+        async addArticulo(item) {
             if (this.nuevo == null) return
             this.nuevo = null
             this.modal.articulos = []
@@ -350,7 +359,8 @@ export default {
             // const i = this.modal.transaccion.transaccion_items.findIndex(a => a.articulo == item.id)
             // if (i !== -1) return jmsg('warning', 'El artículo ya está agregado')
 
-            this.modal.transaccion.transaccion_items.push({
+            const send = {
+                orden: this.setOrden(),
                 id: crypto.randomUUID(),
                 articulo: item.id,
                 articulo1: {
@@ -371,7 +381,21 @@ export default {
                 mtoValorVenta: 0,
                 igv: 0,
                 total: 0,
-            })
+            }
+
+            if (this.modal.mode == 2) {
+                send.transaccion = this.modal.transaccion.id
+
+                this.useAuth.setLoading(true, 'Agregando...')
+                const res = await post(urls.transaccion_items, send, 'Agregado con éxito')
+                this.useAuth.setLoading(false)
+
+                if (res.code != 0) return
+
+                send.id = res.data.id
+            }
+
+            this.modal.transaccion.transaccion_items.push(send)
         },
 
         async openPreciosLista() {
@@ -395,12 +419,13 @@ export default {
             }
             this.useModals.setModal('mPreciosLista', 'Lista de precios', null, send, true)
         },
-        agregarArticulos(items) {
+        async agregarArticulos(items) {
             for (const a of items) {
                 // const i = this.modal.transaccion.transaccion_items.findIndex(b => b.articulo == a.articulo)
                 // if (i !== -1) continue
 
-                this.modal.transaccion.transaccion_items.push({
+                const send = {
+                    orden: this.setOrden(),
                     id: crypto.randomUUID(),
                     articulo: a.articulo,
                     articulo1: {
@@ -422,7 +447,21 @@ export default {
                     mtoValorVenta: 0,
                     igv: 0,
                     total: 0,
-                })
+                }
+
+                if (this.modal.mode == 2) {
+                    send.transaccion = this.modal.transaccion.id
+
+                    this.useAuth.setLoading(true, 'Agregando...')
+                    const res = await post(urls.transaccion_items, send, 'Agregado con éxito')
+                    this.useAuth.setLoading(false)
+
+                    if (res.code != 0) return
+
+                    send.id = res.data.id
+                }
+
+                this.modal.transaccion.transaccion_items.push(send)
             }
         },
 
@@ -434,41 +473,56 @@ export default {
 
             this.useModals.setModal('mPedidoItems', 'Items del pedido', null, send, true)
         },
-        agregarPedidoItems(items) {
+        async agregarPedidoItems(items) {
             for (const a of items) {
-                const i = this.modal.transaccion.transaccion_items.findIndex(
-                    (b) => b.articulo == a.articulo,
-                )
+                // const i = this.modal.transaccion.transaccion_items.findIndex(
+                //     (b) => b.articulo == a.articulo,
+                // )
 
-                if (i === -1) {
-                    this.modal.transaccion.transaccion_items.push({
-                        id: crypto.randomUUID(),
-                        articulo: a.articulo,
-                        articulo1: {
-                            nombre: a.articulo1.nombre,
-                            unidad: a.articulo1.unidad,
-                            has_fv: a.has_fv,
-                            is_combo: a.articulo1.is_combo,
-                            combo_articulos: a.articulo1.combo_articulos,
-                        },
+                // if (i === -1) continue
+                const send = {
+                    orden: this.setOrden(),
+                    id: crypto.randomUUID(),
+                    articulo: a.articulo,
+                    articulo1: {
+                        nombre: a.articulo1.nombre,
+                        unidad: a.articulo1.unidad,
+                        has_fv: a.has_fv,
+                        is_combo: a.articulo1.is_combo,
+                        combo_articulos: a.articulo1.combo_articulos,
+                    },
 
-                        cantidad: a.cantidad,
-                        // entregado: a.entregado,
-                        // faltante: a.cantidad - a.entregado,
+                    cantidad: a.cantidad,
+                    // entregado: a.entregado,
+                    // faltante: a.cantidad - a.entregado,
 
-                        lote: this.setLoteHoy(),
+                    lote: this.setLoteHoy(),
 
-                        pu: a.pu,
-                        igv_afectacion: a.igv_afectacion,
-                        igv_porcentaje: a.igv_porcentaje,
+                    pu: a.pu,
+                    igv_afectacion: a.igv_afectacion,
+                    igv_porcentaje: a.igv_porcentaje,
 
-                        mtoValorVenta: 0,
-                        igv: 0,
-                        total: 0,
-                    })
-                } else {
-                    this.modal.transaccion.transaccion_items[i].cantidad += a.cantidad
+                    mtoValorVenta: 0,
+                    igv: 0,
+                    total: 0,
                 }
+
+                if (this.modal.mode == 2) {
+                    send.transaccion = this.modal.transaccion.id
+
+                    this.useAuth.setLoading(true, 'Agregando...')
+                    const res = await post(urls.transaccion_items, send, 'Agregado con éxito')
+                    this.useAuth.setLoading(false)
+
+                    if (res.code != 0) return
+
+                    send.id = res.data.id
+                }
+
+                this.modal.transaccion.transaccion_items.push(send)
+                // } else {
+                //     this.modal.transaccion.transaccion_items[i].cantidad += a.cantidad
+                // }
             }
 
             this.sumarItems()
@@ -533,14 +587,6 @@ export default {
         //     delete send.i
         //     this.modal.transaccion.transaccion_items.splice(item.i + 1, 0, send)
         // },
-        quitar(item) {
-            if (item.entregado > 0) return jmsg('error', 'El artículo ya tiene ingresos')
-
-            const i = this.modal.transaccion.transaccion_items.findIndex((a) => a.id == item.id)
-            this.modal.transaccion.transaccion_items.splice(i, 1)
-
-            this.calcularTotales()
-        },
         openLotes(item) {
             const send = {
                 transaccion_item: item.id,
@@ -558,7 +604,6 @@ export default {
             )
             this.modal.transaccion.transaccion_items[i].kardexes = kardexes
         },
-
         async setLotes() {
             const falta = this.modal.transaccion.transaccion_items.some((a) => !a.cantidad)
 
@@ -678,6 +723,36 @@ export default {
                     }
                 }
             }
+        },
+
+        async modificar(item) {
+            if (this.modal.mode != 2) return
+
+            this.useAuth.setLoading(true, 'Actualizando...')
+            const res = await patch(urls.transaccion_items, item)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+        },
+        async quitar(item) {
+            if (this.modal.mode == 2) {
+                const qst = await jqst('¿Está seguro de eliminar?')
+                if (!qst.isConfirmed) return
+
+                this.useAuth.setLoading(true, 'Eliminando...')
+                const res = await delet(urls.transaccion_items, item)
+                this.useAuth.setLoading(false)
+
+                if (res.code != 0) return
+            }
+
+            const i = this.modal.transaccion.transaccion_items.findIndex((a) => a.id == item.id)
+            this.modal.transaccion.transaccion_items.splice(i, 1)
+
+            this.calcularTotales()
+        },
+        setOrden() {
+            return genCorrelativo(this.modal.transaccion.transaccion_items, 'orden')
         },
     },
 }

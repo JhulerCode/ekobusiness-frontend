@@ -228,7 +228,7 @@ export default {
         initTransaccion() {
             this.modal.transaccion = {
                 tipo: 2,
-                fecha: dayjs().format('YYYY-MM-DD'),
+                fecha: this.modal.produccion_orden.fecha,
                 produccion_orden: this.modal.produccion_orden.id,
                 maquina: this.modal.produccion_orden.maquina,
             }

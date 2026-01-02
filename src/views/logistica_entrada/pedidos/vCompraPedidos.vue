@@ -54,7 +54,7 @@ import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
 import { useModals } from '@/pinia/modals'
 
-import { urls, get, delet, patch } from '@/utils/crud'
+import { urls, get, delet, patch, post } from '@/utils/crud'
 import { jqst } from '@/utils/swal'
 // import { generarOcPDF } from '@/utils/jpdf'
 
@@ -199,6 +199,13 @@ export default {
                 ocultar: { estado: ['0', '2'] },
             },
             {
+                label: 'Recalcular entregados',
+                icon: 'fa-solid fa-calculator',
+                action: 'recalcularEntregados',
+                permiso: 'vCompraPedidos:recalcularEntregados',
+                ocultar: { estado: ['0', '2'] },
+            },
+            {
                 label: 'Ingresar mercadería',
                 icon: 'fa-regular fa-circle-up',
                 action: 'ingresarMercaderia',
@@ -273,9 +280,9 @@ export default {
             const cols = this.columns
             for (const a of cols) {
                 if (a.id == 'socio') a.reload = this.loadSocios
-                if (a.id == 'pago_condicion') a.lista = this.vista.estados
+                if (a.id == 'pago_condicion') a.lista = this.vista.pago_condiciones
                 if (a.id == 'moneda') a.reload = this.loadMonedas
-                if (a.id == 'estado') a.lista = this.vista.estados
+                if (a.id == 'estado') a.lista = this.vista.pedido_estados
             }
 
             const send = {
@@ -395,6 +402,23 @@ export default {
             if (res.code != 0) return
 
             this.useVistas.updateItem('vCompraPedidos', 'pedidos', res.data)
+        },
+        async recalcularEntregados(item) {
+            const resQst = await jqst('¿Está seguro de recalcular los entregados del pedido?')
+            if (resQst.isConfirmed == false) return
+
+            const send = {
+                socio_pedido: item.id,
+            }
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await post(
+                `${urls.socio_pedido_items}/recalcular-entregados`,
+                send,
+                'Entregados recalculados',
+            )
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
         },
         async ingresarMercaderia(item) {
             const qry = {

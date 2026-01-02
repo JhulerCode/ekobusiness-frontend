@@ -101,12 +101,6 @@ export default {
                 show: true,
                 sort: true,
             },
-            // {
-            //     id: 'orden',
-            //     title: 'Orden',
-            //     width: '5rem',
-            //     show: true,
-            // },
             {
                 id: 'unidad',
                 title: 'Unidad',
@@ -122,6 +116,13 @@ export default {
                 show: true,
                 oninput: 'sumarUno',
                 onchange: 'modificar',
+            },
+            {
+                id: 'entregado',
+                title: 'Entregado',
+                type: 'number',
+                width: '6rem',
+                show: false,
             },
             {
                 id: 'pu',
@@ -163,6 +164,10 @@ export default {
         this.modal = this.useModals.mSocioPedido
 
         this.sumarItems()
+
+        if (this.modal.mode == 3) {
+            this.columns.find((c) => c.id == 'entregado').show = true
+        }
     },
     methods: {
         async searchArticulos(txtBuscar) {

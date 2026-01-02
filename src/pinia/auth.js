@@ -74,6 +74,7 @@ export const useAuth = defineStore('auth', {
 
                             { id: 'vCompraPedidos:terminar', label: 'Terminar' },
                             { id: 'vCompraPedidos:generarPdf', label: 'Generar PDF' },
+                            { id: 'vCompraPedidos:recalcularEntregados', label: 'Recalcular entregados' },
                             { id: 'vCompraPedidos:ingresarMercaderia', label: 'Ingresar mercadería' },
                         ]
                     },

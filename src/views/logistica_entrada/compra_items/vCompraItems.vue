@@ -144,6 +144,16 @@ export default {
                 seek: true,
                 sort: true,
             },
+            {
+                id: 'transaccion1.socio_pedido',
+                title: 'Nro pedido',
+                prop: 'transaccion1.socio_pedido1.codigo',
+                filtrable: false,
+                width: '12rem',
+                show: true,
+                seek: true,
+                sort: true,
+            },
         ],
         // tableRowOptions: [
         //     {
@@ -176,7 +186,7 @@ export default {
                 incl: ['transaccion1', 'articulo1'],
                 iccl: {
                     transaccion1: {
-                        incl: ['socio1'],
+                        incl: ['socio1', 'socio_pedido1'],
                     },
                 },
             }

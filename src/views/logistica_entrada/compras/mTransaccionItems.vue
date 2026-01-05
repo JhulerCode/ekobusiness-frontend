@@ -47,7 +47,7 @@
                 />
             </template>
 
-            <template v-if="modal.transaccion.tipo == 5 && modal.mode == 3">
+            <template v-if="modal.transaccion.tipo == 5 && modal.mode != 3">
                 <JdButton
                     icon="fa-solid fa-wrench"
                     text="Auto colocar lotes"

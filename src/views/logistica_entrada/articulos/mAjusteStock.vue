@@ -6,7 +6,7 @@
                 label="Fecha"
                 :nec="true"
                 v-model="modal.transaccion.fecha"
-                :disabled="true"
+                :disabled="false"
                 style="grid-column: 1/3"
             />
 

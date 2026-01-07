@@ -14,7 +14,7 @@
                 label="Tipo"
                 :nec="true"
                 v-model="modal.transaccion.tipo"
-                :lista="modal.transaccion_tipos?.filter((a) => a.id == 6 || a.id == 7) || []"
+                :lista="modal.kardex_operaciones?.filter((a) => a.id == 6 || a.id == 7) || []"
                 style="grid-column: 1/3"
                 @elegir="modal.is_nuevo_lote = false"
             />
@@ -293,7 +293,7 @@ export default {
         },
 
         async loadDatosSistema() {
-            const qry = ['transaccion_tipos', 'empresa']
+            const qry = ['kardex_operaciones', 'empresa']
             const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
 
             if (res.code != 0) return

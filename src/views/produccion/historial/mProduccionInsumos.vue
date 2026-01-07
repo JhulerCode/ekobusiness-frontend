@@ -332,14 +332,14 @@ export default {
                 return true
             }
 
-            // const lote_padre = this.modal.lotes.find(
-            //     (a) => a.id == this.modal.transaccion.lote_padre,
-            // )
+            const lote_padre = this.modal.lotes.find(
+                (a) => a.id == this.modal.transaccion.lote_padre,
+            )
 
-            // if (lote_padre.stock < this.modal.transaccion.cantidad) {
-            //     jmsg('warning', 'Stock insuficiente')
-            //     return true
-            // }
+            if (lote_padre.stock < this.modal.transaccion.cantidad) {
+                jmsg('warning', 'Stock insuficiente')
+                return true
+            }
 
             return false
         },

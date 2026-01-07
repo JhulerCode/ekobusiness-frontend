@@ -15,6 +15,12 @@
             />
 
             <JdSwitch label="Activo" v-model="articulo_linea.activo" :disabled="modal.mode == 3" />
+
+            <JdSwitch
+                label="Ecommerce?"
+                v-model="articulo_linea.is_ecommerce"
+                :disabled="modal.mode == 3"
+            />
         </div>
     </JdModal>
 </template>

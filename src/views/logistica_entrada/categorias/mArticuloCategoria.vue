@@ -24,11 +24,19 @@
                 :disabled="modal.mode == 3"
             />
 
-            <JdSwitch
-                label="Destacado"
-                v-model="articulo_categoria.is_destacado"
-                :disabled="modal.mode == 3"
-            />
+            <template v-if="articulo_categoria.tipo == 2">
+                <JdSwitch
+                    label="Ecommerce?"
+                    v-model="articulo_categoria.is_ecommerce"
+                    :disabled="modal.mode == 3"
+                />
+
+                <JdSwitch
+                    label="Destacado"
+                    v-model="articulo_categoria.is_destacado"
+                    :disabled="modal.mode == 3"
+                />
+            </template>
         </div>
     </JdModal>
 </template>

@@ -85,6 +85,17 @@ export default {
                 sort: false,
             },
             {
+                id: 'is_ecommerce',
+                title: 'Ecommerce?',
+                prop: 'is_ecommerce1.nombre',
+                type: 'select',
+                format: 'yesno',
+                width: '10rem',
+                show: true,
+                seek: false,
+                sort: false,
+            },
+            {
                 id: 'is_destacado',
                 title: 'Destacado?',
                 prop: 'is_destacado1.nombre',

@@ -543,7 +543,7 @@ export default {
             const qry = {
                 fltr: { linea: { op: 'Es', val: this.columns[6].val } },
                 cols: ['codigo', 'nombre', 'linea', 'velocidad', 'limpieza_tiempo'],
-                ordr: [['nombre', 'ASC']],
+                ordr: [['orden', 'ASC']],
             }
 
             this.vista.maquinas = []

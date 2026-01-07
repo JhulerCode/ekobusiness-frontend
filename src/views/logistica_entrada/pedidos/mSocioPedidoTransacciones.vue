@@ -33,31 +33,43 @@ export default {
 
         columns: [
             {
-                id: 'fecha',
+                id: 'transaccion1.fecha',
+                prop: 'transaccion1.fecha',
                 title: 'Fecha',
                 width: '8rem',
                 show: true,
                 sort: true,
             },
             {
-                id: 'guia',
+                id: 'transaccion1.guia',
+                prop: 'transaccion1.guia',
                 title: 'Guia',
                 width: '8rem',
                 show: true,
                 sort: true,
             },
             {
-                id: 'factura',
+                id: 'transaccion1.factura',
+                prop: 'transaccion1.factura',
                 title: 'Factura',
                 width: '8rem',
                 show: true,
                 sort: true,
             },
             {
-                id: 'monto',
-                title: 'Importe',
+                id: 'articulo',
+                title: 'Artículo',
+                prop: 'articulo1.nombre',
+                width: '20rem',
+                show: true,
+                sort: true,
+            },
+            {
+                id: 'cantidad',
+                title: 'Cantidad',
                 type: 'decimal',
-                width: '8rem',
+                toRight: true,
+                width: '6rem',
                 show: true,
             },
         ],
@@ -73,15 +85,16 @@ export default {
         async loadTransacciones() {
             const qry = {
                 fltr: {
-                    socio_pedido: { op: 'Es', val: this.modal.socio_pedido.id },
+                    'transaccion1.socio_pedido': { op: 'Es', val: this.modal.socio_pedido.id },
                 },
+                incl: ['transaccion1', 'articulo1'],
                 ordr: [['fecha', 'DESC']],
             }
 
             this.useAuth.updateQuery(this.columns, qry)
 
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.transacciones}?qry=${JSON.stringify(qry)}`)
+            const res = await get(`${urls.transaccion_items}?qry=${JSON.stringify(qry)}`)
             this.useAuth.setLoading(false)
 
             if (res.code !== 0) return

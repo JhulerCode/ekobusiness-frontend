@@ -20,64 +20,66 @@
                 v-if="modal.transaccion.maquina"
             />
 
-            <template v-if="modal.transaccion.maquina">
+            <template v-if="ot_abierto">
+                <template v-if="modal.transaccion.maquina">
+                    <JdSelect
+                        label="Insumo"
+                        :nec="true"
+                        v-model="modal.transaccion.articulo"
+                        id="articulo"
+                        :lista="articulos_compartidos"
+                        @elegir="loadLotes"
+                        style="grid-column: 1/3"
+                    />
+                </template>
+
+                <template v-else>
+                    <JdSelectQuery
+                        label="Artículo"
+                        :nec="true"
+                        v-model="modal.transaccion.articulo"
+                        :spin="modal.spinArticulos"
+                        :lista="modal.articulos"
+                        @search="searchArticulos"
+                        @elegir="loadLotes"
+                        style="grid-column: 1/3"
+                    />
+                </template>
+
                 <JdSelect
-                    label="Insumo"
+                    label="Lote"
                     :nec="true"
-                    v-model="modal.transaccion.articulo"
-                    id="articulo"
-                    :lista="articulos_compartidos"
-                    @elegir="loadLotes"
+                    v-model="modal.transaccion.lote_padre"
+                    :lista="modal.lotes || []"
+                    mostrar="lote_fv_stock"
+                    :loaded="modal.lotesLoaded"
+                    @reload="loadLotes"
                     style="grid-column: 1/3"
                 />
-            </template>
 
-            <template v-else>
-                <JdSelectQuery
-                    label="Artículo"
+                <JdInput
+                    type="number"
+                    label="Cantidad"
                     :nec="true"
-                    v-model="modal.transaccion.articulo"
-                    :spin="modal.spinArticulos"
-                    :lista="modal.articulos"
-                    @search="searchArticulos"
-                    @elegir="loadLotes"
+                    v-model="modal.transaccion.cantidad"
+                    style="grid-column: 1/2"
+                />
+
+                <JdTextArea
+                    label="Observación"
+                    v-model="modal.transaccion.observacion"
                     style="grid-column: 1/3"
                 />
+
+                <JdButton text="Grabar" tipo="2" @click="grabar" style="grid-column: 3/4" />
             </template>
-
-            <JdSelect
-                label="Lote"
-                :nec="true"
-                v-model="modal.transaccion.lote_padre"
-                :lista="modal.lotes || []"
-                mostrar="lote_fv_stock"
-                :loaded="modal.lotesLoaded"
-                @reload="loadLotes"
-                style="grid-column: 1/3"
-            />
-
-            <JdInput
-                type="number"
-                label="Cantidad"
-                :nec="true"
-                v-model="modal.transaccion.cantidad"
-                style="grid-column: 1/2"
-            />
-
-            <JdTextArea
-                label="Observación"
-                v-model="modal.transaccion.observacion"
-                style="grid-column: 1/3"
-            />
-
-            <JdButton text="Grabar" tipo="2" @click="grabar" style="grid-column: 3/4" />
         </div>
 
         <JdTable
             :columns="columns"
             :datos="modal.produccion_insumos || []"
             width="61rem"
-            :colAct="modal.tableColAct"
+            :colAct="ot_abierto"
             :download="false"
             :reload="loadProduccionInsumos"
             colActWidth="4.5rem"
@@ -240,20 +242,29 @@ export default {
             },
         ],
     }),
+    computed: {
+        ot_abierto() {
+            if (this.modal.maquina) {
+                return this.modal.maquina.produccion_ordenes.some((a) => a.estado == 1)
+            } else {
+                return true
+            }
+        },
+    },
     async created() {
         this.modal = this.useModals.mProduccionInsumosCompartidos
 
-        this.modal.tableColAct = false
+        // this.modal.tableColAct = false
 
-        if (this.modal.maquina) {
-            if (this.modal.maquina.produccion_ordenes.some((a) => a.estado == 1)) {
-                this.modal.tableColAct = true
-            } else {
-                this.modal.tableColAct = false
-            }
-        } else {
-            this.modal.tableColAct = true
-        }
+        // if (this.modal.maquina) {
+        //     if (this.modal.maquina.produccion_ordenes.some((a) => a.estado == 1)) {
+        //         this.modal.tableColAct = true
+        //     } else {
+        //         this.modal.tableColAct = false
+        //     }
+        // } else {
+        //     this.modal.tableColAct = true
+        // }
 
         // await this.loadMaquinas()
         await this.loadProduccionInsumos()

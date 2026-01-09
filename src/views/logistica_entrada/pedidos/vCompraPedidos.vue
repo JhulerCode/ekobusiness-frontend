@@ -184,6 +184,7 @@ export default {
                 icon: 'fa-solid fa-trash-can',
                 action: 'eliminar',
                 permiso: 'vCompraPedidos:eliminar',
+                ocultar: { estado: ['0', '2'] },
             },
             {
                 label: 'Exportar en PDF',

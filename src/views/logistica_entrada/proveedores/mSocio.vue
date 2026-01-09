@@ -130,19 +130,19 @@ export default {
                 return true
             }
 
-            if (this.socio.direcciones.length == 0) {
-                jmsg('warning', 'Agregue al menos una dirección')
-                return true
-            }
+            // if (this.socio.direcciones.length == 0) {
+            //     jmsg('warning', 'Agregue al menos una dirección')
+            //     return true
+            // }
 
-            if (this.socio.tipo == 1) {
-                if (this.socio.doc_tipo == 6) {
-                    if (this.socio.contactos.length == 0) {
-                        jmsg('warning', 'Agregue al menos un contacto')
-                        return true
-                    }
-                }
-            }
+            // if (this.socio.tipo == 1) {
+            //     if (this.socio.doc_tipo == 6) {
+            //         if (this.socio.contactos.length == 0) {
+            //             jmsg('warning', 'Agregue al menos un contacto')
+            //             return true
+            //         }
+            //     }
+            // }
 
             return false
         },

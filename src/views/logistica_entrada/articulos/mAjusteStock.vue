@@ -289,7 +289,7 @@ export default {
             if (res.code != 0) return
 
             this.initTransaccion()
-            // this.useModals.show.mAjusteStock = false
+            this.useModals.show.mAjusteStock = false
         },
 
         async loadDatosSistema() {

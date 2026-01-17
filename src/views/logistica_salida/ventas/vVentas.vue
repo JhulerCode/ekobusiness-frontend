@@ -309,7 +309,9 @@ export default {
                 ordr: [['orden', 'ASC']],
             }
 
+            this.useAuth.setLoading(true, 'Cargando...')
             const res2 = await get(`${urls.transaccion_items}?qry=${JSON.stringify(qry2)}`)
+            this.useAuth.setLoading(false)
 
             if (res2.code != 0) return
 

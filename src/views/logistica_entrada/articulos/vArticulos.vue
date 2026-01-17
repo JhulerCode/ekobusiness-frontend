@@ -59,8 +59,8 @@
 </template>
 
 <script>
-import { JdButton, JdTable, mConfigFiltros, mConfigCols } from '@jhuler/components'
-import mEditar from '@/components/mEditar.vue'
+import { JdButton, JdTable, mConfigFiltros, mConfigCols, mEditar } from '@jhuler/components'
+// import mEditar from '@/components/mEditar.vue'
 
 import mImportarArticulos from '@/views/logistica_entrada/articulos/mImportarArticulos.vue'
 import mArticulo from '@/views/logistica_entrada/articulos/mArticulo.vue'
@@ -422,7 +422,6 @@ export default {
         async editarBulk() {
             await this.loadDatosSistema()
 
-            const cols = this.columns
             for (const a of this.columns) {
                 if (a.id == 'unidad') a.lista = this.vista.unidades
                 if (a.id == 'has_fv') a.lista = this.vista.estados
@@ -431,6 +430,7 @@ export default {
                 if (a.id == 'igv_afectacion') a.lista = this.vista.igv_afectaciones
                 if (a.id == 'categoria') a.reload = this.loadCategorias
             }
+            const cols = this.columns
 
             const ids = this.vista.articulos.filter((a) => a.selected).map((b) => b.id)
 

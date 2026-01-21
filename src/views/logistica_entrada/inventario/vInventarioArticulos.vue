@@ -10,6 +10,7 @@
             :columns="columns"
             :datos="vista.inventario || []"
             :configFiltros="openConfigFiltros"
+            :reload="loadInventario"
         />
     </div>
 
@@ -90,6 +91,17 @@ export default {
                 seek: true,
                 sort: true,
             },
+            {
+                id: 'articulo_movimientos_valorizado',
+                title: 'Valor',
+                format: 'decimal',
+                toRight: true,
+                filtrable: false,
+                width: '7rem',
+                show: true,
+                seek: true,
+                sort: true,
+            },
         ],
     }),
     created() {
@@ -113,7 +125,12 @@ export default {
         setQuery() {
             this.vista.qry = {
                 incl: ['categoria1', 'kardexes'],
-                sqls: ['articulo_movimientos_cantidad'],
+                iccl: {
+                    kardexes: {
+                        incl: ['lote_padre2'],
+                    }
+                },
+                sqls: ['articulo_movimientos_cantidad', 'articulo_movimientos_valorizado'],
                 fltr: {
                     tipo: { op: 'Es', val: 1 },
                 },

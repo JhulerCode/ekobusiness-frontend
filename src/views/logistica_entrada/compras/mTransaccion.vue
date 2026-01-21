@@ -27,6 +27,13 @@
                     style="grid-column: 1/4"
                 />
 
+                <div style="grid-column: 4/5" v-if="modal.transaccion.moneda">
+                    <small v-if="modal.transaccion.tipo_cambio">
+                        TC: {{ modal.transaccion.tipo_cambio }}
+                    </small>
+                    <small v-else> TC: no encontrado </small>
+                </div>
+
                 <JdInput
                     label="Guía de remisión"
                     :nec="true"

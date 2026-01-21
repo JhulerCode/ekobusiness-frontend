@@ -5,7 +5,8 @@
             v-if="
                 modal.mode != 3 &&
                 modal.transaccion.socio != null &&
-                modal.transaccion.moneda != null
+                modal.transaccion.moneda != null &&
+                modal.transaccion.tipo_cambio
             "
         >
             <template v-if="!modal.transaccion.socio_pedido">

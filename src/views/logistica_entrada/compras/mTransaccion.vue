@@ -246,9 +246,13 @@ export default {
             if (this.modal.mode != 1) this.loadSocios()
         },
 
-        changeDate() {
+        async changeDate() {
             for (const a of this.modal.transaccion.transaccion_items) {
                 a.lote = this.setLote()
+            }
+
+            if (this.modal.transaccion.moneda) {
+                this.setTipoCambio()
             }
         },
         setLote() {
@@ -448,7 +452,7 @@ export default {
                 ],
             }
 
-            this.useAuth.setLoading(true, 'Cargando...')
+            this.useAuth.setLoading(true, 'Cargando tipo de cambio...')
             this.modal.monedasLoaded = false
             const res = await get(`${urls.monedas}?qry=${JSON.stringify(qry)}`)
             this.useAuth.setLoading(false)

@@ -75,6 +75,7 @@ export const useAuth = defineStore('auth', {
                             { id: 'vCompraPedidos:terminar', label: 'Terminar' },
                             { id: 'vCompraPedidos:generarPdf', label: 'Generar PDF' },
                             { id: 'vCompraPedidos:recalcularEntregados', label: 'Recalcular entregados' },
+                            { id: 'vCompraPedidos:entregarMercaderia', label: 'Entregar mercadería' },
                             { id: 'vCompraPedidos:ingresarMercaderia', label: 'Ingresar mercadería' },
                         ]
                     },
@@ -211,6 +212,15 @@ export const useAuth = defineStore('auth', {
             },
             {
                 id: 'produccion', label: 'Producción', icon: 'fa-solid fa-oil-well', children: [
+                    {
+                        label: 'Lista de materiales', goto: 'vMrpBom', permisos: [
+                            { id: 'vMrpBom:listar', label: 'Listar' },
+                            { id: 'vMrpBom:crear', label: 'Crear' },
+                            { id: 'vMrpBom:ver', label: 'Ver' },
+                            { id: 'vMrpBom:editar', label: 'Editar' },
+                            { id: 'vMrpBom:eliminar', label: 'Eliminar' },
+                        ]
+                    },
                     {
                         label: 'Programa', goto: 'vPrograma', permisos: [
                             { id: 'vPrograma:listar', label: 'Listar' },

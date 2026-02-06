@@ -23,9 +23,8 @@
         <vVentaItems v-if="useVistas.show.vVentaItems" />
         <vInventarioProductos v-if="useVistas.show.vInventarioProductos" />
 
+        <vMrpBom v-if="useVistas.show.vMrpBom" />
         <vPrograma v-if="useVistas.show.vPrograma" />
-        <!-- <vProgramaGranel v-if="useVistas.show.vProgramaGranel" />
-        <vProgramaLuxury v-if="useVistas.show.vProgramaLuxury" /> -->
         <vProduccionHistorial v-if="useVistas.show.vProduccionHistorial" />
         <vProductosCuarentena v-if="useVistas.show.vProductosCuarentena" />
         <vReporteProduccion v-if="useVistas.show.vReporteProduccion" />
@@ -77,9 +76,8 @@ import vVentaItems from '@/views/logistica_salida/venta_items/vVentaItems.vue'
 import vInventarioProductos from '@/views/logistica_salida/inventario/vInventarioProductos.vue'
 
 // ----- PRODUCCIÓN ----- //
+import vMrpBom from '@/views/produccion/mrp_bom/vMrpBom.vue'
 import vPrograma from '@/views/produccion/vPrograma.vue'
-// import vProgramaGranel from '@/views/produccion/granel/vProgramaGranel.vue'
-// import vProgramaLuxury from '@/views/produccion/piramidal/vProgramaLuxury.vue'
 import vProduccionHistorial from '@/views/produccion/historial/vProduccionHistorial.vue'
 import vProductosCuarentena from '@/views/produccion/vProductosCuarentena.vue'
 import vReporteProduccion from '@/views/produccion/vReporteProduccion.vue'
@@ -130,9 +128,8 @@ export default {
         vVentaItems,
         vInventarioProductos,
 
+        vMrpBom,
         vPrograma,
-        // vProgramaGranel,
-        // vProgramaLuxury,
         vProduccionHistorial,
         vProductosCuarentena,
         vReporteProduccion,

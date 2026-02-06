@@ -26,6 +26,8 @@ const urls = {
     kardex: `${host}/api/kardex`,
     maquinas: `${host}/api/maquinas`,
     monedas: `${host}/api/monedas`,
+    mrp_boms: `${host}/api/mrp_boms`,
+    mrp_bom_lines: `${host}/api/mrp_bom_lines`,
     precio_listas: `${host}/api/precio_listas`,
     precio_lista_items: `${host}/api/precio_lista_items`,
     produccion_ordenes: `${host}/api/produccion_ordenes`,

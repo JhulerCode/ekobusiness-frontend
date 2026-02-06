@@ -14,7 +14,7 @@ function deepCopy(obj) {
     return JSON.parse(JSON.stringify(obj))
 }
 
-function genCorrelativo(array, prop = 'id') {
+function genCorrelativo(array, prop = 'orden') {
     const max = array.length
         ? array.reduce(
             (m, o) => Math.max(m, Number(o[prop]) || 0),

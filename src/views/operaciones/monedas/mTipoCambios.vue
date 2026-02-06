@@ -62,6 +62,7 @@ export default {
                 width: '8rem',
                 show: true,
                 seek: true,
+                sort: true,
             },
             {
                 id: 'compra',

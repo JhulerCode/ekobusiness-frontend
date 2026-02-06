@@ -44,7 +44,7 @@
                     text="Items del pedido"
                     tipo="3"
                     @click="openPedidoItems"
-                    v-if="modal.transaccion.tipo == 1"
+
                 />
             </template>
 

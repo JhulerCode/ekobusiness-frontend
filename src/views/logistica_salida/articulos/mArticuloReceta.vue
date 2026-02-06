@@ -153,7 +153,7 @@ export default {
 
             const qry = {
                 fltr: {
-                    tipo: { op: 'Es', val: 1 },
+                    type: { op: 'Es', val: 'consumable' },
                     activo: { op: 'Es', val: true },
                     nombre: { op: 'Contiene', val: txtBuscar },
                 },

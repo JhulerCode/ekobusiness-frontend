@@ -1,22 +1,48 @@
 <template>
     <JdModal modal="mPrecioListaItems">
         <div>
-            <div class="container-datos" v-if="this.useAuth.verifyPermiso('vPrecioListaItems:crear')">
-                <JdSelectQuery label="Artículo" v-model="nuevo.articulo" :spin="spinArticulos" :lista="articulos"
-                    @search="searchArticulos" style="grid-column: 1/5" />
+            <div
+                class="container-datos"
+                v-if="this.useAuth.verifyPermiso('vPrecioListaItems:crear')"
+            >
+                <JdSelectQuery
+                    label="Artículo"
+                    v-model="nuevo.articulo"
+                    :spin="spinArticulos"
+                    :lista="articulos"
+                    @search="searchArticulos"
+                    style="grid-column: 1/5"
+                />
 
-                <JdInput label="Valor unitario" type="number" :nec="true" v-model="nuevo.precio" style="grid-column: 1/3" />
+                <JdInput
+                    label="Valor unitario"
+                    type="number"
+                    :nec="true"
+                    v-model="nuevo.precio"
+                    style="grid-column: 1/3"
+                />
 
                 <JdButton text="Agregar" @click="crear()" />
             </div>
 
-            <JdTable :columns="columns" :datos="modal.precio_lista_items || []" maxHeight="29rem" :colAct="true"
-                :reload="loadPrecioListaItems" @onChange="(action, a) => this[action](a)"
-                :inputsDisabled="!this.useAuth.verifyPermiso('vPrecioListaItems:editar')">
-
+            <JdTable
+                :columns="columns"
+                :datos="modal.precio_lista_items || []"
+                maxHeight="29rem"
+                :colAct="true"
+                :reload="loadPrecioListaItems"
+                @onChange="(action, a) => this[action](a)"
+                :inputsDisabled="!this.useAuth.verifyPermiso('vPrecioListaItems:editar')"
+            >
                 <template v-slot:cAction="{ item }">
-                    <JdButton icon="fa-solid fa-trash-can" title="Eliminar" tipo="2" :small="true"
-                        @click="eliminar(item)" v-if="this.useAuth.verifyPermiso('vPrecioListaItems:eliminar')" />
+                    <JdButton
+                        icon="fa-solid fa-trash-can"
+                        title="Eliminar"
+                        tipo="2"
+                        :small="true"
+                        @click="eliminar(item)"
+                        v-if="this.useAuth.verifyPermiso('vPrecioListaItems:eliminar')"
+                    />
                 </template>
             </JdTable>
         </div>
@@ -148,7 +174,7 @@ export default {
 
             if (res.code != 0) return
 
-            const i = this.modal.precio_lista_items.findIndex(a => a.id == item.id)
+            const i = this.modal.precio_lista_items.findIndex((a) => a.id == item.id)
             this.modal.precio_lista_items.splice(i, 1)
         },
 
@@ -160,7 +186,7 @@ export default {
 
             const qry = {
                 fltr: {
-                    tipo: { op: 'Es', val: 1 },
+                    purchase_ok: { op: 'Es', val: true },
                     activo: { op: 'Es', val: true },
                     nombre: { op: 'Contiene', val: txtBuscar },
                 },
@@ -176,7 +202,7 @@ export default {
 
             this.articulos = JSON.parse(JSON.stringify(res.data))
         },
-    }
+    },
 }
 </script>
 

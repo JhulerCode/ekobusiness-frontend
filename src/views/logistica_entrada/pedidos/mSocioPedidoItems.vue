@@ -178,12 +178,17 @@ export default {
 
             const qry = {
                 fltr: {
-                    tipo: { op: 'Es', val: this.modal.socio_pedido.tipo },
                     activo: { op: 'Es', val: true },
                     nombre: { op: 'Contiene', val: txtBuscar },
                 },
                 cols: ['nombre', 'unidad', 'igv_afectacion', 'has_fv'],
                 ordr: [['nombre', 'ASC']],
+            }
+
+            if (this.modal.socio_elegido.tipo == 1) {
+                qry.fltr.purchase_ok = { op: 'Es', val: true }
+            } else {
+                qry.fltr.sale_ok = { op: 'Es', val: true }
             }
 
             this.modal.spinArticulos = true
@@ -326,7 +331,7 @@ export default {
                 // ----- BUSCA LOS ARTICULOS ----- //
                 const qry = {
                     fltr: {
-                        tipo: { op: 'Es', val: 2 },
+                        sale_ok: { op: 'Es', val: true },
                         activo: { op: 'Es', val: true },
                         codigo_barra: { op: 'Son', val: res.data.map((a) => a.EAN) },
                     },

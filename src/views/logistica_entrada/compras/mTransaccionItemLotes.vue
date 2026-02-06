@@ -22,7 +22,6 @@
                 @elegir="setNuevoArticulo"
                 v-else
             />
-            <!-- @reload="loadComboArticulos(item)" -->
 
             <JdSelect
                 label="Lotes"
@@ -157,31 +156,6 @@ export default {
             }
         },
 
-        // async loadComboArticulos() {
-        //     const qry = {
-        //         fltr: {
-        //             id: {
-        //                 op: 'Es',
-        //                 val: this.modal.articulo1.combo_articulos.map((a) => a.articulo),
-        //             },
-        //         },
-        //         cols: ['id', 'nombre'],
-        //         ordr: [['nombre', 'ASC']],
-        //     }
-
-        //     this.useAuth.setLoading(true, 'Cargando...')
-        //     const res = await get(`${urls.articulos}?qry=${JSON.stringify(qry)}`)
-        //     this.useAuth.setLoading(false)
-
-        //     if (res.code !== 0) return
-
-        //     this.modal.articulo1.combo_articulos = res.data
-
-        //     if (res.data.length > 0) {
-        //         this.nuevo.articulo = res.data[0].id
-        //         this.setNuevoArticulo(res.data[0])
-        //     }
-        // },
         setNuevoArticulo(item) {
             this.modal.lotes = []
 

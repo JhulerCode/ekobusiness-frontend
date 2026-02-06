@@ -44,7 +44,6 @@
                     text="Items del pedido"
                     tipo="3"
                     @click="openPedidoItems"
-
                 />
             </template>
 
@@ -329,7 +328,6 @@ export default {
 
             const qry = {
                 fltr: {
-                    tipo: { op: 'Es', val: this.modal.transaccion.tipo == 1 ? 1 : 2 },
                     activo: { op: 'Es', val: true },
                     nombre: { op: 'Contiene', val: txtBuscar },
                 },
@@ -342,6 +340,12 @@ export default {
                     'combo_articulos',
                 ],
                 ordr: [['nombre', 'ASC']],
+            }
+
+            if (this.modal.transaccion.tipo == 1) {
+                qry.fltr.purchase_ok = { op: 'Es', val: true }
+            } else {
+                qry.fltr.sale_ok = { op: 'Es', val: true }
             }
 
             this.modal.spinArticulos = true

@@ -1,55 +1,55 @@
 @import url('https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@100..900&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Lora:ital,wght@0,400..700;1,400..700&family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400;1,700;1,900&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap');
 
 :root {
-	--primary-color: #2492c2;
-	--primary-color-dark: #2083ae;
-	--verde: #34d16e;
+    --primary-color: #2492c2;
+    --primary-color-dark: #2083ae;
+    --verde: #34d16e;
     --amarillo: #ffb22b;
-	--rojo: #e94343;
-    --morado: #A855F7;
+    --rojo: #e94343;
+    --morado: #a855f7;
 
-	--bg-color: #ffffff;
-	--bg-color-hover: whitesmoke;
-	--bg-color-selected: #def8f2;
+    --bg-color: #ffffff;
+    --bg-color-hover: whitesmoke;
+    --bg-color-selected: #def8f2;
 
-	--bg-color2: #f2f2f2;
-	--bg-color-transparent: rgba(0, 0, 0, 0.5);
+    --bg-color2: #f2f2f2;
+    --bg-color-transparent: rgba(0, 0, 0, 0.5);
 
-	--text-color: black;
-	--text-color2: rgba(60, 60, 60, 0.66);
+    --text-color: black;
+    --text-color2: rgba(60, 60, 60, 0.66);
 
-	--border: solid 1px #dfdfdf;
-	--shadow-color: #d1d0d0;
+    --border: solid 1px #dfdfdf;
+    --shadow-color: #d1d0d0;
 
-	scrollbar-color: var(--text-color2) var(--bg-color2);
+    scrollbar-color: var(--text-color2) var(--bg-color2);
 }
 
 body.dark-mode {
-	--bg-color: #181818;
-	--bg-color-hover: #262626;
-	--bg-color-selected: #262c37;
+    --bg-color: #181818;
+    --bg-color-hover: #262626;
+    --bg-color-selected: #262c37;
 
-	--bg-color2: #282828;
-	--bg-color-transparent: rgba(0, 0, 0, 0.7);
+    --bg-color2: #282828;
+    --bg-color-transparent: rgba(0, 0, 0, 0.7);
 
-	--text-color: #ffffffe1;
-	--text-color2: rgba(235, 235, 235, 0.64);
+    --text-color: #ffffffe1;
+    --text-color2: rgba(235, 235, 235, 0.64);
 
-	--border: solid 1px #333;
-	--shadow-color: #333;
+    --border: solid 1px #333;
+    --shadow-color: #333;
 
-	scrollbar-color: var(--text-color2) var(--bg-color2);
+    scrollbar-color: var(--text-color2) var(--bg-color2);
 }
 
 * {
-	margin: 0;
-	padding: 0;
-	box-sizing: border-box;
-	font-family: "Rubik", sans-serif;
-	border: none;
-	outline: none;
-	color: var(--text-color);
-	font-size: 14px;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Rubik', sans-serif;
+    border: none;
+    outline: none;
+    color: var(--text-color);
+    font-size: 14px;
 }
 
 body {
@@ -58,93 +58,98 @@ body {
 
 p,
 strong {
-	font-size: 1rem;
+    font-size: 1rem;
 }
 
 small {
-	font-size: 0.8rem;
-	color: var(--text-color2);
+    font-size: 0.8rem;
+    color: var(--text-color2);
 }
 
 ul {
-	padding: 0;
-	margin: 0;
+    padding: 0;
+    margin: 0;
 }
 
 li {
-	list-style: none;
+    list-style: none;
 }
 
 a {
-	text-decoration: none;
+    text-decoration: none;
 }
 
 .mrg-btm05 {
-	margin-bottom: 0.5rem;
+    margin-bottom: 0.5rem;
 }
 
 .mrg-btm1 {
-	margin-bottom: 1rem;
+    margin-bottom: 1rem;
 }
 
 .mrg-btm2 {
-	margin-bottom: 2rem;
+    margin-bottom: 2rem;
 }
 
 .mrg-top05 {
-	margin-top: 0.5rem;
+    margin-top: 0.5rem;
 }
 
 .mrg-top1 {
-	margin-top: 1rem;
+    margin-top: 1rem;
 }
 
 .mrg-top2 {
-	margin-top: 2rem;
+    margin-top: 2rem;
 }
 
 .max-1line {
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .max-2lines {
-	display: -webkit-box;
-	-webkit-line-clamp: 2;
-	-webkit-box-orient: vertical;
-	overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
 .botones {
-	display: flex;
-	justify-content: right;
-	gap: 0.5rem;
+    display: flex;
+    justify-content: right;
+    gap: 0.5rem;
 }
 
 @keyframes bounce-in {
-	0% {
-		transform: scale(0.5)
-	}
+    0% {
+        transform: scale(0.5);
+    }
 
-	50% {
-		transform: scale(1.1)
-	}
+    50% {
+        transform: scale(1.1);
+    }
 
-	100% {
-		transform: scale(1)
-	}
+    100% {
+        transform: scale(1);
+    }
 }
 
 .scroll-tiny {
-	&::-webkit-scrollbar {
-		width: 0.6rem;
-		height: 0.6rem;
-	}
+    &::-webkit-scrollbar {
+        width: 0.6rem;
+        height: 0.6rem;
+    }
 
-	&::-webkit-scrollbar-thumb {
-		border: solid 0.1rem var(--bg-color);
-		background-color: var(--bg-color2);
-		border-radius: 0.3rem;
-	}
+    &::-webkit-scrollbar-thumb {
+        border: solid 0.1rem var(--bg-color);
+        background-color: var(--bg-color2);
+        border-radius: 0.3rem;
+    }
+}
+
+* {
+    /* scrollbar-color: red orange; */
+    scrollbar-width: thin;
 }

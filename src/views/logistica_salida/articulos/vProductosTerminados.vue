@@ -20,15 +20,15 @@
                     v-if="useAuth.verifyPermiso('vProductosTerminados:importar')"
                 />
 
-                <JdButton
+                <!-- <JdButton
                     text="Nuevo combo"
                     tipo="2"
                     @click="nuevoCombo()"
                     v-if="useAuth.verifyPermiso('vProductosTerminados:crearCombo')"
-                />
+                /> -->
 
                 <JdButton
-                    text="Crear nuevo"
+                    text="Nuevo"
                     @click="nuevo()"
                     v-if="useAuth.verifyPermiso('vProductosTerminados:crear')"
                 />
@@ -353,9 +353,17 @@ export default {
         if (this.useAuth.verifyPermiso('vProductosTerminados:listar') == true) this.loadArticulos()
     },
     methods: {
+        verifyRowSelectIsActive() {
+            if (this.vista.articulos && this.vista.articulos.some((a) => a.selected)) {
+                setTimeout(() => {
+                    this.$refs['jdtable'].toogleSelectItems()
+                }, 0)
+            }
+        },
+
         setQuery() {
             this.vista.qry = {
-                fltr: { tipo: { op: 'Es', val: 2 } },
+                fltr: { sale_ok: { op: 'Es', val: true } },
                 incl: ['categoria1', 'linea1'],
                 ordr: [['nombre', 'ASC']],
             }
@@ -376,42 +384,73 @@ export default {
 
             this.vista.articulos = res.data
         },
-        verifyRowSelectIsActive() {
-            if (this.vista.articulos && this.vista.articulos.some((a) => a.selected)) {
-                setTimeout(() => {
-                    this.$refs['jdtable'].toogleSelectItems()
-                }, 0)
+        async loadDatosSistema() {
+            const qry = ['igv_afectaciones', 'unidades', 'estados']
+            const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
+
+            if (res.code != 0) return
+
+            Object.assign(this.vista, res.data)
+        },
+        async loadLineas() {
+            const qry = {
+                fltr: {},
+                cols: ['nombre'],
+                ordr: [['nombre', 'ASC']],
             }
+
+            this.vista.articulo_lineas = []
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.articulo_lineas}?qry=${JSON.stringify(qry)}`)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            this.vista.articulo_lineas = res.data
+            return res.data
+        },
+        async loadCategorias() {
+            const qry = {
+                cols: ['nombre'],
+                fltr: {
+                    tipo: { op: 'Es', val: 2 },
+                    activo: { op: 'Es', val: true },
+                },
+                ordr: [['nombre', 'ASC']],
+            }
+
+            this.vista.articulo_categorias = []
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.articulo_categorias}?qry=${JSON.stringify(qry)}`)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            this.vista.articulo_categorias = res.data
+            return res.data
         },
 
         nuevo() {
-            const item = {
-                tipo: 2,
-                igv_afectacion: 10,
+            const send = {
+                articulo: {
+                    type: 'consumable',
+                    sale_ok: true,
+                    purchase_ok: false,
+                    activo: true,
 
-                has_fv: true,
-                vende: true,
-                activo: true,
+                    combo_articulos: [],
+                    ingredientes: [],
+                    beneficios: [],
 
-                is_combo: false,
+                    tipo: 2,
+                    igv_afectacion: 10,
+                    has_fv: true,
+                    is_combo: false,
+                },
+                pestana: 1,
             }
 
-            this.useModals.setModal('mArticulo', 'Nuevo producto', 1, item)
-        },
-        nuevoCombo() {
-            const item = {
-                tipo: 2,
-                igv_afectacion: 10,
-
-                has_fv: false,
-                vende: true,
-                activo: true,
-
-                is_combo: true,
-                combo_articulos: [],
-            }
-
-            this.useModals.setModal('mCombo', 'Nuevo Combo', 1, item)
+            this.useModals.setModal('mArticulo', 'Nuevo producto', 1, send, true)
         },
         importar(event) {
             this.useAuth.setLoading(true, 'Cargando archivo...')
@@ -582,11 +621,12 @@ export default {
 
             if (res.code != 0) return
 
-            if (res.data.is_combo) {
-                this.useModals.setModal('mCombo', 'Editar combo', 2, res.data)
-            } else {
-                this.useModals.setModal('mArticulo', 'Editar producto', 2, res.data)
+            const send = {
+                articulo: { ...res.data },
+                pestana: 1,
             }
+
+            this.useModals.setModal('mArticulo', 'Editar producto', 2, send, true)
         },
         openUploadFiles(item) {
             const send = {
@@ -676,52 +716,6 @@ export default {
             }
 
             this.useModals.setModal('mAjusteStock', 'Ajuste de stock', null, send, true)
-        },
-
-        async loadLineas() {
-            const qry = {
-                fltr: {},
-                cols: ['nombre'],
-                ordr: [['nombre', 'ASC']],
-            }
-
-            this.vista.articulo_lineas = []
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.articulo_lineas}?qry=${JSON.stringify(qry)}`)
-            this.useAuth.setLoading(false)
-
-            if (res.code != 0) return
-
-            this.vista.articulo_lineas = res.data
-            return res.data
-        },
-        async loadCategorias() {
-            const qry = {
-                cols: ['nombre'],
-                fltr: {
-                    tipo: { op: 'Es', val: 2 },
-                    activo: { op: 'Es', val: true },
-                },
-                ordr: [['nombre', 'ASC']],
-            }
-
-            this.vista.articulo_categorias = []
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.articulo_categorias}?qry=${JSON.stringify(qry)}`)
-            this.useAuth.setLoading(false)
-
-            if (res.code != 0) return
-
-            this.vista.articulo_categorias = res.data
-            return res.data
-        },
-        async loadDatosSistema() {
-            const qry = ['igv_afectaciones', 'unidades', 'estados']
-            const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
-
-            if (res.code != 0) return
-
-            Object.assign(this.vista, res.data)
         },
     },
 }

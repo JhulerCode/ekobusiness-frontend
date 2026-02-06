@@ -274,14 +274,23 @@ export default {
         if (this.useAuth.verifyPermiso('vArticulos:listar') == true) this.loadArticulos()
     },
     methods: {
+        verifyRowSelectIsActive() {
+            if (this.vista.articulos && this.vista.articulos.some((a) => a.selected)) {
+                setTimeout(() => {
+                    this.$refs['jdtable'].toogleSelectItems()
+                }, 0)
+            }
+        },
+
         setQuery() {
             this.vista.qry = {
-                fltr: { tipo: { op: 'Es', val: 1 } },
+                fltr: { purchase_ok: { op: 'Es', val: true } },
                 incl: ['categoria1'],
                 ordr: [['nombre', 'ASC']],
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
+            this.vista.qry.cols.push('fotos')
         },
         async loadArticulos() {
             this.setQuery()
@@ -296,27 +305,56 @@ export default {
 
             this.vista.articulos = res.data
         },
-        verifyRowSelectIsActive() {
-            if (this.vista.articulos && this.vista.articulos.some((a) => a.selected)) {
-                setTimeout(() => {
-                    this.$refs['jdtable'].toogleSelectItems()
-                }, 0)
+        async loadCategorias() {
+            const qry = {
+                cols: ['nombre'],
+                fltr: {
+                    tipo: { op: 'Es', val: 1 },
+                    activo: { op: 'Es', val: true },
+                },
+                ordr: [['nombre', 'ASC']],
             }
+
+            this.vista.articulo_categorias = []
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.articulo_categorias}?qry=${JSON.stringify(qry)}`)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            this.vista.articulo_categorias = res.data
+            return res.data
+        },
+        async loadDatosSistema() {
+            const qry = ['igv_afectaciones', 'unidades', 'estados']
+            const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
+
+            if (res.code != 0) return
+
+            Object.assign(this.vista, res.data)
         },
 
         nuevo() {
-            const item = {
-                tipo: 1,
-                igv_afectacion: 10,
+            const send = {
+                articulo: {
+                    type: 'consumable',
+                    sale_ok: false,
+                    purchase_ok: true,
+                    activo: true,
 
-                has_fv: false,
-                vende: false,
-                activo: true,
+                    combo_articulos: [],
+                    ingredientes: [],
+                    beneficios: [],
 
-                is_combo: false,
+                    tipo: 1,
+                    igv_afectacion: 10,
+                    has_fv: false,
+                    is_combo: false,
+                },
+                pestana: 1,
             }
 
-            this.useModals.setModal('mArticulo', 'Nuevo artículo', 1, item)
+            this.useModals.setModal('mArticulo', 'Nuevo artículo', 1, send, true)
         },
         importar(event) {
             this.useAuth.setLoading(true, 'Cargando archivo...')
@@ -462,7 +500,12 @@ export default {
 
             if (res.code != 0) return
 
-            this.useModals.setModal('mArticulo', 'Editar artículo', 2, res.data)
+            const send = {
+                articulo: { ...res.data },
+                pestana: 1,
+            }
+
+            this.useModals.setModal('mArticulo', 'Editar artículo', 2, send, true)
         },
         async eliminar(item) {
             const resQst = await jqst('¿Está seguro de eliminar?')
@@ -528,35 +571,6 @@ export default {
             }
 
             this.useModals.setModal('mAjusteStock', 'Ajuste de stock', null, send, true)
-        },
-
-        async loadCategorias() {
-            const qry = {
-                cols: ['nombre'],
-                fltr: {
-                    tipo: { op: 'Es', val: 1 },
-                    activo: { op: 'Es', val: true },
-                },
-                ordr: [['nombre', 'ASC']],
-            }
-
-            this.vista.articulo_categorias = []
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.articulo_categorias}?qry=${JSON.stringify(qry)}`)
-            this.useAuth.setLoading(false)
-
-            if (res.code != 0) return
-
-            this.vista.articulo_categorias = res.data
-            return res.data
-        },
-        async loadDatosSistema() {
-            const qry = ['igv_afectaciones', 'unidades', 'estados']
-            const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
-
-            if (res.code != 0) return
-
-            Object.assign(this.vista, res.data)
         },
     },
 }

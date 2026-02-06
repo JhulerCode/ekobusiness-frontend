@@ -34,6 +34,7 @@
                 @search="searchArticulos"
                 @elegir="setArticulo"
                 style="grid-column: 1/4"
+                :disabled="true"
             />
 
             <JdSelect

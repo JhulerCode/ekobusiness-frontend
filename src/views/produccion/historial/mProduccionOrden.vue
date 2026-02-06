@@ -23,9 +23,7 @@
                     :nec="true"
                     v-model="modal.produccion_orden.maquina"
                     :lista="
-                        modal.maquinas?.filter(
-                            (a) => a.linea == modal.produccion_orden.linea,
-                        ) || []
+                        modal.maquinas?.filter((a) => a.linea == modal.produccion_orden.linea) || []
                     "
                     @elegir="setMaquina"
                     :disabled="modal.mode == 3"
@@ -246,7 +244,7 @@ export default {
                 fltr: {
                     activo: { op: 'Es', val: true },
                     nombre: { op: 'Contiene', val: txtBuscar },
-                    tipo: { op: 'Es', val: 2 },
+                    type: { op: 'Es', val: 'consumable' },
                     linea: { op: 'Es', val: this.modal.produccion_orden.linea },
                 },
                 cols: ['nombre', 'linea', 'filtrantes'],

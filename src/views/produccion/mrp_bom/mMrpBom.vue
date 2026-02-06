@@ -29,7 +29,7 @@
                 v-model="nuevo.articulo"
                 :spin="modal.spin_articulos"
                 :lista="modal.articulos || []"
-                @search="searchArticulos"
+                @search="loadArticulosConsumables"
                 @elegir="setComponenteNuevo"
                 style="grid-column: 1/5"
             />
@@ -185,7 +185,7 @@ export default {
 
             const qry = {
                 fltr: {
-                    tipo: { op: 'Es', val: 2 },
+                    type: { op: 'Es', val: 'consumable' },
                     activo: { op: 'Es', val: true },
                     nombre: { op: 'Contiene', val: txtBuscar },
                 },
@@ -201,7 +201,7 @@ export default {
 
             this.modal.articulos_fabricables = JSON.parse(JSON.stringify(res.data))
         },
-        async searchArticulos(txtBuscar) {
+        async loadArticulosConsumables(txtBuscar) {
             if (!txtBuscar) {
                 this.modal.articulos.length = 0
                 return
@@ -209,7 +209,7 @@ export default {
 
             const qry = {
                 fltr: {
-                    tipo: { op: 'Es', val: 1 },
+                    type: { op: 'Es', val: 'consumable' },
                     activo: { op: 'Es', val: true },
                     nombre: { op: 'Contiene', val: txtBuscar },
                 },

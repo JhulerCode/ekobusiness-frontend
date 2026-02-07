@@ -349,7 +349,6 @@ export default {
                     tipo: 1,
                     igv_afectacion: 10,
                     has_fv: false,
-                    is_combo: false,
                 },
                 pestana: 1,
             }
@@ -527,11 +526,14 @@ export default {
             if (res.code != 0) return
 
             const send = {
-                ...res.data,
-                id: null,
+                articulo: {
+                    ...res.data,
+                    id: null,
+                },
+                pestana: 1,
             }
 
-            this.useModals.setModal('mArticulo', 'Nuevo artículo', 1, send)
+            this.useModals.setModal('mArticulo', 'Nuevo artículo', 1, send, true)
         },
         async verKardex(item) {
             const send = {

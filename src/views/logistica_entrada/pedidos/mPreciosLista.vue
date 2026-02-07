@@ -80,7 +80,7 @@ export default {
                 ordr: [['articulo1', 'nombre', 'ASC']],
                 iccl: {
                     articulo1: {
-                        cols: ['has_fv', 'igv_afectacion', 'is_combo', 'combo_articulos'],
+                        cols: ['igv_afectacion', 'combo_articulos'],
                     },
                 },
             }

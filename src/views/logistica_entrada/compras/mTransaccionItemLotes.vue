@@ -9,7 +9,7 @@
                 label="Artículo"
                 v-model="modal.articulo1.nombre"
                 :disabled="true"
-                v-if="!modal.articulo1.is_combo"
+                v-if="modal.articulo1.type != 'combo'"
             />
 
             <JdSelect
@@ -129,7 +129,7 @@ export default {
     }),
     computed: {
         totalRequerido() {
-            if (!this.modal.articulo1.is_combo) {
+            if (this.modal.articulo1.type != 'combo') {
                 return this.modal.cantidad
             } else {
                 return this.modal.articulo1.combo_articulos.reduce(
@@ -150,7 +150,7 @@ export default {
     },
     methods: {
         async setColumns() {
-            if (this.modal.articulo1.is_combo == true) {
+            if (this.modal.articulo1.type == 'combo') {
                 this.columns[0].show = true
                 this.setNuevoArticulo(this.modal.articulo1.combo_articulos[0])
             }
@@ -186,9 +186,10 @@ export default {
                 fltr: {
                     articulo: {
                         op: 'Es',
-                        val: !this.modal.articulo1.is_combo
-                            ? this.modal.articulo
-                            : this.nuevo.articulo,
+                        val:
+                            this.modal.articulo1.type != 'combo'
+                                ? this.modal.articulo
+                                : this.nuevo.articulo,
                     },
                     is_lote_padre: { op: 'Es', val: true },
                 },
@@ -218,9 +219,10 @@ export default {
             this.modal.kardexes.push({
                 articulo1: { ...this.nuevo.articulo1 },
 
-                articulo: !this.modal.articulo1.is_combo
-                    ? this.modal.articulo
-                    : this.nuevo.articulo,
+                articulo:
+                    this.modal.articulo1.type != 'combo'
+                        ? this.modal.articulo
+                        : this.nuevo.articulo,
                 lote_padre: item.id,
                 lote_padre1: {
                     lote_fv_stock: item.lote_fv_stock,

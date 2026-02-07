@@ -5,7 +5,7 @@
             :datos="modal.articulos || []"
             :rowSelectable="true"
             :download="false"
-            :reload="loadItems"
+            :reload="loadPedidoItems"
             maxHeight="30rem"
         />
     </JdModal>
@@ -111,12 +111,12 @@ export default {
 
             this.useModals.show.mPedidoItems = false
         },
-        async loadItems() {
+        async loadPedidoItems() {
             const qry = {
                 incl: ['articulo1'],
                 iccl: {
                     articulo1: {
-                        cols: ['is_combo', 'combo_articulos'],
+                        cols: ['combo_articulos'],
                     },
                 },
                 cols: { exclude: [] },

@@ -313,7 +313,7 @@ export default {
                         return true
                     }
 
-                    if (!a.articulo1.is_combo) {
+                    if (!a.articulo1.type == 'combo') {
                         const kardexesTotal = a.kardexes.reduce(
                             (sum, a) => sum + (a.cantidad ?? 0),
                             0,

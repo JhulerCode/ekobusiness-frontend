@@ -547,7 +547,7 @@ export default {
                 incl: ['articulo1'],
                 iccl: {
                     articulo1: {
-                        cols: ['is_combo', 'combo_articulos'],
+                        cols: ['combo_articulos'],
                     },
                 },
                 cols: { exclude: [] },

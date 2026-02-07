@@ -20,13 +20,6 @@
                     v-if="useAuth.verifyPermiso('vProductosTerminados:importar')"
                 />
 
-                <!-- <JdButton
-                    text="Nuevo combo"
-                    tipo="2"
-                    @click="nuevoCombo()"
-                    v-if="useAuth.verifyPermiso('vProductosTerminados:crearCombo')"
-                /> -->
-
                 <JdButton
                     text="Nuevo"
                     @click="nuevo()"
@@ -314,14 +307,6 @@ export default {
                 icon: 'fa-solid fa-copy',
                 action: 'clonar',
                 permiso: 'vProductosTerminados:clonar',
-                ocultar: { is_combo: true },
-            },
-            {
-                label: 'Receta',
-                icon: 'fa-solid fa-flask',
-                action: 'showReceta',
-                permiso: 'vReceta:listar',
-                ocultar: { is_combo: true },
             },
             {
                 label: 'Ver kardex',
@@ -369,7 +354,7 @@ export default {
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
-            this.vista.qry.cols.push('is_combo', 'fotos')
+            this.vista.qry.cols.push('fotos')
         },
         async loadArticulos() {
             this.setQuery()
@@ -445,7 +430,6 @@ export default {
                     tipo: 2,
                     igv_afectacion: 10,
                     has_fv: true,
-                    is_combo: false,
                 },
                 pestana: 1,
             }
@@ -665,11 +649,14 @@ export default {
             if (res.code != 0) return
 
             const send = {
-                ...res.data,
-                id: null,
+                articulo: {
+                    ...res.data,
+                    id: null,
+                },
+                pestana: 1,
             }
 
-            this.useModals.setModal('mArticulo', 'Nuevo producto', 1, send)
+            this.useModals.setModal('mArticulo', 'Nuevo producto', 1, send, true)
         },
         async showReceta(item) {
             const send = {

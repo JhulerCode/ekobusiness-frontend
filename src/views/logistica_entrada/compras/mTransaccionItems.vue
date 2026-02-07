@@ -129,7 +129,7 @@
         </JdTable>
     </div>
 
-    <mPreciosLista v-if="useModals.show.mPreciosLista" @sendItems="agregarArticulos" />
+    <mPreciosLista v-if="useModals.show.mPreciosLista" @sendItems="agregarArticulosDePrecioLista" />
     <mPedidoItems v-if="useModals.show.mPedidoItems" @sendItems="agregarPedidoItems" />
     <mTransaccionItemLotes
         v-if="useModals.show.mTransaccionItemLotes"
@@ -331,14 +331,7 @@ export default {
                     activo: { op: 'Es', val: true },
                     nombre: { op: 'Contiene', val: txtBuscar },
                 },
-                cols: [
-                    'nombre',
-                    'unidad',
-                    'igv_afectacion',
-                    'has_fv',
-                    'is_combo',
-                    'combo_articulos',
-                ],
+                cols: ['type', 'nombre', 'unidad', 'igv_afectacion', 'has_fv', 'combo_articulos'],
                 ordr: [['nombre', 'ASC']],
             }
 
@@ -369,10 +362,10 @@ export default {
                 id: crypto.randomUUID(),
                 articulo: item.id,
                 articulo1: {
+                    type: item.type,
                     nombre: item.nombre,
                     unidad: item.unidad,
                     has_fv: item.has_fv,
-                    is_combo: item.is_combo,
                     combo_articulos: item.combo_articulos,
                 },
 
@@ -424,7 +417,7 @@ export default {
             }
             this.useModals.setModal('mPreciosLista', 'Lista de precios', null, send, true)
         },
-        async agregarArticulos(items) {
+        async agregarArticulosDePrecioLista(items) {
             for (const a of items) {
                 // const i = this.modal.transaccion.transaccion_items.findIndex(b => b.articulo == a.articulo)
                 // if (i !== -1) continue
@@ -434,10 +427,10 @@ export default {
                     id: crypto.randomUUID(),
                     articulo: a.articulo,
                     articulo1: {
+                        type: a.articulo1.type,
                         nombre: a.articulo1.nombre,
                         unidad: a.articulo1.unidad,
                         has_fv: a.articulo1.has_fv,
-                        is_combo: a.articulo1.is_combo,
                         combo_articulos: a.articulo1.combo_articulos,
                     },
 
@@ -490,10 +483,10 @@ export default {
                     id: crypto.randomUUID(),
                     articulo: a.articulo,
                     articulo1: {
+                        type: a.articulo1.type,
                         nombre: a.articulo1.nombre,
                         unidad: a.articulo1.unidad,
                         has_fv: a.has_fv,
-                        is_combo: a.articulo1.is_combo,
                         combo_articulos: a.articulo1.combo_articulos,
                     },
 
@@ -616,8 +609,7 @@ export default {
 
             const to_look_for_ids = []
             for (const a of this.modal.transaccion.transaccion_items) {
-                // console.log(a.is_combo)
-                if (a.articulo1.is_combo) {
+                if (a.articulo1.type == 'combo') {
                     for (const b of a.articulo1.combo_articulos) {
                         to_look_for_ids.push(b.articulo)
                     }
@@ -660,9 +652,7 @@ export default {
             for (const a of this.modal.transaccion.transaccion_items) {
                 a.kardexes = []
 
-                // console.log(a.articulo1.nombre)
-                // console.log(a.articulo1.is_combo)
-                if (a.articulo1.is_combo == true) {
+                if (a.articulo1.type == 'combo') {
                     for (const c of a.articulo1.combo_articulos) {
                         const lotes = lotesMap[c.articulo] ?? []
 

@@ -28,6 +28,7 @@ const urls = {
     monedas: `${host}/api/monedas`,
     mrp_boms: `${host}/api/mrp_boms`,
     mrp_bom_lines: `${host}/api/mrp_bom_lines`,
+    mrp_bom_socios: `${host}/api/mrp_bom_socios`,
     precio_listas: `${host}/api/precio_listas`,
     precio_lista_items: `${host}/api/precio_lista_items`,
     produccion_ordenes: `${host}/api/produccion_ordenes`,

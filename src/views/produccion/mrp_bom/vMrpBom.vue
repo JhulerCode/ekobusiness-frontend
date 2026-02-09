@@ -145,6 +145,7 @@ export default {
         nuevo() {
             const send = {
                 mrp_bom: {
+                    mrp_bom_socios: [],
                     mrp_bom_lines: [],
                 },
             }
@@ -198,12 +199,37 @@ export default {
 
             if (res1.code != 0) return
 
+            if (res.code != 0) return
+
+            const qry2 = {
+                fltr: {
+                    mrp_bom: { op: 'Es', val: item.id },
+                },
+                cols: ['socio'],
+                incl: ['socio1'],
+            }
+
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res2 = await get(`${urls.mrp_bom_socios}?qry=${JSON.stringify(qry2)}`)
+            this.useAuth.setLoading(false)
+
+            if (res2.code != 0) return
+
             const send = {
                 mrp_bom: {
                     ...res.data,
                     mrp_bom_lines: res1.data,
+                    mrp_bom_socios: res2.data,
                 },
                 articulos_fabricables: [{ ...res.data.articulo1 }],
+            }
+
+            for (const a of send.mrp_bom.mrp_bom_lines) {
+                send['articulos' + a.id] = [{ ...a.articulo1 }]
+            }
+
+            for (const a of send.mrp_bom.mrp_bom_socios) {
+                send['socios' + a.id] = [{ ...a.socio1 }]
             }
 
             this.useModals.setModal('mMrpBom', 'Editar lista de materiales', 2, send, true)
@@ -218,7 +244,7 @@ export default {
 
             if (res.code != 0) return
 
-            this.useVistas.removeItem('vProductoLineas', 'mrp_boms', item)
+            this.useVistas.removeItem('vMrpBom', 'mrp_boms', item)
         },
     },
 }

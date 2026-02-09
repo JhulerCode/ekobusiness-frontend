@@ -18,32 +18,58 @@
                 :lista="modal.mrp_bom_tipos"
                 style="grid-column: 1/3"
             />
+
+            <JdButton
+                text="Agregar"
+                tipo="2"
+                @click="addLineSocio"
+                v-if="
+                    useAuth.verifyPermiso('vMrpBom:editar') && modal.mrp_bom.tipo == 'subcontratar'
+                "
+            />
         </div>
 
-        <div class="agregar" v-if="useAuth.verifyPermiso('vMrpBom:editar')">
-            <strong>Componentes</strong>
+        <JdTable
+            :columns="columns_socios"
+            :datos="modal.mrp_bom.mrp_bom_socios || []"
+            :seeker="false"
+            :download="false"
+            :colAct="true"
+            @onChange="(action, a) => this[action](a)"
+            :inputsDisabled="!this.useAuth.verifyPermiso('vReceta:editar')"
+            class="mrg-btm2"
+            v-if="modal.mrp_bom.tipo == 'subcontratar'"
+        >
+            <template v-slot:cAction="{ item }">
+                <JdButton
+                    :small="true"
+                    tipo="2"
+                    icon="fa-solid fa-trash-can"
+                    title="Eliminar"
+                    @click="removeLineSocio(item)"
+                    v-if="this.useAuth.verifyPermiso('vReceta:editar')"
+                />
+            </template>
 
-            <JdSelectQuery
-                label="Componente"
-                :nec="true"
-                v-model="nuevo.articulo"
-                :spin="modal.spin_articulos"
-                :lista="modal.articulos || []"
-                @search="loadArticulosConsumables"
-                @elegir="setComponenteNuevo"
-                style="grid-column: 1/5"
-            />
+            <template v-slot:cSocio="{ item }">
+                <JdSelectQuery
+                    :nec="true"
+                    v-model="item.socio"
+                    :spin="modal.spin_socios"
+                    :lista="modal['socios' + item.id] || []"
+                    mostrar="nombres"
+                    @search="(value) => loadSocios(value, item)"
+                    style="grid-column: 1/5"
+                />
+            </template>
+        </JdTable>
 
-            <JdInput
-                type="number"
-                label="Cantidad"
-                :nec="true"
-                v-model="nuevo.cantidad"
-                style="grid-column: 1/3"
-            />
-
-            <JdButton text="Agregar" @click="addLine" />
-        </div>
+        <JdButton
+            text="Agregar"
+            tipo="2"
+            @click="addLine"
+            v-if="useAuth.verifyPermiso('vMrpBom:editar')"
+        />
 
         <JdTable
             :columns="columns"
@@ -51,9 +77,7 @@
             :seeker="false"
             :download="false"
             :colAct="true"
-            :reload="loadReceta"
             class="jd-table"
-            @onChange="(action, a) => this[action](a)"
             :inputsDisabled="!this.useAuth.verifyPermiso('vReceta:editar')"
         >
             <template v-slot:cAction="{ item }">
@@ -63,7 +87,7 @@
                     icon="fa-solid fa-trash-can"
                     title="Eliminar"
                     @click="removeLine(item)"
-                    v-if="this.useAuth.verifyPermiso('vReceta:eliminar')"
+                    v-if="this.useAuth.verifyPermiso('vReceta:editar')"
                 />
             </template>
 
@@ -88,12 +112,24 @@
                     />
                 </div>
             </template>
+
+            <template v-slot:cArticulo="{ item }">
+                <JdSelectQuery
+                    :nec="true"
+                    v-model="item.articulo"
+                    :spin="modal.spin_articulos"
+                    :lista="modal['articulos' + item.id] || []"
+                    @search="(value) => loadArticulosConsumables(value, item)"
+                    @elegir="(value) => setComponenteNuevo(value, item)"
+                    style="grid-column: 1/5"
+                />
+            </template>
         </JdTable>
     </JdModal>
 </template>
 
 <script>
-import { JdModal, JdSelect, JdTable, JdButton, JdInput, JdSelectQuery } from '@jhuler/components'
+import { JdModal, JdSelect, JdTable, JdButton, JdSelectQuery } from '@jhuler/components'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
@@ -108,7 +144,6 @@ export default {
         JdModal,
         JdSelect,
         JdSelectQuery,
-        JdInput,
         JdButton,
         JdTable,
     },
@@ -119,6 +154,16 @@ export default {
 
         modal: {},
         nuevo: {},
+
+        columns_socios: [
+            {
+                id: 'socio',
+                title: 'Subcontratistas',
+                slot: 'cSocio',
+                width: '35rem',
+                show: true,
+            },
+        ],
 
         columns: [
             {
@@ -131,7 +176,7 @@ export default {
             {
                 id: 'articulo',
                 title: 'Componente',
-                prop: 'articulo1.nombre',
+                slot: 'cArticulo',
                 width: '25rem',
                 show: true,
             },
@@ -148,7 +193,6 @@ export default {
                 toRight: true,
                 input: true,
                 type: 'number',
-                onchange: 'modificar',
                 width: '6rem',
                 show: true,
             },
@@ -201,9 +245,33 @@ export default {
 
             this.modal.articulos_fabricables = JSON.parse(JSON.stringify(res.data))
         },
-        async loadArticulosConsumables(txtBuscar) {
+        async loadSocios(txtBuscar, item) {
             if (!txtBuscar) {
-                this.modal.articulos.length = 0
+                this.modal['socios' + item.id].length = 0
+                return
+            }
+
+            const qry = {
+                fltr: {
+                    tipo: { op: 'Es', val: 1 },
+                    activo: { op: 'Es', val: true },
+                    nombres: { op: 'Contiene', val: txtBuscar },
+                },
+                cols: ['nombres'],
+                ordr: [['nombres', 'ASC']],
+            }
+
+            this.modal.spin_socios = true
+            const res = await get(`${urls.socios}?qry=${JSON.stringify(qry)}`)
+            this.modal.spin_socios = false
+
+            if (res.code !== 0) return
+
+            this.modal['socios' + item.id] = JSON.parse(JSON.stringify(res.data))
+        },
+        async loadArticulosConsumables(txtBuscar, item) {
+            if (!txtBuscar) {
+                this.modal['articulos' + item.id].length = 0
                 return
             }
 
@@ -223,7 +291,7 @@ export default {
 
             if (res.code !== 0) return
 
-            this.modal.articulos = JSON.parse(JSON.stringify(res.data))
+            this.modal['articulos' + item.id] = JSON.parse(JSON.stringify(res.data))
         },
         async loadDatosSistema() {
             const qry = ['mrp_bom_tipos']
@@ -235,26 +303,13 @@ export default {
         },
 
         addLine() {
-            if (this.nuevo.articulo == null || this.nuevo.cantidad == null) {
-                return jmsg('warning', 'Selecciona un artículo e ingrese la cantidad')
-            }
-
-            const i = this.modal.mrp_bom.mrp_bom_lines.findIndex(
-                (a) => a.articulo == this.nuevo.articulo,
-            )
-            if (i !== -1) return jmsg('warning', 'El artículo ya está agregado')
-
             this.modal.mrp_bom.mrp_bom_lines.push({
+                id: crypto.randomUUID(),
                 orden: genCorrelativo(this.modal.mrp_bom.mrp_bom_lines),
-                articulo: this.nuevo.articulo,
-                cantidad: this.nuevo.cantidad,
-                articulo1: {
-                    nombre: this.nuevo.nombre,
-                    unidad: this.nuevo.unidad,
-                },
+                articulo: null,
+                cantidad: null,
+                articulo1: {},
             })
-
-            this.nuevo = {}
         },
         async removeLine(item) {
             const i = this.modal.mrp_bom.mrp_bom_lines.findIndex((a) => a.articulo == item.articulo)
@@ -281,12 +336,26 @@ export default {
             this.modal.mrp_bom.mrp_bom_lines.sort((a, b) => a.orden - b.orden)
         },
 
-        setComponenteNuevo(a) {
+        addLineSocio() {
+            this.modal.mrp_bom.mrp_bom_socios.push({
+                id: crypto.randomUUID(),
+                socio: null,
+                socio1: {},
+            })
+        },
+        async removeLineSocio(item) {
+            const i = this.modal.mrp_bom.mrp_bom_socios.findIndex((a) => a.id == item.id)
+            this.modal.mrp_bom.mrp_bom_socios.splice(i, 1)
+        },
+
+        setComponenteNuevo(a, item) {
             if (a == null) {
-                this.nuevo = {}
+                item.articulo1 = {}
             } else {
-                this.nuevo.nombre = a.nombre
-                this.nuevo.unidad = a.unidad
+                item.articulo1 = {
+                    nombre: a.nombre,
+                    unidad: a.unidad,
+                }
             }
         },
         checkDatos() {
@@ -329,25 +398,6 @@ export default {
 
             this.useVistas.updateItem('mMrpBom', 'mrp_boms', res.data)
             this.useModals.show.mMrpBom = false
-        },
-
-        async loadReceta() {
-            const qry = {
-                fltr: {
-                    articulo_principal: { op: 'Es', val: this.receta.id },
-                },
-                cols: ['articulo', 'cantidad', 'orden'],
-                incl: ['articulo1'],
-            }
-
-            this.modal.mrp_bom.mrp_bom_lines = []
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.receta_insumos}?qry=${JSON.stringify(qry)}`)
-            this.useAuth.setLoading(false, '')
-
-            if (res.code != 0) return
-
-            this.modal.mrp_bom.mrp_bom_lines = res.data
         },
     },
 }

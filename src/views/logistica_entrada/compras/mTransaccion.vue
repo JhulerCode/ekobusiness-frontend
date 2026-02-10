@@ -51,7 +51,7 @@
                     v-model="modal.transaccion.fecha"
                     @change="changeDate"
                     :disabled="modal.mode == 3"
-                    style="grid-column: 1/3"
+                    style="grid-column: 1/4"
                 />
 
                 <JdSelect
@@ -314,7 +314,7 @@ export default {
                         return true
                     }
 
-                    if (!a.articulo1.type == 'combo') {
+                    if (a.articulo1.type != 'combo') {
                         const kardexesTotal = a.kardexes.reduce(
                             (sum, a) => sum + (a.cantidad ?? 0),
                             0,

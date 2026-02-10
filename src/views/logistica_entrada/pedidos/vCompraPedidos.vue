@@ -38,6 +38,7 @@
     <mSocioPedido v-if="useModals.show.mSocioPedido" />
     <mSocioPedidoPdf v-if="useModals.show.mSocioPedidoPdf" />
     <mTransaccion v-if="useModals.show.mTransaccion" />
+    <mStockPicking v-if="useModals.show.mStockPicking" />
 
     <mConfigCols v-if="useModals.show.mConfigCols" />
     <mConfigFiltros v-if="useModals.show.mConfigFiltros" />
@@ -49,6 +50,7 @@ import { JdButton, JdTable, mConfigFiltros, mConfigCols } from '@jhuler/componen
 import mSocioPedido from '@/views/logistica_entrada/pedidos/mSocioPedido.vue'
 import mSocioPedidoPdf from '@/views/logistica_entrada/pedidos/mSocioPedidoPdf.vue'
 import mTransaccion from '@/views/logistica_entrada/compras/mTransaccion.vue'
+import mStockPicking from '@/views/logistica_entrada/pedidos/mStockPicking.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
@@ -71,6 +73,7 @@ export default {
         mSocioPedido,
         mSocioPedidoPdf,
         mTransaccion,
+        mStockPicking,
     },
     data: () => ({
         useAuth: useAuth(),
@@ -430,6 +433,57 @@ export default {
             if (res.code != 0) return
         },
         async entregarMercaderia(item) {
+            //--- LOAD STOCK PICKING ---//
+            const qry0 = {
+                cols: ['tipo', 'socio', 'fecha', 'guia', 'socio_pedido'],
+                fltr: {
+                    tipo: { op: 'Es', val: 'abastacer_maquila' },
+                    socio_pedido: { op: 'Es', val: item.id },
+                },
+                // incl: ['transaccion_items'],
+                iccl: {
+                    transaccion_items: {
+                        incl: ['articulo1'],
+                    },
+                },
+            }
+
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res0 = await get(`${urls.transacciones}?qry=${JSON.stringify(qry0)}`)
+            this.useAuth.setLoading(false)
+
+            if (res0.code != 0) return
+
+            let transaccion = {}
+            let mrp_bom_lines = []
+
+            if (res0.data.length > 0) {
+                const qry01 = {
+                    incl: ['articulo1', 'kardexes'],
+                    iccl: {
+                        kardexes: {
+                            cols: ['cantidad', 'fv', 'lote', 'stock', 'lote_fv_stock'],
+                            incl: ['lote_padre1'],
+                        },
+                    },
+                    cols: { exclude: [] },
+                    fltr: {
+                        transaccion: { op: 'Es', val: res0.data[0].id },
+                    },
+                    ordr: [['orden', 'ASC']],
+                }
+
+                this.useAuth.setLoading(true, 'Cargando...')
+                const res01 = await get(`${urls.transaccion_items}?qry=${JSON.stringify(qry01)}`)
+                this.useAuth.setLoading(false)
+
+                if (res01.code != 0) return
+
+                res0.data[0].transaccion_items = res01.data
+                transaccion = res0.data[0]
+            }
+
+            //--- LOAD PEDIDO ---//
             const qry = {
                 incl: ['socio1', 'moneda1', 'socio_pedido_items'],
                 iccl: {
@@ -445,8 +499,8 @@ export default {
 
             if (res.code != 0) return
 
-            const send = {
-                transaccion: {
+            if (!transaccion.id) {
+                transaccion = {
                     tipo: 'abastacer_maquila',
                     fecha: dayjs().format('YYYY-MM-DD'),
 
@@ -458,8 +512,53 @@ export default {
 
                     estado: 1,
                     transaccion_items: [],
-                },
+                }
+
+                //--- LOAD MRP BOMS ---//
+                const qry1 = {
+                    cols: ['articulo'],
+                    fltr: {
+                        articulo: {
+                            op: 'Es',
+                            val: res.data.socio_pedido_items.map((a) => a.articulo),
+                        },
+                        'mrp_bom_socios.socio': {
+                            op: 'Es',
+                            val: res.data.socio,
+                        },
+                    },
+                    incl: ['mrp_bom_lines', 'mrp_bom_socios'],
+                    iccl: {
+                        mrp_bom_lines: {
+                            incl: ['articulo1'],
+                        },
+                    },
+                }
+
+                this.useAuth.setLoading(true, 'Cargando...')
+                const res1 = await get(`${urls.mrp_boms}?qry=${JSON.stringify(qry1)}`)
+                this.useAuth.setLoading(false)
+
+                if (res1.code != 0) return
+
+                if (res1.data.length > 0) {
+                    for (const a of res1.data) {
+                        for (const b of a.mrp_bom_lines) {
+                            const i = res.data.socio_pedido_items.find(
+                                (c) => c.articulo == a.articulo,
+                            )
+                            b.cantidad = i.cantidad * b.cantidad
+                        }
+                    }
+
+                    mrp_bom_lines = res1.data.reduce((acc, a) => [...acc, ...a.mrp_bom_lines], [])
+                }
+            }
+
+            const send = {
+                transaccion,
                 socio_pedido_items: res.data.socio_pedido_items,
+                socios: [{ ...res.data.socio1 }],
                 pedido: {
                     id: res.data.id,
                     codigo: res.data.codigo,
@@ -470,10 +569,16 @@ export default {
                         codigo: res.data.codigo,
                     },
                 ],
-                socios: [{ ...res.data.socio1 }],
+                mrp_bom_lines,
             }
 
-            this.useModals.setModal('mTransaccion', 'Abastecer para maquila', 1, send, true)
+            if (!transaccion.id) {
+                send.transaccion.transaccion_items = JSON.parse(JSON.stringify(send.mrp_bom_lines))
+
+                this.useModals.setModal('mStockPicking', 'Abastecer para maquila', 1, send, true)
+            } else {
+                this.useModals.setModal('mStockPicking', 'Abastecer para maquila', 3, send, true)
+            }
         },
         async ingresarMercaderia(item) {
             const qry = {

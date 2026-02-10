@@ -1,33 +1,17 @@
 <template>
     <div class="pedido-items">
-        <div
-            class="agregar"
-            v-if="
-                modal.mode != 3 &&
-                modal.transaccion.socio != null &&
-                modal.transaccion.moneda != null &&
-                modal.transaccion.tipo_cambio
-            "
-        >
+        <div class="agregar" v-if="modal.mode != 3 && modal.transaccion.socio != null">
             <template v-if="modal.transaccion.tipo == 1 || modal.transaccion.tipo == 5">
                 <template v-if="!modal.transaccion.socio_pedido">
                     <JdSelectQuery
                         text="asd"
                         icon="fa-solid fa-magnifying-glass"
-                        placeholder="Busca artículos"
+                        placeholder="Buscar artículos"
                         v-model="nuevo"
                         :spin="modal.spinArticulos"
                         :lista="modal.articulos"
                         @search="searchArticulos"
                         @elegir="addArticulo"
-                    />
-
-                    <JdButton
-                        icon="fa-solid fa-tags"
-                        text="Lista de precios"
-                        tipo="3"
-                        @click="openPreciosLista"
-                        v-if="modal.socio?.precio_lista"
                     />
                 </template>
 
@@ -39,6 +23,26 @@
                         @click="openPedidoItems"
                     />
                 </template>
+            </template>
+
+            <template v-if="modal.transaccion.tipo == 'abastacer_maquila'">
+                <JdSelectQuery
+                    text="asd"
+                    icon="fa-solid fa-magnifying-glass"
+                    placeholder="Buscar artículos"
+                    v-model="nuevo"
+                    :spin="modal.spinArticulos"
+                    :lista="modal.articulos"
+                    @search="searchArticulos"
+                    @elegir="addArticulo"
+                />
+
+                <JdButton
+                    icon="fa-solid fa-list-ul"
+                    text="Lista de materiales"
+                    tipo="3"
+                    @click="openPedidoMrpBomLines"
+                />
             </template>
 
             <template
@@ -59,7 +63,7 @@
             :datos="modal.transaccion.transaccion_items || []"
             :colAct="modal.mode == 1 || (modal.mode == 2 && modal.transaccion.tipo != 5)"
             :download="false"
-            :seeker="modal.transaccion.socio_pedido != null"
+            :seeker="false"
             minHeight="10rem"
             :inputsDisabled="modal.mode == 3 || (modal.mode == 2 && modal.transaccion.tipo == 5)"
             @onInput="runMethod"
@@ -94,7 +98,7 @@
                     icon="fa-solid fa-list-ul"
                     title="Lotes"
                     @click="openLotes(item)"
-                    v-if="modal.mode == 1 && item.cantidad > 0"
+                    v-if="modal.mode != 3 && item.cantidad > 0"
                 />
 
                 <ul class="container-lotes-padre">
@@ -103,22 +107,12 @@
                         <div>{{ a.lote_padre1.lote_fv_stock }}</div>
                     </li>
                 </ul>
-
-                <!-- <JdSelect
-                    v-model="item.lote_padre"
-                    :lista="item.lotes"
-                    mostrar="lote_fv_stock"
-                    :loaded="item.lotesLoades || true"
-                    @reload="loadLotes(item)"
-                    @elegir="setLotePadre(item)"
-                    :disabled="modal.mode == 3"
-                /> -->
             </template>
         </JdTable>
     </div>
 
-    <mPreciosLista v-if="useModals.show.mPreciosLista" @sendItems="agregarArticulosDePrecioLista" />
     <mPedidoItems v-if="useModals.show.mPedidoItems" @sendItems="agregarPedidoItems" />
+    <mPedidoMrpBomLines v-if="useModals.show.mPedidoMrpBomLines" @sendItems="agregarPedidoItems" />
     <mTransaccionItemLotes
         v-if="useModals.show.mTransaccionItemLotes"
         @sendItems="setArticuloLotes"
@@ -128,17 +122,17 @@
 <script>
 import { JdInput, JdSelectQuery, JdButton, JdTable } from '@jhuler/components'
 
-import mPreciosLista from '@/views/logistica_entrada/pedidos/mPreciosLista.vue'
 import mPedidoItems from '@/views/logistica_entrada/compras/mPedidoItems.vue'
+import mPedidoMrpBomLines from './mPedidoMrpBomLines.vue'
 import mTransaccionItemLotes from '@/views/logistica_entrada/compras/mTransaccionItemLotes.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
 import { useVistas } from '@/pinia/vistas'
 
-import { urls, get, post, patch, delet } from '@/utils/crud'
-import { jmsg, jqst } from '@/utils/swal'
-import { getItemFromArray, obtenerNumeroJuliano, genCorrelativo } from '@/utils/mine'
+import { urls, get, patch } from '@/utils/crud'
+import { jmsg } from '@/utils/swal'
+import { obtenerNumeroJuliano, genCorrelativo } from '@/utils/mine'
 
 export default {
     components: {
@@ -147,8 +141,8 @@ export default {
         JdButton,
         JdTable,
 
-        mPreciosLista,
         mPedidoItems,
+        mPedidoMrpBomLines,
         mTransaccionItemLotes,
     },
     data: () => ({
@@ -165,7 +159,7 @@ export default {
                 id: 'articulo',
                 title: 'Artículo',
                 prop: 'articulo1.nombre',
-                width: '23rem',
+                width: '25rem',
                 show: true,
                 sort: true,
                 seek: true,
@@ -187,126 +181,22 @@ export default {
                 show: true,
             },
             {
-                id: 'pu',
-                title: 'Valor unitario',
-                type: 'number',
-                input: true,
-                width: '6rem',
-                show: true,
-                oninput: 'sumarUno',
-            },
-            {
-                id: 'fv',
-                title: 'Lote | Fv',
-                slot: 'cFv',
-                width: '14.5rem',
-                show: false,
-            },
-            {
                 id: 'lote_padre',
                 title: 'Lote | Fv | Stock',
                 slot: 'cLote',
-                width: '17rem',
-                show: false,
-            },
-            {
-                id: 'mtoValorVenta',
-                title: 'Subtotal',
-                format: 'decimal',
-                width: '7rem',
+                width: '19rem',
                 show: true,
-                toRight: true,
-            },
-            {
-                id: 'igv',
-                title: 'Impuesto',
-                format: 'decimal',
-                width: '7rem',
-                show: true,
-                toRight: true,
-            },
-            {
-                id: 'total',
-                title: 'Importe',
-                format: 'decimal',
-                width: '7rem',
-                show: true,
-                toRight: true,
             },
         ],
-        // tableRowOptions: [
-        //     {
-        //         label: 'Duplicar',
-        //         icon: 'fa-solid fa-copy',
-        //         action: 'duplicar',
-        //     },
-        //     {
-        //         label: 'Quitar',
-        //         icon: 'fa-solid fa-trash-can',
-        //         action: 'quitar',
-        //         permiso: 'vVentas:crear',
-        //     },
-        // ],
     }),
     created() {
-        this.modal = this.useModals.mTransaccion
-
-        this.setColumns()
-        this.sumarItems()
+        this.modal = this.useModals.mStockPicking
     },
     methods: {
-        setColumns() {
-            if (this.modal.transaccion.tipo == 1) {
-                this.columns[4].show = true
-            } else if (this.modal.transaccion.tipo == 5) {
-                this.columns[5].show = true
-            }
-        },
         setLoteHoy() {
             if (this.modal.transaccion.tipo != 1) return null
             return `${obtenerNumeroJuliano(this.modal.transaccion.fecha)}-${Math.floor(Math.random() * 90 + 10)}`
         },
-        // async loadLotes(item) {
-        //     const qry = {
-        //         incl: ['articulo1'],
-        //         cols: [
-        //             'fecha',
-        //             'moneda',
-        //             'tipo_cambio',
-        //             'pu',
-        //             'igv_afectacion',
-        //             'igv_porcentaje',
-        //             'fv',
-        //             'lote',
-        //             'stock',
-        //             'lote_fv_stock',
-        //         ],
-        //         fltr: {
-        //             articulo: { op: 'Es', val: item.articulo },
-        //             is_lote_padre: { op: 'Es', val: true },
-        //         },
-        //         ordr: [['lote', 'DESC']],
-        //     }
-
-        //     item.lotesLoades = false
-        //     this.useAuth.setLoading(true, 'Cargando...')
-        //     const res = await get(`${urls.kardex}?qry=${JSON.stringify(qry)}`)
-        //     this.useAuth.setLoading(false)
-        //     item.lotesLoades = true
-
-        //     if (res.code !== 0) return
-
-        //     item.lotes = res.data
-        // },
-        // setLotePadre(item) {
-        //     console.log(item)
-        //     // if (item.lote_padre == null) {
-        //     //     item.stock = null
-        //     //     return
-        //     // }
-
-        //     // item.stock = item.lotes.find((a) => a.id == item.lote_padre)?.stock || 0
-        // },
 
         async searchArticulos(txtBuscar) {
             if (!txtBuscar) {
@@ -346,8 +236,8 @@ export default {
             // if (i !== -1) return jmsg('warning', 'El artículo ya está agregado')
 
             const send = {
-                orden: this.setOrden(),
                 id: crypto.randomUUID(),
+                orden: this.setOrden(),
                 articulo: item.id,
                 articulo1: {
                     type: item.type,
@@ -369,86 +259,7 @@ export default {
                 total: 0,
             }
 
-            if (this.modal.mode == 2) {
-                send.transaccion = this.modal.transaccion.id
-
-                this.useAuth.setLoading(true, 'Agregando...')
-                const res = await post(urls.transaccion_items, send, 'Agregado con éxito')
-                this.useAuth.setLoading(false)
-
-                if (res.code != 0) return
-
-                send.id = res.data.id
-            }
-
             this.modal.transaccion.transaccion_items.push(send)
-        },
-
-        async openPreciosLista() {
-            if (this.modal.socio.precio_lista1.moneda != this.modal.transaccion.moneda) {
-                jmsg(
-                    'warning',
-                    'La moneda de la lista de precios no es igual a la moneda del pedido',
-                )
-                return
-            }
-
-            const send = {
-                precio_lista: {
-                    id: this.modal.socio.precio_lista,
-                    ...this.modal.socio.precio_lista1,
-                    moneda: getItemFromArray(
-                        this.modal.socio.precio_lista1.moneda,
-                        this.modal.monedas,
-                    ),
-                },
-            }
-            this.useModals.setModal('mPreciosLista', 'Lista de precios', null, send, true)
-        },
-        async agregarArticulosDePrecioLista(items) {
-            for (const a of items) {
-                // const i = this.modal.transaccion.transaccion_items.findIndex(b => b.articulo == a.articulo)
-                // if (i !== -1) continue
-
-                const send = {
-                    orden: this.setOrden(),
-                    id: crypto.randomUUID(),
-                    articulo: a.articulo,
-                    articulo1: {
-                        type: a.articulo1.type,
-                        nombre: a.articulo1.nombre,
-                        unidad: a.articulo1.unidad,
-                        has_fv: a.articulo1.has_fv,
-                        combo_articulos: a.articulo1.combo_articulos,
-                    },
-
-                    cantidad: null,
-                    lote: this.setLoteHoy(),
-
-                    pu: a.precio,
-                    igv_afectacion: a.articulo1.igv_afectacion,
-                    igv_porcentaje:
-                        a.articulo1.igv_afectacion == '10' ? this.modal.empresa.igv_porcentaje : 0,
-
-                    mtoValorVenta: 0,
-                    igv: 0,
-                    total: 0,
-                }
-
-                if (this.modal.mode == 2) {
-                    send.transaccion = this.modal.transaccion.id
-
-                    this.useAuth.setLoading(true, 'Agregando...')
-                    const res = await post(urls.transaccion_items, send, 'Agregado con éxito')
-                    this.useAuth.setLoading(false)
-
-                    if (res.code != 0) return
-
-                    send.id = res.data.id
-                }
-
-                this.modal.transaccion.transaccion_items.push(send)
-            }
         },
 
         async openPedidoItems() {
@@ -464,11 +275,11 @@ export default {
                 // const i = this.modal.transaccion.transaccion_items.findIndex(
                 //     (b) => b.articulo == a.articulo,
                 // )
-
                 // if (i === -1) continue
+
                 const send = {
-                    orden: this.setOrden(),
                     id: crypto.randomUUID(),
+                    orden: this.setOrden(),
                     articulo: a.articulo,
                     articulo1: {
                         type: a.articulo1.type,
@@ -479,39 +290,43 @@ export default {
                     },
 
                     cantidad: a.cantidad,
-                    // entregado: a.entregado,
-                    // faltante: a.cantidad - a.entregado,
 
-                    lote: this.setLoteHoy(),
+                    // lote: this.setLoteHoy(),
 
-                    pu: a.pu,
-                    igv_afectacion: a.igv_afectacion,
-                    igv_porcentaje: a.igv_porcentaje,
+                    // pu: a.pu,
+                    // igv_afectacion: a.igv_afectacion,
+                    // igv_porcentaje: a.igv_porcentaje,
 
                     mtoValorVenta: 0,
                     igv: 0,
                     total: 0,
                 }
 
-                if (this.modal.mode == 2) {
-                    send.transaccion = this.modal.transaccion.id
+                // if (this.modal.mode == 2) {
+                //     send.transaccion = this.modal.transaccion.id
 
-                    this.useAuth.setLoading(true, 'Agregando...')
-                    const res = await post(urls.transaccion_items, send, 'Agregado con éxito')
-                    this.useAuth.setLoading(false)
+                //     this.useAuth.setLoading(true, 'Agregando...')
+                //     const res = await post(urls.transaccion_items, send, 'Agregado con éxito')
+                //     this.useAuth.setLoading(false)
 
-                    if (res.code != 0) return
+                //     if (res.code != 0) return
 
-                    send.id = res.data.id
-                }
+                //     send.id = res.data.id
+                // }
 
                 this.modal.transaccion.transaccion_items.push(send)
-                // } else {
-                //     this.modal.transaccion.transaccion_items[i].cantidad += a.cantidad
-                // }
             }
 
             this.sumarItems()
+        },
+
+        async openPedidoMrpBomLines() {
+            const send = {
+                articulos: this.modal.mrp_bom_lines,
+                socio_pedido: this.modal.transaccion.socio_pedido,
+            }
+
+            this.useModals.setModal('mPedidoMrpBomLines', 'Lista de materiales', null, send, true)
         },
 
         calcularUno(item) {
@@ -718,16 +533,16 @@ export default {
             if (res.code != 0) return
         },
         async quitar(item) {
-            if (this.modal.mode == 2) {
-                const qst = await jqst('¿Está seguro de eliminar?')
-                if (!qst.isConfirmed) return
+            // if (this.modal.mode == 2) {
+            //     const qst = await jqst('¿Está seguro de eliminar?')
+            //     if (!qst.isConfirmed) return
 
-                this.useAuth.setLoading(true, 'Eliminando...')
-                const res = await delet(urls.transaccion_items, item)
-                this.useAuth.setLoading(false)
+            //     this.useAuth.setLoading(true, 'Eliminando...')
+            //     const res = await delet(urls.transaccion_items, item)
+            //     this.useAuth.setLoading(false)
 
-                if (res.code != 0) return
-            }
+            //     if (res.code != 0) return
+            // }
 
             const i = this.modal.transaccion.transaccion_items.findIndex((a) => a.id == item.id)
             this.modal.transaccion.transaccion_items.splice(i, 1)
@@ -743,8 +558,6 @@ export default {
 
 <style lang="scss" scoped>
 .agregar {
-    // display: grid;
-    // grid-template-columns: 1fr auto auto;
     display: flex;
     gap: 0.5rem;
     margin-bottom: 1rem;

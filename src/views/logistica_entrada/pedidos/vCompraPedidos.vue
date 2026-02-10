@@ -207,6 +207,13 @@ export default {
                 ocultar: { estado: ['0', '2'] },
             },
             {
+                label: 'Entregar mercadería',
+                icon: 'fa-regular fa-circle-down',
+                action: 'entregarMercaderia',
+                permiso: 'vCompraPedidos:entregarMercaderia',
+                ocultar: { estado: ['0', '2'], is_maquila: false },
+            },
+            {
                 label: 'Ingresar mercadería',
                 icon: 'fa-regular fa-circle-up',
                 action: 'ingresarMercaderia',
@@ -238,6 +245,7 @@ export default {
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
+            this.vista.qry.cols.push('is_maquila')
         },
         async loadPedidos() {
             this.setQuery()
@@ -421,16 +429,12 @@ export default {
 
             if (res.code != 0) return
         },
-        async ingresarMercaderia(item) {
+        async entregarMercaderia(item) {
             const qry = {
                 incl: ['socio1', 'moneda1', 'socio_pedido_items'],
                 iccl: {
                     socio1: {
-                        incl: ['precio_lista1'],
                         cols: ['doc_numero', 'contactos', 'direcciones', 'precio_lista'],
-                    },
-                    socio_pedido_items: {
-                        incl: ['articulo1'],
                     },
                 },
             }
@@ -440,6 +444,68 @@ export default {
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
+
+            const send = {
+                transaccion: {
+                    tipo: 'abastacer_maquila',
+                    fecha: dayjs().format('YYYY-MM-DD'),
+
+                    socio: res.data.socio,
+                    socio_pedido: res.data.id,
+
+                    moneda: res.data.moneda,
+                    pago_condicion: res.data.pago_condicion,
+
+                    estado: 1,
+                    transaccion_items: [],
+                },
+                socio_pedido_items: res.data.socio_pedido_items,
+                pedido: {
+                    id: res.data.id,
+                    codigo: res.data.codigo,
+                },
+                pedidos: [
+                    {
+                        id: res.data.id,
+                        codigo: res.data.codigo,
+                    },
+                ],
+                socios: [{ ...res.data.socio1 }],
+            }
+
+            this.useModals.setModal('mTransaccion', 'Abastecer para maquila', 1, send, true)
+        },
+        async ingresarMercaderia(item) {
+            const qry = {
+                incl: ['socio1', 'moneda1'],
+                iccl: {
+                    socio1: {
+                        incl: ['precio_lista1'],
+                        cols: ['doc_numero', 'contactos', 'direcciones', 'precio_lista'],
+                    },
+                },
+            }
+
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.socio_pedidos}/uno/${item.id}?qry=${JSON.stringify(qry)}`)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            const qry2 = {
+                incl: ['articulo1'],
+                cols: { exclude: [] },
+                fltr: {
+                    socio_pedido: { op: 'Es', val: item.id },
+                },
+                ordr: [['orden', 'ASC']],
+            }
+
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res2 = await get(`${urls.socio_pedido_items}?qry=${JSON.stringify(qry2)}`)
+            this.useAuth.setLoading(false)
+
+            if (res2.code != 0) return
 
             const send = {
                 transaccion: {
@@ -455,7 +521,7 @@ export default {
                     estado: 1,
                     transaccion_items: [],
                 },
-                socio_pedido_items: res.data.socio_pedido_items,
+                socio_pedido_items: res2.data,
                 pedido: {
                     id: res.data.id,
                     codigo: res.data.codigo,

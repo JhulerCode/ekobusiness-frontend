@@ -635,10 +635,12 @@ export default {
 }
 
 .extra-datos {
+    border-top: var(--border);
+    border-bottom: var(--border);
+
     .pestanas {
         display: flex;
         background-color: var(--bg-color2);
-        margin-bottom: 1rem;
 
         li {
             padding: 0.3rem 0.5rem;
@@ -652,6 +654,8 @@ export default {
     }
 
     .pestanas-body {
+        padding: 1rem 0;
+
         .container-datos {
             display: grid;
             gap: 0.5rem;

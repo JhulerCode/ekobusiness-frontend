@@ -183,7 +183,7 @@ export default {
         this.loadDatosSistema()
 
         if (this.modal.mode == 1) {
-            if (this.modal.transaccion.tipo == 5) {
+            if (this.modal.transaccion.tipo == 1 || this.modal.transaccion.tipo == 5) {
                 if (this.modal.transaccion.socio_pedido) {
                     setTimeout(() => {
                         this.$refs.mTransaccionItems.agregarPedidoItems(
@@ -191,13 +191,14 @@ export default {
                         )
                     }, 300)
                 }
+
+                this.loadSocios()
+
+                await this.loadMonedas()
+                if (this.modal.transaccion.socio_pedido) this.setTipoCambio()
             }
 
             this.setTotalesCero()
-            this.loadSocios()
-            await this.loadMonedas()
-
-            if (this.modal.transaccion.socio_pedido) this.setTipoCambio()
         }
     },
     methods: {
@@ -502,7 +503,8 @@ export default {
 }
 
 .extra-datos {
-    border: var(--border);
+    border-top: var(--border);
+    border-bottom: var(--border);
 
     .pestanas {
         display: flex;
@@ -520,17 +522,15 @@ export default {
     }
 
     .pestana-body {
-        padding: 1rem;
-        height: 20rem;
+        padding: 1rem 0;
         width: 60rem;
-        overflow-y: auto;
     }
 }
 
 .botom {
     display: flex;
     justify-content: space-between;
-    margin-top: 1rem;
+    margin-top: 2rem;
     gap: 2rem;
 
     .left {

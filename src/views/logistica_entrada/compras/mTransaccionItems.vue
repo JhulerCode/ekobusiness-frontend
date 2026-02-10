@@ -9,45 +9,39 @@
                 modal.transaccion.tipo_cambio
             "
         >
-            <template v-if="!modal.transaccion.socio_pedido">
-                <JdSelectQuery
-                    text="asd"
-                    icon="fa-solid fa-magnifying-glass"
-                    placeholder="Busca artículos"
-                    v-model="nuevo"
-                    :spin="modal.spinArticulos"
-                    :lista="modal.articulos"
-                    @search="searchArticulos"
-                    @elegir="addArticulo"
-                />
+            <template v-if="modal.transaccion.tipo == 1 || modal.transaccion.tipo == 5">
+                <template v-if="!modal.transaccion.socio_pedido">
+                    <JdSelectQuery
+                        text="asd"
+                        icon="fa-solid fa-magnifying-glass"
+                        placeholder="Busca artículos"
+                        v-model="nuevo"
+                        :spin="modal.spinArticulos"
+                        :lista="modal.articulos"
+                        @search="searchArticulos"
+                        @elegir="addArticulo"
+                    />
 
-                <JdButton
-                    icon="fa-solid fa-tags"
-                    text="Lista de precios"
-                    tipo="3"
-                    @click="openPreciosLista"
-                    v-if="modal.socio?.precio_lista"
-                />
+                    <JdButton
+                        icon="fa-solid fa-tags"
+                        text="Lista de precios"
+                        tipo="3"
+                        @click="openPreciosLista"
+                        v-if="modal.socio?.precio_lista"
+                    />
+                </template>
+
+                <template v-if="modal.transaccion.socio_pedido">
+                    <JdButton
+                        icon="fa-solid fa-list-ul"
+                        text="Items del pedido"
+                        tipo="3"
+                        @click="openPedidoItems"
+                    />
+                </template>
             </template>
 
-            <template v-if="modal.transaccion.socio_pedido">
-                <JdButton
-                    icon="fa-solid fa-list-ul"
-                    text="Items del pedido"
-                    tipo="3"
-                    @click="openPedidoItems"
-                    v-if="modal.transaccion.tipo == 5 && modal.mode == 1"
-                />
-
-                <JdButton
-                    icon="fa-solid fa-list-ul"
-                    text="Items del pedido"
-                    tipo="3"
-                    @click="openPedidoItems"
-                />
-            </template>
-
-            <template v-if="modal.transaccion.tipo == 5 && modal.mode != 3">
+            <template v-if="modal.transaccion.tipo == 5 || modal.transaccion.tipo == 'abastacer_maquila'">
                 <JdButton
                     icon="fa-solid fa-wrench"
                     text="Auto colocar lotes"
@@ -64,20 +58,11 @@
             :colAct="modal.mode == 1 || (modal.mode == 2 && modal.transaccion.tipo != 5)"
             :download="false"
             :seeker="modal.transaccion.socio_pedido != null"
-            :maxHeight="modal.mode == 3 ? '18rem' : '14.5rem'"
+            minHeight="10rem"
             :inputsDisabled="modal.mode == 3 || (modal.mode == 2 && modal.transaccion.tipo == 5)"
             @onInput="runMethod"
         >
-            <!-- :rowOptions="tableRowOptions"
-            @rowOptionSelected="runMethod" -->
             <template v-slot:cAction="{ item }">
-                <!-- <JdButton
-                    :small="true"
-                    tipo="2"
-                    icon="fa-solid fa-copy"
-                    title="Duplicar"
-                    @click="duplicar(item)"
-                /> -->
                 <JdButton
                     :small="true"
                     tipo="2"
@@ -90,6 +75,7 @@
             <template v-slot:cFv="{ item }">
                 <div class="container-compra-fv">
                     <p class="lote">{{ item.lote }}</p>
+
                     <JdInput
                         type="date"
                         v-model="item.fv"
@@ -270,9 +256,13 @@ export default {
         setColumns() {
             if (this.modal.transaccion.tipo == 1) {
                 this.columns[4].show = true
-            } else {
+            } else if (this.modal.transaccion.tipo == 2) {
                 this.columns[5].show = true
             }
+
+            // if (!this.modal.transaccion.socio_pedido) {
+            //     this.modal.table_has_actions = true
+            // }
         },
         setLoteHoy() {
             if (this.modal.transaccion.tipo != 1) return null

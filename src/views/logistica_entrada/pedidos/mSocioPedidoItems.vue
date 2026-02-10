@@ -178,6 +178,7 @@ export default {
 
             const qry = {
                 fltr: {
+                    // purchase_ok: { op: 'Es', val: true },
                     activo: { op: 'Es', val: true },
                     nombre: { op: 'Contiene', val: txtBuscar },
                 },
@@ -185,7 +186,7 @@ export default {
                 ordr: [['nombre', 'ASC']],
             }
 
-            if (this.modal.socio_elegido.tipo == 1) {
+            if (this.modal.socio_pedido.tipo == 1) {
                 qry.fltr.purchase_ok = { op: 'Es', val: true }
             } else {
                 qry.fltr.sale_ok = { op: 'Es', val: true }

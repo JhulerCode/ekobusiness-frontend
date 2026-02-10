@@ -524,16 +524,12 @@ export default {
         },
         async entregarMercaderia(item) {
             const qry = {
-                // incl: ['socio1', 'moneda1', 'socio_pedido_items'],
                 incl: ['socio1', 'moneda1'],
                 iccl: {
                     socio1: {
                         incl: ['precio_lista1'],
                         cols: ['doc_numero', 'contactos', 'direcciones', 'precio_lista'],
                     },
-                    // socio_pedido_items: {
-                    //     incl: ['articulo1'],
-                    // },
                 },
             }
 

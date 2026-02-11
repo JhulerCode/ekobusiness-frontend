@@ -294,7 +294,7 @@ export default {
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
-            this.vista.qry.cols.push('articulo')
+            this.vista.qry.cols.push('articulo', 'mrp_bom')
         },
         async loadProduccionOrdenes() {
             this.setQuery()
@@ -528,9 +528,25 @@ export default {
 
             if (res.code != 0) return
 
+            const qry1 = {
+                fltr: {
+                    mrp_bom: { op: 'Es', val: item.mrp_bom },
+                },
+                cols: ['articulo', 'cantidad', 'orden'],
+                incl: ['articulo1'],
+                ordr: [['orden', 'ASC']],
+            }
+
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res1 = await get(`${urls.mrp_bom_lines}?qry=${JSON.stringify(qry1)}`)
+            this.useAuth.setLoading(false)
+
+            if (res1.code != 0) return
+
             const send = {
                 is_receta: true,
-                produccion_orden: JSON.parse(JSON.stringify(res.data)),
+                produccion_orden: { ...item },
+                mrp_bom_lines: res1.data,
             }
 
             this.useModals.setModal('mProduccionInsumos', `Salida de insumos`, 1, send, true)

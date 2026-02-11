@@ -44,6 +44,13 @@
                 @click="exportarPrograma"
                 v-if="useAuth.verifyPermiso('vPrograma:crear')"
             />
+
+            <JdButton
+                text="Recargar"
+                tipo="2"
+                @click="loadProduccionOrdenes"
+                v-if="useAuth.verifyPermiso('vPrograma:listar')"
+            />
         </div>
         <!-- {{ maquinas_produccion }} -->
         <div class="asdasd">
@@ -611,8 +618,14 @@ export default {
             this[method](item)
         },
         async ver(item) {
+            const qry = {
+                incl: ['maquina1', 'articulo1', 'mrp_bom1'],
+            }
+
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.produccion_ordenes}/uno/${item.id}`)
+            const res = await get(
+                `${urls.produccion_ordenes}/uno/${item.id}?qry=${JSON.stringify(qry)}`,
+            )
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
@@ -625,6 +638,7 @@ export default {
                         ...res.data.articulo_info,
                     },
                 ],
+                mrp_boms: [{ ...res.data.mrp_bom1 }],
                 maquinas: [
                     {
                         id: res.data.maquina,
@@ -638,8 +652,14 @@ export default {
             this.useModals.setModal('mProduccionOrden', 'Ver órden de producción', 3, send, true)
         },
         async editar(item) {
+            const qry = {
+                incl: ['maquina1', 'articulo1', 'mrp_bom1'],
+            }
+
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.produccion_ordenes}/uno/${item.id}`)
+            const res = await get(
+                `${urls.produccion_ordenes}/uno/${item.id}?qry=${JSON.stringify(qry)}`,
+            )
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
@@ -652,8 +672,11 @@ export default {
                         ...res.data.articulo_info,
                     },
                 ],
+                mrp_boms: [{ ...res.data.mrp_bom1 }],
                 maquinas: this.vista.maquinas,
                 origin: 'vPrograma',
+                maquinas_loaded: true,
+                mrp_boms_loaded: true,
             }
 
             this.useModals.setModal('mProduccionOrden', 'Editar órden de producción', 2, send, true)
@@ -715,25 +738,25 @@ export default {
 
             if (res.code != 0) return
 
-            // const qry1 = {
-            //     fltr: {
-            //         mrp_bom: { op: 'Es', val: item.mrp_bom },
-            //     },
-            //     cols: ['articulo', 'cantidad', 'orden'],
-            //     incl: ['articulo1'],
-            //     ordr: [['orden', 'ASC']],
-            // }
+            const qry1 = {
+                fltr: {
+                    mrp_bom: { op: 'Es', val: item.mrp_bom },
+                },
+                cols: ['articulo', 'cantidad', 'orden'],
+                incl: ['articulo1'],
+                ordr: [['orden', 'ASC']],
+            }
 
-            // this.useAuth.setLoading(true, 'Cargando...')
-            // const res1 = await get(`${urls.mrp_bom_lines}?qry=${JSON.stringify(qry1)}`)
-            // this.useAuth.setLoading(false)
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res1 = await get(`${urls.mrp_bom_lines}?qry=${JSON.stringify(qry1)}`)
+            this.useAuth.setLoading(false)
 
-            // if (res1.code != 0) return
+            if (res1.code != 0) return
 
             const send = {
                 is_receta: true,
                 produccion_orden: { ...item },
-                // mrp_bom_lines: res1.data,
+                mrp_bom_lines: res1.data,
             }
 
             this.useModals.setModal('mProduccionInsumos', `Salida de insumos`, 1, send, true)

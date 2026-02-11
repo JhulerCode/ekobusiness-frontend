@@ -18,7 +18,7 @@
                     :lista="
                         modal.maquinas?.filter((a) => a.linea == modal.produccion_orden.linea) || []
                     "
-                    :loaded="maquinas_loaded"
+                    :loaded="modal.maquinas_loaded"
                     @reload="loadMaquinas"
                     @elegir="setMaquina"
                     :disabled="modal.mode == 3"
@@ -62,7 +62,7 @@
                 :nec="true"
                 :lista="modal.mrp_boms"
                 mostrar="referencia"
-                :loaded="modal.mrp_boms_loaded && modal.articulo != null"
+                :loaded="modal.mrp_boms_loaded && modal.produccion_orden.articulo != null"
                 @reload="loadMrpBoms"
                 @elegir="setMrpBom"
                 v-model="modal.produccion_orden.mrp_bom"
@@ -301,9 +301,7 @@ export default {
             }
 
             this.useAuth.setLoading(true, 'Cargando...')
-            this.modal.mrp_boms_loaded = false
             const res = await get(`${urls.mrp_bom_lines}?qry=${JSON.stringify(qry)}`)
-            this.modal.mrp_boms_loaded = true
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return

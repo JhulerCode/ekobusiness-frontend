@@ -19,7 +19,7 @@
                 :nec="true"
                 v-model="modal.transaccion.articulo"
                 id="articulo"
-                :lista="modal.produccion_orden.articulo_info.receta_insumos || []"
+                :lista="modal.mrp_bom_lines || []"
                 mostrar="articulo1.nombre"
                 @elegir="loadLotes"
                 style="grid-column: 1/3"
@@ -67,9 +67,8 @@
                 Cant. planificada:
                 {{
                     redondear(
-                        modal.produccion_orden.articulo_info.receta_insumos.find(
-                            (a) => a.articulo == modal.transaccion.articulo,
-                        )?.cantidad * modal.produccion_orden.cantidad,
+                        modal.mrp_bom_lines.find((a) => a.articulo == modal.transaccion.articulo)
+                            ?.cantidad * modal.produccion_orden.cantidad,
                     )
                 }}
             </small>

@@ -194,7 +194,7 @@ export default {
             return `${diaDelAnio.toString().padStart(3, '0')} ${anio}`
         },
         setLote() {
-            return `${obtenerNumeroJuliano(this.modal.transaccion_item.fecha)}-${Math.floor(Math.random() * 90 + 10)}`
+            return `${obtenerNumeroJuliano(this.modal.produccion_orden.fecha)}-${Math.floor(Math.random() * 90 + 10)}`
         },
 
         checkDatos() {

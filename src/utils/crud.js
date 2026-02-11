@@ -3,7 +3,7 @@ import { useModals } from '@/pinia/modals'
 import { jmsg } from '@/utils/swal'
 
 const host = import.meta.env.VITE_API_HOST
-const subdominio_prueba = 'ekofood'
+const subdominio_local = import.meta.env.VITE_SUBDOMINIO_LOCAL
 
 const urls = {
     signin: `${host}/api/auth`,
@@ -197,7 +197,7 @@ function getSubdominio() {
 
     if (parts.length > 2) return parts[0]
 
-    return subdominio_prueba
+    return subdominio_local
 }
 
 export {

@@ -366,9 +366,21 @@ export default {
                 return true
             }
 
+            if (this.modal.mrp_bom.mrp_bom_lines.length == 0) {
+                jmsg('warning', 'Agregue al menos un componente')
+                return true
+            }
+
             for (const a of this.modal.mrp_bom.mrp_bom_lines) {
                 if (incompleteData(a, ['articulo', 'cantidad'])) {
                     jmsg('warning', 'Ingrese los datos necesarios de cada componente')
+                    return true
+                }
+            }
+
+            if (this.modal.mrp_bom.tipo == 'subcontratar') {
+                if (this.modal.mrp_bom.mrp_bom_socios.length == 0) {
+                    jmsg('warning', 'Agregue al menos un subcontratista')
                     return true
                 }
             }
@@ -384,7 +396,7 @@ export default {
 
             if (res.code !== 0) return
 
-            this.useVistas.addItem('mMrpBom', 'mrp_boms', res.data)
+            this.useVistas.addItem('vMrpBom', 'mrp_boms', res.data)
             this.useModals.show.mMrpBom = false
         },
         async modificar() {

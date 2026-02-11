@@ -34,6 +34,14 @@
                         TL: {{ modal.produccion_orden.maquina_info?.limpieza_tiempo }} min
                     </small>
                 </div>
+
+                <p
+                    v-if="modal.maquinas && modal.maquinas.length > 0"
+                    style="grid-column: 4/5; text-align: right"
+                >
+                    <small>Tiempo de producción:</small>
+                    {{ setTiempo() }} <br />
+                </p>
             </template>
 
             <JdSelectQuery
@@ -79,13 +87,21 @@
                 style="grid-column: 1/2"
             />
 
-            <p
-                v-if="modal.maquinas && modal.maquinas.length > 0"
-                style="grid-column: 4/5; text-align: right"
+            <JdSelect
+                label="Responsable"
+                :nec="true"
+                :lista="modal.colaboradores"
+                mostrar="nombres_apellidos"
+                :loaded="modal.colaboradores_loaded && modal.produccion_orden.articulo != null"
+                @reload="loadColaboradores"
+                v-model="modal.produccion_orden.responsable"
+                :disabled="modal.mode == 3"
+                style="grid-column: 1/4"
+            />
+
+            <small v-if="responsable?.produccion_codigo"
+                >Código: {{ responsable?.produccion_codigo }}</small
             >
-                <small>Tiempo de producción:</small>
-                {{ setTiempo() }} <br />
-            </p>
 
             <JdTextArea
                 label="Observación"
@@ -205,6 +221,11 @@ export default {
                 cantidad_necesitada: a.cantidad * (this.modal.produccion_orden.cantidad || 0),
             }))
         },
+        responsable() {
+            return this.modal.colaboradores.find(
+                (a) => a.id == this.modal.produccion_orden.responsable,
+            )
+        },
     },
     created() {
         this.modal = this.useModals.mProduccionOrden
@@ -214,6 +235,8 @@ export default {
         if (this.modal.produccion_orden.mrp_bom) {
             this.loadMrpBomLines()
         }
+
+        this.loadColaboradores()
     },
     methods: {
         showButtons() {
@@ -265,6 +288,30 @@ export default {
             if (res.code !== 0) return
 
             this.modal.articulos = JSON.parse(JSON.stringify(res.data))
+        },
+        async loadColaboradores() {
+            this.modal.colaboradores = []
+
+            const qry = {
+                fltr: {
+                    activo: { op: 'Es', val: true },
+                },
+                cols: ['nombres', 'apellidos', 'nombres_apellidos', 'produccion_codigo'],
+                ordr: [
+                    ['nombres', 'ASC'],
+                    ['apellidos', 'ASC'],
+                ],
+            }
+
+            this.useAuth.setLoading(true, 'Cargando...')
+            this.modal.colaboradores_loaded = false
+            const res = await get(`${urls.colaboradores}?qry=${JSON.stringify(qry)}`)
+            this.modal.colaboradores_loaded = true
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            this.modal.colaboradores = res.data
         },
         async loadMrpBoms() {
             this.modal.mrp_boms = []
@@ -388,7 +435,7 @@ export default {
         },
 
         checkDatos() {
-            const props = ['fecha', 'articulo', 'cantidad', 'mrp_bom', 'orden']
+            const props = ['fecha', 'articulo', 'cantidad', 'orden']
 
             if (this.modal.maquinas && this.modal.maquinas.length > 0) {
                 props.push('maquina', 'maquina_info')

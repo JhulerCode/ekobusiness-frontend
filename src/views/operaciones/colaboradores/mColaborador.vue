@@ -61,6 +61,12 @@
                     :disabled="modal.mode == 3"
                 />
 
+                <JdInput
+                    label="Producción código"
+                    v-model="colaborador.produccion_codigo"
+                    :disabled="modal.mode == 3"
+                />
+
                 <JdSwitch label="Activo" v-model="colaborador.activo" :disabled="modal.mode == 3" />
 
                 <JdSwitch

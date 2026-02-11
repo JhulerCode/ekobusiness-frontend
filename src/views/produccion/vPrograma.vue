@@ -155,6 +155,20 @@
                                 "
                             />
                         </template>
+
+                        <!-- <template v-slot:cActInicio="{ item }">
+                            <div class="col-act-inicio-fin">
+                                <JdButton
+                                    icon="fa-solid fa-play"
+                                    tipo="2"
+                                    @click="setInicio(item)"
+                                />
+
+                                <small v-if="item.inicio">
+                                    {{ dayjs(item.inicio).format('HH:mm') }}
+                                </small>
+                            </div>
+                        </template> -->
                     </JdTable>
                 </li>
             </ul>
@@ -267,7 +281,7 @@ export default {
                 id: 'articulo1.nombre',
                 title: 'Producto',
                 prop: 'articulo1.nombre',
-                width: '25rem',
+                width: '30rem',
                 show: true,
             },
             {
@@ -305,6 +319,13 @@ export default {
                 width: '15rem',
                 show: true,
             },
+            // {
+            //     id: 'act_inicio',
+            //     title: '',
+            //     slot: 'cActInicio',
+            //     width: '15rem',
+            //     show: true,
+            // },
         ],
         tableRowOptions: [
             {
@@ -360,16 +381,16 @@ export default {
                 id: 'articulo',
                 title: 'Nombre',
                 prop: 'articulo1.nombre',
-                width: '20rem',
+                width: '30rem',
                 show: true,
                 seek: true,
             },
             {
                 id: 'cantidad_necesitada',
-                title: 'Cant. necesaria',
+                title: 'Cantidad necesaria',
                 format: 'decimal',
                 toRight: true,
-                width: '7rem',
+                width: '8rem',
                 show: true,
             },
             {
@@ -377,7 +398,7 @@ export default {
                 title: 'Stock',
                 slot: 'colStock',
                 toRight: true,
-                width: '7rem',
+                width: '8rem',
                 show: true,
             },
         ],
@@ -570,7 +591,7 @@ export default {
             this.vista.qry = {
                 // fltr: { tipo: { op: 'Es', val: this.columns[6].val } },
                 fltr: {},
-                incl: ['articulo1'],
+                incl: ['articulo1', 'responsable1'],
                 sqls: ['productos_terminados'],
             }
 
@@ -585,6 +606,8 @@ export default {
                 'articulo_info',
                 'estado',
                 'mrp_bom',
+                'inicio',
+                'fin',
             )
         },
         async loadProduccionOrdenes() {
@@ -778,6 +801,21 @@ export default {
         setProduccionProductos(item) {
             const pr = this.vista.produccion_ordenes.find((a) => a.id == item.id)
             pr.productos_terminados = item.productos_terminados
+        },
+
+        setInicio(item) {
+            const send = {
+                id: item.id,
+                inicio: dayjs(),
+            }
+
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = patch(`${urls.produccion_ordenes}`, send, 'Inicio registrado')
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            item.inicio = send.inicio
         },
 
         nuevo(maquina) {
@@ -1046,9 +1084,16 @@ export default {
 
 .asdasd {
     display: flex;
+    flex-direction: column;
     gap: 2rem;
     // .div {
     //     flex: 1;
     // }
+}
+
+.col-act-inicio-fin {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 </style>

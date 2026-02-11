@@ -104,15 +104,9 @@ export default {
     methods: {
         setQuery() {
             this.vista.qry = {
-                fltr: {
-                    // tipo: { op: 'Es', val: 4 },
-                },
+                fltr: {},
                 incl: ['articulo1'],
-                // iccl: {
-                //     produccion_orden1: {
-                //         incl: ['linea1'],
-                //     },
-                // },
+                ordr: [['articulo1', 'nombre', 'ASC']],
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)

@@ -6,12 +6,7 @@
         </p>
 
         <div class="container-datos" v-if="modal.produccion_orden.estado == 1">
-            <JdInput
-                label="Lote"
-                :nec="true"
-                v-model="modal.transaccion_item.lote"
-                :disabled="!produccion_orden"
-            />
+            <JdInput label="Lote" :nec="true" v-model="modal.transaccion_item.lote" />
 
             <JdInput
                 label="F. vencimiento"
@@ -189,9 +184,11 @@ export default {
             const unDia = 1000 * 60 * 60 * 24
             const diaDelAnio = Math.floor(diferencia / unDia) + 1
 
+            const juliano_day = diaDelAnio.toString().padStart(3, '0')
             const anio = fecha.getFullYear().toString().slice(-2)
-
-            return `${diaDelAnio.toString().padStart(3, '0')} ${anio}`
+            const responsable_codigo =
+                this.modal.produccion_orden?.responsable1?.produccion_codigo || ''
+            return `${juliano_day} ${anio} ${responsable_codigo}`
         },
         setLote() {
             return `${obtenerNumeroJuliano(this.modal.produccion_orden.fecha)}-${Math.floor(Math.random() * 90 + 10)}`

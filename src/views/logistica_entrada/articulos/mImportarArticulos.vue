@@ -1,18 +1,21 @@
 <template>
-    <JdModal modal="mImportarArticulos" :buttons="buttons" @button-click="(action) => this[action]()">
-        <JdTable :columns="columns" :datos="modal.articulos" :seeker="false" :download="false">
-        </JdTable>
+    <JdModal
+        modal="mImportarArticulos"
+        :buttons="buttons"
+        @button-click="(action) => this[action]()"
+    >
+        <JdTable :columns="columns" :datos="modal.articulos" :seeker="false" :download="false" />
     </JdModal>
 </template>
 
 <script>
 import { JdModal, JdTable } from '@jhuler/components'
 
-import { useAuth } from "@/pinia/auth"
-import { useVistas } from "@/pinia/vistas"
-import { useModals } from "@/pinia/modals"
+import { useAuth } from '@/pinia/auth'
+import { useVistas } from '@/pinia/vistas'
+import { useModals } from '@/pinia/modals'
 
-import { urls, post } from "@/utils/crud"
+import { urls, post } from '@/utils/crud'
 
 export default {
     components: {
@@ -27,37 +30,61 @@ export default {
         modal: {},
 
         columns: [
-            { id: 'Nombre', show: true, width: '25rem', title: "Nombre" },
-            { id: 'Linea', show: true, width: '8rem', title: "Tipo de producción", prop: "Tipo_produccion1.nombre" },
-            { id: 'Categoria', show: true, width: '10rem', title: "Categoria", prop: "Categoria1.nombre" },
-            { id: 'Sobres_caja', show: true, width: '7rem', title: "Sobres en caja" },
-            { id: 'EAN', show: true, width: '10rem', title: "EAN" },
-            { id: 'Unidad', show: true, width: '5rem', title: "Unidad", prop: "Unidad" },
-            { id: 'Marca', show: true, width: '8rem', title: "Marca" },
-            { id: 'Tributo', show: true, width: '18rem', title: "Tributo", prop: "Tributo1.nombre" }
+            { id: 'nombre', title: 'Nombre', width: '25rem', show: true },
+            { id: 'codigo_barra', title: 'EAN', width: '10rem', show: true },
+            { id: 'type', title: 'Tipo', prop: 'type1.nombre', width: '10rem', show: true },
+            {
+                id: 'Se compra',
+                title: 'Se compra',
+                width: '10rem',
+                show: true,
+            },
+            {
+                id: 'Se vende',
+                title: 'Se vende',
+                width: '10rem',
+                show: true,
+            },
+
+            {
+                id: 'Tributo',
+                show: true,
+                width: '18rem',
+                title: 'Tributo',
+                prop: 'igv_afectacion1.nombre',
+            },
+            { id: 'unidad', title: 'Unidad', width: '5rem', show: true },
+            {
+                id: 'categoria',
+                title: 'Categoria',
+                prop: 'categoria1.nombre',
+                width: '10rem',
+                show: true,
+            },
+            { id: 'Marca', title: 'Marca', width: '8rem', show: true },
+
+            { id: 'Tiene fv', title: 'Tiene fv', width: '10rem', show: true },
         ],
 
-        buttons: [
-            { text: "Grabar", action: "grabar", spin: false, show: true },
-        ],
+        buttons: [{ text: 'Grabar', action: 'grabar', spin: false, show: true }],
     }),
     created() {
         this.modal = this.useModals.mImportarArticulos
 
-        if (this.modal.tipo == 1) {
-            this.columns[1].show = false
-            this.columns[2].show = false
-            this.columns[4].show = false
-            this.columns[6].show = false
-        }
+        // if (this.modal.tipo == 1) {
+        //     this.columns[1].show = false
+        //     this.columns[2].show = false
+        //     this.columns[4].show = false
+        //     this.columns[6].show = false
+        // }
     },
     methods: {
         eliminar(item) {
-            this.modal.articulos = this.modal.articulos.filter(a => a !== item)
+            this.modal.articulos = this.modal.articulos.filter((a) => a !== item)
         },
         async grabar() {
             const send = {
-                tipo: this.modal.tipo,
+                // tipo: this.modal.tipo,
                 articulos: this.modal.articulos,
             }
 
@@ -68,9 +95,9 @@ export default {
             if (res.code != 0) return
 
             this.useModals.show.mImportarArticulos = false
-        }
+        },
     },
-};
+}
 </script>
 
 <style scoped>

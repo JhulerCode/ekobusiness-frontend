@@ -326,7 +326,7 @@ export default {
             return res.data
         },
         async loadDatosSistema() {
-            const qry = ['igv_afectaciones', 'unidades', 'estados']
+            const qry = ['igv_afectaciones', 'unidades', 'estados', 'articulo_tipos']
             const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
 
             if (res.code != 0) return
@@ -362,7 +362,19 @@ export default {
             const reader = new FileReader()
 
             reader.onload = async () => {
-                const headers = ['Nombre', 'Categoria', 'Unidad', 'Tributo']
+                const headers = [
+                    // 'ID',
+                    'Nombre',
+                    'EAN',
+                    'Tipo',
+                    'Se compra',
+                    'Se vende',
+                    'Tributo',
+                    'Unidad',
+                    'Categoria',
+                    'Marca',
+                    'Tiene fv',
+                ]
                 const res = await tryOficialExcel(this.$refs.excel, file, reader, headers)
 
                 if (res.code != 0) {
@@ -371,6 +383,11 @@ export default {
                 }
 
                 await this.loadDatosSistema()
+                const articulo_tiposMap = this.vista.articulo_tipos.reduce(
+                    (obj, a) => ((obj[a.nombre] = a), obj),
+                    {},
+                )
+
                 const igv_afectacionesMap = this.vista.igv_afectaciones.reduce(
                     (obj, a) => ((obj[a.id] = a), obj),
                     {},
@@ -383,25 +400,27 @@ export default {
                 )
 
                 for (const a of res.data) {
-                    if (categoriasMap[a.Categoria]) {
-                        a.Categoria1 = categoriasMap[a.Categoria]
-                        a.Categoria = categoriasMap[a.Categoria].id
-                    } else {
-                        a.Categoria = null
-                    }
+                    ;(a.id = a.ID), (a.nombre = a.Nombre)
+                    a.codigo_barra = a.EAN
+                    a.type1 = articulo_tiposMap[a.Tipo]
+                    a.type = a.type1.id
+                    a.purchase_ok = a['Se compra'] == 'Sí' ? true : false
+                    a.sale_ok = a['Se vende'] == 'Sí' ? true : false
 
-                    if (igv_afectacionesMap[a.Tributo]) {
-                        a.Tributo = igv_afectacionesMap[a.Tributo].id
-                        a.Tributo1 = { ...igv_afectacionesMap[a.Tributo] }
-                    } else {
-                        a.Tributo = null
-                    }
+                    a.igv_afectacion1 = igv_afectacionesMap[a.Tributo]
+                    a.igv_afectacion = a.igv_afectacion1?.id
+                    a.unidad = a.Unidad
+                    a.categoria1 = categoriasMap[a.Categoria]
+                    a.categoria = a.categoria1?.id
+                    a.marca = a.Marca
+
+                    a.has_fv = a['Tiene fv'] == 'Sí' ? true : false
                 }
 
                 this.useAuth.setLoading(false)
 
                 const send = {
-                    tipo: 1,
+                    // tipo: 1,
                     articulos: res.data,
                 }
                 this.useModals.setModal(

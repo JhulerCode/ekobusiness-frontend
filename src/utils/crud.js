@@ -3,7 +3,7 @@ import { useModals } from '@/pinia/modals'
 import { jmsg } from '@/utils/swal'
 
 const host = import.meta.env.VITE_API_HOST
-const subdominio_prueba = 'app'
+const subdominio_prueba = 'ekofood'
 
 const urls = {
     signin: `${host}/api/auth`,

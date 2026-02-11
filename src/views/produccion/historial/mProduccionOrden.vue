@@ -10,13 +10,6 @@
                 style="grid-column: 1/3"
             />
 
-            <JdSelect
-                v-model="modal.produccion_orden.estado"
-                :lista="modal.produccion_orden_estados"
-                :disabled="true"
-                style="grid-column: 4/5"
-            />
-
             <template v-if="modal.maquinas && modal.maquinas.length > 0">
                 <JdSelect
                     label="Máquina"
@@ -25,6 +18,8 @@
                     :lista="
                         modal.maquinas?.filter((a) => a.linea == modal.produccion_orden.linea) || []
                     "
+                    :loaded="maquinas_loaded"
+                    @reload="loadMaquinas"
                     @elegir="setMaquina"
                     :disabled="modal.mode == 3"
                     style="grid-column: 1/3"
@@ -62,9 +57,22 @@
                 style="grid-column: 1/3"
             />
 
+            <JdSelect
+                label="Lista de materiales"
+                :nec="true"
+                :lista="modal.mrp_boms"
+                mostrar="referencia"
+                :loaded="modal.mrp_boms_loaded && modal.articulo != null"
+                @reload="loadMrpBoms"
+                @elegir="setMrpBom"
+                v-model="modal.produccion_orden.mrp_bom"
+                :disabled="modal.mode == 3"
+                style="grid-column: 1/4"
+            />
+
             <JdInput
                 type="number"
-                label="Orden"
+                label="Prioridad"
                 :nec="true"
                 v-model="modal.produccion_orden.orden"
                 :disabled="modal.mode == 3"
@@ -87,10 +95,13 @@
             />
         </div>
 
+        <div class="mrg-btm1">
+            <JdButton text="Comprobar disponibilidad" tipo="2" @click="loadStock" />
+        </div>
+
         <JdTable
             :columns="columns1"
             :datos="insumos_necesitados"
-            :reload="calcularInsumosNecesarios"
             :seeker="false"
             :download="false"
             class="jd-table"
@@ -109,7 +120,15 @@
 </template>
 
 <script>
-import { JdModal, JdInput, JdSelect, JdSelectQuery, JdTextArea, JdTable } from '@jhuler/components'
+import {
+    JdModal,
+    JdInput,
+    JdSelect,
+    JdSelectQuery,
+    JdTextArea,
+    JdTable,
+    JdButton,
+} from '@jhuler/components'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
@@ -129,6 +148,7 @@ export default {
         JdSelectQuery,
         JdTextArea,
         JdTable,
+        JdButton,
     },
     data: () => ({
         useAuth: useAuth(),
@@ -151,31 +171,6 @@ export default {
             { text: 'Actualizar', action: 'modificar', spin: false },
         ],
 
-        columns: [
-            {
-                id: 'articulo',
-                title: 'Nombre',
-                prop: 'articulo1.nombre',
-                width: '25rem',
-                show: true,
-            },
-            {
-                id: 'cantidad',
-                title: 'Cantidad req.',
-                slot: 'colCantidad',
-                toRight: true,
-                width: '8rem',
-                show: true,
-            },
-            {
-                title: 'Stock',
-                slot: 'colStock',
-                toRight: true,
-                width: '8rem',
-                show: true,
-            },
-        ],
-
         columns1: [
             {
                 id: 'articulo',
@@ -186,7 +181,7 @@ export default {
             },
             {
                 id: 'cantidad_necesitada',
-                title: 'Cantidad req.',
+                title: 'Cantidad requerida',
                 toRight: true,
                 format: 'decimal',
                 width: '8rem',
@@ -203,13 +198,9 @@ export default {
     }),
     computed: {
         insumos_necesitados() {
-            if (
-                !this.modal.produccion_orden.articulo_info ||
-                !this.modal.produccion_orden.articulo_info.receta_insumos
-            )
-                return []
+            if (!this.modal.mrp_bom_lines || this.modal.mrp_bom_lines.length == 0) return []
 
-            return this.modal.produccion_orden.articulo_info.receta_insumos.map((a) => ({
+            return this.modal.mrp_bom_lines.map((a) => ({
                 ...a,
                 cantidad_necesitada: a.cantidad * (this.modal.produccion_orden.cantidad || 0),
             }))
@@ -219,11 +210,10 @@ export default {
         this.modal = this.useModals.mProduccionOrden
 
         this.showButtons()
-        this.loadDatosSistema()
 
-        // if (this.modal.mode != 3) {
-        //     this.loadMaquinas()
-        // }
+        if (this.modal.produccion_orden.mrp_bom) {
+            this.loadMrpBomLines()
+        }
     },
     methods: {
         showButtons() {
@@ -234,6 +224,24 @@ export default {
             }
         },
 
+        async loadMaquinas() {
+            const qry = {
+                fltr: {},
+                cols: ['codigo', 'nombre', 'linea', 'velocidad', 'limpieza_tiempo'],
+                ordr: [['nombre', 'ASC']],
+            }
+
+            this.modal.maquinas = []
+            this.useAuth.setLoading(true, 'Cargando...')
+            this.modal.maquinas_loaded = false
+            const res = await get(`${urls.maquinas}?qry=${JSON.stringify(qry)}`)
+            this.modal.maquinas_loaded = true
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            this.modal.maquinas = res.data
+        },
         async searchArticulos(txtBuscar) {
             if (!txtBuscar) {
                 this.modal.articulos.length = 0
@@ -245,7 +253,6 @@ export default {
                     activo: { op: 'Es', val: true },
                     nombre: { op: 'Contiene', val: txtBuscar },
                     type: { op: 'Es', val: 'consumable' },
-                    linea: { op: 'Es', val: this.modal.produccion_orden.linea },
                 },
                 cols: ['nombre', 'linea', 'filtrantes'],
                 ordr: [['nombre', 'ASC']],
@@ -259,37 +266,99 @@ export default {
 
             this.modal.articulos = JSON.parse(JSON.stringify(res.data))
         },
-        setArticulo(a) {
-            if (a == null) {
-                this.modal.produccion_orden.articulo_info = {}
-            } else {
-                this.modal.produccion_orden.articulo_info = a
+        async loadMrpBoms() {
+            this.modal.mrp_boms = []
 
-                // this.modal.produccion_orden.articulo_info.receta_insumos.sort(
-                //     (a, b) => a.orden - b.orden,
-                // )
-                this.calcularInsumosNecesarios()
-            }
-        },
-        async calcularInsumosNecesarios() {
-            const send = {
-                articulos: [
-                    {
-                        id: this.modal.produccion_orden.articulo,
-                        cantidad: this.modal.produccion_orden.cantidad,
-                    },
-                ],
+            const qry = {
+                fltr: {
+                    articulo: { op: 'Es', val: this.modal.produccion_orden.articulo },
+                    tipo: { op: 'Es', val: 'fabricar' },
+                },
+                cols: ['referencia'],
             }
 
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await post(`${urls.receta_insumos}/calcular-necesidad`, send, false)
+            this.modal.mrp_boms_loaded = false
+            const res = await get(`${urls.mrp_boms}?qry=${JSON.stringify(qry)}`)
+            this.modal.mrp_boms_loaded = true
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
 
-            this.modal.produccion_orden.articulo_info.receta_insumos = res.data[0].receta.sort(
-                (a, b) => a.orden - b.orden,
-            )
+            this.modal.mrp_boms = res.data
+        },
+        async loadMrpBomLines() {
+            this.modal.mrp_bom_lines = []
+
+            const qry = {
+                fltr: {
+                    mrp_bom: { op: 'Es', val: this.modal.produccion_orden.mrp_bom },
+                    tipo: { op: 'Es', val: 'fabricar' },
+                },
+                cols: ['articulo', 'cantidad', 'orden'],
+                incl: ['articulo1'],
+                ordr: [['orden', 'ASC']],
+            }
+
+            this.useAuth.setLoading(true, 'Cargando...')
+            this.modal.mrp_boms_loaded = false
+            const res = await get(`${urls.mrp_bom_lines}?qry=${JSON.stringify(qry)}`)
+            this.modal.mrp_boms_loaded = true
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            this.modal.mrp_bom_lines = res.data
+        },
+        async loadStock() {
+            const qry = {
+                fltr: {
+                    id: { op: 'Es', val: this.modal.mrp_bom_lines.map((a) => a.articulo) },
+                },
+                sqls: ['articulo_stock'],
+            }
+
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.articulos}?qry=${JSON.stringify(qry)}`)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            this.modal.mrp_bom_lines = this.modal.mrp_bom_lines.map((line) => {
+                const articulo = res.data.find((a) => a.id == line.articulo)
+
+                return {
+                    ...line,
+                    stock: articulo?.stock || 0,
+                }
+            })
+            // this.modal.mrp_boms = res.data
+        },
+
+        async setArticulo(a) {
+            if (a == null) {
+                this.modal.produccion_orden.articulo_info = {}
+                this.modal.produccion_orden.mrp_bom = null
+                this.modal.mrp_boms = []
+                this.modal.mrp_bom_lines = []
+                return
+            }
+
+            this.modal.produccion_orden.articulo_info = a
+
+            await this.loadMrpBoms()
+            if (this.modal.mrp_boms.length == 1) {
+                this.modal.produccion_orden.mrp_bom = this.modal.mrp_boms[0].id
+                await this.loadMrpBomLines()
+            }
+        },
+        async setMrpBom(a) {
+            if (a == null) {
+                this.modal.mrp_bom_lines = []
+                return
+            }
+
+            this.loadMrpBomLines()
         },
 
         setMaquina(a) {
@@ -321,7 +390,7 @@ export default {
         },
 
         checkDatos() {
-            const props = ['fecha', 'linea', 'articulo', 'cantidad']
+            const props = ['fecha', 'articulo', 'cantidad', 'mrp_bom', 'orden']
 
             if (this.modal.maquinas && this.modal.maquinas.length > 0) {
                 props.push('maquina', 'maquina_info')
@@ -334,11 +403,6 @@ export default {
 
             return false
         },
-        // async crear1() {
-        //     if (this.checkDatos()) return
-
-        //     console.log(this.modal.produccion_orden)
-        // },
         async crear() {
             if (this.checkDatos()) return
 
@@ -348,12 +412,10 @@ export default {
 
             if (res.code != 0) return
 
-            this.useVistas.addItem(
-                // this.tipoPrograma[this.modal.produccion_orden.linea],
-                'vPrograma',
-                'produccion_ordenes',
-                { ...res.data, receta: this.insumos_necesitados },
-            )
+            this.useVistas.addItem(this.modal.origin, 'produccion_ordenes', {
+                ...res.data,
+                receta: this.insumos_necesitados,
+            })
             this.useModals.show.mProduccionOrden = false
         },
         async modificar() {
@@ -365,38 +427,11 @@ export default {
 
             if (res.code != 0) return
 
-            this.useVistas.updateItem(
-                // this.tipoPrograma[this.modal.produccion_orden.linea],
-                'vPrograma',
-                'produccion_ordenes',
-                { ...res.data, receta: this.insumos_necesitados },
-            )
+            this.useVistas.updateItem(this.modal.origin, 'produccion_ordenes', {
+                ...res.data,
+                receta: this.insumos_necesitados,
+            })
             this.useModals.show.mProduccionOrden = false
-        },
-
-        async loadDatosSistema() {
-            const qry = ['produccion_orden_estados']
-            const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
-
-            if (res.code != 0) return
-
-            Object.assign(this.modal, res.data)
-        },
-        async loadMaquinas() {
-            const qry = {
-                fltr: {},
-                cols: ['codigo', 'nombre', 'linea', 'velocidad', 'limpieza_tiempo'],
-                ordr: [['nombre', 'ASC']],
-            }
-
-            this.modal.maquinas = []
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.maquinas}?qry=${JSON.stringify(qry)}`)
-            this.useAuth.setLoading(false)
-
-            if (res.code != 0) return
-
-            this.modal.maquinas = res.data
         },
     },
 }

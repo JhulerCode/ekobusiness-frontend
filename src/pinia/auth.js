@@ -240,13 +240,20 @@ export const useAuth = defineStore('auth', {
                     {
                         label: 'Órdenes de producción', goto: 'vProduccionHistorial', permisos: [
                             { id: 'vProduccionHistorial:listar', label: 'Listar' },
+                            { id: 'vProduccionHistorial:crear', label: 'Crear' },
                             { id: 'vProduccionHistorial:ver', label: 'Ver' },
+                            { id: 'vProduccionHistorial:editar', label: 'Editar' },
+                            { id: 'vProduccionHistorial:eliminar', label: 'Eliminar' },
 
+                            { id: 'vProduccionHistorial:terminar', label: 'Terminar' },
+                            { id: 'vProduccionHistorial:salidaInsumos', label: 'Salida insumos' },
+                            { id: 'vProduccionHistorial:productosTerminados', label: 'Productos terminados' },
                             { id: 'vProduccionHistorial:trazabilidad', label: 'Ver trazabilidad' },
                             { id: 'vProduccionHistorial:controlPesos', label: 'Control de pesos' },
                             { id: 'vProduccionHistorial:controlPpc', label: 'Control del PPC' },
 
-                            { id: 'vProduccionHistorial:salidaInsumos', label: 'Salida de insumos' },
+                            { id: 'vProduccionHistorial:verProductosPedidos', label: 'Ver productos pedidos' },
+                            { id: 'vProduccionHistorial:salidaInsumosCompartidos', label: 'Salida de insumos compartidos' },
                         ]
                     },
                     {

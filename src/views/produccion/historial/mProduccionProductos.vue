@@ -6,30 +6,43 @@
         </p>
 
         <div class="container-datos" v-if="modal.produccion_orden.estado == 1">
-            <JdInput label="Lote" :nec="true" v-model="modal.transaccion.lote" />
+            <JdInput
+                label="Lote"
+                :nec="true"
+                v-model="modal.transaccion_item.lote"
+                :disabled="!produccion_orden"
+            />
 
             <JdInput
                 label="F. vencimiento"
                 type="Date"
-                :nec="true"
-                v-model="modal.transaccion.fv"
+                :nec="modal.produccion_orden.articulo1.has_fv"
+                v-model="modal.transaccion_item.fv"
+                style="grid-column: 1/2"
             />
 
             <JdInput
                 label="Cantidad"
                 type="number"
                 :nec="true"
-                v-model="modal.transaccion.cantidad"
+                v-model="modal.transaccion_item.cantidad"
+                style="grid-column: 1/2"
             />
 
-            <JdButton text="Grabar" tipo="2" @click="grabar" v-if="modal.transaccion.id == null" />
+            <JdButton
+                text="Grabar"
+                tipo="2"
+                @click="grabar"
+                v-if="modal.transaccion_item.id == null"
+                style="grid-column: 1/2"
+            />
 
             <JdButton
                 icon="fa-solid fa-pen-to-square"
                 text="Actualizar"
                 tipo="2"
                 @click="modificar"
-                v-if="modal.transaccion.id != null"
+                v-if="modal.transaccion_item.id != null"
             />
         </div>
 
@@ -55,7 +68,7 @@ import { useModals } from '@/pinia/modals'
 import { useVistas } from '@/pinia/vistas'
 
 import { urls, get, post, patch, delet } from '@/utils/crud'
-import { incompleteData } from '@/utils/mine'
+import { incompleteData, obtenerNumeroJuliano } from '@/utils/mine'
 import { jmsg, jqst } from '@/utils/swal'
 
 import dayjs from 'dayjs'
@@ -130,14 +143,16 @@ export default {
     },
     methods: {
         initTransaccion() {
-            this.modal.transaccion = {
+            this.modal.transaccion_item = {
                 tipo: 4,
                 fecha: this.modal.produccion_orden.fecha,
                 produccion_orden: this.modal.produccion_orden.id,
                 maquina: this.modal.produccion_orden.maquina,
 
                 articulo: this.modal.produccion_orden.articulo,
-                lote: this.obtenerNumeroJuliano(this.modal.produccion_orden.fecha),
+                lote: this.modal.lote_manual
+                    ? this.setJulianoSunka(this.modal.produccion_orden.fecha)
+                    : this.setLote(),
 
                 pu: 1, // FALTA CALCULAR EL COSTO UNITARIO
                 igv_afectacion: 10, // FALTA QUE LO OBTENGA DEL PRODUCTO
@@ -167,7 +182,7 @@ export default {
             this.modal.produccion_productos = res.data
         },
 
-        obtenerNumeroJuliano(fechatexto) {
+        setJulianoSunka(fechatexto) {
             const fecha = fechatexto ? new Date(fechatexto) : new Date()
             const inicioAnio = new Date(fecha.getFullYear(), 0, 0)
             const diferencia = fecha - inicioAnio
@@ -178,11 +193,18 @@ export default {
 
             return `${diaDelAnio.toString().padStart(3, '0')} ${anio}`
         },
+        setLote() {
+            return `${obtenerNumeroJuliano(this.modal.transaccion_item.fecha)}-${Math.floor(Math.random() * 90 + 10)}`
+        },
 
         checkDatos() {
-            const props = ['lote', 'fv', 'cantidad']
+            const props = ['lote', 'cantidad']
 
-            if (incompleteData(this.modal.transaccion, props)) {
+            if (this.modal.produccion_orden.articulo1.has_fv) {
+                props.push('fv')
+            }
+
+            if (incompleteData(this.modal.transaccion_item, props)) {
                 jmsg('warning', 'Ingrese los datos necesarios')
                 return true
             }
@@ -193,7 +215,7 @@ export default {
             if (this.checkDatos()) return
 
             this.useAuth.setLoading(true, 'Grabando...')
-            const res = await post(urls.kardex, this.modal.transaccion)
+            const res = await post(urls.kardex, this.modal.transaccion_item)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
@@ -206,11 +228,11 @@ export default {
             if (this.checkDatos()) return
 
             const send = {
-                id: this.modal.transaccion.id,
+                id: this.modal.transaccion_item.id,
                 articulo: this.modal.produccion_orden.articulo,
-                lote: this.modal.transaccion.lote,
-                fv: this.modal.transaccion.fv,
-                cantidad: this.modal.transaccion.cantidad,
+                lote: this.modal.transaccion_item.lote,
+                fv: this.modal.transaccion_item.fv,
+                cantidad: this.modal.transaccion_item.cantidad,
             }
 
             this.useAuth.setLoading(true, 'Actualizando...')
@@ -220,7 +242,7 @@ export default {
             if (res.code != 0) return
 
             const i = this.modal.produccion_productos.findIndex((a) => a.id == send.id)
-            this.modal.produccion_productos.splice(i, 1, this.modal.transaccion)
+            this.modal.produccion_productos.splice(i, 1, this.modal.transaccion_item)
             this.initTransaccion()
             this.$emit('productosCargados', this.sumarProductos())
         },
@@ -229,7 +251,7 @@ export default {
             this[method](item)
         },
         edit(item) {
-            this.modal.transaccion = JSON.parse(JSON.stringify(item))
+            this.modal.transaccion_item = JSON.parse(JSON.stringify(item))
         },
         async eliminar(item) {
             const resQst = await jqst('¿Está seguro de eliminar?')

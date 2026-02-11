@@ -186,6 +186,7 @@
         v-if="useModals.show.mProduccionProductos"
         @productosCargados="setProduccionProductos"
     />
+
     <mProductosFaltantes v-if="useModals.show.mProductosFaltantes" />
     <mProduccionInsumosCompartidos v-if="useModals.show.mProduccionInsumosCompartidos" />
 </template>
@@ -630,6 +631,7 @@ export default {
                         linea: this.columns[6].val,
                     },
                 ],
+                origin: 'vPrograma',
             }
 
             this.useModals.setModal('mProduccionOrden', 'Ver órden de producción', 3, send, true)
@@ -650,6 +652,7 @@ export default {
                     },
                 ],
                 maquinas: this.vista.maquinas,
+                origin: 'vPrograma',
             }
 
             this.useModals.setModal('mProduccionOrden', 'Editar órden de producción', 2, send, true)
@@ -721,6 +724,7 @@ export default {
         productosTerminados(item) {
             const send = {
                 produccion_orden: { ...item },
+                lote_manual: true,
             }
 
             this.useModals.setModal(
@@ -744,6 +748,7 @@ export default {
                     estado: 1,
                 },
                 maquinas: this.vista.maquinas,
+                origin: 'vPrograma',
             }
 
             if (maquina) {

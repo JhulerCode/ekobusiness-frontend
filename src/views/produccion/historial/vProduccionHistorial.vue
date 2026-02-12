@@ -172,12 +172,29 @@ export default {
             {
                 id: 'responsable',
                 title: 'Responsable',
-                type: 'select',
                 prop: 'responsable1.nombres_apellidos',
+                type: 'select',
+                mostrar: 'nombres_apellidos',
                 width: '10rem',
                 show: true,
                 seek: true,
                 sort: true,
+            },
+            {
+                id: 'inicio',
+                title: 'Hora inicio',
+                format: 'datetime',
+                width: '11rem',
+                show: true,
+                filtrable: false,
+            },
+            {
+                id: 'fin',
+                title: 'Hora fin',
+                format: 'datetime',
+                width: '11rem',
+                show: true,
+                filtrable: false,
             },
             {
                 id: 'estado_calidad_revisado',
@@ -363,6 +380,29 @@ export default {
             this.vista.maquinas = res.data
             return res.data
         },
+        async loadColaboradores() {
+            this.vista.colaboradores = []
+
+            const qry = {
+                fltr: {
+                    activo: { op: 'Es', val: true },
+                },
+                cols: ['nombres', 'apellidos', 'nombres_apellidos', 'produccion_codigo'],
+                ordr: [
+                    ['nombres', 'ASC'],
+                    ['apellidos', 'ASC'],
+                ],
+            }
+
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.colaboradores}?qry=${JSON.stringify(qry)}`)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            this.vista.colaboradores = res.data
+            return res.data
+        },
 
         nuevo() {
             const send = {
@@ -400,6 +440,7 @@ export default {
             for (const a of cols) {
                 if (a.id == 'linea') a.reload = this.loadLineas
                 if (a.id == 'maquina') a.reload = this.loadMaquinas
+                if (a.id == 'responsable') a.reload = this.loadColaboradores
                 if (a.id == 'estado') a.lista = this.vista.produccion_orden_estados
             }
 

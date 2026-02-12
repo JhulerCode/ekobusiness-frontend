@@ -156,19 +156,36 @@
                             />
                         </template>
 
-                        <!-- <template v-slot:cActInicio="{ item }">
+                        <template v-slot:cActInicio="{ item }">
                             <div class="col-act-inicio-fin">
                                 <JdButton
                                     icon="fa-solid fa-play"
                                     tipo="2"
                                     @click="setInicio(item)"
+                                    v-if="!item.inicio && useAuth.usuario.id == item.responsable"
                                 />
 
-                                <small v-if="item.inicio">
-                                    {{ dayjs(item.inicio).format('HH:mm') }}
-                                </small>
+                                <JdButton
+                                    icon="fa-solid fa-stop"
+                                    tipo="2"
+                                    @click="setFin(item)"
+                                    v-if="
+                                        item.inicio &&
+                                        !item.fin &&
+                                        useAuth.usuario.id == item.responsable
+                                    "
+                                />
+
+                                <p>
+                                    <span v-if="item.inicio">
+                                        {{ dayjs(item.inicio).format('HH:mm') }}
+                                    </span>
+                                    <span v-if="item.fin">
+                                        - {{ dayjs(item.fin).format('HH:mm') }}
+                                    </span>
+                                </p>
                             </div>
-                        </template> -->
+                        </template>
                     </JdTable>
                 </li>
             </ul>
@@ -319,13 +336,13 @@ export default {
                 width: '15rem',
                 show: true,
             },
-            // {
-            //     id: 'act_inicio',
-            //     title: '',
-            //     slot: 'cActInicio',
-            //     width: '15rem',
-            //     show: true,
-            // },
+            {
+                id: 'act_inicio',
+                title: '',
+                slot: 'cActInicio',
+                width: '15rem',
+                show: true,
+            },
         ],
         tableRowOptions: [
             {
@@ -803,19 +820,35 @@ export default {
             pr.productos_terminados = item.productos_terminados
         },
 
-        setInicio(item) {
+        async setInicio(item) {
             const send = {
                 id: item.id,
                 inicio: dayjs(),
             }
 
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = patch(`${urls.produccion_ordenes}`, send, 'Inicio registrado')
+            const res = await patch(`${urls.produccion_ordenes}`, send, 'Inicio registrado')
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
 
-            item.inicio = send.inicio
+            const i = this.vista.produccion_ordenes.findIndex((a) => a.id == item.id)
+            this.vista.produccion_ordenes[i].inicio = send.inicio
+        },
+        async setFin(item) {
+            const send = {
+                id: item.id,
+                fin: dayjs(),
+            }
+
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await patch(`${urls.produccion_ordenes}`, send, 'Final registrado')
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            const i = this.vista.produccion_ordenes.findIndex((a) => a.id == item.id)
+            this.vista.produccion_ordenes[i].fin = send.fin
         },
 
         nuevo(maquina) {

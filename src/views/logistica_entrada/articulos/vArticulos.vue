@@ -322,6 +322,7 @@ export default {
                     purchase_ok: true,
                     activo: true,
 
+                    articulo_suppliers: [],
                     combo_articulos: [],
                     ingredientes: [],
                     beneficios: [],
@@ -492,8 +493,12 @@ export default {
         },
 
         async editar(item) {
+            const qry = {
+                incl: ['articulo_suppliers'],
+            }
+
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.articulos}/uno/${item.id}`)
+            const res = await get(`${urls.articulos}/uno/${item.id}?qry=${JSON.stringify(qry)}`)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return

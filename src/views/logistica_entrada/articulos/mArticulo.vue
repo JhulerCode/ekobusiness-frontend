@@ -127,7 +127,27 @@
                     <JdInput label="Marca" v-model="articulo.marca" />
                 </div>
 
-                <div class="container-datos compra" v-if="modal.pestana == 2"></div>
+                <div class="container-datos compra" v-if="modal.pestana == 2">
+                    <JdTable
+                        :columns="columns_suppliers"
+                        :datos="articulo.articulo_suppliers || []"
+                        :colAct="true"
+                        :seeker="false"
+                        :download="false"
+                        :agregarFila="addSupplier"
+                        style="grid-column: 1/3"
+                    >
+                        <template v-slot:cAction="{ item }">
+                            <JdButton
+                                tipo="2"
+                                :small="true"
+                                icon="fa-solid fa-trash-can"
+                                title="Eliminar"
+                                @click="removeSupplier(item)"
+                            />
+                        </template>
+                    </JdTable>
+                </div>
 
                 <div class="container-datos venta" v-if="modal.pestana == 3">
                     <JdInput
@@ -296,7 +316,7 @@
                                 :small="true"
                                 icon="fa-solid fa-trash-can"
                                 title="Eliminar"
-                                @click="quitar(item)"
+                                @click="removeComponente(item)"
                             />
                         </template>
                     </JdTable>
@@ -318,6 +338,7 @@ import {
     JdCheckBox,
     JdSelectQuery,
 } from '@jhuler/components'
+// import JdTable from '@/components/JdTable.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
@@ -378,6 +399,8 @@ export default {
             },
         ],
 
+        columns_suppliers: [],
+
         columns_componentes: [
             {
                 id: 'articulo',
@@ -399,14 +422,104 @@ export default {
     created() {
         this.modal = this.useModals.mArticulo
         this.articulo = this.useModals.mArticulo.articulo
-
+        this.setColumnsSuppliers()
         this.showButtons()
 
         this.loadLineas()
         this.loadCategorias()
+        this.loadMonedas()
         this.loadDatosSistema()
     },
     methods: {
+        setColumnsSuppliers() {
+            this.columns_suppliers = [
+                {
+                    id: 'socio',
+                    title: 'Proveedor',
+                    width: '20rem',
+                    input: true,
+                    select_query: {
+                        mostrar: 'nombres',
+                        search: this.loadProveedores,
+                    },
+                    show: true,
+                    sort: true,
+                },
+                {
+                    id: 'min_qty',
+                    title: 'Cantidad mínima',
+                    type: 'number',
+                    input: true,
+                    width: '6rem',
+                    show: true,
+                    sort: true,
+                },
+                {
+                    id: 'price',
+                    title: 'Precio',
+                    type: 'number',
+                    input: true,
+                    width: '6rem',
+                    show: true,
+                    sort: true,
+                },
+                {
+                    id: 'currency_id',
+                    title: 'Moneda',
+                    width: '10rem',
+                    input: true,
+                    type: 'select',
+                    lista: [],
+                    show: true,
+                    sort: true,
+                },
+                {
+                    id: 'delay',
+                    title: 'Lead time (días)',
+                    type: 'number',
+                    input: true,
+                    width: '6rem',
+                    show: true,
+                    sort: true,
+                },
+                {
+                    id: 'date_start',
+                    title: 'Fecha inicio',
+                    type: 'date',
+                    input: true,
+                    width: '10rem',
+                    show: true,
+                    sort: true,
+                },
+                {
+                    id: 'date_end',
+                    title: 'Fecha fin',
+                    type: 'date',
+                    input: true,
+                    width: '10rem',
+                    show: true,
+                    sort: true,
+                },
+                {
+                    id: 'product_code',
+                    title: 'Código de producto del proveedor',
+                    type: 'text',
+                    input: true,
+                    width: '8rem',
+                    show: true,
+                    sort: true,
+                },
+                {
+                    id: 'product_name',
+                    title: 'Nombre de producto del proveedor',
+                    type: 'text',
+                    input: true,
+                    width: '20rem',
+                    show: true,
+                    sort: true,
+                },
+            ]
+        },
         showButtons() {
             if (this.useModals.mArticulo.mode == 1) {
                 this.buttons[0].show = true
@@ -484,6 +597,53 @@ export default {
 
             this.modal.articulos_consumables = JSON.parse(JSON.stringify(res.data))
         },
+        async loadMonedas() {
+            const qry = {
+                fltr: {
+                    activo: { op: 'Es', val: true },
+                },
+                cols: ['nombre'],
+                ordr: [['nombre', 'ASC']],
+            }
+
+            this.modal.monedas = []
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.monedas}?qry=${JSON.stringify(qry)}`)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            this.modal.monedas = res.data
+            for (const c of this.columns_suppliers) {
+                if (c.id == 'currency_id') {
+                    c.list = res.data
+                    break
+                }
+            }
+        },
+        async loadProveedores(txtBuscar, fila, column) {
+            if (!txtBuscar) {
+                fila.table_columns[column.id + '_lista'].length = 0
+                return
+            }
+
+            const qry = {
+                fltr: {
+                    activo: { op: 'Es', val: true },
+                    nombres: { op: 'Contiene', val: txtBuscar },
+                },
+                cols: ['nombres'],
+                ordr: [['nombres', 'ASC']],
+            }
+
+            fila.table_columns[column.id + '_spin'] = true
+            const res = await get(`${urls.socios}?qry=${JSON.stringify(qry)}`)
+            fila.table_columns[column.id + '_spin'] = false
+
+            if (res.code !== 0) return
+
+            fila.table_columns[column.id + '_lista'] = res.data
+        },
 
         setArticuloType() {
             if (this.articulo.type == 'combo') {
@@ -494,6 +654,18 @@ export default {
             if (this.articulo.type == 'service') {
                 this.articulo.produce_ok = false
             }
+        },
+
+        //--- COMPRAS ---//
+        addSupplier() {
+            this.articulo.articulo_suppliers.push({
+                id: crypto.randomUUID(),
+                table_columns: {},
+            })
+        },
+        async removeSupplier(item) {
+            const i = this.articulo.articulo_suppliers.findIndex((a) => a.id == item.id)
+            this.articulo.articulo_suppliers.splice(i, 1)
         },
 
         //--- COMBO ---//
@@ -675,7 +847,7 @@ export default {
         .container-datos {
             display: grid;
             gap: 0.5rem;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(2, 24rem);
             gap: 0.5rem 2rem;
         }
 

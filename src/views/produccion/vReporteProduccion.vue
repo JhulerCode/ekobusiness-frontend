@@ -59,6 +59,18 @@
                         height="22rem"
                     />
                 </div>
+
+                <div class="card">
+                    <div class="card-head">
+                        <p>Por responsable</p>
+                    </div>
+
+                    <JdTable
+                        :columns="columns_por_responsable"
+                        :datos="vista.resumen.por_responsable || []"
+                        height="22rem"
+                    />
+                </div>
             </div>
         </div>
     </div>
@@ -188,6 +200,48 @@ export default {
                 id: 'diferencia',
                 title: 'Diferencia',
                 format: 'decimal',
+                toRight: true,
+                width: '7rem',
+                show: true,
+                seek: true,
+                sort: true,
+            },
+        ],
+
+        columns_por_responsable: [
+            {
+                id: 'responsable',
+                title: 'Nombre',
+                prop: 'responsable1.nombres_apellidos',
+                width: '12rem',
+                show: true,
+                seek: true,
+                sort: true,
+            },
+            {
+                id: 'cantidad',
+                title: 'Cant. programada',
+                format: 'number',
+                toRight: true,
+                width: '7rem',
+                show: true,
+                seek: true,
+                sort: true,
+            },
+            {
+                id: 'productos_terminados',
+                title: 'Cant. real',
+                format: 'number',
+                toRight: true,
+                width: '7rem',
+                show: true,
+                seek: true,
+                sort: true,
+            },
+            {
+                id: 'diferencia',
+                title: 'Diferencia',
+                format: 'number',
                 toRight: true,
                 width: '7rem',
                 show: true,

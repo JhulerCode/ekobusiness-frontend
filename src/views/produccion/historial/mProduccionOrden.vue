@@ -276,6 +276,7 @@ export default {
                     activo: { op: 'Es', val: true },
                     nombre: { op: 'Contiene', val: txtBuscar },
                     type: { op: 'Es', val: 'consumable' },
+                    produce_ok: { op: 'Es', val: true },
                 },
                 cols: ['nombre', 'linea', 'filtrantes'],
                 ordr: [['nombre', 'ASC']],

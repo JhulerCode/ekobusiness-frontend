@@ -37,7 +37,14 @@
                 v-if="articulo.type != 'combo'"
             />
 
-            <JdSwitch label="Activo?" v-model="articulo.activo" style="grid-column: 4/5" />
+            <JdCheckBox
+                label="Se produce"
+                :nec="true"
+                v-model="articulo.produce_ok"
+                v-if="articulo.type == 'consumable'"
+            />
+
+            <JdSwitch label="Activo?" v-model="articulo.activo" />
         </div>
 
         <div class="extra-datos">
@@ -73,7 +80,7 @@
                 <li
                     @click="modal.pestana = 5"
                     :class="{ 'pestana-activo': modal.pestana == 5 }"
-                    v-if="articulo.type == 'consumable'"
+                    v-if="articulo.produce_ok == true"
                 >
                     Producción
                 </li>
@@ -481,6 +488,11 @@ export default {
         setArticuloType() {
             if (this.articulo.type == 'combo') {
                 this.articulo.purchase_ok = false
+                this.articulo.produce_ok = false
+            }
+
+            if (this.articulo.type == 'service') {
+                this.articulo.produce_ok = false
             }
         },
 
@@ -560,6 +572,10 @@ export default {
                 if (this.articulo.is_ecommerce == true) {
                     props.push('descripcion', 'precio')
                 }
+            }
+
+            if (this.articulo.produce_ok == true) {
+                props.push('linea')
             }
 
             if (incompleteData(this.articulo, props)) {

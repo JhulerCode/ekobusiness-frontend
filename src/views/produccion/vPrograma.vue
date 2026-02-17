@@ -625,7 +625,7 @@ export default {
                 'mrp_bom',
                 'inicio',
                 'fin',
-                'responsable'
+                'responsable',
             )
         },
         async loadProduccionOrdenes() {
@@ -822,13 +822,18 @@ export default {
         },
 
         async setInicio(item) {
+            const resQst = await jqst(
+                `¿Está seguro de marcar el inicio de la producción de ${item.articulo1.nombre}?`,
+            )
+            if (resQst.isConfirmed == false) return
+
             const send = {
                 id: item.id,
                 inicio: dayjs(),
             }
 
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await patch(`${urls.produccion_ordenes}`, send, 'Inicio registrado')
+            const res = await patch(`${urls.produccion_ordenes}/inicio`, send, 'Inicio registrado')
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
@@ -837,13 +842,18 @@ export default {
             this.vista.produccion_ordenes[i].inicio = send.inicio
         },
         async setFin(item) {
+            const resQst = await jqst(
+                `¿Está seguro de marcar el fin de la producción de ${item.articulo1.nombre}?`,
+            )
+            if (resQst.isConfirmed == false) return
+
             const send = {
                 id: item.id,
                 fin: dayjs(),
             }
 
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await patch(`${urls.produccion_ordenes}`, send, 'Final registrado')
+            const res = await patch(`${urls.produccion_ordenes}/fin`, send, 'Final registrado')
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return

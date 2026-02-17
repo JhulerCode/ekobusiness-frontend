@@ -1,6 +1,6 @@
 <template>
     <JdModal modal="mArticulo" :buttons="buttons" @button-click="(action) => this[action]()">
-        <div class="container-datos">
+        <div class="general-datos">
             <JdInput
                 label="Nombre"
                 :nec="true"
@@ -815,7 +815,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.container-datos {
+.general-datos {
     display: grid;
     grid-template-columns: repeat(4, 12rem);
     gap: 0.5rem;
@@ -846,7 +846,6 @@ export default {
 
         .container-datos {
             display: grid;
-            gap: 0.5rem;
             grid-template-columns: repeat(2, 24rem);
             gap: 0.5rem 2rem;
         }

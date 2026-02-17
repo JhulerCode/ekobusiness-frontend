@@ -625,6 +625,7 @@ export default {
                 'mrp_bom',
                 'inicio',
                 'fin',
+                'responsable'
             )
         },
         async loadProduccionOrdenes() {

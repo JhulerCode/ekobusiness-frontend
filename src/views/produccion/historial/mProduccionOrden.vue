@@ -436,7 +436,7 @@ export default {
         },
 
         checkDatos() {
-            const props = ['fecha', 'articulo', 'cantidad', 'orden']
+            const props = ['fecha', 'articulo', 'cantidad', 'orden', 'responsable']
 
             if (this.modal.maquinas && this.modal.maquinas.length > 0) {
                 props.push('maquina', 'maquina_info')

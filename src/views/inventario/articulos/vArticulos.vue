@@ -230,6 +230,36 @@ export default {
                 width: '10rem',
                 show: false,
             },
+            {
+                id: 'purchase_ok',
+                title: 'Se compra',
+                prop: 'purchase_ok1.nombre',
+                type: 'select',
+                format: 'yesno',
+                editable: true,
+                width: '8rem',
+                show: false,
+            },
+            {
+                id: 'sale_ok',
+                title: 'Se vende',
+                prop: 'sale_ok1.nombre',
+                type: 'select',
+                format: 'yesno',
+                editable: true,
+                width: '8rem',
+                show: false,
+            },
+            {
+                id: 'produce_ok',
+                title: 'Se produce',
+                prop: 'produce_ok1.nombre',
+                type: 'select',
+                format: 'yesno',
+                editable: true,
+                width: '8rem',
+                show: false,
+            },
         ],
         tableActions: [
             {
@@ -280,7 +310,7 @@ export default {
                 label: 'Ver lotes',
                 icon: 'fa-solid fa-table-list',
                 action: 'verLotes',
-                permiso: 'vProductosTerminados:lotes',
+                permiso: 'vArticulos:lotes',
             },
             {
                 label: 'Ajuste stock',
@@ -490,6 +520,9 @@ export default {
                 if (a.id == 'igv_afectacion') a.lista = this.vista.igv_afectaciones
                 if (a.id == 'categoria') a.reload = this.loadCategorias
                 if (a.id == 'linea') a.reload = this.loadLineas
+                if (a.id == 'purchase_ok') a.lista = this.vista.estados
+                if (a.id == 'sale_ok') a.lista = this.vista.estados
+                if (a.id == 'produce_ok') a.lista = this.vista.estados
             }
 
             const send = {
@@ -584,7 +617,7 @@ export default {
                 accept: 'image/*',
                 cantidad: 10,
                 url: `${urls.articulos}/fotos`,
-                vista: 'vProductosTerminados',
+                vista: 'vArticulos',
                 tabla: 'articulos',
                 prop: 'fotos',
             }

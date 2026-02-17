@@ -1,7 +1,7 @@
 <template>
     <div class="vista vista-fill">
         <div class="head">
-            <strong>Categorías de artículos</strong>
+            <strong>Categorías</strong>
 
             <div class="buttons">
                 <JdButton
@@ -22,20 +22,20 @@
             :reload="loadCategorias"
             :rowOptions="tableRowOptions"
             @rowOptionSelected="runMethod"
-        >
-        </JdTable>
+        />
     </div>
 
     <mArticuloCategoria v-if="useModals.show.mArticuloCategoria" />
+    <mUploadFiles v-if="useModals.show.mUploadFiles" @updated="fotosUpdated" />
 
-    <mConfigCols v-if="useModals.show.mConfigCols" />
     <mConfigFiltros v-if="useModals.show.mConfigFiltros" />
 </template>
 
 <script>
-import { JdButton, JdTable, mConfigFiltros, mConfigCols } from '@jhuler/components'
+import { JdButton, JdTable, mConfigFiltros } from '@jhuler/components'
 
-import mArticuloCategoria from '@/views/logistica_entrada/categorias/mArticuloCategoria.vue'
+import mArticuloCategoria from '@/views/inventario/categorias/mArticuloCategoria.vue'
+import mUploadFiles from '@/components/mUploadFiles.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
@@ -49,10 +49,10 @@ export default {
         JdButton,
         JdTable,
 
-        mConfigCols,
         mConfigFiltros,
 
         mArticuloCategoria,
+        mUploadFiles,
     },
     data: () => ({
         useAuth: useAuth(),
@@ -84,6 +84,28 @@ export default {
                 sort: false,
             },
             {
+                id: 'is_ecommerce',
+                title: 'Ecommerce?',
+                prop: 'is_ecommerce1.nombre',
+                type: 'select',
+                format: 'yesno',
+                width: '10rem',
+                show: true,
+                seek: false,
+                sort: false,
+            },
+            {
+                id: 'is_destacado',
+                title: 'Destacado?',
+                prop: 'is_destacado1.nombre',
+                type: 'select',
+                format: 'yesno',
+                width: '10rem',
+                show: true,
+                seek: false,
+                sort: false,
+            },
+            {
                 id: 'descripcion',
                 title: 'Descripción',
                 type: 'text',
@@ -94,12 +116,6 @@ export default {
             },
         ],
         tableRowOptions: [
-            {
-                label: 'Ver',
-                icon: 'fa-regular fa-folder-open',
-                action: 'ver',
-                permiso: 'vArticuloCategorias_ver',
-            },
             {
                 label: 'Editar',
                 icon: 'fa-solid fa-pen-to-square',
@@ -112,6 +128,12 @@ export default {
                 action: 'eliminar',
                 permiso: 'vArticuloCategorias:eliminar',
             },
+            {
+                label: 'Actualizar fotos',
+                icon: 'fa-solid fa-image',
+                action: 'openUploadFiles',
+                permiso: 'vProductoCategorias:actualizarFotos',
+            },
         ],
     }),
     created() {
@@ -122,13 +144,23 @@ export default {
         if (this.useAuth.verifyPermiso('vArticuloCategorias:listar') == true) this.loadCategorias()
     },
     methods: {
+        async loadDatosSistema() {
+            const qry = ['estados']
+            const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
+
+            if (res.code != 0) return
+
+            Object.assign(this.vista, res.data)
+        },
+
         setQuery() {
             this.vista.qry = {
-                fltr: { tipo: { op: 'Es', val: 1 } },
+                fltr: {},
                 ordr: [['nombre', 'ASC']],
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
+            this.vista.qry.cols.push('fotos')
         },
         async loadCategorias() {
             this.setQuery()
@@ -147,7 +179,7 @@ export default {
         },
 
         nuevo() {
-            const item = { tipo: 1, activo: true }
+            const item = { activo: true }
 
             this.useModals.setModal('mArticuloCategoria', 'Nueva categoría', 1, item)
         },
@@ -202,14 +234,22 @@ export default {
 
             this.useVistas.removeItem('vArticuloCategorias', 'articulo_categorias', item)
         },
+        openUploadFiles(item) {
+            const send = {
+                item: {
+                    id: item.id,
+                    nombre: item.nombre,
+                    archivos: item.fotos || [],
+                },
+                accept: 'image/*',
+                cantidad: 2,
+                url: `${urls.articulo_categorias}/fotos`,
+                vista: 'vArticuloCategorias',
+                tabla: 'articulo_categorias',
+                prop: 'fotos',
+            }
 
-        async loadDatosSistema() {
-            const qry = ['estados']
-            const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
-
-            if (res.code != 0) return
-
-            Object.assign(this.vista, res.data)
+            this.useModals.setModal('mUploadFiles', 'Actualizar fotos', 2, send, true)
         },
     },
 }

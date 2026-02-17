@@ -52,6 +52,7 @@
     <mKardex v-if="useModals.show.mKardex" />
     <mLotes v-if="useModals.show.mLotes" />
     <mAjusteStock v-if="useModals.show.mAjusteStock" />
+    <mUploadFiles v-if="useModals.show.mUploadFiles" />
 
     <mConfigCols v-if="useModals.show.mConfigCols" />
     <mConfigFiltros v-if="useModals.show.mConfigFiltros" />
@@ -62,11 +63,12 @@
 import { JdButton, JdTable, mConfigFiltros, mConfigCols, mEditar } from '@jhuler/components'
 // import mEditar from '@/components/mEditar.vue'
 
-import mImportarArticulos from '@/views/logistica_entrada/articulos/mImportarArticulos.vue'
-import mArticulo from '@/views/logistica_entrada/articulos/mArticulo.vue'
-import mKardex from '@/views/logistica_entrada/articulos/mKardex.vue'
-import mLotes from '@/views/logistica_entrada/articulos/mLotes.vue'
-import mAjusteStock from '@/views/logistica_entrada/articulos/mAjusteStock.vue'
+import mImportarArticulos from '@/views/inventario/articulos/mImportarArticulos.vue'
+import mArticulo from '@/views/inventario/articulos/mArticulo.vue'
+import mKardex from '@/views/inventario/articulos/mKardex.vue'
+import mLotes from '@/views/inventario/articulos/mLotes.vue'
+import mAjusteStock from '@/views/inventario/articulos/mAjusteStock.vue'
+import mUploadFiles from '@/components/mUploadFiles.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
@@ -91,6 +93,7 @@ export default {
         mKardex,
         mLotes,
         mAjusteStock,
+        mUploadFiles,
     },
     data: () => ({
         useAuth: useAuth(),
@@ -142,12 +145,50 @@ export default {
                 sort: true,
             },
             {
+                id: 'codigo_barra',
+                title: 'EAN',
+                type: 'text',
+                width: '10rem',
+                show: true,
+                seek: true,
+                sort: true,
+            },
+            {
+                id: 'linea',
+                title: 'Línea',
+                prop: 'linea1.nombre',
+                type: 'select',
+                editable: true,
+                width: '10rem',
+                show: true,
+                seek: true,
+                sort: true,
+            },
+            {
                 id: 'categoria',
                 title: 'Categoría',
                 prop: 'categoria1.nombre',
                 type: 'select',
                 editable: true,
                 width: '10rem',
+                show: true,
+                seek: true,
+                sort: true,
+            },
+            {
+                id: 'filtrantes',
+                title: 'Sobres en caja',
+                type: 'number',
+                width: '5rem',
+                show: true,
+                seek: true,
+                sort: true,
+            },
+            {
+                id: 'contenido_neto',
+                title: 'Contenido neto (g)',
+                type: 'number',
+                width: '5rem',
                 show: true,
                 seek: true,
                 sort: true,
@@ -186,7 +227,6 @@ export default {
                 title: 'Precio',
                 type: 'number',
                 editable: true,
-                // prop: 'igv_afectacion1.nombre',
                 width: '10rem',
                 show: false,
             },
@@ -211,6 +251,12 @@ export default {
                 icon: 'fa-solid fa-pen-to-square',
                 action: 'editar',
                 permiso: 'vArticulos:editar',
+            },
+            {
+                label: 'Actualizar fotos',
+                icon: 'fa-solid fa-image',
+                action: 'openUploadFiles',
+                permiso: 'vProductos:actualizarFotos',
             },
             {
                 label: 'Eliminar',
@@ -264,7 +310,7 @@ export default {
 
         setQuery() {
             this.vista.qry = {
-                fltr: { purchase_ok: { op: 'Es', val: true } },
+                fltr: {},
                 incl: ['categoria1'],
                 ordr: [['nombre', 'ASC']],
             }
@@ -284,6 +330,23 @@ export default {
             if (res.code != 0) return
 
             this.vista.articulos = res.data
+        },
+        async loadLineas() {
+            const qry = {
+                fltr: {},
+                cols: ['nombre'],
+                ordr: [['nombre', 'ASC']],
+            }
+
+            this.vista.articulo_lineas = []
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.articulo_lineas}?qry=${JSON.stringify(qry)}`)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            this.vista.articulo_lineas = res.data
+            return res.data
         },
         async loadCategorias() {
             const qry = {
@@ -426,6 +489,7 @@ export default {
                 if (a.id == 'is_ecommerce') a.lista = this.vista.estados
                 if (a.id == 'igv_afectacion') a.lista = this.vista.igv_afectaciones
                 if (a.id == 'categoria') a.reload = this.loadCategorias
+                if (a.id == 'linea') a.reload = this.loadLineas
             }
 
             const send = {
@@ -509,6 +573,23 @@ export default {
             }
 
             this.useModals.setModal('mArticulo', 'Editar artículo', 2, send, true)
+        },
+        openUploadFiles(item) {
+            const send = {
+                item: {
+                    id: item.id,
+                    nombre: item.nombre,
+                    archivos: item.fotos || [],
+                },
+                accept: 'image/*',
+                cantidad: 10,
+                url: `${urls.articulos}/fotos`,
+                vista: 'vProductosTerminados',
+                tabla: 'articulos',
+                prop: 'fotos',
+            }
+
+            this.useModals.setModal('mUploadFiles', 'Actualizar fotos', 2, send, true)
         },
         async eliminar(item) {
             const resQst = await jqst('¿Está seguro de eliminar?')

@@ -3,20 +3,14 @@
         <div class="head">
             <strong>Inventario</strong>
 
-            <div class="buttons">
-                <JdButton
-                    @click="recalcularInventario"
-                    text="Recalcular stock"
-                    tipo="2"
-                    v-if="useAuth.verifyPermiso('vInventarioProductos:recalcularStock')"
-                />
-            </div>
+            <div class="buttons"></div>
         </div>
 
         <JdTable
             :columns="columns"
             :datos="vista.inventario || []"
             :configFiltros="openConfigFiltros"
+            :reload="loadInventario"
         />
     </div>
 
@@ -24,13 +18,13 @@
 </template>
 
 <script>
-import { JdTable, JdButton, mConfigFiltros } from '@jhuler/components'
+import { JdTable, mConfigFiltros } from '@jhuler/components'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
 import { useVistas } from '@/pinia/vistas'
 
-import { urls, get, post } from '@/utils/crud'
+import { urls, get } from '@/utils/crud'
 import { redondear } from '@/utils/mine'
 
 import dayjs from 'dayjs'
@@ -39,7 +33,6 @@ import { jmsg } from '@/utils/swal'
 export default {
     components: {
         JdTable,
-        JdButton,
         mConfigFiltros,
     },
     data: () => ({
@@ -51,6 +44,7 @@ export default {
 
         vista: {},
 
+        tableName: 'vInventarioArticulos',
         columns: [
             {
                 id: 'kardexes.fecha',
@@ -89,7 +83,18 @@ export default {
             {
                 id: 'cantidad',
                 title: 'Stock',
-                format: 'number',
+                format: 'decimal',
+                toRight: true,
+                filtrable: false,
+                width: '7rem',
+                show: true,
+                seek: true,
+                sort: true,
+            },
+            {
+                id: 'articulo_movimientos_valorizado',
+                title: 'Valor',
+                format: 'decimal',
                 toRight: true,
                 filtrable: false,
                 width: '7rem',
@@ -100,7 +105,7 @@ export default {
         ],
     }),
     created() {
-        this.vista = this.useVistas.vInventarioProductos
+        this.vista = this.useVistas.vInventarioArticulos
         this.initFiltros()
         this.useAuth.setColumns(this.tableName, this.columns)
     },
@@ -120,9 +125,14 @@ export default {
         setQuery() {
             this.vista.qry = {
                 incl: ['categoria1', 'kardexes'],
-                sqls: ['articulo_movimientos_cantidad'],
+                iccl: {
+                    kardexes: {
+                        incl: ['lote_padre2'],
+                    },
+                },
+                sqls: ['articulo_movimientos_cantidad', 'articulo_movimientos_valorizado'],
                 fltr: {
-                    tipo: { op: 'Es', val: 2 },
+                    // tipo: { op: 'Es', val: 1 },
                 },
                 grop: ['id'],
                 ordr: [['nombre', 'ASC']],
@@ -164,7 +174,7 @@ export default {
             const qry = {
                 cols: ['nombre'],
                 fltr: {
-                    tipo: { op: 'Es', val: 2 },
+                    tipo: { op: 'Es', val: 1 },
                     activo: { op: 'Es', val: true },
                 },
                 ordr: [['nombre', 'ASC']],
@@ -179,13 +189,6 @@ export default {
 
             this.vista.articulo_categorias = res.data
             return res.data
-        },
-        async recalcularInventario() {
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await post(`${urls.kardex}/recalcular-stock`)
-            this.useAuth.setLoading(false)
-
-            if (res.code != 0) return
         },
     },
 }

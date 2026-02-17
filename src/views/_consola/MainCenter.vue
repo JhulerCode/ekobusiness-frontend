@@ -1,32 +1,28 @@
 <template>
     <section class="main-center">
         <!-- <PestanasOpen /> -->
-
-        <vProveedores v-if="useVistas.show.vProveedores" />
+        <vProductoLineas v-if="useVistas.show.vProductoLineas" />
         <vArticuloCategorias v-if="useVistas.show.vArticuloCategorias" />
         <vArticulos v-if="useVistas.show.vArticulos" />
+        <vInventarioArticulos v-if="useVistas.show.vInventarioArticulos" />
+
+        <vProveedores v-if="useVistas.show.vProveedores" />
         <vPrecioListas v-if="useVistas.show.vPrecioListas" />
-        <vCompraPedidos v-if="useVistas.show.vCompraPedidos" />
         <vCompraPedidoItems v-if="useVistas.show.vCompraPedidoItems" />
         <vCompras v-if="useVistas.show.vCompras" />
         <vCompraItems v-if="useVistas.show.vCompraItems" />
-        <vInventarioArticulos v-if="useVistas.show.vInventarioArticulos" />
 
         <vClientes v-if="useVistas.show.vClientes" />
-        <vProductoLineas v-if="useVistas.show.vProductoLineas" />
-        <vProductoCategorias v-if="useVistas.show.vProductoCategorias" />
-        <vProductosTerminados v-if="useVistas.show.vProductosTerminados" />
-        <vPtsIngresos v-if="useVistas.show.vPtsIngresos" />
         <vVentaPedidos v-if="useVistas.show.vVentaPedidos" />
         <vVentaPedidoItems v-if="useVistas.show.vVentaPedidoItems" />
         <vVentas v-if="useVistas.show.vVentas" />
         <vVentaItems v-if="useVistas.show.vVentaItems" />
-        <vInventarioProductos v-if="useVistas.show.vInventarioProductos" />
 
         <vMrpBom v-if="useVistas.show.vMrpBom" />
         <vPrograma v-if="useVistas.show.vPrograma" />
         <vProduccionHistorial v-if="useVistas.show.vProduccionHistorial" />
         <vProductosCuarentena v-if="useVistas.show.vProductosCuarentena" />
+        <vPtsIngresos v-if="useVistas.show.vPtsIngresos" />
         <vReporteProduccion v-if="useVistas.show.vReporteProduccion" />
 
         <vFormatosBpm v-if="useVistas.show.vFormatosBpm" />
@@ -49,37 +45,34 @@
 
 <script>
 // import PestanasOpen from './PestanasOpen.vue'
-
 // import vHome from '@/views/u/home/vHome.vue'
 
-// ----- LOGISTICA ENTRADA ----- //
+// ----- INVENTARIO ----- //
+import vProductoLineas from '@/views/inventario/lineas/vProductoLineas.vue'
+import vArticuloCategorias from '@/views/inventario/categorias/vArticuloCategorias.vue'
+import vArticulos from '@/views/inventario/articulos/vArticulos.vue'
+import vInventarioArticulos from '@/views/inventario/inventario/vInventarioArticulos.vue'
+
+// ----- COMPRAS ----- //
 import vProveedores from '@/views/logistica_entrada/proveedores/vProveedores.vue'
-import vArticuloCategorias from '@/views/logistica_entrada/categorias/vArticuloCategorias.vue'
-import vArticulos from '@/views/logistica_entrada/articulos/vArticulos.vue'
 import vPrecioListas from '@/views/logistica_entrada/precios/vPrecioListas.vue'
-import vCompraPedidos from '@/views/logistica_entrada/pedidos/vCompraPedidos.vue'
 import vCompraPedidoItems from '@/views/logistica_entrada/pedido_items/vCompraPedidoItems.vue'
 import vCompras from '@/views/logistica_entrada/compras/vCompras.vue'
 import vCompraItems from '@/views/logistica_entrada/compra_items/vCompraItems.vue'
-import vInventarioArticulos from '@/views/logistica_entrada/inventario/vInventarioArticulos.vue'
 
 // ----- LOGISTICA SALIDA ----- //
 import vClientes from '@/views/logistica_salida/clientes/vClientes.vue'
-import vProductoLineas from '@/views/logistica_salida/lineas/vProductoLineas.vue'
-import vProductoCategorias from '@/views/logistica_salida/categorias/vProductoCategorias.vue'
-import vProductosTerminados from '@/views/logistica_salida/articulos/vProductosTerminados.vue'
-import vPtsIngresos from '@/views/logistica_salida/ingreso_pt/vPtsIngresos.vue'
 import vVentaPedidos from '@/views/logistica_salida/pedidos/vVentaPedidos.vue'
 import vVentaPedidoItems from '@/views/logistica_salida/pedido_items/vVentaPedidoItems.vue'
 import vVentas from '@/views/logistica_salida/ventas/vVentas.vue'
 import vVentaItems from '@/views/logistica_salida/venta_items/vVentaItems.vue'
-import vInventarioProductos from '@/views/logistica_salida/inventario/vInventarioProductos.vue'
 
 // ----- PRODUCCIÓN ----- //
 import vMrpBom from '@/views/produccion/mrp_bom/vMrpBom.vue'
 import vPrograma from '@/views/produccion/vPrograma.vue'
 import vProduccionHistorial from '@/views/produccion/historial/vProduccionHistorial.vue'
 import vProductosCuarentena from '@/views/produccion/vProductosCuarentena.vue'
+import vPtsIngresos from '@/views/logistica_salida/ingreso_pt/vPtsIngresos.vue'
 import vReporteProduccion from '@/views/produccion/vReporteProduccion.vue'
 
 // ----- CALIDAD ----- //
@@ -106,32 +99,28 @@ export default {
     components: {
         // PestanasOpen,
         // vHome,
-
-        vProveedores,
+        vProductoLineas,
         vArticuloCategorias,
         vArticulos,
+        vInventarioArticulos,
+
+        vProveedores,
         vPrecioListas,
-        vCompraPedidos,
         vCompraPedidoItems,
         vCompras,
         vCompraItems,
-        vInventarioArticulos,
 
         vClientes,
-        vProductoLineas,
-        vProductoCategorias,
-        vProductosTerminados,
-        vPtsIngresos,
         vVentaPedidos,
         vVentaPedidoItems,
         vVentas,
         vVentaItems,
-        vInventarioProductos,
 
         vMrpBom,
         vPrograma,
         vProduccionHistorial,
         vProductosCuarentena,
+        vPtsIngresos,
         vReporteProduccion,
 
         vFormatosBpm,

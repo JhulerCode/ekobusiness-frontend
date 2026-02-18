@@ -411,8 +411,8 @@ export default {
             const send = {
                 articulo: {
                     type: 'consumable',
-                    sale_ok: false,
-                    purchase_ok: true,
+                    // sale_ok: false,
+                    // purchase_ok: true,
                     activo: true,
 
                     articulo_suppliers: [],
@@ -591,7 +591,7 @@ export default {
 
         async editar(item) {
             const qry = {
-                incl: ['articulo_suppliers'],
+                incl: ['categoria1', 'linea1'],
             }
 
             this.useAuth.setLoading(true, 'Cargando...')
@@ -603,6 +603,8 @@ export default {
             const send = {
                 articulo: { ...res.data },
                 pestana: 1,
+                articulo_categorias: [{ ...res.data.categoria1 }],
+                articulo_lineas: [{ ...res.data.linea1 }],
             }
 
             this.useModals.setModal('mArticulo', 'Editar artículo', 2, send, true)

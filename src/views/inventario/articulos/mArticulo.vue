@@ -4,13 +4,13 @@
             <JdInput
                 label="Nombre"
                 :nec="true"
-                v-model="articulo.nombre"
+                v-model="modal.articulo.nombre"
                 style="grid-column: 1/5"
             />
 
             <JdInput
                 label="Código barras / EAN"
-                v-model="articulo.codigo_barra"
+                v-model="modal.articulo.codigo_barra"
                 style="grid-column: 1/4"
             />
 
@@ -18,7 +18,7 @@
                 label="Tipo"
                 :nec="true"
                 :lista="modal.articulo_tipos || []"
-                v-model="articulo.type"
+                v-model="modal.articulo.type"
                 style="grid-column: 1/3"
                 @elegir="setArticuloType"
             />
@@ -26,25 +26,25 @@
             <JdCheckBox
                 label="Se vende"
                 :nec="true"
-                v-model="articulo.sale_ok"
+                v-model="modal.articulo.sale_ok"
                 style="grid-column: 1/2"
             />
 
             <JdCheckBox
                 label="Se compra"
                 :nec="true"
-                v-model="articulo.purchase_ok"
-                v-if="articulo.type != 'combo'"
+                v-model="modal.articulo.purchase_ok"
+                v-if="modal.articulo.type != 'combo'"
             />
 
             <JdCheckBox
                 label="Se produce"
                 :nec="true"
-                v-model="articulo.produce_ok"
-                v-if="articulo.type == 'consumable'"
+                v-model="modal.articulo.produce_ok"
+                v-if="modal.articulo.type == 'consumable'"
             />
 
-            <JdSwitch label="Activo?" v-model="articulo.activo" />
+            <JdSwitch label="Activo?" v-model="modal.articulo.activo" />
         </div>
 
         <div class="extra-datos">
@@ -56,7 +56,7 @@
                 <li
                     @click="modal.pestana = 2"
                     :class="{ 'pestana-activo': modal.pestana == 2 }"
-                    v-if="articulo.purchase_ok == true"
+                    v-if="modal.articulo.purchase_ok == true"
                 >
                     Compra
                 </li>
@@ -64,7 +64,7 @@
                 <li
                     @click="modal.pestana = 3"
                     :class="{ 'pestana-activo': modal.pestana == 3 }"
-                    v-if="articulo.sale_ok == true"
+                    v-if="modal.articulo.sale_ok == true"
                 >
                     Venta
                 </li>
@@ -72,7 +72,7 @@
                 <li
                     @click="modal.pestana = 4"
                     :class="{ 'pestana-activo': modal.pestana == 4 }"
-                    v-if="articulo.type == 'consumable'"
+                    v-if="modal.articulo.type == 'consumable'"
                 >
                     Inventario
                 </li>
@@ -80,7 +80,7 @@
                 <li
                     @click="modal.pestana = 5"
                     :class="{ 'pestana-activo': modal.pestana == 5 }"
-                    v-if="articulo.produce_ok == true"
+                    v-if="modal.articulo.produce_ok == true"
                 >
                     Producción
                 </li>
@@ -88,264 +88,89 @@
                 <li
                     @click="modal.pestana = 6"
                     :class="{ 'pestana-activo': modal.pestana == 6 }"
-                    v-if="articulo.type == 'combo'"
+                    v-if="modal.articulo.type == 'combo'"
                 >
                     Componentes
                 </li>
             </ul>
 
             <div class="pestanas-body">
-                <div class="container-datos general" v-if="modal.pestana == 1">
+                <div class="container-datos" v-if="modal.pestana == 1">
                     <JdSelect
                         label="Tributo"
                         :nec="true"
-                        v-model="articulo.igv_afectacion"
+                        v-model="modal.articulo.igv_afectacion"
                         :lista="modal.igv_afectaciones || []"
                     />
 
                     <JdSelect
                         label="Unidad"
                         :nec="true"
-                        v-model="articulo.unidad"
+                        v-model="modal.articulo.unidad"
                         :lista="modal.unidades"
                         mostrar="nombre_completo"
                     />
 
-                    <JdSelect
+                    <JdSelectQuery
                         label="Categoría"
-                        :lista="modal.articulo_categorias || []"
-                        v-model="articulo.categoria"
+                        :spin="modal.spin_articulo_categorias"
+                        :lista="modal.articulo_categorias"
+                        @search="loadCategorias"
+                        v-model="modal.articulo.categoria"
                     />
 
                     <JdSelect
                         label="Tipo de materia prima"
                         :lista="modal.mp_tipos || []"
-                        v-model="articulo.mp_tipo"
-                        v-if="articulo.categoria == materiaprima_id"
+                        v-model="modal.articulo.mp_tipo"
+                        v-if="modal.articulo.categoria == materiaprima_id"
                     />
 
-                    <JdInput label="Marca" v-model="articulo.marca" />
+                    <JdInput label="Marca" v-model="modal.articulo.marca" />
                 </div>
 
-                <div class="container-datos compra" v-if="modal.pestana == 2">
-                    <JdTable
-                        :columns="columns_suppliers"
-                        :datos="articulo.articulo_suppliers || []"
-                        :colAct="true"
-                        :seeker="false"
-                        :download="false"
-                        :agregarFila="addSupplier"
-                        style="grid-column: 1/3"
-                    >
-                        <template v-slot:cAction="{ item }">
-                            <JdButton
-                                tipo="2"
-                                :small="true"
-                                icon="fa-solid fa-trash-can"
-                                title="Eliminar"
-                                @click="removeSupplier(item)"
-                            />
-                        </template>
-                    </JdTable>
+                <mArticuloCompra v-if="modal.pestana == 2" />
+
+                <mArticiloVenta v-if="modal.pestana == 3" />
+
+                <div class="container-datos" v-if="modal.pestana == 4">
+                    <JdSwitch label="Tiene fecha de vencimiento?" v-model="modal.articulo.has_fv" />
                 </div>
 
-                <div class="container-datos venta" v-if="modal.pestana == 3">
-                    <JdInput
-                        label="Precio de venta/lista"
-                        type="number"
-                        v-model="articulo.list_price"
-                    />
-
-                    <JdCheckBox label="Mostrar en ecommerce" v-model="articulo.is_ecommerce" />
-
-                    <template v-if="articulo.is_ecommerce == true">
-                        <div class="mrg-top1" style="grid-column: 1/3">
-                            <strong>--- Datos para el ecommerce ---</strong>
-                        </div>
-
-                        <JdTextArea
-                            label="Descripción"
-                            :nec="true"
-                            v-model="articulo.descripcion"
-                            :disabled="modal.mode == 3"
-                            style="grid-column: 1/3"
-                        />
-
-                        <JdInput
-                            label="Precio de venta"
-                            :nec="true"
-                            type="number"
-                            v-model="articulo.precio"
-                        />
-
-                        <JdInput
-                            label="Precio anterior"
-                            type="number"
-                            v-model="articulo.precio_anterior"
-                        />
-
-                        <JdInput
-                            label="Contenido neto (g)"
-                            type="number"
-                            v-model="articulo.contenido_neto"
-                        />
-
-                        <JdInput
-                            label="Dimenciones"
-                            v-model="articulo.dimenciones"
-                            placeholder="largo x ancho x alto mm"
-                        />
-
-                        <JdInput
-                            label="Tipo de envase"
-                            v-model="articulo.envase_tipo"
-                            placeholder="CAJA, BOLSA"
-                        />
-
-                        <JdCheckBox label="Destacado" v-model="articulo.is_destacado" />
-
-                        <div style="grid-column: 1/3">
-                            <div class="container-anadir">
-                                <JdButton
-                                    text="Añadir"
-                                    tipo="2"
-                                    :small="true"
-                                    @click="addNewIngrediente"
-                                />
-                            </div>
-
-                            <JdTable
-                                :columns="columnsIngredientes"
-                                :datos="articulo.ingredientes"
-                                :seeker="false"
-                                :download="false"
-                                :colAct="true"
-                            >
-                                <template v-slot:cAction="{ item }">
-                                    <JdButton
-                                        icon="fa-solid fa-trash"
-                                        title="Eliminar"
-                                        tipo="2"
-                                        :small="true"
-                                        @click="removeIngrediente(item)"
-                                    />
-                                </template>
-                            </JdTable>
-                        </div>
-
-                        <div style="grid-column: 1/3">
-                            <div class="container-anadir">
-                                <JdButton
-                                    text="Añadir"
-                                    tipo="2"
-                                    :small="true"
-                                    @click="addNewBeneficio"
-                                />
-                            </div>
-
-                            <JdTable
-                                :columns="columnsBeneficios"
-                                :datos="articulo.beneficios"
-                                :seeker="false"
-                                :download="false"
-                                :colAct="true"
-                            >
-                                <template v-slot:cAction="{ item }">
-                                    <JdButton
-                                        icon="fa-solid fa-trash"
-                                        title="Eliminar"
-                                        tipo="2"
-                                        :small="true"
-                                        @click="removeBeneficio(item)"
-                                    />
-                                </template>
-                            </JdTable>
-                        </div>
-                    </template>
-                </div>
-
-                <div class="container-datos inventario" v-if="modal.pestana == 4">
-                    <JdSwitch label="Tiene fecha de vencimiento?" v-model="articulo.has_fv" />
-                </div>
-
-                <div class="container-datos produccion" v-if="modal.pestana == 5">
-                    <JdSelect
-                        label="Tipo de producción"
-                        v-model="articulo.linea"
-                        :lista="modal.articulo_lineas"
-                    />
-
-                    <JdInput label="Sobres en caja" type="number" v-model="articulo.filtrantes" />
-                </div>
-
-                <div class="container-datos componentes" v-if="modal.pestana == 6">
-                    <!-- <div class="agregar" style="grid-column: 1/3"> -->
+                <div class="container-datos" v-if="modal.pestana == 5">
                     <JdSelectQuery
-                        label="Artículo"
-                        :nec="true"
-                        v-model="nuevo_componente.articulo"
-                        :spin="modal.spin_articulos_consumables"
-                        :lista="modal.articulos_consumables"
-                        @search="load_articulos_consumables"
-                        @elegir="setComponenteNuevo"
-                        style="grid-column: 1/3"
+                        label="Tipo de producción"
+                        :spin="modal.spin_articulo_lineas"
+                        :lista="modal.articulo_lineas"
+                        @search="loadLineas"
+                        v-model="modal.articulo.linea"
                     />
 
                     <JdInput
+                        label="Sobres en caja"
                         type="number"
-                        label="Cantidad"
-                        :nec="true"
-                        v-model="nuevo_componente.cantidad"
-                        style="grid-column: 1/2"
+                        v-model="modal.articulo.filtrantes"
                     />
-
-                    <JdButton text="Agregar" tipo="2" @click="addComponente" />
-                    <!-- </div> -->
-
-                    <JdTable
-                        :columns="columns_componentes"
-                        :datos="articulo.combo_articulos || []"
-                        :seeker="false"
-                        :colAct="true"
-                        :download="false"
-                        style="grid-column: 1/3"
-                    >
-                        <template v-slot:cAction="{ item }">
-                            <JdButton
-                                tipo="2"
-                                :small="true"
-                                icon="fa-solid fa-trash-can"
-                                title="Eliminar"
-                                @click="removeComponente(item)"
-                            />
-                        </template>
-                    </JdTable>
                 </div>
+
+                <mArticuloComponentes v-if="modal.pestana == 6" />
             </div>
         </div>
     </JdModal>
 </template>
 
 <script>
-import {
-    JdModal,
-    JdInput,
-    JdSelect,
-    JdSwitch,
-    JdTextArea,
-    JdTable,
-    JdButton,
-    JdCheckBox,
-    JdSelectQuery,
-} from '@jhuler/components'
-// import JdTable from '@/components/JdTable.vue'
+import { JdModal, JdInput, JdSelect, JdSwitch, JdCheckBox, JdSelectQuery } from '@jhuler/components'
+import mArticuloCompra from './mArticuloCompra.vue'
+import mArticiloVenta from './mArticuloVenta.vue'
+import mArticuloComponentes from './mArticuloComponentes.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
 import { useVistas } from '@/pinia/vistas'
 
 import { urls, post, patch, get } from '@/utils/crud'
-import { incompleteData, genCorrelativo } from '@/utils/mine'
+import { incompleteData } from '@/utils/mine'
 import { jmsg } from '@/utils/swal'
 
 export default {
@@ -353,12 +178,13 @@ export default {
         JdModal,
         JdInput,
         JdSelect,
-        JdTextArea,
         JdSwitch,
-        JdTable,
-        JdButton,
         JdCheckBox,
         JdSelectQuery,
+
+        mArticiloVenta,
+        mArticuloCompra,
+        mArticuloComponentes,
     },
     data: () => ({
         useAuth: useAuth(),
@@ -369,163 +195,30 @@ export default {
         nuevo_componente: {},
         materiaprima_id: 'f000be66-e4b1-4334-b57a-0e356eb8c7a6',
 
-        articulo: {},
-
         buttons: [
             { text: 'Grabar', action: 'crear', spin: false },
             { text: 'Actualizar', action: 'modificar', spin: false },
         ],
-
-        columnsIngredientes: [
-            {
-                id: 'nombre',
-                title: 'Ingredientes',
-                width: '25rem',
-                input: true,
-                type: 'longtext',
-                show: true,
-                sort: true,
-            },
-        ],
-        columnsBeneficios: [
-            {
-                id: 'nombre',
-                title: 'Beneficios',
-                width: '25rem',
-                input: true,
-                type: 'longtext',
-                show: true,
-                sort: true,
-            },
-        ],
-
-        columns_suppliers: [],
-
-        columns_componentes: [
-            {
-                id: 'articulo',
-                title: 'Artículo',
-                prop: 'articulo1.nombre',
-                width: '25rem',
-                show: true,
-            },
-            {
-                id: 'cantidad',
-                title: 'Cantidad',
-                type: 'number',
-                input: true,
-                width: '6rem',
-                show: true,
-            },
-        ],
     }),
     created() {
         this.modal = this.useModals.mArticulo
-        this.articulo = this.useModals.mArticulo.articulo
-        this.setColumnsSuppliers()
         this.showButtons()
+        this.setOriginal()
 
-        this.loadLineas()
-        this.loadCategorias()
-        this.loadMonedas()
         this.loadDatosSistema()
     },
     methods: {
-        setColumnsSuppliers() {
-            this.columns_suppliers = [
-                {
-                    id: 'socio',
-                    title: 'Proveedor',
-                    width: '20rem',
-                    input: true,
-                    select_query: {
-                        mostrar: 'nombres',
-                        search: this.loadProveedores,
-                    },
-                    show: true,
-                    sort: true,
-                },
-                {
-                    id: 'min_qty',
-                    title: 'Cantidad mínima',
-                    type: 'number',
-                    input: true,
-                    width: '6rem',
-                    show: true,
-                    sort: true,
-                },
-                {
-                    id: 'price',
-                    title: 'Precio',
-                    type: 'number',
-                    input: true,
-                    width: '6rem',
-                    show: true,
-                    sort: true,
-                },
-                {
-                    id: 'currency_id',
-                    title: 'Moneda',
-                    width: '10rem',
-                    input: true,
-                    type: 'select',
-                    lista: [],
-                    show: true,
-                    sort: true,
-                },
-                {
-                    id: 'delay',
-                    title: 'Lead time (días)',
-                    type: 'number',
-                    input: true,
-                    width: '6rem',
-                    show: true,
-                    sort: true,
-                },
-                {
-                    id: 'date_start',
-                    title: 'Fecha inicio',
-                    type: 'date',
-                    input: true,
-                    width: '10rem',
-                    show: true,
-                    sort: true,
-                },
-                {
-                    id: 'date_end',
-                    title: 'Fecha fin',
-                    type: 'date',
-                    input: true,
-                    width: '10rem',
-                    show: true,
-                    sort: true,
-                },
-                {
-                    id: 'product_code',
-                    title: 'Código de producto del proveedor',
-                    type: 'text',
-                    input: true,
-                    width: '8rem',
-                    show: true,
-                    sort: true,
-                },
-                {
-                    id: 'product_name',
-                    title: 'Nombre de producto del proveedor',
-                    type: 'text',
-                    input: true,
-                    width: '20rem',
-                    show: true,
-                    sort: true,
-                },
-            ]
-        },
         showButtons() {
             if (this.useModals.mArticulo.mode == 1) {
                 this.buttons[0].show = true
             } else {
                 this.buttons[1].show = true
             }
+        },
+        setOriginal() {
+            const send = JSON.parse(JSON.stringify(this.modal.articulo))
+            const { articulo_suppliers, combo_articulos, ...articulo } = send
+            this.modal.original = { articulo, articulo_suppliers, combo_articulos }
         },
 
         async loadDatosSistema() {
@@ -536,203 +229,76 @@ export default {
 
             Object.assign(this.modal, res.data)
         },
-        async loadLineas() {
+        async loadLineas(txtBuscar) {
+            if (!txtBuscar) {
+                this.modal.articulo_lineas.length = 0
+                return
+            }
+
             const qry = {
                 fltr: {
                     activo: { op: 'Es', val: true },
+                    nombre: { op: 'Contiene', val: txtBuscar },
                 },
                 cols: ['nombre'],
                 ordr: [['nombre', 'ASC']],
             }
 
             this.modal.articulo_lineas = []
-            this.useAuth.setLoading(true, 'Cargando...')
+            this.modal.spin_articulo_lineas = true
             const res = await get(`${urls.articulo_lineas}?qry=${JSON.stringify(qry)}`)
-            this.useAuth.setLoading(false)
+            this.modal.spin_articulo_lineas = false
 
             if (res.code != 0) return
 
             this.modal.articulo_lineas = res.data
         },
-        async loadCategorias() {
+        async loadCategorias(txtBuscar) {
+            if (!txtBuscar) {
+                this.modal.articulo_categorias.length = 0
+                return
+            }
+
             const qry = {
-                cols: ['nombre'],
                 fltr: {
-                    tipo: { op: 'Es', val: this.articulo.tipo },
                     activo: { op: 'Es', val: true },
+                    nombre: { op: 'Contiene', val: txtBuscar },
                 },
+                cols: ['nombre'],
                 ordr: [['nombre', 'ASC']],
             }
 
             this.modal.articulo_categorias = []
-            this.useAuth.setLoading(true, 'Cargando...')
+            this.modal.spin_articulo_categorias = true
             const res = await get(`${urls.articulo_categorias}?qry=${JSON.stringify(qry)}`)
-            this.useAuth.setLoading(false)
+            this.modal.spin_articulo_categorias = false
 
             if (res.code != 0) return
 
             this.modal.articulo_categorias = res.data
         },
-        async load_articulos_consumables(txtBuscar) {
-            if (!txtBuscar) {
-                this.modal.articulos_consumables.length = 0
-                return
-            }
-
-            const qry = {
-                fltr: {
-                    type: { op: 'Es', val: 'consumable' },
-                    activo: { op: 'Es', val: true },
-                    nombre: { op: 'Contiene', val: txtBuscar },
-                },
-                cols: ['nombre', 'unidad', 'igv_afectacion', 'has_fv'],
-                ordr: [['nombre', 'ASC']],
-            }
-
-            this.modal.spin_articulos_consumables = true
-            const res = await get(`${urls.articulos}?qry=${JSON.stringify(qry)}`)
-            this.modal.spin_articulos_consumables = false
-
-            if (res.code !== 0) return
-
-            this.modal.articulos_consumables = JSON.parse(JSON.stringify(res.data))
-        },
-        async loadMonedas() {
-            const qry = {
-                fltr: {
-                    activo: { op: 'Es', val: true },
-                },
-                cols: ['nombre'],
-                ordr: [['nombre', 'ASC']],
-            }
-
-            this.modal.monedas = []
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.monedas}?qry=${JSON.stringify(qry)}`)
-            this.useAuth.setLoading(false)
-
-            if (res.code != 0) return
-
-            this.modal.monedas = res.data
-            for (const c of this.columns_suppliers) {
-                if (c.id == 'currency_id') {
-                    c.list = res.data
-                    break
-                }
-            }
-        },
-        async loadProveedores(txtBuscar, fila, column) {
-            if (!txtBuscar) {
-                fila.table_columns[column.id + '_lista'].length = 0
-                return
-            }
-
-            const qry = {
-                fltr: {
-                    activo: { op: 'Es', val: true },
-                    nombres: { op: 'Contiene', val: txtBuscar },
-                },
-                cols: ['nombres'],
-                ordr: [['nombres', 'ASC']],
-            }
-
-            fila.table_columns[column.id + '_spin'] = true
-            const res = await get(`${urls.socios}?qry=${JSON.stringify(qry)}`)
-            fila.table_columns[column.id + '_spin'] = false
-
-            if (res.code !== 0) return
-
-            fila.table_columns[column.id + '_lista'] = res.data
-        },
 
         setArticuloType() {
-            if (this.articulo.type == 'combo') {
-                this.articulo.purchase_ok = false
-                this.articulo.produce_ok = false
+            if (this.modal.articulo.type == 'combo') {
+                this.modal.articulo.purchase_ok = false
+                this.modal.articulo.produce_ok = false
             }
 
-            if (this.articulo.type == 'service') {
-                this.articulo.produce_ok = false
+            if (this.modal.articulo.type == 'service') {
+                this.modal.articulo.produce_ok = false
             }
-        },
-
-        //--- COMPRAS ---//
-        addSupplier() {
-            this.articulo.articulo_suppliers.push({
-                id: crypto.randomUUID(),
-                table_columns: {},
-            })
-        },
-        async removeSupplier(item) {
-            const i = this.articulo.articulo_suppliers.findIndex((a) => a.id == item.id)
-            this.articulo.articulo_suppliers.splice(i, 1)
-        },
-
-        //--- COMBO ---//
-        setComponenteNuevo(a) {
-            if (a == null) {
-                this.nuevo_componente = {}
-            } else {
-                this.nuevo_componente.nombre = a.nombre
-                this.nuevo_componente.unidad = a.unidad
-            }
-        },
-        async addComponente() {
-            if (this.nuevo_componente.articulo == null || this.nuevo_componente.cantidad == null) {
-                return jmsg('warning', 'Selecciona un artículo e ingrese la cantidad')
-            }
-
-            const i = this.articulo.combo_articulos.findIndex(
-                (a) => a.articulo == this.nuevo_componente.articulo,
-            )
-            if (i !== -1) return jmsg('warning', 'El artículo ya está agregado')
-
-            this.articulo.combo_articulos.push({
-                id: crypto.randomUUID(),
-                orden: genCorrelativo(this.articulo.combo_articulos),
-                articulo: this.nuevo_componente.articulo,
-                cantidad: this.nuevo_componente.cantidad,
-                articulo1: {
-                    nombre: this.nuevo_componente.nombre,
-                    unidad: this.nuevo_componente.unidad,
-                },
-            })
-
-            this.nuevo_componente = {}
-        },
-        async removeComponente(item) {
-            const i = this.articulo.combo_articulos.findIndex((a) => a.articulo == item.articulo)
-            this.articulo.combo_articulos.splice(i, 1)
-        },
-
-        //--- ECOMMERCE ---//
-        addNewIngrediente() {
-            this.articulo.ingredientes.push({
-                id: crypto.randomUUID(),
-            })
-        },
-        removeIngrediente(item) {
-            this.articulo.ingredientes = this.articulo.ingredientes.filter((a) => a.id != item.id)
-        },
-        addNewBeneficio() {
-            this.articulo.beneficios.push({
-                id: crypto.randomUUID(),
-            })
-        },
-        removeBeneficio(item) {
-            this.articulo.beneficios = this.articulo.beneficios.filter((a) => a.id != item.id)
         },
 
         checkDatos() {
             const props = ['nombre', 'type', 'igv_afectacion', 'unidad']
 
-            if (this.articulo.type == 'combo') {
-                if (this.articulo.combo_articulos.length == 0) {
+            if (this.modal.articulo.type == 'combo') {
+                if (this.modal.articulo.combo_articulos.length == 0) {
                     jmsg('warning', 'Agregue al menos un componente')
                     return true
                 }
 
-                for (const a of this.articulo.combo_articulos) {
+                for (const a of this.modal.articulo.combo_articulos) {
                     if (incompleteData(a, ['articulo', 'cantidad'])) {
                         jmsg('warning', 'Ingrese los datos necesarios')
                         return true
@@ -740,17 +306,17 @@ export default {
                 }
             }
 
-            if (this.articulo.sale_ok == true) {
-                if (this.articulo.is_ecommerce == true) {
+            if (this.modal.articulo.sale_ok == true) {
+                if (this.modal.articulo.is_ecommerce == true) {
                     props.push('descripcion', 'precio')
                 }
             }
 
-            if (this.articulo.produce_ok == true) {
+            if (this.modal.articulo.produce_ok == true) {
                 props.push('linea')
             }
 
-            if (incompleteData(this.articulo, props)) {
+            if (incompleteData(this.modal.articulo, props)) {
                 jmsg('warning', 'Ingrese los datos necesarios')
                 return true
             }
@@ -758,36 +324,47 @@ export default {
             return false
         },
         shapeDatos() {
-            if (this.articulo.type == 'combo') {
-                this.articulo.purchase_ok = false
+            if (this.modal.articulo.type == 'combo') {
+                this.modal.articulo.purchase_ok = false
             }
 
-            // if (this.articulo.tipo == 1) {
-            //     this.articulo.codigo_barra = null
-            //     this.articulo.linea = null
-            //     this.articulo.filtrantes = null
+            // if (this.modal.articulo.tipo == 1) {
+            //     this.modal.articulo.codigo_barra = null
+            //     this.modal.articulo.linea = null
+            //     this.modal.articulo.filtrantes = null
             // }
 
-            // if (this.articulo.linea == 2) {
-            //     this.articulo.filtrantes = null
+            // if (this.modal.articulo.linea == 2) {
+            //     this.modal.articulo.filtrantes = null
             // }
 
-            // if (this.articulo.precio_anterior == '') {
-            //     this.articulo.precio_anterior = null
+            // if (this.modal.articulo.precio_anterior == '') {
+            //     this.modal.articulo.precio_anterior = null
             // }
+
+            if (this.modal.mode == 2) {
+                this.modal.articulo.dirty = {}
+                const send = JSON.parse(JSON.stringify(this.modal.articulo))
+                const { articulo_suppliers, ...articulo } = send
+
+                this.modal.articulo.dirty.articulo = articulo !== this.modal.original.articulo
+
+                this.modal.articulo.dirty.articulo_suppliers =
+                    articulo_suppliers !== this.modal.original.articulo_suppliers
+            }
         },
         async crear() {
             if (this.checkDatos()) return
             this.shapeDatos()
 
             this.useAuth.setLoading(true)
-            const res = await post(urls.articulos, this.articulo)
+            const res = await post(urls.articulos, this.modal.articulo)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
 
             this.useVistas.addItem(
-                this.articulo.tipo == 1 ? 'vArticulos' : 'vProductosTerminados',
+                this.modal.articulo.tipo == 1 ? 'vArticulos' : 'vProductosTerminados',
                 'articulos',
                 res.data,
             )
@@ -798,13 +375,13 @@ export default {
             this.shapeDatos()
 
             this.useAuth.setLoading(true)
-            const res = await patch(urls.articulos, this.articulo)
+            const res = await patch(urls.articulos, this.modal.articulo)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
 
             this.useVistas.updateItem(
-                this.articulo.tipo == 1 ? 'vArticulos' : 'vProductosTerminados',
+                this.modal.articulo.tipo == 1 ? 'vArticulos' : 'vProductosTerminados',
                 'articulos',
                 res.data,
             )

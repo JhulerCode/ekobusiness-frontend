@@ -7,7 +7,7 @@
         <vInventarioArticulos v-if="useVistas.show.vInventarioArticulos" />
 
         <vProveedores v-if="useVistas.show.vProveedores" />
-        <vPrecioListas v-if="useVistas.show.vPrecioListas" />
+        <vCompraPedidos v-if="useVistas.show.vCompraPedidos" />
         <vCompraPedidoItems v-if="useVistas.show.vCompraPedidoItems" />
         <vCompras v-if="useVistas.show.vCompras" />
         <vCompraItems v-if="useVistas.show.vCompraItems" />
@@ -55,7 +55,7 @@ import vInventarioArticulos from '@/views/inventario/inventario/vInventarioArtic
 
 // ----- COMPRAS ----- //
 import vProveedores from '@/views/logistica_entrada/proveedores/vProveedores.vue'
-import vPrecioListas from '@/views/logistica_entrada/precios/vPrecioListas.vue'
+import vCompraPedidos from '@/views/logistica_entrada/pedidos/vCompraPedidos.vue'
 import vCompraPedidoItems from '@/views/logistica_entrada/pedido_items/vCompraPedidoItems.vue'
 import vCompras from '@/views/logistica_entrada/compras/vCompras.vue'
 import vCompraItems from '@/views/logistica_entrada/compra_items/vCompraItems.vue'
@@ -105,7 +105,7 @@ export default {
         vInventarioArticulos,
 
         vProveedores,
-        vPrecioListas,
+        vCompraPedidos,
         vCompraPedidoItems,
         vCompras,
         vCompraItems,

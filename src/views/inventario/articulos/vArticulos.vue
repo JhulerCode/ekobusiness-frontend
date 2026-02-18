@@ -61,7 +61,6 @@
 
 <script>
 import { JdButton, JdTable, mConfigFiltros, mConfigCols, mEditar } from '@jhuler/components'
-// import mEditar from '@/components/mEditar.vue'
 
 import mImportarArticulos from '@/views/inventario/articulos/mImportarArticulos.vue'
 import mArticulo from '@/views/inventario/articulos/mArticulo.vue'
@@ -416,7 +415,7 @@ export default {
                     activo: true,
 
                     articulo_suppliers: [],
-                    combo_articulos: [],
+                    combo_componentes: [],
                     ingredientes: [],
                     beneficios: [],
 

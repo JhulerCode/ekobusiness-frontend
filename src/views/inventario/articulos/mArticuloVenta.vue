@@ -98,8 +98,7 @@
 </template>
 
 <script>
-import { JdButton, JdInput, JdTextArea, JdCheckBox } from '@jhuler/components'
-import JdTable from '@/components/JdTable.vue'
+import { JdButton,JdTable, JdInput, JdTextArea, JdCheckBox } from '@jhuler/components'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'

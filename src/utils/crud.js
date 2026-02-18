@@ -20,6 +20,7 @@ const urls = {
     caja_aperturas: `${host}/api/caja_aperturas`,
     caja_movimientos: `${host}/api/caja_movimientos`,
     colaboradores: `${host}/api/colaboradores`,
+    combo_componentes: `${host}/api/combo_componentes`,
     documentos: `${host}/api/documentos`,
     formatos: `${host}/api/formatos`,
     formato_values: `${host}/api/formato_values`,

@@ -2,10 +2,11 @@
     <div class="container-datos">
         <JdTable
             :columns="modal.columns_componentes"
-            :datos="modal.articulo.combo_articulos || []"
+            :datos="modal.articulo.combo_componentes || []"
             :colAct="true"
             :seeker="false"
             :download="false"
+            :showResumen="false"
             :agregarFila="addComponente"
             style="grid-column: 1/3"
         >
@@ -23,8 +24,7 @@
 </template>
 
 <script>
-import { JdButton } from '@jhuler/components'
-import JdTable from '@/components/JdTable.vue'
+import { JdButton, JdTable } from '@jhuler/components'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
@@ -50,7 +50,7 @@ export default {
         this.setColums()
 
         if (this.modal.mode != 1 && !this.modal.articulo_componentes_loaded) {
-            this.loadArticuloSuppliers()
+            this.loadArticuloComponentes()
         }
     },
     methods: {
@@ -59,7 +59,7 @@ export default {
                 {
                     id: 'articulo',
                     title: 'Artículo',
-                    width: '25rem',
+                    width: '30rem',
                     input: true,
                     select_query: {
                         mostrar: 'nombre',
@@ -78,14 +78,31 @@ export default {
             ]
         },
 
-        async loadArticuloSuppliers() {
+        async loadArticuloComponentes() {
             this.modal.articulo_componentes_loaded = true
+            this.modal.articulo.combo_componentes = []
 
-            for (const a of this.modal.articulo.combo_articulos) {
+            const qry = {
+                fltr: {
+                    articulo_principal: { op: 'Es', val: this.modal.articulo.id },
+                },
+                cols: { exclude: [] },
+                incl: ['articulo1'],
+            }
+
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.combo_componentes}?qry=${JSON.stringify(qry)}`)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            for (const a of res.data) {
                 a.table_columns = {
                     articulo_lista: [{ ...a.articulo1 }],
                 }
             }
+
+            this.modal.articulo.combo_componentes = res.data
         },
         async loadArticulos(txtBuscar, fila, column) {
             if (!txtBuscar) {
@@ -113,17 +130,17 @@ export default {
         },
 
         async addComponente() {
-            this.modal.articulo.combo_articulos.push({
+            this.modal.articulo.combo_componentes.push({
                 table_columns: {},
                 id: crypto.randomUUID(),
-                orden: genCorrelativo(this.modal.articulo.combo_articulos),
+                orden: genCorrelativo(this.modal.articulo.combo_componentes),
             })
 
             this.nuevo_componente = {}
         },
         async removeComponente(item) {
-            const i = this.modal.articulo.combo_articulos.findIndex((a) => a.id == item.id)
-            this.modal.articulo.combo_articulos.splice(i, 1)
+            const i = this.modal.articulo.combo_componentes.findIndex((a) => a.id == item.id)
+            this.modal.articulo.combo_componentes.splice(i, 1)
         },
     },
 }

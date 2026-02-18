@@ -29,14 +29,19 @@
                 tipo="2"
                 @click="grabar"
                 v-if="modal.transaccion_item.id == null"
-                style="grid-column: 1/2"
             />
 
             <JdButton
-                icon="fa-solid fa-pen-to-square"
                 text="Actualizar"
                 tipo="2"
                 @click="modificar"
+                v-if="modal.transaccion_item.id != null"
+            />
+
+            <JdButton
+                text="Cancelar"
+                tipo="2"
+                @click="initTransaccion"
                 v-if="modal.transaccion_item.id != null"
             />
         </div>
@@ -282,7 +287,7 @@ export default {
 <style lang="scss" scoped>
 .container-datos {
     display: grid;
-    grid-template-columns: repeat(2, 20rem);
+    grid-template-columns: 20rem 6rem auto;
     gap: 0.5rem;
 }
 </style>

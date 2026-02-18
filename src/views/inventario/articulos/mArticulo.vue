@@ -203,7 +203,6 @@ export default {
     created() {
         this.modal = this.useModals.mArticulo
         this.showButtons()
-        this.setOriginal()
 
         this.loadDatosSistema()
     },
@@ -214,11 +213,6 @@ export default {
             } else {
                 this.buttons[1].show = true
             }
-        },
-        setOriginal() {
-            const send = JSON.parse(JSON.stringify(this.modal.articulo))
-            const { articulo_suppliers, combo_articulos, ...articulo } = send
-            this.modal.original = { articulo, articulo_suppliers, combo_articulos }
         },
 
         async loadDatosSistema() {
@@ -293,12 +287,12 @@ export default {
             const props = ['nombre', 'type', 'igv_afectacion', 'unidad']
 
             if (this.modal.articulo.type == 'combo') {
-                if (this.modal.articulo.combo_articulos.length == 0) {
+                if (this.modal.articulo.combo_componentes.length == 0) {
                     jmsg('warning', 'Agregue al menos un componente')
                     return true
                 }
 
-                for (const a of this.modal.articulo.combo_articulos) {
+                for (const a of this.modal.articulo.combo_componentes) {
                     if (incompleteData(a, ['articulo', 'cantidad'])) {
                         jmsg('warning', 'Ingrese los datos necesarios')
                         return true
@@ -338,20 +332,20 @@ export default {
             //     this.modal.articulo.filtrantes = null
             // }
 
-            // if (this.modal.articulo.precio_anterior == '') {
-            //     this.modal.articulo.precio_anterior = null
-            // }
-
-            if (this.modal.mode == 2) {
-                this.modal.articulo.dirty = {}
-                const send = JSON.parse(JSON.stringify(this.modal.articulo))
-                const { articulo_suppliers, ...articulo } = send
-
-                this.modal.articulo.dirty.articulo = articulo !== this.modal.original.articulo
-
-                this.modal.articulo.dirty.articulo_suppliers =
-                    articulo_suppliers !== this.modal.original.articulo_suppliers
+            if (this.modal.articulo.precio_anterior == '') {
+                this.modal.articulo.precio_anterior = null
             }
+
+            // if (this.modal.mode == 2) {
+            //     this.modal.articulo.dirty = {}
+            //     const send = JSON.parse(JSON.stringify(this.modal.articulo))
+            //     const { articulo_suppliers, ...articulo } = send
+
+            //     this.modal.articulo.dirty.articulo = articulo !== this.modal.original.articulo
+
+            //     this.modal.articulo.dirty.articulo_suppliers =
+            //         articulo_suppliers !== this.modal.original.articulo_suppliers
+            // }
         },
         async crear() {
             if (this.checkDatos()) return

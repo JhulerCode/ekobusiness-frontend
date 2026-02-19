@@ -6,7 +6,7 @@
                 v-model="socio.precio_lista"
                 :lista="modal.precio_listas"
                 :loaded="modal.precio_listasLoaded"
-                @reload="loadPrecioLista()"
+                @reload="loadPrecioLista"
                 :disabled="modal.mode == 3"
                 style="grid-column: 1/4"
                 v-if="this.socio.tipo == 1"

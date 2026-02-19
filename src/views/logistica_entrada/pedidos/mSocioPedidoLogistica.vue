@@ -22,17 +22,6 @@
                     style="grid-column: 1/3"
                 />
 
-                <!-- <JdSelectQuery
-                    label="Distrito"
-                    :nec="true"
-                    :spin="modal.spinUbigeos"
-                    :lista="modal.ubigeos"
-                    @search="searchUbigeos"
-                    v-model="modal.socio_pedido.entrega_ubigeo"
-                    :disabled="modal.mode == 3"
-                    style="grid-column: 1/4"
-                /> -->
-
                 <JdInput
                     label="Distrito"
                     :nec="true"

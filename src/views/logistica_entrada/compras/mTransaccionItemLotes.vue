@@ -29,7 +29,7 @@
                 :lista="modal.lotes"
                 mostrar="lote_fv_stock"
                 :loaded="modal.lotesLoaded"
-                @reload="loadLotes(item)"
+                @reload="loadLotes"
                 @elegir="agregarLote"
             />
 
@@ -74,7 +74,7 @@
 </template>
 
 <script>
-import { JdModal, JdTable, JdSelect, JdButton, JdInput } from '@jhuler/components'
+import { JdModal, JdTable, JdButton, JdInput, JdSelect } from '@jhuler/components'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'

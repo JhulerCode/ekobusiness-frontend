@@ -160,7 +160,8 @@
 </template>
 
 <script>
-import { JdModal, JdInput, JdSelect, JdSwitch, JdCheckBox, JdSelectQuery } from '@jhuler/components'
+import { JdModal, JdInput, JdSwitch, JdCheckBox, JdSelectQuery, JdSelect } from '@jhuler/components'
+
 import mArticuloCompra from './mArticuloCompra.vue'
 import mArticiloVenta from './mArticuloVenta.vue'
 import mArticuloComponentes from './mArticuloComponentes.vue'

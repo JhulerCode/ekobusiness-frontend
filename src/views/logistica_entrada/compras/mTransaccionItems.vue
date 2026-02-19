@@ -103,16 +103,6 @@
                         <div>{{ a.lote_padre1.lote_fv_stock }}</div>
                     </li>
                 </ul>
-
-                <!-- <JdSelect
-                    v-model="item.lote_padre"
-                    :lista="item.lotes"
-                    mostrar="lote_fv_stock"
-                    :loaded="item.lotesLoades || true"
-                    @reload="loadLotes(item)"
-                    @elegir="setLotePadre(item)"
-                    :disabled="modal.mode == 3"
-                /> -->
             </template>
         </JdTable>
     </div>
@@ -126,7 +116,7 @@
 </template>
 
 <script>
-import { JdInput, JdSelectQuery, JdButton, JdTable } from '@jhuler/components'
+import { JdInput, JdButton, JdTable, JdSelectQuery } from '@jhuler/components'
 
 import mPreciosLista from '@/views/logistica_entrada/pedidos/mPreciosLista.vue'
 import mPedidoItems from '@/views/logistica_entrada/compras/mPedidoItems.vue'

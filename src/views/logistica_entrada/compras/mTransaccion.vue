@@ -8,7 +8,7 @@
                     :lista="modal.socios || []"
                     mostrar="nombres_apellidos"
                     :loaded="modal.sociosLoaded"
-                    @reload="loadSocios()"
+                    @reload="loadSocios"
                     @elegir="setSocio"
                     v-model="modal.transaccion.socio"
                     :disabled="modal.transaccion.socio != null"

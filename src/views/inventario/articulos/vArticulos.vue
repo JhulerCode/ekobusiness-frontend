@@ -33,12 +33,16 @@
             :name="tableName"
             :columns="columns"
             :datos="vista.articulos || []"
+            :meta="vista.table_meta"
+            :page="tablePage"
             :colAct="true"
             :configRowSelect="true"
             :configCols="true"
             :configFiltros="openConfigFiltros"
             :reload="loadArticulos"
             :actions="tableActions"
+            @prevPage="((tablePage -= 1), loadArticulos())"
+            @nextPage="nextPage"
             @actionClick="runMethod"
             :rowOptions="tableRowOptions"
             @rowOptionSelected="runMethod"
@@ -60,7 +64,8 @@
 </template>
 
 <script>
-import { JdButton, JdTable, mConfigFiltros, mConfigCols, mEditar } from '@jhuler/components'
+import { JdButton, mConfigFiltros, mConfigCols, mEditar } from '@jhuler/components'
+import JdTable from '@/components/JdTable.vue'
 
 import mImportarArticulos from '@/views/inventario/articulos/mImportarArticulos.vue'
 import mArticulo from '@/views/inventario/articulos/mArticulo.vue'
@@ -102,6 +107,7 @@ export default {
         vista: {},
 
         tableName: 'articulos',
+        tablePage: 5,
         columns: [
             {
                 id: 'id',
@@ -342,6 +348,7 @@ export default {
                 fltr: {},
                 incl: ['categoria1'],
                 ordr: [['nombre', 'ASC']],
+                page: this.tablePage,
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
@@ -359,6 +366,7 @@ export default {
             if (res.code != 0) return
 
             this.vista.articulos = res.data
+            this.vista.table_meta = res.meta
         },
         async loadLineas() {
             const qry = {
@@ -531,6 +539,10 @@ export default {
             }
 
             this.useModals.setModal('mConfigFiltros', 'Filtros', null, send, true)
+        },
+        nextPage() {
+            this.tablePage += 1
+            this.loadArticulos()
         },
 
         runMethod(method, item) {

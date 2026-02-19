@@ -16,10 +16,7 @@ function deepCopy(obj) {
 
 function genCorrelativo(array, prop = 'orden') {
     const max = array.length
-        ? array.reduce(
-            (m, o) => Math.max(m, Number(o[prop]) || 0),
-            -Infinity
-        )
+        ? array.reduce((m, o) => Math.max(m, Number(o[prop]) || 0), -Infinity)
         : 0
 
     return max + 1
@@ -30,7 +27,7 @@ function genId(arr = []) {
 
     do {
         id = `${Date.now()}${Math.floor(Math.random() * 900) + 100}`
-    } while (arr.some(a => a.id == id))
+    } while (arr.some((a) => a.id == id))
 
     return id
 }
@@ -39,14 +36,14 @@ function incompleteData(obj, p) {
     // p = array de propiedades a evaluar
     if (p === undefined) {
         for (let prop in obj) {
-            if (obj[prop] === "" || obj[prop] === null || obj[prop] === undefined) {
+            if (obj[prop] === '' || obj[prop] === null || obj[prop] === undefined) {
                 console.log(prop + ': ' + obj[prop])
                 return true
             }
         }
     } else {
         for (let a of p) {
-            if (obj[a] === "" || obj[a] === null || obj[a] === undefined) {
+            if (obj[a] === '' || obj[a] === null || obj[a] === undefined) {
                 console.log(a + ': ' + obj[a])
                 return true
             }
@@ -61,7 +58,7 @@ function redondear(num, dec = 2) {
 
     return Number(num).toLocaleString('en-US', {
         minimumFractionDigits: dec,
-        maximumFractionDigits: dec
+        maximumFractionDigits: dec,
     })
 }
 
@@ -70,12 +67,12 @@ function loadFiles(event) {
 
     if (!files.length) return Promise.resolve([])
 
-    const promises = Array.from(files).map(file => {
+    const promises = Array.from(files).map((file) => {
         return new Promise((resolve, reject) => {
             const reader = new FileReader()
 
             const name = file.name
-            const size = ((file.size / 1024).toFixed(1)) + ' KB' // Convert to KB
+            const size = (file.size / 1024).toFixed(1) + ' KB' // Convert to KB
             const type = file.type
             const lastModifiedDate = file.lastModifiedDate.toLocaleDateString()
             const uri = URL.createObjectURL(file)
@@ -89,7 +86,7 @@ function loadFiles(event) {
                 }
             }
 
-            reader.onerror = error => reject(error)
+            reader.onerror = (error) => reject(error)
             reader.readAsDataURL(file)
         })
     })
@@ -98,33 +95,80 @@ function loadFiles(event) {
 }
 
 function getItemFromArray(idVal, array = [], prop = 'nombre', idProp = 'id') {
-    const item = array.find(a => a[idProp] == idVal)
+    const item = array.find((a) => a[idProp] == idVal)
     return item ? item[prop] : null
 }
 
 function numeroATexto(num) {
-    const unidades = ["", "UNO", "DOS", "TRES", "CUATRO", "CINCO", "SEIS", "SIETE", "OCHO", "NUEVE"];
-    const decenas = ["", "DIEZ", "VEINTE", "TREINTA", "CUARENTA", "CINCUENTA", "SESENTA", "SETENTA", "OCHENTA", "NOVENTA"];
-    const especiales = ["DIEZ", "ONCE", "DOCE", "TRECE", "CATORCE", "QUINCE", "DIECISEIS", "DIECISIETE", "DIECIOCHO", "DIECINUEVE"];
-    const centenas = ["", "CIENTO", "DOSCIENTOS", "TRESCIENTOS", "CUATROCIENTOS", "QUINIENTOS", "SEISCIENTOS", "SETECIENTOS", "OCHOCIENTOS", "NOVECIENTOS"];
+    const unidades = ['', 'UNO', 'DOS', 'TRES', 'CUATRO', 'CINCO', 'SEIS', 'SIETE', 'OCHO', 'NUEVE']
+    const decenas = [
+        '',
+        'DIEZ',
+        'VEINTE',
+        'TREINTA',
+        'CUARENTA',
+        'CINCUENTA',
+        'SESENTA',
+        'SETENTA',
+        'OCHENTA',
+        'NOVENTA',
+    ]
+    const especiales = [
+        'DIEZ',
+        'ONCE',
+        'DOCE',
+        'TRECE',
+        'CATORCE',
+        'QUINCE',
+        'DIECISEIS',
+        'DIECISIETE',
+        'DIECIOCHO',
+        'DIECINUEVE',
+    ]
+    const centenas = [
+        '',
+        'CIENTO',
+        'DOSCIENTOS',
+        'TRESCIENTOS',
+        'CUATROCIENTOS',
+        'QUINIENTOS',
+        'SEISCIENTOS',
+        'SETECIENTOS',
+        'OCHOCIENTOS',
+        'NOVECIENTOS',
+    ]
 
     function convertir(n) {
-        if (n < 10) return unidades[n];
-        if (n < 20) return especiales[n - 10];
-        if (n < 100) return decenas[Math.floor(n / 10)] + (n % 10 === 0 ? "" : " Y " + unidades[n % 10]);
-        if (n < 1000) return (n === 100 ? "CIEN" : centenas[Math.floor(n / 100)]) + (n % 100 === 0 ? "" : " " + convertir(n % 100));
-        if (n < 1000000) return (n < 2000 ? "MIL" : convertir(Math.floor(n / 1000)) + " MIL") + (n % 1000 === 0 ? "" : " " + convertir(n % 1000));
-        if (n < 1000000000) return convertir(Math.floor(n / 1000000)) + " MILLONES" + (n % 1000000 === 0 ? "" : " " + convertir(n % 1000000));
-        return "";
+        if (n < 10) return unidades[n]
+        if (n < 20) return especiales[n - 10]
+        if (n < 100)
+            return decenas[Math.floor(n / 10)] + (n % 10 === 0 ? '' : ' Y ' + unidades[n % 10])
+        if (n < 1000)
+            return (
+                (n === 100 ? 'CIEN' : centenas[Math.floor(n / 100)]) +
+                (n % 100 === 0 ? '' : ' ' + convertir(n % 100))
+            )
+        if (n < 1000000)
+            return (
+                (n < 2000 ? 'MIL' : convertir(Math.floor(n / 1000)) + ' MIL') +
+                (n % 1000 === 0 ? '' : ' ' + convertir(n % 1000))
+            )
+        if (n < 1000000000)
+            return (
+                convertir(Math.floor(n / 1000000)) +
+                ' MILLONES' +
+                (n % 1000000 === 0 ? '' : ' ' + convertir(n % 1000000))
+            )
+        return ''
     }
 
-    const parteEntera = Math.floor(num);
-    const parteDecimal = Math.round((num - parteEntera) * 100);
+    const parteEntera = Math.floor(num)
+    const parteDecimal = Math.round((num - parteEntera) * 100)
 
-    const textoEntero = convertir(parteEntera);
-    const textoDecimal = parteDecimal < 10 ? "0" + parteDecimal : parteDecimal;
+    const textoEntero = convertir(parteEntera)
+    const textoDecimal = parteDecimal < 10 ? '0' + parteDecimal : parteDecimal
 
-    return `${textoEntero} CON ${textoDecimal}/100`;
+    return `${textoEntero} CON ${textoDecimal}/100`
 }
 
 function openOptionsCase(itemid, this1) {
@@ -139,17 +183,15 @@ function openOptionsCase(itemid, this1) {
         setTimeout(() => {
             const rect2 = el.getBoundingClientRect()
 
-            if (screenWidth < (rect.left + rect2.width)) {
-                el.style.right = `${(screenWidth - rect.right) + window.scrollX}px`
-            }
-            else {
+            if (screenWidth < rect.left + rect2.width) {
+                el.style.right = `${screenWidth - rect.right + window.scrollX}px`
+            } else {
                 el.style.left = `${rect.left + window.scrollX}px`
             }
 
-            if (screenHeight < (rect.bottom + rect2.height)) {
-                el.style.bottom = `${(screenHeight - rect.top) + window.scrollY + 5}px`
-            }
-            else {
+            if (screenHeight < rect.bottom + rect2.height) {
+                el.style.bottom = `${screenHeight - rect.top + window.scrollY + 5}px`
+            } else {
                 el.style.top = `${rect.bottom + window.scrollY + 5}px`
             }
         }, 0)
@@ -174,10 +216,11 @@ async function tryOficialExcel(element, file, reader, headers) {
     }
     // console.log(headers)
     // console.log(headers1)
-    if (JSON.stringify(headers) !== JSON.stringify(headers1)) return { code: 2, msg: 'El archivo no es el formato oficial' }
+    if (JSON.stringify(headers) !== JSON.stringify(headers1))
+        return { code: 2, msg: 'El archivo no es el formato oficial' }
 
     const jsonData = []
-    worksheet.eachRow(row => {
+    worksheet.eachRow((row) => {
         const rowData = []
         for (let i = 1; i <= worksheet.lastColumn.number; i++) {
             const cell = row.getCell(i)
@@ -204,7 +247,7 @@ async function downloadExcel(columns, datos = [], nombre = Date.now()) {
     const worksheet = workbook.addWorksheet('Hoja1')
 
     // Agrega las columnas a la hoja de cálculo
-    const headerRow = columns.map(a => a.title)
+    const headerRow = columns.map((a) => a.title)
     worksheet.addRow(headerRow)
 
     // Agrega los datos a la hoja de cálculo
@@ -224,7 +267,9 @@ async function downloadExcel(columns, datos = [], nombre = Date.now()) {
 
     // Configura la hoja de cálculo para que se descargue automáticamente
     const excelBuffer = await workbook.xlsx.writeBuffer()
-    const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
+    const blob = new Blob([excelBuffer], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    })
     saveAs(blob, `${nombre}.xlsx`)
 }
 
@@ -258,16 +303,10 @@ function obtenerNumeroJuliano(fecha = new Date()) {
 }
 
 function getNestedProp(obj, prop) {
-    const result = prop
-        .split('.')
-        .reduce((acc, part) => acc?.[part], obj)
+    const result = prop.split('.').reduce((acc, part) => acc?.[part], obj)
 
     return result === undefined || result === null ? '' : result
 }
-
-// function runMethod() {
-
-// }
 
 export {
     playAudio,
@@ -284,5 +323,4 @@ export {
     // selectRow,
     obtenerNumeroJuliano,
     downloadExcel,
-    // runMethod
 }

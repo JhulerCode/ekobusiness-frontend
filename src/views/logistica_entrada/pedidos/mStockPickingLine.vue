@@ -191,8 +191,18 @@ export default {
     }),
     created() {
         this.modal = this.useModals.mStockPicking
+        this.loadEmpresa()
     },
     methods: {
+        async loadEmpresa() {
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.empresas}/uno/${this.useAuth.usuario.empresa}`)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            this.modal.empresa = res.data
+        },
         setLoteHoy() {
             if (this.modal.transaccion.tipo != 1) return null
             return `${obtenerNumeroJuliano(this.modal.transaccion.fecha)}-${Math.floor(Math.random() * 90 + 10)}`

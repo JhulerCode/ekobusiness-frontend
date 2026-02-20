@@ -1,14 +1,14 @@
 <template>
     <div class="vista vista-fill">
         <div class="head">
-            <strong>Monedas</strong>
+            <strong>Soporte al cliente</strong>
 
             <div class="buttons">
                 <JdButton
                     text="Nuevo"
                     title="Crear nuevo"
                     @click="nuevo()"
-                    v-if="useAuth.verifyPermiso('vMonedas:crear')"
+                    v-if="useAuth.verifyPermiso('vHelpdeskTickets:crear')"
                 />
             </div>
         </div>
@@ -16,16 +16,17 @@
         <JdTable
             :name="tableName"
             :columns="columns"
-            :datos="vista.monedas || []"
+            :datos="vista.helpdesk_tickets || []"
             :colAct="true"
             :configFiltros="openConfigFiltros"
-            :reload="loadMonedas"
+            :reload="loadHelpdesk"
             :rowOptions="tableRowOptions"
             @rowOptionSelected="runMethod"
-        />
+        >
+        </JdTable>
     </div>
 
-    <mMoneda v-if="useModals.show.mMoneda" />
+    <mHelpdesk v-if="useModals.show.mHelpdesk" />
     <mTipoCambios v-if="useModals.show.mTipoCambios" />
 
     <mConfigFiltros v-if="useModals.show.mConfigFiltros" />
@@ -34,8 +35,7 @@
 <script>
 import { JdButton, JdTable, mConfigFiltros } from '@jhuler/components'
 
-import mMoneda from './mMoneda.vue'
-import mTipoCambios from './mTipoCambios.vue'
+import mHelpdesk from './mHelpdesk.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
@@ -51,8 +51,7 @@ export default {
 
         mConfigFiltros,
 
-        mMoneda,
-        mTipoCambios,
+        mHelpdesk,
     },
     data: () => ({
         useAuth: useAuth(),
@@ -61,7 +60,7 @@ export default {
 
         vista: {},
 
-        tableName: 'vMonedas',
+        tableName: 'vHelpdeskTickets',
         columns: [
             {
                 id: 'nombre',
@@ -73,17 +72,17 @@ export default {
                 sort: true,
             },
             {
-                id: 'codigo',
-                title: 'Código',
+                id: 'descripcion',
+                title: 'Descripción',
                 type: 'text',
-                width: '8rem',
+                width: '10rem',
                 show: true,
                 seek: true,
                 sort: true,
             },
             {
-                id: 'simbolo',
-                title: 'Símbolo',
+                id: 'socio',
+                title: 'Cliente',
                 type: 'text',
                 width: '5rem',
                 show: true,
@@ -91,8 +90,26 @@ export default {
                 sort: true,
             },
             {
-                id: 'plural',
-                title: 'En plural',
+                id: 'articulo',
+                title: 'Producto',
+                type: 'text',
+                width: '10rem',
+                show: true,
+                seek: true,
+                sort: true,
+            },
+            {
+                id: 'reclamo_fecha',
+                title: 'Fecha de reclamo',
+                type: 'text',
+                width: '10rem',
+                show: true,
+                seek: true,
+                sort: true,
+            },
+            {
+                id: 'reclamo_fuente',
+                title: 'Fuente de reclamo',
                 type: 'text',
                 width: '10rem',
                 show: true,
@@ -102,37 +119,27 @@ export default {
         ],
         tableRowOptions: [
             {
-                id: 1,
                 label: 'Editar',
                 icon: 'fa-solid fa-pen-to-square',
                 action: 'editar',
-                permiso: 'vMonedas:editar',
+                permiso: 'vHelpdeskTickets:editar',
             },
             {
-                id: 2,
                 label: 'Eliminar',
                 icon: 'fa-solid fa-trash-can',
                 action: 'eliminar',
-                permiso: 'vMonedas:eliminar',
-                ocultar: { estandar: true },
-            },
-            {
-                id: 3,
-                label: 'Tipos de cambio',
-                icon: 'fa-solid fa-dollar-sign',
-                action: 'openTiposCambio',
-                permiso: 'vTipoCambios:listar',
+                permiso: 'vHelpdeskTickets:eliminar',
                 ocultar: { estandar: true },
             },
         ],
     }),
     created() {
-        this.vista = this.useVistas.vMonedas
+        this.vista = this.useVistas.vHelpdeskTickets
         this.useAuth.setColumns(this.tableName, this.columns)
 
         if (this.vista.loaded) return
 
-        if (this.useAuth.verifyPermiso('vMonedas:listar') == true) this.loadMonedas()
+        if (this.useAuth.verifyPermiso('vHelpdeskTickets:listar') == true) this.loadHelpdesk()
     },
     methods: {
         setQuery() {
@@ -144,24 +151,24 @@ export default {
             this.useAuth.updateQuery(this.columns, this.vista.qry)
             this.vista.qry.cols.push('estandar')
         },
-        async loadMonedas() {
+        async loadHelpdesk() {
             this.setQuery()
 
-            this.vista.monedas = []
+            this.vista.helpdesk_tickets = []
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.monedas}?qry=${JSON.stringify(this.vista.qry)}`)
+            const res = await get(`${urls.helpdesk}?qry=${JSON.stringify(this.vista.qry)}`)
             this.useAuth.setLoading(false)
             this.vista.loaded = true
 
             if (res.code != 0) return
 
-            this.vista.monedas = res.data
+            this.vista.helpdesk_tickets = res.data
         },
 
         nuevo() {
             const item = { estandar: false }
 
-            this.useModals.setModal('mMoneda', 'Nueva moneda', 1, item)
+            this.useModals.setModal('mHelpdesk', 'Nuevo ticket', 1, item)
         },
 
         async openConfigFiltros() {
@@ -170,7 +177,7 @@ export default {
             const send = {
                 table: this.tableName,
                 cols,
-                reload: this.loadMonedas,
+                reload: this.loadHelpdesk,
             }
 
             this.useModals.setModal('mConfigFiltros', 'Filtros', null, send, true)
@@ -181,44 +188,25 @@ export default {
         },
         async editar(item) {
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.monedas}/uno/${item.id}`)
+            const res = await get(`${urls.helpdesk}/uno/${item.id}`)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
 
-            this.useModals.setModal('mMoneda', 'Editar moneda', 2, res.data)
+            this.useModals.setModal('mHelpdesk', 'Editar ticket', 2, res.data)
         },
         async eliminar(item) {
             const resQst = await jqst('¿Está seguro de eliminar?')
             if (resQst.isConfirmed == false) return
 
             this.useAuth.setLoading(true, 'Eliminando...')
-            const res = await delet(urls.monedas, item)
+            const res = await delet(urls.helpdesk, item)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
 
-            this.useVistas.removeItem('vMonedas', 'monedas', item)
+            this.useVistas.removeItem('vHelpdeskTickets', 'helpdesk_tickets', item)
         },
-
-        async openTiposCambio(item) {
-            const send = {
-                moneda: {
-                    id: item.id,
-                    nombre: item.nombre,
-                },
-            }
-
-            this.useModals.setModal('mTipoCambios', 'Tipos de cambio', null, send, true)
-        },
-        // async loadDatosSistema() {
-        //     const qry = ['documentos_estados']
-        //     const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
-
-        //     if (res.code != 0) return
-
-        //     Object.assign(this.vista, res.data)
-        // },
     },
 }
 </script>

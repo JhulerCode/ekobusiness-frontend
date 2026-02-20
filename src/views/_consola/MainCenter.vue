@@ -17,6 +17,7 @@
         <vVentaPedidoItems v-if="useVistas.show.vVentaPedidoItems" />
         <vVentas v-if="useVistas.show.vVentas" />
         <vVentaItems v-if="useVistas.show.vVentaItems" />
+        <vHelpdeskTickets v-if="useVistas.show.vHelpdeskTickets" />
 
         <vMrpBom v-if="useVistas.show.vMrpBom" />
         <vPrograma v-if="useVistas.show.vPrograma" />
@@ -60,12 +61,13 @@ import vCompraPedidoItems from '@/views/logistica_entrada/pedido_items/vCompraPe
 import vCompras from '@/views/logistica_entrada/compras/vCompras.vue'
 import vCompraItems from '@/views/logistica_entrada/compra_items/vCompraItems.vue'
 
-// ----- LOGISTICA SALIDA ----- //
+// ----- VENTAS ----- //
 import vClientes from '@/views/logistica_salida/clientes/vClientes.vue'
 import vVentaPedidos from '@/views/logistica_salida/pedidos/vVentaPedidos.vue'
 import vVentaPedidoItems from '@/views/logistica_salida/pedido_items/vVentaPedidoItems.vue'
 import vVentas from '@/views/logistica_salida/ventas/vVentas.vue'
 import vVentaItems from '@/views/logistica_salida/venta_items/vVentaItems.vue'
+import vHelpdeskTickets from '@/views/logistica_salida/soporte_cliente/vHelpdeskTickets.vue'
 
 // ----- PRODUCCIÓN ----- //
 import vMrpBom from '@/views/produccion/mrp_bom/vMrpBom.vue'
@@ -115,6 +117,7 @@ export default {
         vVentaPedidoItems,
         vVentas,
         vVentaItems,
+        vHelpdeskTickets,
 
         vMrpBom,
         vPrograma,

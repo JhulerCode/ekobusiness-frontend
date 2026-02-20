@@ -85,7 +85,7 @@ export const useAuth = defineStore('auth', {
                         ],
                     },
                     {
-                        label: 'Pedidos de compra',
+                        label: 'Pedidos',
                         goto: 'vCompraPedidos',
                         permisos: [
                             { id: 'vCompraPedidos:listar', label: 'Listar' },
@@ -111,7 +111,7 @@ export const useAuth = defineStore('auth', {
                         ],
                     },
                     {
-                        label: 'Pedidos de compra detalle',
+                        label: 'Pedidos detalle',
                         goto: 'vCompraPedidoItems',
                         permisos: [{ id: 'vCompraPedidoItems:listar', label: 'Listar' }],
                     },
@@ -152,7 +152,7 @@ export const useAuth = defineStore('auth', {
                         ],
                     },
                     {
-                        label: 'Pedidos de venta',
+                        label: 'Pedidos',
                         goto: 'vVentaPedidos',
                         permisos: [
                             { id: 'vVentaPedidos:listar', label: 'Listar' },
@@ -177,7 +177,7 @@ export const useAuth = defineStore('auth', {
                         ],
                     },
                     {
-                        label: 'Pedidos de venta detalle',
+                        label: 'Pedidos detalle',
                         goto: 'vVentaPedidoItems',
                         permisos: [{ id: 'vVentaPedidoItems:listar', label: 'Listar' }],
                     },
@@ -197,6 +197,17 @@ export const useAuth = defineStore('auth', {
                         label: 'Ventas detalle',
                         goto: 'vVentaItems',
                         permisos: [{ id: 'vVentaItems:listar', label: 'Listar' }],
+                    },
+                    {
+                        label: 'Soporte al cliente',
+                        goto: 'vHelpdeskTickets',
+                        permisos: [
+                            { id: 'vHelpdeskTickets:listar', label: 'Listar' },
+                            { id: 'vHelpdeskTickets:crear', label: 'Crear' },
+                            { id: 'vHelpdeskTickets:ver', label: 'Ver' },
+                            { id: 'vHelpdeskTickets:editar', label: 'Editar' },
+                            { id: 'vHelpdeskTickets:eliminar', label: 'Eliminar' },
+                        ],
                     },
                 ],
             },

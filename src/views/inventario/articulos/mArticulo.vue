@@ -307,9 +307,9 @@ export default {
                 }
             }
 
-            if (this.modal.articulo.produce_ok == true) {
-                props.push('linea')
-            }
+            // if (this.modal.articulo.produce_ok == true) {
+            //     props.push('linea')
+            // }
 
             if (incompleteData(this.modal.articulo, props)) {
                 jmsg('warning', 'Ingrese los datos necesarios')

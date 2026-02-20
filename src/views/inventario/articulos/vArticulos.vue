@@ -42,7 +42,7 @@
             :reload="loadArticulos"
             :actions="tableActions"
             @prevPage="((tablePage -= 1), loadArticulos())"
-            @nextPage="nextPage"
+            @nextPage="((tablePage += 1), loadArticulos())"
             @actionClick="runMethod"
             :rowOptions="tableRowOptions"
             @rowOptionSelected="runMethod"
@@ -64,8 +64,7 @@
 </template>
 
 <script>
-import { JdButton, mConfigFiltros, mConfigCols, mEditar } from '@jhuler/components'
-import JdTable from '@/components/JdTable.vue'
+import { JdButton, mConfigFiltros, mConfigCols, mEditar, JdTable } from '@jhuler/components'
 
 import mImportarArticulos from '@/views/inventario/articulos/mImportarArticulos.vue'
 import mArticulo from '@/views/inventario/articulos/mArticulo.vue'
@@ -539,10 +538,6 @@ export default {
             }
 
             this.useModals.setModal('mConfigFiltros', 'Filtros', null, send, true)
-        },
-        nextPage() {
-            this.tablePage += 1
-            this.loadArticulos()
         },
 
         runMethod(method, item) {

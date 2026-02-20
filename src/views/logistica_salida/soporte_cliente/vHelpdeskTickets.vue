@@ -19,15 +19,16 @@
             :datos="vista.helpdesk_tickets || []"
             :colAct="true"
             :configFiltros="openConfigFiltros"
-            :reload="loadHelpdesk"
+            :reload="loadHelpdeskTickets"
             :rowOptions="tableRowOptions"
             @rowOptionSelected="runMethod"
-        >
-        </JdTable>
+            :meta="vista.table_meta"
+            @prevPage="((vista.table_page -= 1), loadHelpdeskTickets())"
+            @nextPage="((vista.table_page += 1), loadHelpdeskTickets())"
+        />
     </div>
 
-    <mHelpdesk v-if="useModals.show.mHelpdesk" />
-    <mTipoCambios v-if="useModals.show.mTipoCambios" />
+    <mHelpdeskTicket v-if="useModals.show.mHelpdeskTicket" />
 
     <mConfigFiltros v-if="useModals.show.mConfigFiltros" />
 </template>
@@ -35,7 +36,7 @@
 <script>
 import { JdButton, JdTable, mConfigFiltros } from '@jhuler/components'
 
-import mHelpdesk from './mHelpdesk.vue'
+import mHelpdeskTicket from './mHelpdeskTicket.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
@@ -51,7 +52,7 @@ export default {
 
         mConfigFiltros,
 
-        mHelpdesk,
+        mHelpdeskTicket,
     },
     data: () => ({
         useAuth: useAuth(),
@@ -75,25 +76,27 @@ export default {
                 id: 'descripcion',
                 title: 'Descripción',
                 type: 'text',
-                width: '10rem',
+                width: '15rem',
                 show: true,
                 seek: true,
                 sort: true,
             },
             {
-                id: 'socio',
+                id: 'socio1.nombres',
                 title: 'Cliente',
+                prop: 'socio1.nombres',
                 type: 'text',
-                width: '5rem',
+                width: '15rem',
                 show: true,
                 seek: true,
                 sort: true,
             },
             {
-                id: 'articulo',
+                id: 'articulo1.nombre',
                 title: 'Producto',
+                prop: 'articulo1.nombre',
                 type: 'text',
-                width: '10rem',
+                width: '15rem',
                 show: true,
                 seek: true,
                 sort: true,
@@ -101,7 +104,8 @@ export default {
             {
                 id: 'reclamo_fecha',
                 title: 'Fecha de reclamo',
-                type: 'text',
+                format: 'date',
+                type: 'date',
                 width: '10rem',
                 show: true,
                 seek: true,
@@ -110,6 +114,26 @@ export default {
             {
                 id: 'reclamo_fuente',
                 title: 'Fuente de reclamo',
+                type: 'text',
+                width: '10rem',
+                show: true,
+                seek: true,
+                sort: true,
+            },
+            {
+                id: 'createdAt',
+                title: 'Creado el',
+                format: 'datetime',
+                type: 'datetime',
+                width: '10rem',
+                show: true,
+                seek: true,
+                sort: true,
+            },
+            {
+                id: 'createdBy1.nombres',
+                title: 'Creado por',
+                prop: 'createdBy1.nombres_apellidos',
                 type: 'text',
                 width: '10rem',
                 show: true,
@@ -138,37 +162,40 @@ export default {
         this.useAuth.setColumns(this.tableName, this.columns)
 
         if (this.vista.loaded) return
-
-        if (this.useAuth.verifyPermiso('vHelpdeskTickets:listar') == true) this.loadHelpdesk()
+        this.vista.table_page = 1
+        if (this.useAuth.verifyPermiso('vHelpdeskTickets:listar') == true)
+            this.loadHelpdeskTickets()
     },
     methods: {
         setQuery() {
             this.vista.qry = {
                 fltr: {},
-                ordr: [['nombre', 'ASC']],
+                incl: ['socio1', 'articulo1', 'createdBy1'],
+                page: this.vista.table_page,
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
             this.vista.qry.cols.push('estandar')
         },
-        async loadHelpdesk() {
+        async loadHelpdeskTickets() {
             this.setQuery()
 
             this.vista.helpdesk_tickets = []
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.helpdesk}?qry=${JSON.stringify(this.vista.qry)}`)
+            const res = await get(`${urls.helpdesk_tickets}?qry=${JSON.stringify(this.vista.qry)}`)
             this.useAuth.setLoading(false)
             this.vista.loaded = true
 
             if (res.code != 0) return
 
             this.vista.helpdesk_tickets = res.data
+            this.vista.table_meta = res.meta
         },
 
         nuevo() {
-            const item = { estandar: false }
+            const send = { helpdesk_ticket: { estado: 1 } }
 
-            this.useModals.setModal('mHelpdesk', 'Nuevo ticket', 1, item)
+            this.useModals.setModal('mHelpdeskTicket', 'Nuevo ticket', 1, send, true)
         },
 
         async openConfigFiltros() {
@@ -177,7 +204,7 @@ export default {
             const send = {
                 table: this.tableName,
                 cols,
-                reload: this.loadHelpdesk,
+                reload: this.loadHelpdeskTickets,
             }
 
             this.useModals.setModal('mConfigFiltros', 'Filtros', null, send, true)
@@ -187,20 +214,32 @@ export default {
             this[method](item)
         },
         async editar(item) {
+            const qry = {
+                incl: ['socio1', 'articulo1'],
+            }
+
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.helpdesk}/uno/${item.id}`)
+            const res = await get(
+                `${urls.helpdesk_tickets}/uno/${item.id}?qry=${JSON.stringify(qry)}`,
+            )
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
 
-            this.useModals.setModal('mHelpdesk', 'Editar ticket', 2, res.data)
+            const send = {
+                helpdesk_ticket: res.data,
+                clientes: [{ ...res.data.socio1 }],
+                productos: [{ ...res.data.articulo1 }],
+            }
+
+            this.useModals.setModal('mHelpdeskTicket', 'Editar ticket', 2, send, true)
         },
         async eliminar(item) {
             const resQst = await jqst('¿Está seguro de eliminar?')
             if (resQst.isConfirmed == false) return
 
             this.useAuth.setLoading(true, 'Eliminando...')
-            const res = await delet(urls.helpdesk, item)
+            const res = await delet(urls.helpdesk_tickets, item)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return

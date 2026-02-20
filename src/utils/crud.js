@@ -24,7 +24,7 @@ const urls = {
     documentos: `${host}/api/documentos`,
     formatos: `${host}/api/formatos`,
     formato_values: `${host}/api/formato_values`,
-    helpdesk: `${host}/api/helpdesk`,
+    helpdesk_tickets: `${host}/api/helpdesk_tickets`,
     inspecciones: `${host}/api/inspecciones`,
     kardex: `${host}/api/kardex`,
     maquinas: `${host}/api/maquinas`,

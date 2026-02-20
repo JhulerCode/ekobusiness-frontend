@@ -28,6 +28,9 @@
             :rowOptions="tableRowOptions"
             maxHeight="70vh"
             @rowOptionSelected="runMethod"
+            :meta="modal.table_meta"
+            @prevPage="((modal.table_page -= 1), loadKardex())"
+            @nextPage="((modal.table_page += 1), loadKardex())"
             ref="TableKardex"
         />
     </JdModal>
@@ -186,6 +189,7 @@ export default {
     async created() {
         this.modal = this.useModals.mKardex
 
+        this.modal.table_page = 1
         await this.loadKardex()
     },
     methods: {
@@ -201,6 +205,7 @@ export default {
                     },
                 },
                 ordr: [['fecha', 'DESC']],
+                page: this.modal.table_page,
             }
 
             this.useAuth.updateQuery(this.columns, this.modal.qry)
@@ -224,6 +229,7 @@ export default {
             if (res.code != 0) return
 
             this.modal.kardex = res.data
+            this.modal.table_meta = res.meta
             this.calculateStock()
         },
         calculateStock() {

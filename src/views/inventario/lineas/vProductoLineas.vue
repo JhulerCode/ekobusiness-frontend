@@ -22,8 +22,10 @@
             :reload="loadCategorias"
             :rowOptions="tableRowOptions"
             @rowOptionSelected="runMethod"
-        >
-        </JdTable>
+            :meta="vista.table_meta"
+            @prevPage="((vista.table_page -= 1), loadCategorias())"
+            @nextPage="((vista.table_page += 1), loadCategorias())"
+        />
     </div>
 
     <mArticuloLinea v-if="useModals.show.mArticuloLinea" />
@@ -33,7 +35,7 @@
 </template>
 
 <script>
-import { JdButton, JdTable, mConfigFiltros } from '@jhuler/components'
+import { JdButton, mConfigFiltros, JdTable } from '@jhuler/components'
 import mUploadFiles from '@/components/mUploadFiles.vue'
 
 import mArticuloLinea from './mArticuloLinea.vue'
@@ -131,7 +133,7 @@ export default {
         this.useAuth.setColumns(this.tableName, this.columns)
 
         if (this.vista.loaded) return
-
+        this.vista.table_page = 1
         if (this.useAuth.verifyPermiso('vProductoLineas:listar') == true) this.loadCategorias()
     },
     methods: {
@@ -139,6 +141,7 @@ export default {
             this.vista.qry = {
                 fltr: {},
                 ordr: [['nombre', 'ASC']],
+                page: this.vista.table_page,
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
@@ -156,6 +159,7 @@ export default {
             if (res.code != 0) return
 
             this.vista.articulo_lineas = res.data
+            this.vista.table_meta = res.meta
         },
 
         nuevo() {

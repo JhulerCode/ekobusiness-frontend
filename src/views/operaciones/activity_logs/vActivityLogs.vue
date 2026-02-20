@@ -11,8 +11,10 @@
             :reload="loadActivityLogs"
             :configFiltros="openConfigFiltros"
             :colAct="true"
-        >
-        </JdTable>
+            :meta="vista.table_meta"
+            @prevPage="((vista.table_page -= 1), loadActivityLogs())"
+            @nextPage="((vista.table_page += 1), loadActivityLogs())"
+        />
     </div>
 
     <mConfigFiltros v-if="useModals.show.mConfigFiltros" />
@@ -99,7 +101,7 @@ export default {
         this.useAuth.setColumns(this.tableName, this.columns)
 
         if (this.vista.loaded) return
-
+        this.vista.table_page = 1
         if (this.useAuth.verifyPermiso('vActivityLogs:listar') == true) this.loadActivityLogs()
     },
     methods: {
@@ -113,6 +115,7 @@ export default {
             this.vista.qry = {
                 fltr: {},
                 incl: ['colaborador1'],
+                page: this.vista.table_page,
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
@@ -129,6 +132,7 @@ export default {
             if (res.code != 0) return
 
             this.vista.activity_logs = res.data
+            this.vista.table_meta = res.meta
         },
         async openConfigFiltros() {
             const cols = this.columns

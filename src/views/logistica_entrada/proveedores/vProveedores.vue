@@ -25,6 +25,9 @@
             @actionClick="runMethod"
             :rowOptions="tableRowOptions"
             @rowOptionSelected="runMethod"
+            :meta="vista.table_meta"
+            @prevPage="((vista.table_page -= 1), loadSocios())"
+            @nextPage="((vista.table_page += 1), loadSocios())"
             ref="jdtable"
         >
         </JdTable>
@@ -182,16 +185,15 @@ export default {
         this.verifyRowSelectIsActive()
 
         if (this.vista.loaded) return
+        this.vista.table_page = 1
         if (this.useAuth.verifyPermiso('vProveedores:listar') == true) this.loadSocios()
     },
     methods: {
         setQuery() {
             this.vista.qry = {
                 fltr: { tipo: { op: 'Es', val: 1 } },
-                ordr: [
-                    ['nombres', 'ASC'],
-                    ['apellidos', 'ASC'],
-                ],
+                ordr: [['nombres', 'ASC']],
+                page: this.vista.table_page,
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
@@ -208,6 +210,7 @@ export default {
             if (res.code != 0) return
 
             this.vista.socios = res.data
+            this.vista.table_meta = res.meta
         },
         verifyRowSelectIsActive() {
             if (this.vista.socios && this.vista.socios.some((a) => a.selected)) {

@@ -18,8 +18,10 @@
             :datos="vista.produccion_productos || []"
             :configFiltros="openConfigFiltros"
             :reload="loadTransacciones"
-        >
-        </JdTable>
+            :meta="vista.table_meta"
+            @prevPage="((vista.table_page -= 1), loadTransacciones())"
+            @nextPage="((vista.table_page += 1), loadTransacciones())"
+        />
     </div>
 
     <mProductosCuarentena v-if="useModals.show.mProductosCuarentena" />
@@ -137,7 +139,7 @@ export default {
         this.useAuth.setColumns(this.tableName, this.columns)
 
         if (this.vista.loaded) return
-
+        this.vista.table_page = 1
         if (this.useAuth.verifyPermiso('vPtsIngresos:listar') == true) this.loadTransacciones()
     },
     methods: {
@@ -157,7 +159,8 @@ export default {
                     produccion_orden1: {
                         incl: ['linea1'],
                     }
-                }
+                },
+                page: this.vista.table_page,
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
@@ -175,6 +178,7 @@ export default {
             if (res.code != 0) return
 
             this.vista.produccion_productos = res.data
+            this.vista.table_meta = res.meta
         },
 
         async verCuarentena() {

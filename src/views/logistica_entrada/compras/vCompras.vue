@@ -28,6 +28,9 @@
             :reload="loadTransacciones"
             :rowOptions="tableRowOptions"
             @rowOptionSelected="runMethod"
+            :meta="vista.table_meta"
+            @prevPage="((vista.table_page -= 1), loadTransacciones())"
+            @nextPage="((vista.table_page += 1), loadTransacciones())"
         />
     </div>
 
@@ -194,7 +197,7 @@ export default {
         this.useAuth.setColumns(this.tableName, this.columns)
 
         if (this.vista.loaded) return
-
+        this.vista.table_page = 1
         if (this.useAuth.verifyPermiso('vCompras:listar') == true) this.loadTransacciones()
     },
     methods: {
@@ -207,6 +210,7 @@ export default {
             this.vista.qry = {
                 fltr: { tipo: { op: 'Es', val: 1 } },
                 incl: ['socio1', 'moneda1', 'socio_pedido1'],
+                page: this.vista.table_page,
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
@@ -223,6 +227,7 @@ export default {
             if (res.code != 0) return
 
             this.vista.transacciones = res.data
+            this.vista.table_meta = res.meta
         },
 
         nuevo() {

@@ -33,22 +33,20 @@
             :name="tableName"
             :columns="columns"
             :datos="vista.articulos || []"
-            :meta="vista.table_meta"
-            :page="tablePage"
             :colAct="true"
             :configRowSelect="true"
             :configCols="true"
             :configFiltros="openConfigFiltros"
             :reload="loadArticulos"
             :actions="tableActions"
-            @prevPage="((tablePage -= 1), loadArticulos())"
-            @nextPage="((tablePage += 1), loadArticulos())"
             @actionClick="runMethod"
             :rowOptions="tableRowOptions"
             @rowOptionSelected="runMethod"
+            :meta="vista.table_meta"
+            @prevPage="((vista.table_page -= 1), loadArticulos())"
+            @nextPage="((vista.table_page += 1), loadArticulos())"
             ref="jdtable"
-        >
-        </JdTable>
+        />
     </div>
 
     <mImportarArticulos v-if="useModals.show.mImportarArticulos" />
@@ -106,7 +104,7 @@ export default {
         vista: {},
 
         tableName: 'articulos',
-        tablePage: 5,
+        tablePage: 1,
         columns: [
             {
                 id: 'id',
@@ -331,6 +329,7 @@ export default {
         this.verifyRowSelectIsActive()
 
         if (this.vista.loaded) return
+        this.vista.table_page = 1
         if (this.useAuth.verifyPermiso('vArticulos:listar') == true) this.loadArticulos()
     },
     methods: {
@@ -347,7 +346,7 @@ export default {
                 fltr: {},
                 incl: ['categoria1'],
                 ordr: [['nombre', 'ASC']],
-                page: this.tablePage,
+                page: this.vista.table_page,
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)

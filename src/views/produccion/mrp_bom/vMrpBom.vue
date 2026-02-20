@@ -17,6 +17,9 @@
             :reload="loadMrpBoms"
             :rowOptions="tableRowOptions"
             @rowOptionSelected="runMethod"
+            :meta="vista.table_meta"
+            @prevPage="((vista.table_page -= 1), loadMrpBoms())"
+            @nextPage="((vista.table_page += 1), loadMrpBoms())"
         />
     </div>
 
@@ -99,6 +102,7 @@ export default {
         this.useAuth.setColumns(this.tableName, this.columns)
 
         if (this.vista.loaded) return
+        this.vista.table_page = 1
         if (this.useAuth.verifyPermiso('vMrpBom:listar') == true) this.loadMrpBoms()
     },
     methods: {
@@ -107,6 +111,7 @@ export default {
                 fltr: {},
                 incl: ['articulo1'],
                 ordr: [['articulo1', 'nombre', 'ASC']],
+                page: this.vista.table_page,
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
@@ -125,6 +130,7 @@ export default {
             if (res.code != 0) return
 
             this.vista.mrp_boms = res.data
+            this.vista.table_meta = res.meta
         },
 
         async loadDatosSistema() {

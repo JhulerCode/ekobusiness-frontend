@@ -10,11 +10,10 @@
             :datos="vista.transaccion_items || []"
             :configFiltros="openConfigFiltros"
             :reload="loadPedidoItems"
-        >
-            <!-- :colAct="true"
-            :rowOptions="tableRowOptions"
-            @rowOptionSelected="runMethod" -->
-        </JdTable>
+            :meta="vista.table_meta"
+            @prevPage="((vista.table_page -= 1), loadPedidoItems())"
+            @nextPage="((vista.table_page += 1), loadPedidoItems())"
+        />
     </div>
 
     <mConfigFiltros v-if="useModals.show.mConfigFiltros" />
@@ -138,7 +137,7 @@ export default {
         this.useAuth.setColumns(this.tableName, this.columns)
 
         if (this.vista.loaded) return
-
+        this.vista.table_page = 1
         if (this.useAuth.verifyPermiso('vCompraPedidoItems:listar') == true) this.loadPedidoItems()
     },
     methods: {
@@ -156,6 +155,7 @@ export default {
                         incl: ['socio1'],
                     },
                 },
+                page: this.vista.table_page,
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
@@ -174,6 +174,7 @@ export default {
             if (res.code != 0) return
 
             this.vista.transaccion_items = res.data
+            this.vista.table_meta = res.meta
         },
 
         async openConfigFiltros() {

@@ -29,8 +29,10 @@
             :reload="loadProduccionOrdenes"
             :rowOptions="tableRowOptions"
             @rowOptionSelected="runMethod"
-        >
-        </JdTable>
+            :meta="vista.table_meta"
+            @prevPage="((vista.table_page -= 1), loadProduccionOrdenes())"
+            @nextPage="((vista.table_page += 1), loadProduccionOrdenes())"
+        />
     </div>
 
     <mProduccionOrden v-if="useModals.show.mProduccionOrden" />
@@ -300,6 +302,7 @@ export default {
         this.useAuth.setColumns(this.tableName, this.columns)
 
         if (this.vista.loaded) return
+        this.vista.table_page = 1
         if (this.useAuth.verifyPermiso('vProduccionHistorial:listar') == true)
             this.loadProduccionOrdenes()
     },
@@ -318,6 +321,7 @@ export default {
                     ['fecha', 'DESC'],
                     ['createdAt', 'DESC'],
                 ],
+                page: this.vista.table_page,
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
@@ -337,6 +341,7 @@ export default {
             if (res.code != 0) return
 
             this.vista.produccion_ordenes = res.data
+            this.vista.table_meta = res.meta
         },
         async loadDatosSistema() {
             const qry = ['produccion_orden_estados']

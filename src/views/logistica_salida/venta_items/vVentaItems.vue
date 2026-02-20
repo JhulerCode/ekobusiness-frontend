@@ -10,11 +10,10 @@
             :datos="vista.transaccion_items || []"
             :configFiltros="openConfigFiltros"
             :reload="loadTransaccionItems"
-        >
-            <!-- :colAct="true" -->
-            <!-- :rowOptions="tableRowOptions" -->
-            <!-- @rowOptionSelected="runMethod" -->
-        </JdTable>
+            :meta="vista.table_meta"
+            @prevPage="((vista.table_page -= 1), loadTransaccionItems())"
+            @nextPage="((vista.table_page += 1), loadTransaccionItems())"
+        />
     </div>
 
     <mFormato v-if="useModals.show.mFormato" @created="setTransaccionItemCalidadRevisado" />
@@ -161,7 +160,7 @@ export default {
         this.useAuth.setColumns(this.tableName, this.columns)
 
         if (this.vista.loaded) return
-
+        this.vista.table_page = 1
         if (this.useAuth.verifyPermiso('vVentaItems:listar') == true) this.loadTransaccionItems()
     },
     methods: {
@@ -179,6 +178,7 @@ export default {
                         incl: ['socio1'],
                     },
                 },
+                page: this.vista.table_page,
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
@@ -195,6 +195,7 @@ export default {
             if (res.code != 0) return
 
             this.vista.transaccion_items = res.data
+            this.vista.table_meta = res.meta
         },
 
         async openConfigFiltros() {

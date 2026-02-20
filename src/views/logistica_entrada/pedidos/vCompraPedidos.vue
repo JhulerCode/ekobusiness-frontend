@@ -31,8 +31,10 @@
             :reload="loadPedidos"
             :rowOptions="tableRowOptions"
             @rowOptionSelected="runMethod"
-        >
-        </JdTable>
+            :meta="vista.table_meta"
+            @prevPage="((vista.table_page -= 1), loadPedidos())"
+            @nextPage="((vista.table_page += 1), loadPedidos())"
+        />
     </div>
 
     <mSocioPedido v-if="useModals.show.mSocioPedido" />
@@ -231,7 +233,7 @@ export default {
         this.useAuth.setColumns(this.tableName, this.columns)
 
         if (this.vista.loaded) return
-
+        this.vista.table_page = 1
         if (this.useAuth.verifyPermiso('vCompraPedidos:listar') == true) this.loadPedidos()
     },
     methods: {
@@ -245,6 +247,7 @@ export default {
                 fltr: { tipo: { op: 'Es', val: 1 } },
                 incl: ['socio1', 'moneda1', 'createdBy1'],
                 ordr: [['fecha', 'DESC']],
+                page: this.vista.table_page,
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
@@ -262,6 +265,7 @@ export default {
             if (res.code != 0) return
 
             this.vista.pedidos = res.data
+            this.vista.table_meta = res.meta
         },
 
         nuevo() {

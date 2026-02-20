@@ -24,6 +24,9 @@
             @actionClick="runMethod"
             :rowOptions="tableRowOptions"
             @rowOptionSelected="runMethod"
+            :meta="vista.table_meta"
+            @prevPage="((vista.table_page -= 1), loadSocios())"
+            @nextPage="((vista.table_page += 1), loadSocios())"
             ref="jdtable"
         >
         </JdTable>
@@ -158,7 +161,7 @@ export default {
         this.useAuth.setColumns(this.tableName, this.columns)
 
         if (this.vista.loaded) return
-
+        this.vista.table_page = 1
         if (this.useAuth.verifyPermiso('vClientes:listar') == true) this.loadSocios()
     },
     methods: {
@@ -169,6 +172,7 @@ export default {
                     ['nombres', 'ASC'],
                     ['apellidos', 'ASC'],
                 ],
+                page: this.vista.table_page,
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
@@ -185,6 +189,7 @@ export default {
             if (res.code != 0) return
 
             this.vista.socios = res.data
+            this.vista.table_meta = res.meta
         },
 
         nuevo() {

@@ -394,6 +394,9 @@ export default {
                     socio_pedido_items: {
                         incl: ['articulo1'],
                     },
+                    createdBy1: {
+                        cols: ['cargo', 'telefono'],
+                    },
                 },
             }
 

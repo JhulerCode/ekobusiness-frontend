@@ -135,8 +135,6 @@ export default {
                 id: crypto.randomUUID(),
                 orden: genCorrelativo(this.modal.articulo.combo_componentes),
             })
-
-            this.nuevo_componente = {}
         },
         async removeComponente(item) {
             const i = this.modal.articulo.combo_componentes.findIndex((a) => a.id == item.id)

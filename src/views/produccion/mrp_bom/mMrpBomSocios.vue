@@ -1,64 +1,29 @@
 <template>
-    <JdModal modal="mMrpBom" :buttons="buttons" @button-click="(action) => this[action]()">
-        <div class="datos-generales">
-            <JdSelectQuery
-                label="Artículo"
-                :nec="true"
-                v-model="modal.mrp_bom.articulo"
-                :spin="modal.spin_articulos_fabricables"
-                :lista="modal.articulos_fabricables"
-                @search="loadArticulosFabricables"
-                style="grid-column: 1/5"
-            />
-
-            <JdSelect
-                label="Tipo"
-                :nec="true"
-                v-model="modal.mrp_bom.tipo"
-                :lista="modal.mrp_bom_tipos"
-                style="grid-column: 1/3"
-            />
-
+    <JdTable
+        :columns="columns_socios"
+        :datos="modal.mrp_bom.mrp_bom_socios || []"
+        :seeker="false"
+        :download="false"
+        :colAct="true"
+        @onChange="(action, a) => this[action](a)"
+        :inputsDisabled="!this.useAuth.verifyPermiso('vMrpBom:editar')"
+        v-if="modal.mrp_bom.tipo == 'subcontratar'"
+    >
+        <template v-slot:cAction="{ item }">
             <JdButton
-                text="Agregar"
+                :small="true"
                 tipo="2"
-                @click="addLineSocio"
-                v-if="
-                    useAuth.verifyPermiso('vMrpBom:editar') && modal.mrp_bom.tipo == 'subcontratar'
-                "
+                icon="fa-solid fa-trash-can"
+                title="Eliminar"
+                @click="removeLineSocio(item)"
+                v-if="this.useAuth.verifyPermiso('vMrpBom:editar')"
             />
-        </div>
-
-        <JdTable
-            :columns="columns_socios"
-            :datos="modal.mrp_bom.mrp_bom_socios || []"
-            :seeker="false"
-            :download="false"
-            :colAct="true"
-            @onChange="(action, a) => this[action](a)"
-            :inputsDisabled="!this.useAuth.verifyPermiso('vMrpBom:editar')"
-            class="mrg-btm2"
-            v-if="modal.mrp_bom.tipo == 'subcontratar'"
-        >
-            <template v-slot:cAction="{ item }">
-                <JdButton
-                    :small="true"
-                    tipo="2"
-                    icon="fa-solid fa-trash-can"
-                    title="Eliminar"
-                    @click="removeLineSocio(item)"
-                    v-if="this.useAuth.verifyPermiso('vMrpBom:editar')"
-                />
-            </template>
-        </JdTable>
-
-        <mMrpBomLines />
-    </JdModal>
+        </template>
+    </JdTable>
 </template>
 
 <script>
-import { JdModal, JdSelect, JdTable, JdButton, JdSelectQuery } from '@jhuler/components'
-import mMrpBomLines from './mMrpBomLines.vue'
+import { JdTable, JdButton } from '@jhuler/components'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
@@ -70,12 +35,8 @@ import { incompleteData } from '@/utils/mine'
 
 export default {
     components: {
-        JdModal,
-        JdSelect,
-        JdSelectQuery,
         JdButton,
         JdTable,
-        mMrpBomLines,
     },
     data: () => ({
         useAuth: useAuth(),
@@ -307,19 +268,3 @@ export default {
     },
 }
 </script>
-
-<style lang="scss" scoped>
-.datos-generales {
-    display: grid;
-    grid-template-columns: repeat(4, 10rem);
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-}
-
-.agregar {
-    display: grid;
-    grid-template-columns: repeat(4, 10rem);
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-}
-</style>

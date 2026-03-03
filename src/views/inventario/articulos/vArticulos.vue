@@ -135,6 +135,16 @@ export default {
                 sort: true,
             },
             {
+                id: 'stock',
+                title: 'Stock',
+                format: 'decimal',
+                filtrable: false,
+                width: '7rem',
+                show: true,
+                seek: false,
+                sort: true,
+            },
+            {
                 id: 'activo',
                 title: 'Activo?',
                 prop: 'activo1.nombre',
@@ -345,12 +355,16 @@ export default {
             this.vista.qry = {
                 fltr: {},
                 incl: ['categoria1'],
+                sqls: [],
                 ordr: [['nombre', 'ASC']],
-                page: this.vista.table_page,
+                // page: this.vista.table_page,
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
             this.vista.qry.cols.push('fotos')
+            if (this.columns[3].show == true) {
+                this.vista.qry.sqls.push('articulo_stock')
+            }
         },
         async loadArticulos() {
             this.setQuery()

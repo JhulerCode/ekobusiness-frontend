@@ -102,6 +102,33 @@ export default {
                 seek: true,
                 sort: true,
             },
+            {
+                id: 'purchase_ok',
+                title: 'Se compra',
+                prop: 'purchase_ok1.nombre',
+                type: 'select',
+                format: 'yesno',
+                width: '8rem',
+                show: false,
+            },
+            {
+                id: 'sale_ok',
+                title: 'Se vende',
+                prop: 'sale_ok1.nombre',
+                type: 'select',
+                format: 'yesno',
+                width: '8rem',
+                show: false,
+            },
+            {
+                id: 'produce_ok',
+                title: 'Se produce',
+                prop: 'produce_ok1.nombre',
+                type: 'select',
+                format: 'yesno',
+                width: '8rem',
+                show: false,
+            },
         ],
     }),
     created() {
@@ -157,9 +184,14 @@ export default {
         },
 
         async openConfigFiltros() {
+            await this.loadDatosSistema()
+
             const cols = this.columns
             for (const a of cols) {
                 if (a.id == 'categoria') a.reload = this.loadCategorias
+                if (a.id == 'purchase_ok') a.lista = this.vista.estados
+                if (a.id == 'sale_ok') a.lista = this.vista.estados
+                if (a.id == 'produce_ok') a.lista = this.vista.estados
             }
 
             const send = {
@@ -169,6 +201,14 @@ export default {
             }
 
             this.useModals.setModal('mConfigFiltros', 'Filtros', null, send, true)
+        },
+        async loadDatosSistema() {
+            const qry = ['igv_afectaciones', 'unidades', 'estados', 'articulo_tipos']
+            const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
+
+            if (res.code != 0) return
+
+            Object.assign(this.vista, res.data)
         },
         async loadCategorias() {
             const qry = {

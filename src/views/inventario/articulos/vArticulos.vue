@@ -23,7 +23,7 @@
                 <JdButton
                     text="Nuevo"
                     title="Crear nuevo"
-                    @click="nuevo()"
+                    @click="nuevo"
                     v-if="useAuth.verifyPermiso('vArticulos:crear')"
                 />
             </div>
@@ -401,7 +401,7 @@ export default {
             const qry = {
                 cols: ['nombre'],
                 fltr: {
-                    tipo: { op: 'Es', val: 1 },
+                    // tipo: { op: 'Es', val: 1 },
                     activo: { op: 'Es', val: true },
                 },
                 ordr: [['nombre', 'ASC']],
@@ -610,7 +610,7 @@ export default {
 
         async editar(item) {
             const qry = {
-                incl: ['categoria1', 'linea1'],
+                incl: ['categoria1', 'linea1', 'articulo_suppliers', 'combo_componentes'],
             }
 
             this.useAuth.setLoading(true, 'Cargando...')
@@ -658,18 +658,21 @@ export default {
             this.useVistas.removeItem('vArticulos', 'articulos', item)
         },
         async clonar(item) {
+            const qry = {
+                incl: ['categoria1', 'linea1', 'articulo_suppliers', 'combo_componentes'],
+            }
+
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.articulos}/uno/${item.id}`)
+            const res = await get(`${urls.articulos}/uno/${item.id}?qry=${JSON.stringify(qry)}`)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
 
             const send = {
-                articulo: {
-                    ...res.data,
-                    id: null,
-                },
+                articulo: { ...res.data, id: null },
                 pestana: 1,
+                articulo_categorias: [{ ...res.data.categoria1 }],
+                articulo_lineas: [{ ...res.data.linea1 }],
             }
 
             this.useModals.setModal('mArticulo', 'Nuevo artículo', 1, send, true)

@@ -358,11 +358,7 @@ export default {
 
             if (res.code != 0) return
 
-            this.useVistas.addItem(
-                this.modal.articulo.tipo == 1 ? 'vArticulos' : 'vProductosTerminados',
-                'articulos',
-                res.data,
-            )
+            this.useVistas.addItem('vArticulos', 'articulos', res.data)
             this.useModals.show.mArticulo = false
         },
         async modificar() {
@@ -375,11 +371,7 @@ export default {
 
             if (res.code != 0) return
 
-            this.useVistas.updateItem(
-                this.modal.articulo.tipo == 1 ? 'vArticulos' : 'vProductosTerminados',
-                'articulos',
-                res.data,
-            )
+            this.useVistas.updateItem('vArticulos', 'articulos', res.data)
             this.useModals.show.mArticulo = false
         },
     },

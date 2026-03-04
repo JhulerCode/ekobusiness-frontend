@@ -95,6 +95,12 @@ export default {
                 action: 'eliminar',
                 permiso: 'vMrpBom:eliminar',
             },
+            {
+                label: 'Clonar',
+                icon: 'fa-solid fa-copy',
+                action: 'clonar',
+                permiso: 'vMrpBom:editar',
+            },
         ],
     }),
     created() {
@@ -225,11 +231,15 @@ export default {
             }
 
             for (const a of send.mrp_bom.mrp_bom_lines) {
-                send['articulos' + a.id] = [{ ...a.articulo1 }]
+                a.table_columns = {
+                    articulo_lista: [{ ...a.articulo1 }],
+                }
             }
 
             for (const a of send.mrp_bom.mrp_bom_socios) {
-                send['socios' + a.id] = [{ ...a.socio1 }]
+                a.table_columns = {
+                    socio_lista: [{ ...a.socio1 }],
+                }
             }
 
             this.useModals.setModal('mMrpBom', 'Editar lista de materiales', 2, send, true)
@@ -245,6 +255,70 @@ export default {
             if (res.code != 0) return
 
             this.useVistas.removeItem('vMrpBom', 'mrp_boms', item)
+        },
+        async clonar(item) {
+            const qry = {
+                incl: ['articulo1'],
+            }
+
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.mrp_boms}/uno/${item.id}?qry=${JSON.stringify(qry)}`)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            const qry1 = {
+                fltr: {
+                    mrp_bom: { op: 'Es', val: item.id },
+                },
+                cols: { exclude: [] },
+                incl: ['articulo1'],
+                ordr: [['orden', 'ASC']],
+            }
+
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res1 = await get(`${urls.mrp_bom_lines}?qry=${JSON.stringify(qry1)}`)
+            this.useAuth.setLoading(false)
+
+            if (res1.code != 0) return
+
+            const qry2 = {
+                fltr: {
+                    mrp_bom: { op: 'Es', val: item.id },
+                },
+                cols: ['socio'],
+                incl: ['socio1'],
+            }
+
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res2 = await get(`${urls.mrp_bom_socios}?qry=${JSON.stringify(qry2)}`)
+            this.useAuth.setLoading(false)
+
+            if (res2.code != 0) return
+
+            const send = {
+                mrp_bom: {
+                    ...res.data,
+                    mrp_bom_lines: res1.data,
+                    mrp_bom_socios: res2.data,
+                    id: null,
+                },
+                articulos_fabricables: [{ ...res.data.articulo1 }],
+            }
+
+            for (const a of send.mrp_bom.mrp_bom_lines) {
+                a.table_columns = {
+                    articulo_lista: [{ ...a.articulo1 }],
+                }
+            }
+
+            for (const a of send.mrp_bom.mrp_bom_socios) {
+                a.table_columns = {
+                    socio_lista: [{ ...a.socio1 }],
+                }
+            }
+
+            this.useModals.setModal('mMrpBom', 'Nueva lista de materiales', 1, send, true)
         },
     },
 }

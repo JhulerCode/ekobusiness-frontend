@@ -48,10 +48,11 @@ export default {
                     this.useModals.initVars()
                 }
             } else {
-                if (this.$route.name != 'ConsolaView') {
-                    this.$router.replace({ name: 'ConsolaView' })
+                const isInConsola = this.$route.path.startsWith('/consola')
+                if (!isInConsola) {
+                    const vistaInicial = this.useAuth.usuario.vista_inicial
+                    this.$router.replace({ name: vistaInicial || 'ConsolaView' })
                 }
-                this.useVistas.showVista(this.useAuth.usuario.vista_inicial)
             }
         },
     },

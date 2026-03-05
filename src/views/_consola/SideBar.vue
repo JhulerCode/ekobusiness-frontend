@@ -5,7 +5,7 @@
                 <div
                     class="option"
                     @click="this.toggleList(a.label)"
-                    :class="{ active: a.children.some((b) => useVistas.show?.[b.goto]) }"
+                    :class="{ active: a.children.some((b) => $route.name === b.goto) }"
                 >
                     <div class="left" :class="{ 'has-icon': a.icon }">
                         <i v-if="a.icon" :class="a.icon"></i>
@@ -23,8 +23,8 @@
                         v-for="(b, j) in a.children"
                         :key="j"
                         class="option2"
-                        :class="{ active2: useVistas.show?.[b.goto] }"
-                        @click="useVistas.showVista(b.goto, b.label)"
+                        :class="{ active2: $route.name === b.goto }"
+                        @click="navigateTo(b.goto)"
                     >
                         {{ b.label }}
                     </div>
@@ -36,12 +36,10 @@
 
 <script>
 import { useAuth } from '@/pinia/auth'
-import { useVistas } from '@/pinia/vistas.js'
 
 export default {
     data: () => ({
         useAuth: useAuth(),
-        useVistas: useVistas(),
 
         grupoExpandido: null,
     }),
@@ -62,9 +60,29 @@ export default {
                 .filter((seccion) => seccion !== null)
         },
     },
+    watch: {
+        '$route.name': {
+            immediate: true,
+            handler(routeName) {
+                // Auto-expandir el grupo del menú que contiene la vista activa
+                if (!routeName) return
+                for (const seccion of this.useAuth.menu) {
+                    if (seccion.children.some((b) => b.goto === routeName)) {
+                        this.grupoExpandido = seccion.label
+                        break
+                    }
+                }
+            },
+        },
+    },
     methods: {
         toggleList(label) {
             this.grupoExpandido = this.grupoExpandido === label ? null : label
+        },
+        navigateTo(routeName) {
+            if (this.$route.name !== routeName) {
+                this.$router.push({ name: routeName })
+            }
         },
     },
 }

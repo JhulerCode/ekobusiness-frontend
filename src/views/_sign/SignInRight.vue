@@ -37,7 +37,6 @@
 import { JdInput, JdInputPassword, JdButton } from '@jhuler/components'
 
 import { useAuth } from '@/pinia/auth'
-import { useVistas } from '@/pinia/vistas'
 
 import { urls, post } from '@/utils/crud'
 import { jmsg } from '@/utils/swal'
@@ -50,7 +49,6 @@ export default {
     },
     data: () => ({
         useAuth: useAuth(),
-        useVistas: useVistas(),
 
         usuario: '',
         contrasena: '',
@@ -99,8 +97,8 @@ export default {
 
             this.useAuth.setLoading(true, 'Preparando vista...')
             localStorage.setItem('remember-usuario', this.usuario)
-            this.$router.replace({ name: 'ConsolaView' })
-            this.useVistas.showVista(this.useAuth.usuario.vista_inicial)
+            const vistaInicial = this.useAuth.usuario.vista_inicial
+            this.$router.replace({ name: vistaInicial || 'ConsolaView' })
         },
     },
 }

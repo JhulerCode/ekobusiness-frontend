@@ -1,4 +1,4 @@
-import { defineStore } from "pinia"
+import { defineStore } from 'pinia'
 
 export const useVistas = defineStore('vistas', {
     state: () => ({
@@ -10,6 +10,11 @@ export const useVistas = defineStore('vistas', {
             this.show = {}
             this.pestanas = []
         },
+        initVista(name) {
+            if (this[name] === undefined) {
+                this[name] = { loaded: false }
+            }
+        },
 
         async showVista(goto, label) {
             for (let a in this.show) this.show[a] = false
@@ -19,10 +24,9 @@ export const useVistas = defineStore('vistas', {
                 this[goto] = {
                     loaded: false,
                 }
-            }
-            else {
+            } else {
                 if (label != undefined) {
-                    const i = this.pestanas.findIndex(a => a.goto == goto)
+                    const i = this.pestanas.findIndex((a) => a.goto == goto)
                     this.pestanas[i].label = label
                 }
             }
@@ -32,20 +36,18 @@ export const useVistas = defineStore('vistas', {
         addPestana(goto, label) {
             if (goto == 'vHome') return
 
-            if (this.pestanas.some(a => a.goto === goto)) return
+            if (this.pestanas.some((a) => a.goto === goto)) return
 
             this.pestanas.push({ label, goto })
         },
         closePestana(goto, redirect) {
-            const i = this.pestanas.findIndex(a => a.goto == goto)
+            const i = this.pestanas.findIndex((a) => a.goto == goto)
 
             if (redirect !== undefined) {
                 this.show[redirect] = true
-            }
-            else if (this.pestanas.length == 1) {
+            } else if (this.pestanas.length == 1) {
                 this.show.vHome = true
-            }
-            else {
+            } else {
                 if (this.show[goto] == true) {
                     const asd = i == 0 ? this.pestanas[i + 1].goto : this.pestanas[i - 1].goto
                     this.show[asd] = true
@@ -71,15 +73,15 @@ export const useVistas = defineStore('vistas', {
             if (!this[goto]) return
             if (!this[goto][array]) return
 
-            const i = this[goto][array].findIndex(a => a.id == item.id)
+            const i = this[goto][array].findIndex((a) => a.id == item.id)
             this[goto][array].splice(i, 1)
         },
         updateItem(goto, array, item) {
             if (!this[goto]) return
             if (!this[goto][array]) return
 
-            const i = this[goto][array].findIndex(a => a.id == item.id)
+            const i = this[goto][array].findIndex((a) => a.id == item.id)
             this[goto][array].splice(i, 1, item)
-        }
+        },
     },
 })

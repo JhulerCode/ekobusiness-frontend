@@ -19,14 +19,6 @@
             />
 
             <JdButton
-                icon="fa-solid fa-tags"
-                text="Lista de precios"
-                tipo="3"
-                @click="openPreciosLista()"
-                v-if="modal.socio_elegido.precio_lista"
-            />
-
-            <JdButton
                 icon="fa-solid fa-file-excel"
                 text="Importar"
                 tipo="3"
@@ -59,14 +51,10 @@
             </template>
         </JdTable>
     </div>
-
-    <mPreciosLista v-if="useModals.show.mPreciosLista" @sendItems="agregarArticulos" />
 </template>
 
 <script>
 import { JdSelectQuery, JdButton, JdTable } from '@jhuler/components'
-
-import mPreciosLista from '@/views/logistica_entrada/pedidos/mPreciosLista.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
@@ -74,14 +62,13 @@ import { useVistas } from '@/pinia/vistas'
 
 import { urls, get, post, patch, delet } from '@/utils/crud'
 import { jmsg, jqst } from '@/utils/swal'
-import { tryOficialExcel, getItemFromArray, genCorrelativo } from '@/utils/mine'
+import { tryOficialExcel, genCorrelativo } from '@/utils/mine'
 
 export default {
     components: {
         JdSelectQuery,
         JdButton,
         JdTable,
-        mPreciosLista,
     },
     data: () => ({
         useAuth: useAuth(),
@@ -178,7 +165,6 @@ export default {
 
             const qry = {
                 fltr: {
-                    // purchase_ok: { op: 'Es', val: true },
                     activo: { op: 'Es', val: true },
                     nombre: { op: 'Contiene', val: txtBuscar },
                 },
@@ -188,6 +174,7 @@ export default {
 
             if (this.modal.socio_pedido.tipo == 1) {
                 qry.fltr.purchase_ok = { op: 'Es', val: true }
+                qry.incl = ['articulo_suppliers']
             } else {
                 qry.fltr.sale_ok = { op: 'Es', val: true }
             }
@@ -210,6 +197,12 @@ export default {
             )
             if (i !== -1) return jmsg('warning', 'El artículo ya está agregado')
 
+            const supplier = item.articulo_suppliers?.find(
+                (a) =>
+                    a.socio == this.modal.socio_pedido.socio &&
+                    a.currency_id == this.modal.socio_pedido.moneda,
+            )
+
             const send = {
                 orden: this.setOrden(),
                 articulo: item.id,
@@ -222,7 +215,7 @@ export default {
 
                 cantidad: null,
 
-                pu: null,
+                pu: supplier ? supplier.price : null,
                 igv_afectacion: item.igv_afectacion,
                 igv_porcentaje: item.igv_afectacion == '10' ? this.modal.empresa.igv_porcentaje : 0,
 
@@ -244,72 +237,6 @@ export default {
             }
 
             this.modal.socio_pedido.socio_pedido_items.push(send)
-        },
-
-        async openPreciosLista() {
-            if (this.modal.socio_elegido.precio_lista1.moneda != this.modal.socio_pedido.moneda) {
-                jmsg(
-                    'warning',
-                    'La moneda de la lista de precios no es igual a la moneda del pedido',
-                )
-                return
-            }
-
-            const send = {
-                precio_lista: {
-                    id: this.modal.socio_elegido.precio_lista,
-                    ...this.modal.socio_elegido.precio_lista1,
-                    moneda: getItemFromArray(
-                        this.modal.socio_elegido.precio_lista1.moneda,
-                        this.modal.monedas,
-                    ),
-                },
-            }
-            this.useModals.setModal('mPreciosLista', 'Lista de precios', null, send, true)
-        },
-        async agregarArticulos(items) {
-            for (const a of items) {
-                const i = this.modal.socio_pedido.socio_pedido_items.findIndex(
-                    (b) => b.articulo == a.articulo,
-                )
-                if (i !== -1) continue
-
-                const send = {
-                    orden: this.setOrden(),
-                    articulo: a.articulo,
-                    articulo1: {
-                        nombre: a.articulo1.nombre,
-                    },
-                    nombre: a.articulo1.nombre,
-                    unidad: a.articulo1.unidad,
-                    has_fv: a.articulo1.has_fv,
-
-                    cantidad: null,
-
-                    pu: a.precio,
-                    igv_afectacion: a.articulo1.igv_afectacion,
-                    igv_porcentaje:
-                        a.articulo1.igv_afectacion == '10' ? this.modal.empresa.igv_porcentaje : 0,
-
-                    mtoValorVenta: 0,
-                    igv: 0,
-                    total: 0,
-                }
-
-                if (this.modal.mode == 2) {
-                    send.socio_pedido = this.modal.socio_pedido.id
-
-                    this.useAuth.setLoading(true, 'Agregando...')
-                    const res = await post(urls.socio_pedido_items, send, 'Agregado con éxito')
-                    this.useAuth.setLoading(false)
-
-                    if (res.code != 0) return
-
-                    send.id = res.data.id
-                }
-
-                this.modal.socio_pedido.socio_pedido_items.push(send)
-            }
         },
 
         importar(event) {

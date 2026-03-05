@@ -1,10 +1,6 @@
 <template>
     <router-view />
 
-    <div class="box-app-version">
-        <small>v{{ useAuth.app_version }}</small>
-    </div>
-
     <LoadingSpin
         v-if="useAuth.loading.show"
         :text="useAuth.loading.text"
@@ -58,11 +54,3 @@ export default {
     },
 }
 </script>
-
-<style lang="scss" scoped>
-.box-app-version {
-    position: absolute;
-    bottom: 0.25rem;
-    right: 0.25rem;
-}
-</style>

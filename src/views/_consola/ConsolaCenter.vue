@@ -18,7 +18,6 @@ export default {}
     .vista {
         background-color: var(--bg-color);
         padding: 2rem 2rem;
-        border-radius: 0.5rem;
 
         > .head {
             margin-bottom: 1rem;

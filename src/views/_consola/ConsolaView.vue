@@ -26,7 +26,6 @@ import mUserMenu from './mUserMenu.vue'
 import mUserPreferences from './mUserPreferences.vue'
 
 import { useAuth } from '@/pinia/auth.js'
-import { useVistas } from '@/pinia/vistas.js'
 import { useModals } from '@/pinia/modals.js'
 
 export default {
@@ -42,7 +41,6 @@ export default {
     },
     data: () => ({
         useAuth: useAuth(),
-        useVistas: useVistas(),
         useModals: useModals(),
     }),
     created() {

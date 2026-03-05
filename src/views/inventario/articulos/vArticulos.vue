@@ -357,7 +357,7 @@ export default {
                 incl: ['categoria1'],
                 sqls: [],
                 ordr: [['nombre', 'ASC']],
-                // page: this.vista.table_page,
+                page: this.vista.table_page,
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)

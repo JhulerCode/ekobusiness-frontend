@@ -30,6 +30,7 @@
 import { JdModal } from '@jhuler/components'
 
 import { useAuth } from '@/pinia/auth'
+import { useVistas } from '@/pinia/vistas'
 import { useModals } from '@/pinia/modals'
 import { urls, get } from '@/utils/crud'
 
@@ -39,6 +40,7 @@ export default {
     },
     data: () => ({
         useAuth: useAuth(),
+        useVistas: useVistas(),
         useModals: useModals(),
 
         modal: {},

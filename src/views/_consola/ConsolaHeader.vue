@@ -4,7 +4,7 @@
             <nav class="breadcrumbs" v-if="breadcrumbs.length">
                 <ul>
                     <li v-for="(crumb, index) in breadcrumbs" :key="index">
-                        <span v-if="index > 0" class="separator">/</span>
+                        <span v-if="index > 0" class="separator">></span>
                         <a
                             @click="crumb.name ? navigateTo(crumb.name) : null"
                             :class="{
@@ -126,9 +126,6 @@ export default {
             }
         },
 
-        openUserMenu() {
-            this.useModals.setModal('mUserMenu', 'Menu de usuario', null, null, true)
-        },
         navigateTo(name) {
             if (this.$route.name !== name) {
                 this.$router.push({ name })
@@ -144,10 +141,9 @@ header {
     justify-content: space-between;
     align-items: center;
     gap: 1rem;
-    border-bottom: var(--border);
     padding: 0 1.5rem;
     height: 3rem;
-    background-color: var(--bg-color2);
+    background-color: var(--bg-color);
 
     .left {
         display: flex;
@@ -185,6 +181,7 @@ header {
 
                         * {
                             font-size: 0.9rem;
+                            color: var(--text-color2);
                         }
 
                         &.clickable:hover {
@@ -193,8 +190,9 @@ header {
                         }
 
                         &.active {
-                            color: var(--text-color);
-                            font-weight: 600;
+                            * {
+                                color: var(--text-color) !important;
+                            }
                         }
                     }
                 }

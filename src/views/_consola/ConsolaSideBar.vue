@@ -7,13 +7,14 @@
         </div>
 
         <div class="menu">
-            <div v-for="(a, i) in menu" :key="i">
+            <div v-for="(a, i) in menu" :key="i" class="menu-item-wrapper">
                 <div
                     class="btn option"
-                    @click="this.toggleList(a.label)"
+                    @click="this.toggleList(a.label, $event)"
+                    :key="a.label"
                     :class="{
                         'option-active': a.children.some((b) => $route.name === b.goto),
-                        'has-children': !a.goto,
+                        'is-expanded': grupoExpandido === a.label,
                     }"
                 >
                     <i :class="a.icon"></i>
@@ -21,27 +22,28 @@
                     <transition name="to-width-cero">
                         <span v-if="useAuth.showNavbar">{{ a.label }}</span>
                     </transition>
-
-                    <span v-if="!a.goto && useAuth.showNavbar">
-                        <i class="fa-solid fa-caret-down" v-if="grupoExpandido === a.label"></i>
-                        <i class="fa-solid fa-caret-right" v-else></i>
-                    </span>
                 </div>
 
                 <div
-                    v-if="a.children && grupoExpandido === a.label && useAuth.showNavbar"
+                    v-if="a.children && grupoExpandido === a.label"
                     class="items-container"
+                    ref="itemsContainer"
+                    :style="{
+                        position: 'fixed',
+                        top: flyoutPosition.top + 'px',
+                        left: flyoutPosition.left + 14 + 'px',
+                    }"
                 >
                     <div
                         v-for="(b, j) in a.children"
                         :key="j"
                         class="btn"
-                        :class="{ 'option-active': useVistas.show?.[b.goto] }"
+                        :class="{
+                            'option-active': useVistas.show?.[b.goto] || $route.name === b.goto,
+                        }"
                         @click="navigateTo(b.goto)"
                     >
-                        <transition name="to-width-cero">
-                            <span v-if="useAuth.showNavbar">{{ b.label }}</span>
-                        </transition>
+                        <span>{{ b.label }}</span>
                     </div>
                 </div>
             </div>
@@ -51,8 +53,8 @@
             <div
                 class="btn user-info"
                 v-if="useAuth.usuario"
-                @click="openUserMenu"
-                :class="{ 'user-info-active': useModals?.show?.mUserMenu }"
+                @click="toggleUserMenu($event)"
+                :class="{ 'user-info-active': showUserFlyout }"
             >
                 <div class="user-foto">
                     {{ useAuth.usuario.nombres[0] }}
@@ -77,6 +79,52 @@
                 <small>v{{ useAuth.app_version }}</small>
             </div>
         </div>
+
+        <!-- User Menu Flyout -->
+        <div
+            v-if="showUserFlyout"
+            class="user-menu-flyout"
+            ref="userFlyout"
+            :style="{
+                position: 'fixed',
+                top: userFlyoutPosition.top + 'px',
+                left: userFlyoutPosition.left + 14 + 'px',
+            }"
+        >
+            <div class="user-header">
+                <div class="user-avatar-large">
+                    {{ useAuth.usuario.nombres[0] }}
+                </div>
+                <div class="user-details">
+                    <p
+                        class="user-name max-1line"
+                        :title="`${useAuth.usuario.nombres} ${useAuth.usuario.apellidos}`"
+                    >
+                        {{ useAuth.usuario.nombres }} {{ useAuth.usuario.apellidos }}
+                    </p>
+                    <p class="max-1line" :title="useAuth.usuario.cargo">
+                        <small>{{ useAuth.usuario.cargo }}</small>
+                    </p>
+                </div>
+            </div>
+
+            <div class="user-menu-list">
+                <div class="user-menu-item" @click="openPreferenciasUsuario">
+                    <i class="fa-solid fa-sliders"></i>
+                    <span>Preferencias</span>
+                </div>
+
+                <div class="user-menu-item" @click="updateSession">
+                    <i class="fa-solid fa-rotate-right"></i>
+                    <span>Actualizar sesión</span>
+                </div>
+
+                <div class="user-menu-item" @click="logout">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <span>Cerrar sesión</span>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -84,6 +132,8 @@
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas.js'
 import { useModals } from '@/pinia/modals.js'
+import { urls, get } from '@/utils/crud'
+import { nextTick } from 'vue'
 
 export default {
     data: () => ({
@@ -92,6 +142,9 @@ export default {
         useModals: useModals(),
 
         grupoExpandido: null,
+        showUserFlyout: false,
+        flyoutPosition: { top: 0, left: 0 },
+        userFlyoutPosition: { top: 0, left: 0 },
     }),
     computed: {
         menu() {
@@ -110,32 +163,134 @@ export default {
                 .filter((seccion) => seccion !== null)
         },
     },
-    watch: {
-        '$route.name': {
-            immediate: true,
-            handler(routeName) {
-                // Auto-expandir el grupo del menú que contiene la vista activa
-                if (!routeName) return
-                for (const seccion of this.useAuth.menu) {
-                    if (seccion.children.some((b) => b.goto === routeName)) {
-                        this.grupoExpandido = seccion.label
-                        break
-                    }
-                }
-            },
-        },
+    mounted() {
+        document.addEventListener('click', this.handleClickOutside)
+    },
+    unmounted() {
+        document.removeEventListener('click', this.handleClickOutside)
     },
     methods: {
         toogleNavbar() {
             this.useAuth.showNavbar = !this.useAuth.showNavbar
+            this.grupoExpandido = null
+            this.showUserFlyout = false
         },
-        openUserMenu() {
-            this.useModals.setModal('mUserMenu', 'Menu de usuario', null, null, true)
+        async toggleUserMenu(event) {
+            if (this.showUserFlyout) {
+                this.showUserFlyout = false
+                return
+            }
+
+            if (event) {
+                event.stopPropagation()
+                const rect = event.currentTarget.getBoundingClientRect()
+                this.userFlyoutPosition = {
+                    top: rect.top,
+                    left: rect.right,
+                }
+            }
+
+            this.showUserFlyout = true
+            this.grupoExpandido = null
+
+            await nextTick()
+            this.calculateUserFlyoutPosition()
         },
-        toggleList(label) {
-            this.grupoExpandido = this.grupoExpandido === label ? null : label
+        calculateUserFlyoutPosition() {
+            const container = this.$refs.userFlyout
+            if (!container) return
+
+            const rect = container.getBoundingClientRect()
+            const windowHeight = window.innerHeight
+            const rem = 14
+
+            if (this.userFlyoutPosition.top + rect.height > windowHeight) {
+                this.userFlyoutPosition.top = windowHeight - rect.height - rem
+            }
+        },
+        async openPreferenciasUsuario() {
+            this.useModals.setModal('mUserPreferences', 'Preferencias', null, null, true)
+            this.showUserFlyout = false
+        },
+        async updateSession() {
+            this.useAuth.setLoading(true, 'Actualizando...')
+            const res = await get(`${urls.colaboradores}/reload-user`)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            if (res.data == null) {
+                this.$router.replace({ name: 'SignIn' })
+                this.useAuth.initVars()
+                this.useVistas.initVars()
+                this.useModals.initVars()
+            } else {
+                this.useAuth.setSessionDatos(res)
+            }
+            this.showUserFlyout = false
+        },
+        async logout() {
+            await this.useAuth.logout(this.$router)
+        },
+        async toggleList(label, event) {
+            if (this.grupoExpandido === label) {
+                this.grupoExpandido = null
+                return
+            }
+
+            if (event) {
+                event.stopPropagation()
+                const rect = event.currentTarget.getBoundingClientRect()
+                this.flyoutPosition = {
+                    top: rect.top,
+                    left: rect.right,
+                }
+            }
+
+            this.grupoExpandido = label
+            this.showUserFlyout = false
+
+            // Ajustar posición si se sale de la pantalla
+            await nextTick()
+            this.calculateFlyoutPosition()
+        },
+        calculateFlyoutPosition() {
+            const container = this.$refs.itemsContainer
+            if (!container) return
+
+            const rect = container[0].getBoundingClientRect()
+            const windowHeight = window.innerHeight
+            const rem = 14 // 1rem
+
+            // Si la ventanita supera el límite inferior
+            if (this.flyoutPosition.top + rect.height > windowHeight) {
+                this.flyoutPosition.top = Math.max(
+                    3 * rem + rem, // ConsolaHeader (3rem=48px) + un poco de margen
+                    windowHeight - rect.height - rem,
+                )
+            }
+        },
+        handleClickOutside(event) {
+            if (this.grupoExpandido) {
+                const isOption = event.target.closest('.option')
+                const isContainer = event.target.closest('.items-container')
+
+                if (!isOption && !isContainer) {
+                    this.grupoExpandido = null
+                }
+            }
+
+            if (this.showUserFlyout) {
+                const isUserInfo = event.target.closest('.user-info')
+                const isUserFlyout = event.target.closest('.user-menu-flyout')
+
+                if (!isUserInfo && !isUserFlyout) {
+                    this.showUserFlyout = false
+                }
+            }
         },
         navigateTo(routeName) {
+            this.grupoExpandido = null
             if (this.$route.name !== routeName) {
                 this.$router.push({ name: routeName })
             }
@@ -146,16 +301,14 @@ export default {
 
 <style lang="scss" scoped>
 .side-bar {
-    height: 100vh;
-    // display: flex;
-    // flex-direction: column;
-    // overflow-y: auto;
+    height: 100dvh;
     display: grid;
     grid-template-rows: auto 1fr auto;
     overflow-y: hidden;
     overflow-x: hidden;
     transition: width 0.3s linear;
     border-right: var(--border);
+    background-color: var(--bg-color2);
 }
 
 .visible {
@@ -166,21 +319,12 @@ export default {
     width: 4.5rem;
 }
 
-.item-no-visible {
-    width: 0;
-}
-
-.item-visible {
-    width: auto;
-}
-
 .btn {
     padding: 0.8rem 1rem;
     border-radius: 0.5rem;
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    overflow-x: hidden;
     cursor: pointer;
 
     i {
@@ -198,15 +342,9 @@ export default {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    position: sticky;
-    top: 0;
     padding: 0.5rem;
-    background-color: var(--bg-color2);
     border-bottom: var(--border);
-
-    img {
-        height: 2rem;
-    }
+    position: relative;
 
     i {
         text-align: center;
@@ -216,8 +354,8 @@ export default {
 }
 
 .menu {
-    overflow-x: hidden;
     overflow-y: auto;
+    overflow-x: visible;
     display: flex;
     flex-direction: column;
     gap: 0.2rem;
@@ -227,39 +365,36 @@ export default {
         color: var(--text-color2);
     }
 
+    .menu-item-wrapper {
+        position: relative;
+    }
+
     .option {
         display: grid;
         grid-template-columns: 1.5rem 1fr;
 
-        .left {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 0.8rem;
-            align-items: center;
-            overflow-x: hidden;
-
-            i {
-                text-align: center;
-                font-size: 1.2rem;
-            }
-
-            span {
-                width: 100%;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-            }
+        span {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
     }
 
-    .has-children {
-        display: grid;
-        grid-template-columns: 1.5rem 1fr 0.5rem;
+    .is-expanded {
+        background-color: var(--bg-color);
     }
 
     .items-container {
-        margin: 0.2rem 0 0.2rem 1rem;
-        overflow: hidden;
+        min-width: 15rem;
+        max-height: calc(100vh - 4.5rem); // 3rem del header + márgenes
+        overflow-y: auto;
+        overflow-x: hidden;
+        background-color: var(--bg-color2);
+        border: var(--border);
+        border-radius: 0.5rem;
+        box-shadow: 0rem 0rem 1rem var(--shadow-color);
+        z-index: 3;
+        padding: 0.5rem;
         display: flex;
         flex-direction: column;
         gap: 0.2rem;
@@ -276,7 +411,6 @@ export default {
 
 .footer {
     padding: 0.5rem;
-    background-color: var(--bg-color2);
     border-top: var(--border);
 
     .user-info {
@@ -311,6 +445,84 @@ export default {
 
     .version {
         text-align: center;
+        margin-top: 0.5rem;
+    }
+}
+
+.user-menu-flyout {
+    min-width: 18rem;
+    background-color: var(--bg-color2);
+    border: var(--border);
+    border-radius: 0.5rem;
+    box-shadow: 0 0 1rem var(--shadow-color);
+    z-index: 2;
+    padding: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    .user-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: var(--border);
+
+        .user-avatar-large {
+            width: 3rem;
+            height: 3rem;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.2rem;
+            color: white;
+            font-weight: bold;
+        }
+
+        .user-details {
+            display: flex;
+            flex-direction: column;
+
+            .user-name-full {
+                font-weight: bold;
+                font-size: 1rem;
+                color: var(--text-color);
+            }
+
+            .user-role {
+                font-size: 0.85rem;
+                color: var(--text-color2);
+            }
+        }
+    }
+
+    .user-menu-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.2rem;
+
+        .user-menu-item {
+            cursor: pointer;
+            padding: 0.5rem 0.8rem;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+
+            &:hover {
+                background-color: var(--bg-color-hover);
+            }
+
+            * {
+                font-size: 0.9rem;
+            }
+
+            &:hover {
+                background-color: var(--bg-color);
+            }
+        }
     }
 }
 
@@ -323,7 +535,7 @@ export default {
 /* Estado final al entrar */
 .to-width-cero-enter-to,
 .to-width-cero-leave-from {
-    width: 120px; /* ajusta al ancho real de tu imagen */
+    width: 120px;
 }
 
 /* Transición */

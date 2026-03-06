@@ -1,15 +1,11 @@
 <template>
     <main>
         <ConsolaSideBar class="side-bar" />
+        <ConsolaHeader />
 
-        <div class="main-body">
-            <ConsolaHeader />
-
-            <ConsolaCenter v-if="useAuth?.usuario?.id" />
-        </div>
+        <ConsolaCenter v-if="useAuth?.usuario?.id" />
     </main>
 
-    <mUserMenu v-if="useModals?.show?.mUserMenu" class="user-menu" />
     <mUserPreferences v-if="useModals?.show?.mUserPreferences" />
 
     <mLogin v-if="useModals?.show?.mLogin" />
@@ -22,7 +18,6 @@ import ConsolaHeader from '@/views/_consola/ConsolaHeader.vue'
 import ConsolaSideBar from '@/views/_consola/ConsolaSideBar.vue'
 import ConsolaCenter from '@/views/_consola/ConsolaCenter.vue'
 
-import mUserMenu from './mUserMenu.vue'
 import mUserPreferences from './mUserPreferences.vue'
 
 import { useAuth } from '@/pinia/auth.js'
@@ -34,7 +29,6 @@ export default {
         ConsolaSideBar,
         ConsolaCenter,
 
-        mUserMenu,
         mUserPreferences,
 
         mLogin,
@@ -69,20 +63,10 @@ main {
     width: 100%;
     display: grid;
     grid-template-columns: auto 1fr;
-    grid-template-rows: 1fr;
-    overflow-x: hidden;
-    background-color: var(--bg-color2);
+    grid-template-rows: auto 1fr;
 
-    .main-body {
-        height: 100%;
-        display: grid;
-        grid-template-rows: auto 1fr;
-        overflow-y: hidden;
+    .side-bar {
+        grid-row: 1 / 3;
     }
-}
-
-.user-menu {
-    bottom: 6rem;
-    left: 0.5rem;
 }
 </style>

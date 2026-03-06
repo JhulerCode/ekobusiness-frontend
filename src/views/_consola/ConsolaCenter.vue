@@ -58,11 +58,9 @@ export default {}
             justify-content: space-between;
             gap: 1rem;
             flex-wrap: wrap;
-            // position: sticky;
             top: 0;
             background-color: var(--bg-color2);
             padding: 1rem 0;
-            // z-index: 3;
 
             strong {
                 font-size: 1.4rem;

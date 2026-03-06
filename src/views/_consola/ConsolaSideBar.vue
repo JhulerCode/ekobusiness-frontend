@@ -154,10 +154,12 @@ export default {
         menu() {
             return this.useAuth.menu
                 .map((seccion) => {
-                    const hijosFiltrados = seccion.children.filter((a) =>
-                        (this.useAuth.usuario.permisos || []).some((p) =>
-                            p.startsWith(a.goto + ':'),
-                        ),
+                    const hijosFiltrados = seccion.children.filter(
+                        (a) =>
+                            a.showInMenu !== false &&
+                            (this.useAuth.usuario.permisos || []).some((p) =>
+                                p.startsWith(a.goto + ':'),
+                            ),
                     )
 
                     return hijosFiltrados.length > 0

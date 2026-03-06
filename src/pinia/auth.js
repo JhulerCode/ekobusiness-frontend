@@ -41,16 +41,6 @@ export const useAuth = defineStore('auth', {
 
             this.setSessionDatos(result)
 
-            // this.usuario = deepCopy(result.data)
-            // this.permisos = this.usuario.permisos
-
-            // this.setTheme(this.usuario.theme)
-            // this.setPrimaryColor(this.usuario.color)
-            // this.setInicialTables(this.usuario.tables)
-            // this.setInicialAvances(this.usuario.avances)
-            // // Formato de fecha
-            // this.showNavbar = this.usuario.menu_visible
-
             return true
         },
         setSessionDatos(result) {

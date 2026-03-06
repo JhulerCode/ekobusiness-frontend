@@ -8,7 +8,7 @@
 
                 <div class="center">
                     <p>
-                        <strong>{{ modal.empresa?.nombre }}</strong>
+                        <strong>{{ modal.empresa?.razon_social }}</strong>
                     </p>
                     <p>
                         <span>{{
@@ -27,7 +27,7 @@
 
                 <div class="right">
                     <div>
-                        <strong>R.U.C. 20557053213</strong>
+                        <strong>R.U.C. {{ modal.empresa?.ruc }}</strong>
                     </div>
                     <div>
                         <strong>ORDEN DE COMPRA</strong>
@@ -330,15 +330,17 @@ export default {
             this.modal.mtoImpVenta = this.modal.valorVenta + this.modal.mtoIGV
         },
         async loadDatosSistema() {
-            const qry = ['empresa']
+            // const qry = ['empresa']
 
             useAuth().setLoading(true, 'Cargando...')
-            const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
+            // const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
+            const res = await get(`${urls.empresas}/uno/${this.useAuth.usuario.empresa}`)
             useAuth().setLoading(false)
 
             if (res.code != 0) return
 
-            Object.assign(this.modal, res.data)
+            // Object.assign(this.modal, res.data)
+            this.modal.empresa = res.data
         },
         imprimir() {
             const element = this.$refs.elementoPdf

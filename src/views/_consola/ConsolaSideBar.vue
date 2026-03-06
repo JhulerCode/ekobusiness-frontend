@@ -34,6 +34,10 @@
                         left: flyoutPosition.left + 14 + 'px',
                     }"
                 >
+                    <strong class="items-container-daddy" v-if="!useAuth.showNavbar">
+                        {{ a.label }}
+                    </strong>
+
                     <div
                         v-for="(b, j) in a.children"
                         :key="j"
@@ -398,6 +402,14 @@ export default {
         display: flex;
         flex-direction: column;
         gap: 0.2rem;
+
+        .items-container-daddy {
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            font-size: 1.2rem;
+        }
     }
 
     .option-active {

@@ -970,7 +970,6 @@ export default {
 
                 for (const b of a.produccion_ordenes) {
                     const fila = [b.articulo_info.nombre, b.cantidad, '', '', '', b.observacion]
-                    console.log(fila)
 
                     const receta = b.receta
                         .filter((x) => !x.articulo1.nombre.includes('CAJA'))

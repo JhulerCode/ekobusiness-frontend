@@ -365,7 +365,9 @@ const router = createRouter({
     routes,
 })
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
+    const auth = useAuth()
+
     // Actualizar título de la página
     if (to.meta.title) document.title = to.meta.title
 
@@ -373,11 +375,15 @@ router.beforeEach((to, from, next) => {
     const requiresAuth = to.matched.some((r) => r.meta.requiresAuth)
 
     if (requiresAuth) {
-        const auth = useAuth()
-
         // Si no hay token, redirigir al login
         if (!auth.token) {
             return next({ name: 'SignIn' })
+        }
+
+        // Si hay token pero no hay usuario cargado (ej. al refrescar F5), cargarlo
+        if (!auth.usuario?.id) {
+            const loginOk = await auth.login()
+            if (!loginOk) return next({ name: 'SignIn' })
         }
 
         // Verificar permisos de la vista
@@ -386,27 +392,34 @@ router.beforeEach((to, from, next) => {
             const hasPermission = permisos.some((p) => p.startsWith(to.meta.permission + ':'))
 
             if (!hasPermission) {
-                // Si no tiene permiso, quedarse donde está o ir al login
-                if (from.name && from.name !== 'SignIn') {
-                    return next(false)
-                }
+                if (from.name && from.name !== 'SignIn') return next(false)
                 return next({ name: 'SignIn' })
             }
         }
 
-        // Inicializar datos de la vista en el store
+        // Inicializar datos de la vista
         if (to.meta.vistaName) {
             const vistas = useVistas()
             vistas.initVista(to.meta.vistaName)
         }
-    }
 
-    // Si navega a /consola sin vista específica, redirigir a vista inicial
-    if (to.name === 'ConsolaView') {
-        const auth = useAuth()
-        const vistaInicial = auth.usuario?.vista_inicial
-        if (vistaInicial) {
-            return next({ name: vistaInicial, replace: true })
+        // Si navega a /consola sin vista específica, redirigir a vista inicial
+        if (to.name === 'ConsolaView') {
+            const vistaInicial = auth.usuario?.vista_inicial
+            if (vistaInicial) {
+                return next({ name: vistaInicial, replace: true })
+            }
+        }
+    } else {
+        // Si intenta entrar al Login ya estando autenticado, mandarlo a la consola
+        if (to.name === 'SignIn' && auth.token) {
+            // Intentar cargar usuario si no está cargado para saber su vista inicial
+            if (!auth.usuario?.id) await auth.login()
+
+            if (auth.usuario?.id) {
+                const vistaInicial = auth.usuario?.vista_inicial
+                return next({ name: vistaInicial || 'ConsolaView', replace: true })
+            }
         }
     }
 

@@ -29,28 +29,6 @@ export default {
         if (this.useAuth.isDarkMode) {
             document.body.classList.add('dark-mode')
         }
-
-        this.isLogged()
-    },
-    methods: {
-        async isLogged() {
-            const auth = await this.useAuth.login()
-
-            if (!auth) {
-                if (this.$route.name != 'SignIn') {
-                    this.$router.replace({ name: 'SignIn' })
-                    this.useAuth.initVars()
-                    this.useVistas.initVars()
-                    this.useModals.initVars()
-                }
-            } else {
-                const isInConsola = this.$route.path.startsWith('/consola')
-                if (!isInConsola) {
-                    const vistaInicial = this.useAuth.usuario.vista_inicial
-                    this.$router.replace({ name: vistaInicial || 'ConsolaView' })
-                }
-            }
-        },
     },
 }
 </script>

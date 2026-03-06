@@ -267,15 +267,6 @@ export default [
                 ],
             },
             {
-                label: 'Productos terminados',
-                goto: 'vProductosCuarentena',
-                permisos: [
-                    { id: 'vProductosCuarentena:listar', label: 'Listar' },
-                    { id: 'vProductosCuarentena:liberar_lote', label: 'Liberar lote' },
-                    { id: 'vProductosCuarentena:trazabilidad', label: 'Ver trazabilidad' },
-                ],
-            },
-            {
                 label: 'Ingreso de productos',
                 goto: 'vPtsIngresos',
                 permisos: [
@@ -285,6 +276,8 @@ export default [
                         id: 'vPtsIngresos:ingresarPts',
                         label: 'Ingresar productos terminados',
                     },
+                    { id: 'vPtsIngresos:liberar_lote', label: 'Liberar lote' },
+                    { id: 'vPtsIngresos:trazabilidad', label: 'Ver trazabilidad' },
                 ],
             },
             {

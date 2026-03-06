@@ -176,16 +176,6 @@ const consolaChildren = [
         component: () => import('@/views/produccion/historial/vProduccionHistorial.vue'),
     },
     {
-        path: 'produccion/cuarentena',
-        name: 'vProductosCuarentena',
-        meta: {
-            title: 'Productos terminados - Eko Business',
-            vistaName: 'vProductosCuarentena',
-            permission: 'vProductosCuarentena',
-        },
-        component: () => import('@/views/produccion/vProductosCuarentena.vue'),
-    },
-    {
         path: 'produccion/ingresos',
         name: 'vPtsIngresos',
         meta: {
@@ -193,7 +183,7 @@ const consolaChildren = [
             vistaName: 'vPtsIngresos',
             permission: 'vPtsIngresos',
         },
-        component: () => import('@/views/logistica_salida/ingreso_pt/vPtsIngresos.vue'),
+        component: () => import('@/views/produccion/ingreso_pt/vPtsIngresos.vue'),
     },
     {
         path: 'produccion/reporte',

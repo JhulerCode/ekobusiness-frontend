@@ -16,14 +16,19 @@
             :name="tableName"
             :columns="columns"
             :datos="vista.produccion_productos || []"
+            :colAct="true"
             :configFiltros="openConfigFiltros"
             :reload="loadTransacciones"
+            :rowOptions="tableRowOptions"
+            @rowOptionSelected="runMethod"
             :meta="vista.table_meta"
             @prevPage="((vista.table_page -= 1), loadTransacciones())"
             @nextPage="((vista.table_page += 1), loadTransacciones())"
         />
     </div>
 
+    <mFormato v-if="useModals.show.mFormato" @created="setLoteAprobado" />
+    <mProduccionTrazabilidad v-if="useModals.show.mProduccionTrazabilidad" />
     <mProductosCuarentena v-if="useModals.show.mProductosCuarentena" />
 
     <mConfigFiltros v-if="useModals.show.mConfigFiltros" />
@@ -32,13 +37,16 @@
 <script>
 import { JdButton, JdTable, mConfigFiltros } from '@jhuler/components'
 
-import mProductosCuarentena from '@/views/logistica_salida/ingreso_pt/mProductosCuarentena.vue'
+import mProductosCuarentena from '@/views/produccion/ingreso_pt/mProductosCuarentena.vue'
+import mFormato from '@/views/calidad/formatos/mFormato.vue'
+import mProduccionTrazabilidad from '@/views/produccion/historial/mProduccionTrazabilidad.vue'
 
 import { useModals } from '@/pinia/modals'
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
 
 import { urls, get } from '@/utils/crud'
+import { jmsg } from '@/utils/swal.js'
 
 import dayjs from 'dayjs'
 
@@ -50,6 +58,8 @@ export default {
         mConfigFiltros,
 
         mProductosCuarentena,
+        mFormato,
+        mProduccionTrazabilidad,
     },
     data: () => ({
         useModals: useModals(),
@@ -132,6 +142,20 @@ export default {
                 sort: true,
             },
         ],
+        tableRowOptions: [
+            // {
+            //     label: 'Liberación de lote',
+            //     icon: 'fa-solid fa-star',
+            //     action: 'liberarLote',
+            //     permiso: 'vPtsIngresos:liberar_lote',
+            // },
+            {
+                label: 'Ver trazabilidad',
+                icon: 'fa-solid fa-diagram-project',
+                action: 'verTrazabilidad',
+                permiso: 'vPtsIngresos:trazabilidad',
+            },
+        ],
     }),
     async created() {
         this.vista = this.useVistas.vPtsIngresos
@@ -158,7 +182,7 @@ export default {
                 iccl: {
                     produccion_orden1: {
                         incl: ['linea1'],
-                    }
+                    },
                 },
                 page: this.vista.table_page,
             }
@@ -213,6 +237,95 @@ export default {
             }
 
             this.useModals.setModal('mConfigFiltros', 'Filtros', null, send, true)
+        },
+
+        runMethod(method, item) {
+            this[method](item)
+        },
+        async liberarLote(item) {
+            const formato_id = 'RE-BPM-26'
+
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.formatos}/uno/${formato_id}`)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            const formato_name = res.data.nombre
+
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res1 = await get(`${urls.formato_values}/uno/${item.cf_liberacion_lote}`)
+            this.useAuth.setLoading(false)
+
+            if (res1.code != 0) return
+
+            if (res1.data == null) {
+                const send = {
+                    cuarentena_producto: item.id,
+                    cuarentena_producto1: { ...item },
+                    formato: {
+                        codigo: res.data.id,
+                        columns: res.data.columns,
+                        instructivo: res.data.instructivo,
+                    },
+                }
+
+                this.useModals.setModal('mFormato', `${formato_id} ${formato_name}`, 1, send, true)
+            } else {
+                for (const a of res.data.columns) {
+                    a.value = res1.data[a.id]
+                }
+
+                const send = {
+                    cuarentena_producto: item.id,
+                    cuarentena_producto1: res1.data.cuarentena_producto1,
+                    formato: {
+                        id: res1.data.id,
+                        codigo: res.data.id,
+                        columns: res.data.columns,
+                        instructivo: res.data.instructivo,
+                    },
+                }
+
+                this.useModals.setModal('mFormato', `${formato_id} ${formato_name}`, 2, send, true)
+            }
+        },
+        setLoteAprobado(item) {
+            const cuanrentena_producto = this.vista.produccion_productos.find(
+                (a) => a.id == item.cuarentena_producto,
+            )
+            cuanrentena_producto.cf_liberacion_lote = item.id
+        },
+        async verTrazabilidad(item) {
+            console.log(item)
+
+            this.useAuth.setLoading(true, 'Cargando trazabilidad...')
+            // const res = await get(
+            //     `${urls.produccion_ordenes}/trazabilidad/${item.produccion_orden1.id}`,
+            // )
+            const res = await get(`${urls.produccion_ordenes}/uno/${item.produccion_orden1.id}`)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+            if (res.data == null) return jmsg('warning', 'La órden de producción no existe')
+
+            const send = {
+                produccion_orden: res.data,
+                articulos: [
+                    {
+                        id: res.data.articulo,
+                        ...res.data.articulo1,
+                    },
+                ],
+                maquinas: [
+                    {
+                        id: res.data.maquina,
+                        ...res.data.maquina1,
+                    },
+                ],
+            }
+
+            this.useModals.setModal('mProduccionTrazabilidad', 'Trazabilidad', 3, send, true)
         },
 
         async loadLineas() {

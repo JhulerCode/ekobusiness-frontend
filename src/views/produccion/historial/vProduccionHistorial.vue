@@ -626,8 +626,14 @@ export default {
             pr.productos_terminados = item.productos_terminados
         },
         async verTrazabilidad(item) {
+            const qry = {
+                incl: ['articulo1', 'maquina1'],
+            }
+
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.produccion_ordenes}/uno/${item.id}`)
+            const res = await get(
+                `${urls.produccion_ordenes}/uno/${item.id}?qry=${JSON.stringify(qry)}`,
+            )
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return

@@ -297,13 +297,14 @@ export default {
             cuanrentena_producto.cf_liberacion_lote = item.id
         },
         async verTrazabilidad(item) {
-            console.log(item)
+            const qry = {
+                incl: ['articulo1', 'maquina1'],
+            }
 
             this.useAuth.setLoading(true, 'Cargando trazabilidad...')
-            // const res = await get(
-            //     `${urls.produccion_ordenes}/trazabilidad/${item.produccion_orden1.id}`,
-            // )
-            const res = await get(`${urls.produccion_ordenes}/uno/${item.produccion_orden1.id}`)
+            const res = await get(
+                `${urls.produccion_ordenes}/uno/${item.produccion_orden1.id}?qry=${JSON.stringify(qry)}`,
+            )
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return

@@ -3,6 +3,8 @@ import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
 
 import menuConfig from '@/config/menu.js'
+const viewsModules = import.meta.glob('../views/**/*.vue')
+
 
 // ----- RUTAS HIJAS DE LA CONSOLA (DINÁMICAS) ----- //
 const consolaChildren = []
@@ -17,7 +19,7 @@ menuConfig.forEach((section) => {
                 vistaName: item.goto,
                 permission: item.goto,
             },
-            component: () => import(`@/views/${item.view}`),
+            component: viewsModules[`../views/${item.view}`],
         })
     })
 })

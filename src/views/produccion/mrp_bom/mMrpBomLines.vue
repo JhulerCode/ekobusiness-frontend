@@ -8,6 +8,7 @@
         class="jd-table"
         :inputsDisabled="!this.useAuth.verifyPermiso('vMrpBom:editar')"
         :agregarFila="addLine"
+        :rowReorderable="this.useAuth.verifyPermiso('vMrpBom:editar')"
     >
         <template v-slot:cAction="{ item }">
             <JdButton
@@ -20,32 +21,13 @@
             />
         </template>
 
-        <template v-slot:cOrden="{ item }">
-            <div class="acts">
-                <JdButton
-                    icon="fa-solid fa-angle-down"
-                    :small="true"
-                    tipo="2"
-                    @click="reorderLine(item, 1)"
-                    v-if="item.orden != modal.mrp_bom.mrp_bom_lines.length"
-                />
 
-                <span v-else></span>
-
-                <JdButton
-                    icon="fa-solid fa-angle-up"
-                    :small="true"
-                    tipo="2"
-                    @click="reorderLine(item, 2)"
-                    v-if="item.orden != 1"
-                />
-            </div>
-        </template>
     </JdTable>
 </template>
 
 <script>
-import { JdTable, JdButton } from '@jhuler/components'
+import { JdButton } from '@jhuler/components'
+import JdTable from '@/components/JdTable.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
@@ -73,13 +55,6 @@ export default {
     methods: {
         setMrpBomLinesColumns() {
             this.modal.mrp_bom_lines_columns = [
-                {
-                    id: 'orden',
-                    title: 'Ordenar',
-                    slot: 'cOrden',
-                    width: '5rem',
-                    show: true,
-                },
                 {
                     id: 'articulo',
                     title: 'Artículo',
@@ -110,9 +85,7 @@ export default {
                 },
             ]
 
-            if (this.useAuth.verifyPermiso('vMrpBom:editar') == false) {
-                this.modal.mrp_bom_lines_columns[0].show = false
-            }
+
         },
 
         async loadMrpBomLines() {
@@ -188,29 +161,11 @@ export default {
                 a.orden = j + 1
             }
         },
-        async reorderLine(item, k) {
-            const i = this.modal.mrp_bom.mrp_bom_lines.findIndex((a) => a.id == item.id)
 
-            const o = k == 1 ? item.orden + 1 : item.orden - 1
-            const j = k == 1 ? i + 1 : i - 1
-
-            const peer = this.modal.mrp_bom.mrp_bom_lines[j]
-
-            peer.orden = item.orden
-            item.orden = o
-
-            this.modal.mrp_bom.mrp_bom_lines.sort((a, b) => a.orden - b.orden)
-        },
     },
 }
 </script>
 
 <style lang="scss" scoped>
-.jd-table {
-    .acts {
-        display: grid;
-        grid-template-columns: 1.75rem 1.75rem;
-        gap: 0.5rem;
-    }
-}
+
 </style>

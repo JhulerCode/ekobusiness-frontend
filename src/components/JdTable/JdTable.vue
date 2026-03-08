@@ -1,0 +1,351 @@
+<template>
+    <article class="jd-table" :style="{ height, maxHeight, width }">
+        <JdInput
+            icon="fa-solid fa-magnifying-glass"
+            type="search"
+            placeholder="Buscar artículos..."
+            v-model="buscador"
+            v-if="seeker"
+        />
+
+        <div class="container-table" :style="{ minHeight }">
+            <table ref="jdtable" :class="{ 'table-cols-resizable': columnsResizable }">
+                <colgroup>
+                    <col v-if="rowReorderable" style="width: 2rem" />
+                    <col v-if="colNro" style="width: 2rem" />
+                    <col v-if="rowSelectable" style="width: 2.5rem" />
+                    <col v-if="colAct" :style="`width: ${colActWidth}`" />
+                    <col
+                        v-for="col in columns"
+                        :key="col.id"
+                        v-show="col.show"
+                        :style="{ width: col.width }"
+                    />
+                    <col style="width: 100%" />
+                </colgroup>
+
+                <TableHead
+                    v-bind="{
+                        columns,
+                        headless,
+                        rowReorderable,
+                        colNro,
+                        colAct,
+                        rowSelectable: rowSelectable,
+                        resizable: columnsResizable,
+                        allSelected,
+                        rsUno,
+                    }"
+                    @update:allSelected="allSelected = $event"
+                    @sort="sortData"
+                    @resize="onColumnResize"
+                    @resizeEnd="onColumnResizeEnd"
+                />
+
+                <tbody>
+                    <TableRow
+                        v-for="(item, i) in datosFiltrados"
+                        :key="item.id || i"
+                        v-bind="{
+                            item,
+                            index: i,
+                            columns,
+                            rowSelectable: rowSelectable,
+                            reorderable: rowReorderable,
+                            colNro,
+                            colAct,
+                            rowOptions,
+                            resizable: columnsResizable,
+                            inputsDisabled,
+                        }"
+                        @select="selectRow"
+                        @toggleOptions="toogleRowOptions"
+                        @dragStart="draggedRowIndex = $event"
+                        @drop="handleDrop"
+                        @dragEnd="draggedRowIndex = null"
+                        @onChange="(...args) => $emit('onChange', ...args)"
+                        @onInput="(...args) => $emit('onInput', ...args)"
+                    >
+                        <template #cAction="slotProps">
+                            <slot name="cAction" v-bind="slotProps"></slot>
+                        </template>
+                        <!-- Dynamic slots forwarding -->
+                        <template v-for="slot in dynamicSlots" v-slot:[slot]="slotProps">
+                            <slot :name="slot" v-bind="slotProps"></slot>
+                        </template>
+                    </TableRow>
+
+                    <tr v-if="agregarFila">
+                        <td colspan="100%">
+                            <JdButton
+                                text="Agregar fila"
+                                tipo="3"
+                                :small="true"
+                                @click="agregarFila"
+                            />
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <transition name="fade">
+            <ul
+                class="row-options-case"
+                v-if="optionsCaseItem.i >= 0"
+                @click.stop
+                :id="'options-case-' + name"
+            >
+                <template v-for="(b, i) in rowOptions" :key="i">
+                    <li @click="selectOption(b)" v-if="verifyRowOptionPermiso(optionsCaseItem, b)">
+                        <i :class="b.icon"></i>
+                        <span>{{ b.label }}</span>
+                    </li>
+                </template>
+            </ul>
+        </transition>
+    </article>
+</template>
+
+<script setup>
+import { computed, nextTick } from 'vue'
+import { JdButton, JdInput } from '@jhuler/components'
+import { useAuth } from '@/pinia/auth'
+import { useModals } from '@/pinia/modals'
+import { useTable } from './useTable'
+import TableHead from './TableHead.vue'
+import TableRow from './TableRow.vue'
+
+const props = defineProps({
+    name: String,
+    columns: { type: Array, required: true },
+    datos: { type: Array, required: true },
+    headless: { type: Boolean, default: false },
+    height: { type: String, default: 'auto' },
+    maxHeight: { type: String, default: '100%' },
+    minHeight: { type: String, default: 'auto' },
+    width: { type: String, default: '100%' },
+    seeker: { type: Boolean, default: false },
+    colNro: { type: Boolean, default: true },
+    colAct: { type: Boolean, default: false },
+    colActWidth: { type: String, default: '2.5rem' },
+    columnsResizable: { type: Boolean, default: true },
+    rowSelectable: { type: Boolean, default: false },
+    rsUno: { type: Boolean, default: false },
+    inputsDisabled: { type: Boolean, default: false },
+    rowOptions: { type: Array, default: () => [] },
+    rowReorderable: { type: Boolean, default: false },
+    rowReorderProp: { type: String, default: 'orden' },
+    bulkActions: { type: Array, default: () => [] },
+    reload: { type: Function, default: () => {} },
+    agregarFila: Function,
+})
+
+const emit = defineEmits([
+    'rowSelected',
+    'rowOptionSelected',
+    'onReorder',
+    'onChange',
+    'onInput',
+    'bulkActionSelected',
+])
+
+const auth = useAuth()
+const modals = useModals()
+
+const {
+    draggedRowIndex,
+    optionsCaseItem,
+    datosFiltrados,
+    allSelected,
+    sortData,
+    selectRow,
+    downloadData,
+} = useTable(props, emit)
+
+const dynamicSlots = computed(() => props.columns.filter((c) => c.slot).map((c) => c.slot))
+
+const onColumnResize = ({ column, width }) => {
+    column.width = `${width}px`
+}
+
+const onColumnResizeEnd = () => {
+    auth.saveTableColumns(props.name, props.columns)
+}
+
+const openConfigCols = () => {
+    const send = {
+        table: props.name,
+        cols: props.columns,
+        reload: props.reload,
+    }
+    modals.setModal('mConfigCols', 'Configurar columnas', null, send, true)
+}
+
+const handleDrop = (targetItem) => {
+    if (draggedRowIndex.value === null || draggedRowIndex.value.id === targetItem.id) return
+
+    // Encontrar índices reales en el array original (props.datos)
+    const fromIndex = props.datos.indexOf(draggedRowIndex.value)
+    const toIndex = props.datos.indexOf(targetItem)
+
+    if (fromIndex === -1 || toIndex === -1) return
+
+    // eslint-disable-next-line vue/no-mutating-props
+    const item = props.datos.splice(fromIndex, 1)[0]
+    // eslint-disable-next-line vue/no-mutating-props
+    props.datos.splice(toIndex, 0, item)
+
+    props.datos.forEach((item, idx) => {
+        item[props.rowReorderProp] = idx + 1
+    })
+
+    emit('onReorder', props.datos)
+}
+
+const toogleRowOptions = (item) => {
+    if (optionsCaseItem.value.i === item.i) {
+        hide()
+        return
+    }
+    hide()
+    optionsCaseItem.value = item
+    nextTick(() => {
+        const el = document.getElementById('options-case-' + props.name)
+        const btn = document.getElementById(`button-options-${item.id}`)
+        if (!el || !btn) return
+
+        const rect = btn.getBoundingClientRect()
+        const rectMenu = el.getBoundingClientRect()
+
+        if (window.innerWidth < rect.left + rectMenu.width) {
+            el.style.right = `${window.innerWidth - rect.right + window.scrollX}px`
+        } else {
+            el.style.left = `${rect.left + window.scrollX}px`
+        }
+
+        if (window.innerHeight < rect.bottom + rectMenu.height) {
+            el.style.bottom = `${window.innerHeight - rect.top + window.scrollY + 5}px`
+        } else {
+            el.style.top = `${rect.bottom + window.scrollY + 5}px`
+        }
+
+        setTimeout(() => document.body.addEventListener('click', closeOnOutside), 0)
+    })
+}
+
+const closeOnOutside = (e) => {
+    const el = document.getElementById('options-case-' + props.name)
+    if (el && !el.contains(e.target)) hide()
+}
+
+const hide = () => {
+    optionsCaseItem.value = {}
+    document.body.removeEventListener('click', closeOnOutside)
+}
+
+const selectOption = (a) => {
+    emit('rowOptionSelected', a.action, optionsCaseItem.value)
+    hide()
+}
+
+const verifyRowOptionPermiso = (item, option) => {
+    if (option.ocultar) {
+        for (const prop in option.ocultar) {
+            const cond = option.ocultar[prop]
+            const val = item[prop]
+            if (val === undefined) continue
+            if (Array.isArray(cond)) {
+                if (cond.includes(val)) return false
+            } else if (typeof cond === 'object' && cond.op) {
+                if (comparar(val, cond.op, cond.val)) return false
+            } else if (cond == val) return false
+        }
+    }
+    if (!option.permiso) return true
+    return Array.isArray(option.permiso)
+        ? auth.verifyPermiso(...option.permiso)
+        : auth.verifyPermiso(option.permiso)
+}
+
+const comparar = (a, op, b) => {
+    switch (op) {
+        case '>':
+            return a > b
+        case '<':
+            return a < b
+        case '>=':
+            return a >= b
+        case '<=':
+            return a <= b
+        case '==':
+            return a == b
+        case '!=':
+            return a != b
+        default:
+            return false
+    }
+}
+
+// Expose methods for parent
+defineExpose({ downloadData, openConfigCols })
+</script>
+
+<style lang="scss" scoped>
+.jd-table {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    max-width: 100%;
+}
+
+.container-table {
+    height: 100%;
+    overflow: auto;
+    border-bottom: var(--border);
+
+    .table-cols-resizable {
+        table-layout: fixed;
+        width: fit-content !important;
+    }
+
+    table {
+        border-collapse: collapse;
+        border-spacing: 0;
+        width: 100%;
+    }
+}
+
+.row-options-case {
+    position: absolute;
+    z-index: 1000;
+    user-select: none;
+    max-height: 15rem;
+    overflow-y: auto;
+    background-color: var(--bg-color);
+    box-shadow: 0 0 0.5rem 0.1rem var(--shadow-color);
+    border-radius: 0.3rem;
+
+    li {
+        cursor: pointer;
+        padding: 0.5rem 0.8rem;
+        display: grid;
+        grid-template-columns: 1.5rem 1fr;
+        &:hover {
+            background-color: var(--bg-color-hover);
+        }
+        span {
+            text-wrap: nowrap;
+        }
+    }
+}
+
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.1s;
+}
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
+}
+</style>

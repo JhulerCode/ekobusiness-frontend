@@ -27,6 +27,7 @@ export default [
                     { id: 'vArticuloCategorias:crear', label: 'Crear' },
                     { id: 'vArticuloCategorias:editar', label: 'Editar' },
                     { id: 'vArticuloCategorias:eliminar', label: 'Eliminar' },
+                    { id: 'vArticuloCategorias:actualizarFotos', label: 'Actualizar fotos' },
                 ],
             },
             {

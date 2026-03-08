@@ -17,20 +17,42 @@ export default {}
 
     .vista {
         background-color: var(--bg-color);
-        padding: 2rem 2rem;
+        padding: 1.5rem 2rem;
 
         > .head {
-            margin-bottom: 1rem;
-            display: flex;
-            justify-content: space-between;
+            // display: flex;
+            // justify-content: space-between;
             // align-items: center;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
             gap: 1rem;
             flex-wrap: wrap;
-            border-bottom: var(--border);
-            padding-bottom: 1rem;
+            margin-bottom: 1rem;
 
-            strong {
-                font-size: 1.4rem;
+            .head-left {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                flex-wrap: wrap;
+
+                strong {
+                    font-size: 1.4rem;
+                }
+            }
+
+            .head-center {
+                display: flex;
+                justify-content: center;
+                gap: 0.5rem;
+                flex-wrap: wrap;
+            }
+
+            .head-right {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                flex-wrap: wrap;
+                justify-self: end;
             }
 
             .buttons {

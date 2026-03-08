@@ -20,14 +20,12 @@
                 v-if="this.useAuth.verifyPermiso('vMrpBom:editar')"
             />
         </template>
-
-
     </JdTable>
 </template>
 
 <script>
 import { JdButton } from '@jhuler/components'
-import JdTable from '@/components/JdTable.vue'
+import JdTable from '@/components/JdTable/JdTable.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
@@ -84,8 +82,6 @@ export default {
                     show: true,
                 },
             ]
-
-
         },
 
         async loadMrpBomLines() {
@@ -161,11 +157,8 @@ export default {
                 a.orden = j + 1
             }
         },
-
     },
 }
 </script>
 
-<style lang="scss" scoped>
-
-</style>
+<style lang="scss" scoped></style>

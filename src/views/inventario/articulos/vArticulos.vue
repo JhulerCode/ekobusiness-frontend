@@ -1,12 +1,19 @@
 <template>
     <div class="vista vista-fill">
         <div class="head">
-            <strong>Artículos</strong>
+            <div class="head-left">
+                <strong>Artículos</strong>
 
-            <div class="buttons">
+                <JdButton
+                    text="Nuevo"
+                    title="Crear nuevo"
+                    @click="nuevo"
+                    v-if="useAuth.verifyPermiso('vArticulos:crear')"
+                />
+
                 <input
-                    type="file"
                     ref="excel"
+                    type="file"
                     accept=".xlsx, .xls, .csv"
                     hidden
                     @change="importar"
@@ -16,15 +23,45 @@
                     icon="fa-solid fa-file-excel"
                     text="Importar"
                     tipo="2"
-                    @click="this.$refs.excel.click()"
+                    @click="$refs.excel.click()"
                     v-if="useAuth.verifyPermiso('vArticulos:importar')"
+                />
+            </div>
+
+            <div class="head-center">
+                <JdBulkActions
+                    v-if="cantidadSeleccionados > 0"
+                    :view="vista"
+                    dataKey="articulos"
+                    :bulkActions="tableActions"
+                    @bulkActionSelected="runMethod"
+                />
+
+                <JdBuscador
+                    v-else
+                    :view="vista"
+                    :columns="columns"
+                    :tableName="tableName"
+                    @open-filters="openConfigFiltros"
+                    @reload="loadArticulos"
+                />
+            </div>
+
+            <div class="head-right">
+                <JdPaginacion :view="vista" @reload="loadArticulos" />
+
+                <JdButton
+                    icon="fa-solid fa-file-excel"
+                    tipo="2"
+                    title="Exportar"
+                    @click="$refs['jdtable'].downloadData()"
                 />
 
                 <JdButton
-                    text="Nuevo"
-                    title="Crear nuevo"
-                    @click="nuevo"
-                    v-if="useAuth.verifyPermiso('vArticulos:crear')"
+                    icon="fa-solid fa-gear"
+                    tipo="2"
+                    title="Columnas"
+                    @click="$refs['jdtable'].openConfigCols()"
                 />
             </div>
         </div>
@@ -34,36 +71,40 @@
             :columns="columns"
             :datos="vista.articulos || []"
             :colAct="true"
-            :configRowSelect="true"
-            :configCols="true"
-            :configFiltros="openConfigFiltros"
-            :reload="loadArticulos"
-            :actions="tableActions"
-            @actionClick="runMethod"
             :rowOptions="tableRowOptions"
             @rowOptionSelected="runMethod"
-            :meta="vista.table_meta"
-            @prevPage="((vista.table_page -= 1), loadArticulos())"
-            @nextPage="((vista.table_page += 1), loadArticulos())"
+            :rowSelectable="true"
+            :bulkActions="tableActions"
+            @bulkActionSelected="runMethod"
             ref="jdtable"
+            :reload="loadArticulos"
         />
     </div>
 
+    <!-- Modales -->
     <mImportarArticulos v-if="useModals.show.mImportarArticulos" />
     <mArticulo v-if="useModals.show.mArticulo" />
     <mKardex v-if="useModals.show.mKardex" />
     <mLotes v-if="useModals.show.mLotes" />
     <mAjusteStock v-if="useModals.show.mAjusteStock" />
     <mUploadFiles v-if="useModals.show.mUploadFiles" />
-
     <mConfigCols v-if="useModals.show.mConfigCols" />
     <mConfigFiltros v-if="useModals.show.mConfigFiltros" />
     <mEditar v-if="useModals.show.mEditar" @updated="updatedBulk" />
 </template>
 
 <script>
-import { JdButton, mConfigFiltros, mConfigCols, mEditar, JdTable } from '@jhuler/components'
+// Componentes base y utilidades
+import { JdButton, mConfigFiltros, mConfigCols, mEditar } from '@jhuler/components'
+import JdBulkActions from '@/components/JdBulkActions.vue'
+import JdBuscador from '@/components/JdBuscador.vue'
+import JdTable from '@/components/JdTable/JdTable.vue'
+import JdPaginacion from '@/components/JdPaginacion.vue'
 
+// Configuración de la vista
+import { COLUMNS, TABLE_ACTIONS, TABLE_ROW_OPTIONS } from './articulos.config'
+
+// Modales específicos
 import mImportarArticulos from '@/views/inventario/articulos/mImportarArticulos.vue'
 import mArticulo from '@/views/inventario/articulos/mArticulo.vue'
 import mKardex from '@/views/inventario/articulos/mKardex.vue'
@@ -71,24 +112,26 @@ import mLotes from '@/views/inventario/articulos/mLotes.vue'
 import mAjusteStock from '@/views/inventario/articulos/mAjusteStock.vue'
 import mUploadFiles from '@/components/mUploadFiles.vue'
 
+// Pinia y Utils
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
 import { useModals } from '@/pinia/modals'
-
 import { urls, get, delet } from '@/utils/crud'
 import { tryOficialExcel } from '@/utils/mine'
 import { jqst, jmsg } from '@/utils/swal'
 import dayjs from 'dayjs'
 
 export default {
+    name: 'vArticulos',
     components: {
         JdButton,
+        JdBulkActions,
+        JdBuscador,
         JdTable,
-
+        JdPaginacion,
         mConfigCols,
         mConfigFiltros,
         mEditar,
-
         mImportarArticulos,
         mArticulo,
         mKardex,
@@ -102,264 +145,41 @@ export default {
         useModals: useModals(),
 
         vista: {},
-
         tableName: 'articulos',
-        tablePage: 1,
-        columns: [
-            {
-                id: 'id',
-                title: 'id',
-                type: 'text',
-                width: '5rem',
-                show: false,
-                seek: false,
-                sort: false,
-            },
-            {
-                id: 'nombre',
-                title: 'Nombre',
-                type: 'text',
-                width: '25rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'unidad',
-                title: 'Unidad',
-                type: 'select',
-                editable: true,
-                width: '5rem',
-                show: true,
-                seek: false,
-                sort: true,
-            },
-            {
-                id: 'stock',
-                title: 'Stock',
-                format: 'decimal',
-                filtrable: false,
-                width: '7rem',
-                show: true,
-                seek: false,
-                sort: true,
-            },
-            {
-                id: 'activo',
-                title: 'Activo?',
-                prop: 'activo1.nombre',
-                type: 'select',
-                editable: true,
-                format: 'yesno',
-                width: '8rem',
-                show: true,
-                seek: false,
-                sort: true,
-            },
-            {
-                id: 'codigo_barra',
-                title: 'EAN',
-                type: 'text',
-                width: '10rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'linea',
-                title: 'Línea',
-                prop: 'linea1.nombre',
-                type: 'select',
-                editable: true,
-                width: '10rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'categoria',
-                title: 'Categoría',
-                prop: 'categoria1.nombre',
-                type: 'select',
-                editable: true,
-                width: '10rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'filtrantes',
-                title: 'Sobres en caja',
-                type: 'number',
-                width: '5rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'contenido_neto',
-                title: 'Contenido neto (g)',
-                type: 'number',
-                width: '5rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'has_fv',
-                title: 'Tiene fecha de vencimiento?',
-                prop: 'has_fv1.nombre',
-                type: 'select',
-                editable: true,
-                format: 'yesno',
-                width: '8rem',
-                show: true,
-            },
-            {
-                id: 'igv_afectacion',
-                title: 'Tributo',
-                prop: 'igv_afectacion1.nombre',
-                type: 'select',
-                editable: true,
-                width: '10rem',
-                show: true,
-            },
-            {
-                id: 'is_ecommerce',
-                title: 'Ecommerce',
-                prop: 'is_ecommerce1.nombre',
-                type: 'select',
-                format: 'yesno',
-                editable: true,
-                width: '10rem',
-                show: false,
-            },
-            {
-                id: 'precio',
-                title: 'Precio',
-                type: 'number',
-                editable: true,
-                width: '10rem',
-                show: false,
-            },
-            {
-                id: 'purchase_ok',
-                title: 'Se compra',
-                prop: 'purchase_ok1.nombre',
-                type: 'select',
-                format: 'yesno',
-                editable: true,
-                width: '8rem',
-                show: false,
-            },
-            {
-                id: 'sale_ok',
-                title: 'Se vende',
-                prop: 'sale_ok1.nombre',
-                type: 'select',
-                format: 'yesno',
-                editable: true,
-                width: '8rem',
-                show: false,
-            },
-            {
-                id: 'produce_ok',
-                title: 'Se produce',
-                prop: 'produce_ok1.nombre',
-                type: 'select',
-                format: 'yesno',
-                editable: true,
-                width: '8rem',
-                show: false,
-            },
-        ],
-        tableActions: [
-            {
-                icon: 'fa-solid fa-pen-to-square',
-                text: 'Editar',
-                action: 'editarBulk',
-                permiso: 'vArticulos:editarBulk',
-            },
-            {
-                icon: 'fa-solid fa-trash-can',
-                text: 'Eliminar',
-                action: 'eliminarBulk',
-                permiso: 'vArticulos:eliminarBulk',
-            },
-        ],
-        tableRowOptions: [
-            {
-                label: 'Editar',
-                icon: 'fa-solid fa-pen-to-square',
-                action: 'editar',
-                permiso: 'vArticulos:editar',
-            },
-            {
-                label: 'Actualizar fotos',
-                icon: 'fa-solid fa-image',
-                action: 'openUploadFiles',
-                permiso: 'vProductos:actualizarFotos',
-            },
-            {
-                label: 'Eliminar',
-                icon: 'fa-solid fa-trash-can',
-                action: 'eliminar',
-                permiso: 'vArticulos:eliminar',
-            },
-            {
-                label: 'Clonar',
-                icon: 'fa-solid fa-copy',
-                action: 'clonar',
-                permiso: 'vArticulos:clonar',
-            },
-            {
-                label: 'Ver kardex',
-                icon: 'fa-solid fa-table-list',
-                action: 'verKardex',
-                permiso: 'vArticulos:kardex',
-            },
-            {
-                label: 'Ver lotes',
-                icon: 'fa-solid fa-table-list',
-                action: 'verLotes',
-                permiso: 'vArticulos:lotes',
-            },
-            {
-                label: 'Ajuste stock',
-                icon: 'fa-solid fa-wrench',
-                action: 'ajusteStock',
-                permiso: 'vArticulos:ajusteStock',
-            },
-        ],
+
+        // Configuraciones traídas de articulos.config.js
+        columns: JSON.parse(JSON.stringify(COLUMNS)),
+        tableActions: TABLE_ACTIONS,
+        tableRowOptions: TABLE_ROW_OPTIONS,
     }),
+    computed: {
+        cantidadSeleccionados() {
+            return (this.vista.articulos || []).filter((a) => a.selected).length
+        },
+    },
     async created() {
         this.vista = this.useVistas.vArticulos
         this.useAuth.setColumns(this.tableName, this.columns)
 
-        this.verifyRowSelectIsActive()
-
         if (this.vista.loaded) return
         this.vista.table_page = 1
-        if (this.useAuth.verifyPermiso('vArticulos:listar') == true) this.loadArticulos()
+        if (this.useAuth.verifyPermiso('vArticulos:listar')) this.loadArticulos()
     },
     methods: {
-        verifyRowSelectIsActive() {
-            if (this.vista.articulos && this.vista.articulos.some((a) => a.selected)) {
-                setTimeout(() => {
-                    this.$refs['jdtable'].toogleSelectItems()
-                }, 0)
-            }
+        // --- Gestión de Tabla ---
+        runMethod(method, item) {
+            this[method](item)
         },
 
+        // --- Carga de Datos ---
         setQuery() {
             this.vista.qry = {
                 fltr: {},
                 incl: ['categoria1'],
                 sqls: [],
                 ordr: [['nombre', 'ASC']],
-                // page: this.vista.table_page,
+                page: this.vista.table_page,
             }
-
             this.useAuth.updateQuery(this.columns, this.vista.qry)
             this.vista.qry.cols.push('fotos')
             if (this.columns[3].show == true) {
@@ -368,95 +188,206 @@ export default {
         },
         async loadArticulos() {
             this.setQuery()
-
             this.vista.articulos = []
             this.useAuth.setLoading(true, 'Cargando...')
             const res = await get(`${urls.articulos}?qry=${JSON.stringify(this.vista.qry)}`)
             this.useAuth.setLoading(false)
             this.vista.loaded = true
-
             if (res.code != 0) return
-
             this.vista.articulos = res.data
             this.vista.table_meta = res.meta
         },
-        async loadLineas() {
-            const qry = {
-                fltr: {},
-                cols: ['nombre'],
-                ordr: [['nombre', 'ASC']],
-            }
 
-            this.vista.articulo_lineas = []
+        // --- Datos de Apoyo ---
+        async loadLineas() {
+            const qry = { fltr: {}, cols: ['nombre'], ordr: [['nombre', 'ASC']] }
             this.useAuth.setLoading(true, 'Cargando...')
             const res = await get(`${urls.articulo_lineas}?qry=${JSON.stringify(qry)}`)
             this.useAuth.setLoading(false)
-
             if (res.code != 0) return
-
-            this.vista.articulo_lineas = res.data
-            return res.data
+            return (this.vista.articulo_lineas = res.data)
         },
         async loadCategorias() {
             const qry = {
                 cols: ['nombre'],
-                fltr: {
-                    // tipo: { op: 'Es', val: 1 },
-                    activo: { op: 'Es', val: true },
-                },
+                fltr: { activo: { op: 'Es', val: true } },
                 ordr: [['nombre', 'ASC']],
             }
-
-            this.vista.articulo_categorias = []
             this.useAuth.setLoading(true, 'Cargando...')
             const res = await get(`${urls.articulo_categorias}?qry=${JSON.stringify(qry)}`)
             this.useAuth.setLoading(false)
-
             if (res.code != 0) return
-
-            this.vista.articulo_categorias = res.data
-            return res.data
+            return (this.vista.articulo_categorias = res.data)
         },
         async loadDatosSistema() {
             const qry = ['igv_afectaciones', 'unidades', 'estados', 'articulo_tipos']
             const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
-
-            if (res.code != 0) return
-
-            Object.assign(this.vista, res.data)
+            if (res.code == 0) Object.assign(this.vista, res.data)
         },
 
+        // --- Acciones de Registro ---
         nuevo() {
             const send = {
                 articulo: {
                     type: 'consumable',
-                    // sale_ok: false,
-                    // purchase_ok: true,
                     activo: true,
-
                     articulo_suppliers: [],
                     combo_componentes: [],
                     ingredientes: [],
                     beneficios: [],
-
                     tipo: 1,
                     igv_afectacion: 10,
                     has_fv: false,
                 },
                 pestana: 1,
             }
-
             this.useModals.setModal('mArticulo', 'Nuevo artículo', 1, send, true)
         },
-        importar(event) {
-            this.useAuth.setLoading(true, 'Cargando archivo...')
+        async editar(item) {
+            const qry = {
+                incl: ['categoria1', 'linea1', 'articulo_suppliers', 'combo_componentes'],
+            }
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.articulos}/uno/${item.id}?qry=${JSON.stringify(qry)}`)
+            this.useAuth.setLoading(false)
+            if (res.code != 0) return
+            const send = {
+                articulo: { ...res.data },
+                pestana: 1,
+                articulo_categorias: [{ ...res.data.categoria1 }],
+                articulo_lineas: [{ ...res.data.linea1 }],
+            }
+            this.useModals.setModal('mArticulo', 'Editar artículo', 2, send, true)
+        },
+        async clonar(item) {
+            const qry = {
+                incl: ['categoria1', 'linea1', 'articulo_suppliers', 'combo_componentes'],
+            }
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.articulos}/uno/${item.id}?qry=${JSON.stringify(qry)}`)
+            this.useAuth.setLoading(false)
+            if (res.code != 0) return
+            const send = {
+                articulo: { ...res.data, id: null },
+                pestana: 1,
+                articulo_categorias: [{ ...res.data.categoria1 }],
+                articulo_lineas: [{ ...res.data.linea1 }],
+            }
+            this.useModals.setModal('mArticulo', 'Nuevo artículo', 1, send, true)
+        },
+        async eliminar(item) {
+            const resQst = await jqst('¿Está seguro de eliminar?')
+            if (resQst.isConfirmed == false) return
+            this.useAuth.setLoading(true, 'Eliminando...')
+            const res = await delet(urls.articulos, item)
+            this.useAuth.setLoading(false)
+            if (res.code == 0) this.useVistas.removeItem('vArticulos', 'articulos', item)
+        },
+        async verKardex(item) {
+            const send = { articulo: { id: item.id, nombre: item.nombre, unidad: item.unidad } }
+            this.useModals.setModal('mKardex', 'Kardex de artículo', null, send, true)
+        },
+        verLotes(item) {
+            const send = { articulo: { id: item.id, nombre: item.nombre, unidad: item.unidad } }
+            this.useModals.setModal('mLotes', 'Lotes del artículo', null, send, true)
+        },
+        async ajusteStock(item) {
+            const send = {
+                transaccion: { fecha: dayjs().format('YYYY-MM-DD'), articulo: item.id },
+                articulo1: { igv_afectacion: item.igv_afectacion, has_fv: item.has_fv },
+                articulos: [{ id: item.id, nombre: item.nombre }],
+                articulo_tipo: 1,
+                is_nuevo_lote: false,
+            }
+            this.useModals.setModal('mAjusteStock', 'Ajuste de stock', null, send, true)
+        },
+        openUploadFiles(item) {
+            const send = {
+                item: { id: item.id, nombre: item.nombre, archivos: item.fotos || [] },
+                accept: 'image/*',
+                cantidad: 10,
+                url: `${urls.articulos}/fotos`,
+                vista: 'vArticulos',
+                tabla: 'articulos',
+                prop: 'fotos',
+            }
+            this.useModals.setModal('mUploadFiles', 'Actualizar fotos', 2, send, true)
+        },
 
+        // --- Acciones Masivas ---
+        async eliminarBulk() {
+            const selected = this.vista.articulos.filter((a) => a.selected)
+            const ids = selected.map((b) => b.id)
+            const resQst = await jqst(`¿Está seguro de eliminar ${ids.length} registros?`)
+            if (resQst.isConfirmed == false) return
+            this.useAuth.setLoading(true, 'Eliminando...')
+            const res = await delet(`${urls.articulos}/bulk`, { id: 'bulk', ids })
+            this.useAuth.setLoading(false)
+            if (res.code == 0)
+                this.vista.articulos = this.vista.articulos.filter((a) => !a.selected)
+        },
+        async editarBulk() {
+            await this.loadDatosSistema()
+            const cols = this.columns
+            for (const a of cols) {
+                if (a.id == 'unidad') a.lista = this.vista.unidades
+                if (
+                    [
+                        'has_fv',
+                        'activo',
+                        'is_ecommerce',
+                        'purchase_ok',
+                        'sale_ok',
+                        'produce_ok',
+                    ].includes(a.id)
+                )
+                    a.lista = this.vista.estados
+                if (a.id == 'igv_afectacion') a.lista = this.vista.igv_afectaciones
+                if (a.id == 'categoria') a.reload = this.loadCategorias
+            }
+            const ids = this.vista.articulos.filter((a) => a.selected).map((b) => b.id)
+            const send = { uri: 'articulos', nuevo: {}, cols, ids }
+            this.useModals.setModal('mEditar', `Editar ${ids.length} registros`, null, send, true)
+        },
+        updatedBulk(item) {
+            for (const a of this.vista.articulos) {
+                if (!item.ids.includes(a.id)) continue
+                a.selected = false
+                a[item.prop] = item.val
+                if (item.val1) a[`${item.prop}1`] = item.val1
+            }
+        },
+
+        // --- Otros ---
+        async openConfigFiltros() {
+            await this.loadDatosSistema()
+            const cols = this.columns
+            for (const a of cols) {
+                if (a.id == 'unidad') a.lista = this.vista.unidades
+                if (
+                    [
+                        'has_fv',
+                        'activo',
+                        'is_ecommerce',
+                        'purchase_ok',
+                        'sale_ok',
+                        'produce_ok',
+                    ].includes(a.id)
+                )
+                    a.lista = this.vista.estados
+                if (a.id == 'igv_afectacion') a.lista = this.vista.igv_afectaciones
+                if (a.id == 'categoria') a.reload = this.loadCategorias
+                if (a.id == 'linea') a.reload = this.loadLineas
+            }
+            const send = { table: this.tableName, cols, reload: this.loadArticulos }
+            this.useModals.setModal('mConfigFiltros', 'Filtros', null, send, true)
+        },
+        async importar(event) {
+            this.useAuth.setLoading(true, 'Cargando archivo...')
             const file = event.target.files[0]
             const reader = new FileReader()
-
             reader.onload = async () => {
                 const headers = [
-                    // 'ID',
                     'Nombre',
                     'EAN',
                     'Tipo',
@@ -469,23 +400,19 @@ export default {
                     'Tiene fv',
                 ]
                 const res = await tryOficialExcel(this.$refs.excel, file, reader, headers)
-
                 if (res.code != 0) {
                     this.useAuth.setLoading(false)
                     return jmsg('error', res.msg)
                 }
-
                 await this.loadDatosSistema()
                 const articulo_tiposMap = this.vista.articulo_tipos.reduce(
                     (obj, a) => ((obj[a.nombre] = a), obj),
                     {},
                 )
-
                 const igv_afectacionesMap = this.vista.igv_afectaciones.reduce(
                     (obj, a) => ((obj[a.id] = a), obj),
                     {},
                 )
-
                 await this.loadCategorias()
                 const categoriasMap = this.vista.articulo_categorias.reduce(
                     (obj, a) => ((obj[a.nombre] = a), obj),
@@ -493,231 +420,32 @@ export default {
                 )
 
                 for (const a of res.data) {
-                    ;(a.id = a.ID), (a.nombre = a.Nombre)
+                    a.id = a.ID
+                    a.nombre = a.Nombre
                     a.codigo_barra = a.EAN
                     a.type1 = articulo_tiposMap[a.Tipo]
                     a.type = a.type1.id
-                    a.purchase_ok = a['Se compra'] == 'Sí' ? true : false
-                    a.sale_ok = a['Se vende'] == 'Sí' ? true : false
-
+                    a.purchase_ok = a['Se compra'] == 'Sí'
+                    a.sale_ok = a['Se vende'] == 'Sí'
                     a.igv_afectacion1 = igv_afectacionesMap[a.Tributo]
                     a.igv_afectacion = a.igv_afectacion1?.id
                     a.unidad = a.Unidad
                     a.categoria1 = categoriasMap[a.Categoria]
                     a.categoria = a.categoria1?.id
                     a.marca = a.Marca
-
-                    a.has_fv = a['Tiene fv'] == 'Sí' ? true : false
+                    a.has_fv = a['Tiene fv'] == 'Sí'
                 }
-
                 this.useAuth.setLoading(false)
-
-                const send = {
-                    // tipo: 1,
-                    articulos: res.data,
-                }
                 this.useModals.setModal(
                     'mImportarArticulos',
                     'Importar artículos',
                     null,
-                    send,
+                    { articulos: res.data },
                     true,
                 )
             }
             reader.readAsArrayBuffer(file)
         },
-
-        async openConfigFiltros() {
-            await this.loadDatosSistema()
-
-            const cols = this.columns
-            for (const a of cols) {
-                if (a.id == 'unidad') a.lista = this.vista.unidades
-                if (a.id == 'has_fv') a.lista = this.vista.estados
-                if (a.id == 'activo') a.lista = this.vista.estados
-                if (a.id == 'is_ecommerce') a.lista = this.vista.estados
-                if (a.id == 'igv_afectacion') a.lista = this.vista.igv_afectaciones
-                if (a.id == 'categoria') a.reload = this.loadCategorias
-                if (a.id == 'linea') a.reload = this.loadLineas
-                if (a.id == 'purchase_ok') a.lista = this.vista.estados
-                if (a.id == 'sale_ok') a.lista = this.vista.estados
-                if (a.id == 'produce_ok') a.lista = this.vista.estados
-            }
-
-            const send = {
-                table: this.tableName,
-                cols,
-                reload: this.loadArticulos,
-            }
-
-            this.useModals.setModal('mConfigFiltros', 'Filtros', null, send, true)
-        },
-
-        runMethod(method, item) {
-            this[method](item)
-        },
-        async eliminarBulk() {
-            const ids = this.vista.articulos.filter((a) => a.selected).map((b) => b.id)
-
-            const resQst = await jqst(`¿Está seguro de eliminar ${ids.length} registros?`)
-            if (resQst.isConfirmed == false) return
-
-            const send = { id: 'bulk', ids }
-            this.useAuth.setLoading(true, 'Eliminando...')
-            const res = await delet(`${urls.articulos}/bulk`, send)
-            this.useAuth.setLoading(false)
-
-            if (res.code != 0) return
-
-            this.vista.articulos = this.vista.articulos.filter((a) => !a.selected)
-            this.$refs['jdtable'].toogleSelectItems()
-        },
-        async editarBulk() {
-            await this.loadDatosSistema()
-
-            for (const a of this.columns) {
-                if (a.id == 'unidad') a.lista = this.vista.unidades
-                if (a.id == 'has_fv') a.lista = this.vista.estados
-                if (a.id == 'activo') a.lista = this.vista.estados
-                if (a.id == 'is_ecommerce') a.lista = this.vista.estados
-                if (a.id == 'igv_afectacion') a.lista = this.vista.igv_afectaciones
-                if (a.id == 'categoria') a.reload = this.loadCategorias
-            }
-            const cols = this.columns
-
-            const ids = this.vista.articulos.filter((a) => a.selected).map((b) => b.id)
-
-            const send = {
-                uri: 'articulos',
-                nuevo: {},
-                cols,
-                ids,
-            }
-
-            this.useModals.setModal('mEditar', `Editar ${ids.length} registros`, null, send, true)
-        },
-        updatedBulk(item) {
-            for (const a of this.vista.articulos) {
-                if (!item.ids.includes(a.id)) continue
-
-                a.selected = false
-                a[item.prop] = item.val
-                if (item.val1) a[`${item.prop}1`] = item.val1
-            }
-
-            this.$refs['jdtable'].toogleSelectItems()
-        },
-
-        async editar(item) {
-            const qry = {
-                incl: ['categoria1', 'linea1', 'articulo_suppliers', 'combo_componentes'],
-            }
-
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.articulos}/uno/${item.id}?qry=${JSON.stringify(qry)}`)
-            this.useAuth.setLoading(false)
-
-            if (res.code != 0) return
-
-            const send = {
-                articulo: { ...res.data },
-                pestana: 1,
-                articulo_categorias: [{ ...res.data.categoria1 }],
-                articulo_lineas: [{ ...res.data.linea1 }],
-            }
-
-            this.useModals.setModal('mArticulo', 'Editar artículo', 2, send, true)
-        },
-        openUploadFiles(item) {
-            const send = {
-                item: {
-                    id: item.id,
-                    nombre: item.nombre,
-                    archivos: item.fotos || [],
-                },
-                accept: 'image/*',
-                cantidad: 10,
-                url: `${urls.articulos}/fotos`,
-                vista: 'vArticulos',
-                tabla: 'articulos',
-                prop: 'fotos',
-            }
-
-            this.useModals.setModal('mUploadFiles', 'Actualizar fotos', 2, send, true)
-        },
-        async eliminar(item) {
-            const resQst = await jqst('¿Está seguro de eliminar?')
-            if (resQst.isConfirmed == false) return
-
-            this.useAuth.setLoading(true, 'Eliminando...')
-            const res = await delet(urls.articulos, item)
-            this.useAuth.setLoading(false)
-
-            if (res.code != 0) return
-
-            this.useVistas.removeItem('vArticulos', 'articulos', item)
-        },
-        async clonar(item) {
-            const qry = {
-                incl: ['categoria1', 'linea1', 'articulo_suppliers', 'combo_componentes'],
-            }
-
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.articulos}/uno/${item.id}?qry=${JSON.stringify(qry)}`)
-            this.useAuth.setLoading(false)
-
-            if (res.code != 0) return
-
-            const send = {
-                articulo: { ...res.data, id: null },
-                pestana: 1,
-                articulo_categorias: [{ ...res.data.categoria1 }],
-                articulo_lineas: [{ ...res.data.linea1 }],
-            }
-
-            this.useModals.setModal('mArticulo', 'Nuevo artículo', 1, send, true)
-        },
-        async verKardex(item) {
-            const send = {
-                articulo: {
-                    id: item.id,
-                    nombre: item.nombre,
-                    unidad: item.unidad,
-                },
-            }
-
-            this.useModals.setModal('mKardex', 'Kardex de artículo', null, send, true)
-        },
-        verLotes(item) {
-            const send = {
-                articulo: {
-                    id: item.id,
-                    nombre: item.nombre,
-                    unidad: item.unidad,
-                },
-            }
-
-            this.useModals.setModal('mLotes', 'Lotes del artículo', null, send, true)
-        },
-        async ajusteStock(item) {
-            const send = {
-                transaccion: {
-                    fecha: dayjs().format('YYYY-MM-DD'),
-                    articulo: item.id,
-                },
-                articulo1: {
-                    igv_afectacion: item.igv_afectacion,
-                    has_fv: item.has_fv,
-                },
-                articulos: [{ id: item.id, nombre: item.nombre }],
-                articulo_tipo: 1,
-                is_nuevo_lote: false,
-            }
-
-            this.useModals.setModal('mAjusteStock', 'Ajuste de stock', null, send, true)
-        },
     },
 }
 </script>
-
-<style lang="scss" scoped></style>

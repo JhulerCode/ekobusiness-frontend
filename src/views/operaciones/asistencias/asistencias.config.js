@@ -1,6 +1,6 @@
 export const HEADER_ACTIONS = [
     {
-        text: 'Crear',
+        text: 'Nuevo',
         action: 'nuevo',
         permiso: 'vAsistencias:crear',
     },
@@ -17,6 +17,7 @@ export const TABLE_COLUMNS = [
         show: true,
         seek: true,
         sort: true,
+        orden: 1,
     },
     {
         id: 'fecha_entrada',
@@ -27,6 +28,7 @@ export const TABLE_COLUMNS = [
         show: true,
         seek: true,
         sort: true,
+        orden: 2,
     },
     {
         id: 'hora_entrada',
@@ -36,6 +38,7 @@ export const TABLE_COLUMNS = [
         show: true,
         seek: true,
         sort: true,
+        orden: 3,
     },
     {
         id: 'fecha_salida',
@@ -46,6 +49,7 @@ export const TABLE_COLUMNS = [
         show: true,
         seek: true,
         sort: true,
+        orden: 4,
     },
     {
         id: 'hora_salida',
@@ -55,6 +59,7 @@ export const TABLE_COLUMNS = [
         show: true,
         seek: true,
         sort: true,
+        orden: 5,
     },
 ]
 

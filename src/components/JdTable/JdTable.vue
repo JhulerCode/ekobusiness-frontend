@@ -111,7 +111,6 @@
 import { computed, nextTick } from 'vue'
 import { JdButton, JdInput } from '@jhuler/components'
 import { useAuth } from '@/pinia/auth'
-import { useModals } from '@/pinia/modals'
 import { useTable } from './useTable'
 import TableHead from './TableHead.vue'
 import TableRow from './TableRow.vue'
@@ -137,7 +136,6 @@ const props = defineProps({
     rowReorderable: { type: Boolean, default: false },
     rowReorderProp: { type: String, default: 'orden' },
     bulkActions: { type: Array, default: () => [] },
-    reload: { type: Function, default: () => {} },
     agregarFila: Function,
 })
 
@@ -151,7 +149,6 @@ const emit = defineEmits([
 ])
 
 const auth = useAuth()
-const modals = useModals()
 
 const {
     draggedRowIndex,
@@ -171,15 +168,6 @@ const onColumnResize = ({ column, width }) => {
 
 const onColumnResizeEnd = () => {
     auth.saveTableColumns(props.name, props.columns)
-}
-
-const openConfigCols = () => {
-    const send = {
-        table: props.name,
-        cols: props.columns,
-        reload: props.reload,
-    }
-    modals.setModal('mConfigCols', 'Configurar columnas', null, send, true)
 }
 
 const handleDrop = (targetItem) => {
@@ -288,7 +276,7 @@ const comparar = (a, op, b) => {
 }
 
 // Expose methods for parent
-defineExpose({ downloadData, openConfigCols })
+defineExpose({ downloadData })
 </script>
 
 <style lang="scss" scoped>

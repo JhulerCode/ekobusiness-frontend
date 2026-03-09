@@ -3,6 +3,8 @@
         <div class="header">
             <p>{{ modal.articulo.nombre }} ({{ modal.articulo.unidad }})</p>
 
+            <JdPaginacion :view="modal" @reload="loadKardex" />
+
             <div>
                 <p>
                     <small>Stock filtrado:</small>
@@ -23,14 +25,10 @@
         <JdTable
             :columns="columns"
             :datos="modal.kardex || []"
-            :reload="loadKardex"
             :colAct="true"
             :rowOptions="tableRowActions"
             maxHeight="70vh"
             @rowOptionSelected="runMethod"
-            :meta="modal.table_meta"
-            @prevPage="((modal.table_page -= 1), loadKardex())"
-            @nextPage="((modal.table_page += 1), loadKardex())"
             ref="TableKardex"
         />
     </JdModal>
@@ -39,8 +37,10 @@
 </template>
 
 <script>
-import { JdModal, JdTable } from '@jhuler/components'
+import { JdModal } from '@jhuler/components'
+import JdTable from '@/components/JdTable/JdTable.vue'
 import mTransaccion from '@/views/logistica_entrada/compras/mTransaccion.vue'
+import JdPaginacion from '@/components/JdPaginacion.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
@@ -57,6 +57,7 @@ export default {
         JdModal,
         JdTable,
         mTransaccion,
+        JdPaginacion,
     },
     data: () => ({
         useAuth: useAuth(),

@@ -15,6 +15,7 @@ export const TABLE_COLUMNS = [
         show: true,
         seek: true,
         sort: true,
+        orden: 1,
     },
     {
         id: 'codigo',
@@ -24,6 +25,7 @@ export const TABLE_COLUMNS = [
         show: true,
         seek: true,
         sort: true,
+        orden: 2,
     },
     {
         id: 'simbolo',
@@ -33,6 +35,7 @@ export const TABLE_COLUMNS = [
         show: true,
         seek: true,
         sort: true,
+        orden: 3,
     },
     {
         id: 'plural',
@@ -42,6 +45,7 @@ export const TABLE_COLUMNS = [
         show: true,
         seek: true,
         sort: true,
+        orden: 4,
     },
 ]
 

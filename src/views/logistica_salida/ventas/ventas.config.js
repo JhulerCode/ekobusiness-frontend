@@ -22,6 +22,7 @@ export const TABLE_COLUMNS = [
         width: '10rem',
         show: true,
         sort: true,
+        orden: 1,
     },
     {
         id: 'guia',
@@ -31,6 +32,7 @@ export const TABLE_COLUMNS = [
         show: true,
         seek: true,
         sort: true,
+        orden: 2,
     },
     {
         id: 'socio1.nombres',
@@ -42,6 +44,7 @@ export const TABLE_COLUMNS = [
         show: true,
         seek: true,
         sort: true,
+        orden: 3,
     },
     {
         id: 'pago_condicion',
@@ -51,6 +54,7 @@ export const TABLE_COLUMNS = [
         width: '12rem',
         show: true,
         sort: true,
+        orden: 4,
     },
     {
         id: 'moneda1.nombre',
@@ -61,6 +65,7 @@ export const TABLE_COLUMNS = [
         show: true,
         seek: true,
         sort: true,
+        orden: 5,
     },
     {
         id: 'monto',
@@ -71,6 +76,7 @@ export const TABLE_COLUMNS = [
         width: '8rem',
         show: true,
         sort: true,
+        orden: 6,
     },
     {
         id: 'estado',
@@ -81,6 +87,7 @@ export const TABLE_COLUMNS = [
         width: '7rem',
         show: true,
         sort: true,
+        orden: 7,
     },
 ]
 

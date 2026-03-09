@@ -16,6 +16,7 @@ export const TABLE_COLUMNS = [
         width: '8rem',
         show: true,
         sort: true,
+        orden: 1,
     },
     {
         id: 'produccion_orden1.linea1.nombre',
@@ -25,6 +26,7 @@ export const TABLE_COLUMNS = [
         width: '10rem',
         show: true,
         sort: true,
+        orden: 2,
     },
     {
         id: 'maquina1.nombre',
@@ -35,6 +37,7 @@ export const TABLE_COLUMNS = [
         show: true,
         seek: true,
         sort: true,
+        orden: 3,
     },
     {
         id: 'articulo1.nombre',
@@ -45,6 +48,7 @@ export const TABLE_COLUMNS = [
         show: true,
         seek: true,
         sort: true,
+        orden: 4,
     },
     {
         id: 'lote',
@@ -54,6 +58,7 @@ export const TABLE_COLUMNS = [
         show: true,
         seek: true,
         sort: true,
+        orden: 5,
     },
     {
         id: 'fv',
@@ -63,6 +68,7 @@ export const TABLE_COLUMNS = [
         width: '8rem',
         show: true,
         sort: true,
+        orden: 6,
     },
     {
         id: 'cantidad',
@@ -73,6 +79,7 @@ export const TABLE_COLUMNS = [
         width: '8rem',
         show: true,
         sort: true,
+        orden: 7,
     },
 ]
 

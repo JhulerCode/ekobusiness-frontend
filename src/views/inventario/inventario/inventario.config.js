@@ -6,6 +6,7 @@ export const TABLE_COLUMNS = [
         title: 'Fecha',
         type: 'date',
         show: false,
+        orden: 1,
     },
     {
         id: 'nombre',
@@ -15,6 +16,7 @@ export const TABLE_COLUMNS = [
         show: true,
         seek: true,
         sort: true,
+        orden: 2,
     },
     {
         id: 'categoria',
@@ -25,6 +27,7 @@ export const TABLE_COLUMNS = [
         show: true,
         seek: true,
         sort: true,
+        orden: 3,
     },
     {
         id: 'unidad',
@@ -34,6 +37,7 @@ export const TABLE_COLUMNS = [
         show: true,
         seek: true,
         sort: true,
+        orden: 4,
     },
     {
         id: 'cantidad',
@@ -45,6 +49,7 @@ export const TABLE_COLUMNS = [
         show: true,
         seek: true,
         sort: true,
+        orden: 5,
     },
     {
         id: 'articulo_movimientos_valorizado',
@@ -56,6 +61,7 @@ export const TABLE_COLUMNS = [
         show: true,
         seek: true,
         sort: true,
+        orden: 6,
     },
     {
         id: 'purchase_ok',
@@ -65,6 +71,7 @@ export const TABLE_COLUMNS = [
         format: 'yesno',
         width: '8rem',
         show: false,
+        orden: 7,
     },
     {
         id: 'sale_ok',
@@ -74,6 +81,7 @@ export const TABLE_COLUMNS = [
         format: 'yesno',
         width: '8rem',
         show: false,
+        orden: 8,
     },
     {
         id: 'produce_ok',
@@ -83,5 +91,6 @@ export const TABLE_COLUMNS = [
         format: 'yesno',
         width: '8rem',
         show: false,
+        orden: 9,
     },
 ]

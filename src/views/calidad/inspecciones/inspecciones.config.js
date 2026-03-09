@@ -15,6 +15,7 @@ export const TABLE_COLUMNS = [
         width: '10rem',
         show: true,
         sort: true,
+        orden: 1,
     },
     {
         id: 'socio1.nombres',
@@ -26,6 +27,7 @@ export const TABLE_COLUMNS = [
         show: true,
         seek: true,
         sort: true,
+        orden: 2,
     },
     {
         id: 'puntuacion',
@@ -34,6 +36,7 @@ export const TABLE_COLUMNS = [
         width: '10rem',
         show: true,
         sort: true,
+        orden: 3,
     },
     {
         id: 'puntuacion_maxima',
@@ -42,6 +45,7 @@ export const TABLE_COLUMNS = [
         width: '10rem',
         show: true,
         sort: true,
+        orden: 4,
     },
 ]
 

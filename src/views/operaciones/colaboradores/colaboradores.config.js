@@ -15,6 +15,7 @@ export const TABLE_COLUMNS = [
         show: true,
         seek: true,
         sort: true,
+        orden: 1,
     },
     {
         id: 'doc_tipo',
@@ -25,6 +26,7 @@ export const TABLE_COLUMNS = [
         show: true,
         seek: true,
         sort: true,
+        orden: 2,
     },
     {
         id: 'doc_numero',
@@ -34,6 +36,7 @@ export const TABLE_COLUMNS = [
         show: true,
         seek: true,
         sort: true,
+        orden: 3,
     },
     {
         id: 'fecha_nacimiento',
@@ -43,6 +46,7 @@ export const TABLE_COLUMNS = [
         show: true,
         seek: true,
         sort: true,
+        orden: 4,
     },
     {
         id: 'sexo',
@@ -53,6 +57,7 @@ export const TABLE_COLUMNS = [
         show: true,
         seek: true,
         sort: true,
+        orden: 5,
     },
     {
         id: 'correo',
@@ -62,6 +67,7 @@ export const TABLE_COLUMNS = [
         show: true,
         seek: true,
         sort: true,
+        orden: 6,
     },
     {
         id: 'telefono',
@@ -71,6 +77,7 @@ export const TABLE_COLUMNS = [
         show: true,
         seek: true,
         sort: true,
+        orden: 7,
     },
     {
         id: 'direccion',
@@ -80,6 +87,7 @@ export const TABLE_COLUMNS = [
         show: true,
         seek: true,
         sort: true,
+        orden: 8,
     },
     {
         id: 'cargo',
@@ -89,6 +97,7 @@ export const TABLE_COLUMNS = [
         show: true,
         seek: true,
         sort: true,
+        orden: 9,
     },
     {
         id: 'activo',
@@ -100,6 +109,7 @@ export const TABLE_COLUMNS = [
         show: true,
         seek: true,
         sort: true,
+        orden: 10,
     },
     {
         id: 'has_signin',
@@ -111,6 +121,7 @@ export const TABLE_COLUMNS = [
         show: true,
         seek: true,
         sort: true,
+        orden: 11,
     },
 ]
 

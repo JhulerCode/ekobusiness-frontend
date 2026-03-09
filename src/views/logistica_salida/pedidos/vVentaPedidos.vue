@@ -31,7 +31,7 @@
                     icon="fa-solid fa-gear"
                     tipo="2"
                     title="Columnas"
-                    @click="$refs['jdtable'].openConfigCols()"
+                    @click="openConfigCols"
                 />
             </div>
         </div>
@@ -44,7 +44,6 @@
             :rowOptions="tableRowActions"
             @rowOptionSelected="runMethod"
             ref="jdtable"
-            :reload="loadPedidos"
         />
     </div>
 
@@ -58,7 +57,8 @@
 </template>
 
 <script>
-import { JdButton, mConfigFiltros, mConfigCols } from '@jhuler/components'
+import { JdButton, mConfigFiltros } from '@jhuler/components'
+import mConfigCols from '@/components/mConfigCols.vue'
 import JdButtonsOverflow from '@/components/JdButtonsOverflow.vue'
 import JdBuscador from '@/components/JdBuscador.vue'
 import JdPaginacion from '@/components/JdPaginacion.vue'
@@ -211,6 +211,14 @@ export default {
 
         runMethod(method, item) {
             this[method](item)
+        },
+        openConfigCols() {
+            const send = {
+                table: this.tableName,
+                cols: this.tableColumns,
+                reload: this.loadPedidos,
+            }
+            this.useModals.setModal('mConfigCols', 'Configurar columnas', null, send, true)
         },
         async ver(item) {
             const qry = {

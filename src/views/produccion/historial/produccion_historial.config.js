@@ -1,14 +1,14 @@
 export const HEADER_ACTIONS = [
     {
+        text: 'Nuevo',
+        action: 'nuevo',
+        permiso: 'vProduccionHistorial:crear',
+    },
+    {
         text: 'Salida de insumos',
         action: 'salidaInsumosCompartidos',
         permiso: 'vProduccionHistorial:salidaInsumos',
         tipo: '2',
-    },
-    {
-        text: 'Nuevo',
-        action: 'nuevo',
-        permiso: 'vProduccionHistorial:crear',
     },
 ]
 
@@ -21,6 +21,7 @@ export const TABLE_COLUMNS = [
         width: '10rem',
         show: true,
         sort: true,
+        orden: 1,
     },
     {
         id: 'articulo1.nombre',
@@ -31,6 +32,7 @@ export const TABLE_COLUMNS = [
         show: true,
         seek: true,
         sort: true,
+        orden: 2,
     },
     {
         id: 'cantidad',
@@ -41,6 +43,7 @@ export const TABLE_COLUMNS = [
         width: '8rem',
         show: true,
         sort: true,
+        orden: 3,
     },
     {
         id: 'estado',
@@ -51,6 +54,7 @@ export const TABLE_COLUMNS = [
         width: '8rem',
         show: true,
         sort: true,
+        orden: 4,
     },
     {
         id: 'productos_terminados',
@@ -62,6 +66,7 @@ export const TABLE_COLUMNS = [
         width: '8rem',
         show: true,
         sort: true,
+        orden: 5,
     },
     {
         id: 'linea1.nombre',
@@ -72,6 +77,7 @@ export const TABLE_COLUMNS = [
         show: true,
         seek: true,
         sort: true,
+        orden: 6,
     },
     {
         id: 'maquina1.nombre',
@@ -82,6 +88,7 @@ export const TABLE_COLUMNS = [
         show: true,
         seek: true,
         sort: true,
+        orden: 7,
     },
     {
         id: 'responsable1.nombres',
@@ -93,6 +100,7 @@ export const TABLE_COLUMNS = [
         show: true,
         seek: true,
         sort: true,
+        orden: 8,
     },
     {
         id: 'inicio',
@@ -101,6 +109,7 @@ export const TABLE_COLUMNS = [
         width: '11rem',
         show: true,
         filtrable: false,
+        orden: 9,
     },
     {
         id: 'fin',
@@ -109,6 +118,7 @@ export const TABLE_COLUMNS = [
         width: '11rem',
         show: true,
         filtrable: false,
+        orden: 10,
     },
     {
         id: 'estado_calidad_revisado',
@@ -120,6 +130,7 @@ export const TABLE_COLUMNS = [
         show: true,
         seek: true,
         sort: true,
+        orden: 11,
     },
     {
         id: 'estado_cf_ppc',
@@ -131,6 +142,7 @@ export const TABLE_COLUMNS = [
         show: true,
         seek: true,
         sort: true,
+        orden: 12,
     },
     {
         id: 'createdBy1.nombres',
@@ -139,6 +151,7 @@ export const TABLE_COLUMNS = [
         filtrable: false,
         width: '10rem',
         show: true,
+        orden: 13,
     },
 ]
 

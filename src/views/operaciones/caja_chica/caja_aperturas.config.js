@@ -16,6 +16,7 @@ export const TABLE_COLUMNS = [
         show: true,
         seek: true,
         sort: true,
+        orden: 1,
     },
     {
         id: 'monto_apertura',
@@ -26,6 +27,7 @@ export const TABLE_COLUMNS = [
         show: true,
         seek: false,
         sort: false,
+        orden: 2,
     },
     {
         id: 'fecha_cierre',
@@ -36,6 +38,7 @@ export const TABLE_COLUMNS = [
         show: true,
         seek: true,
         sort: true,
+        orden: 3,
     },
     {
         id: 'estado',
@@ -47,6 +50,7 @@ export const TABLE_COLUMNS = [
         show: true,
         seek: false,
         sort: false,
+        orden: 4,
     },
 ]
 

@@ -40,7 +40,7 @@
                     icon="fa-solid fa-gear"
                     tipo="2"
                     title="Columnas"
-                    @click="$refs['jdtable'].openConfigCols()"
+                    @click="openConfigCols"
                 />
             </div>
         </div>
@@ -56,7 +56,6 @@
             :tableBulkActions="tableBulkActions"
             @bulkActionSelected="runMethod"
             ref="jdtable"
-            :reload="loadSocios"
         />
     </div>
 
@@ -69,7 +68,8 @@
 
 <script>
 // Componentes base y utilidades
-import { JdButton, mConfigFiltros, mConfigCols, mEditar } from '@jhuler/components'
+import { JdButton, mConfigFiltros, mEditar } from '@jhuler/components'
+import mConfigCols from '@/components/mConfigCols.vue'
 import JdBulkActions from '@/components/JdBulkActions.vue'
 import JdBuscador from '@/components/JdBuscador.vue'
 import JdTable from '@/components/JdTable/JdTable.vue'
@@ -139,6 +139,14 @@ export default {
         // --- Gestión de Tabla ---
         runMethod(method, item) {
             this[method](item)
+        },
+        openConfigCols() {
+            const send = {
+                table: this.tableName,
+                cols: this.tableColumns,
+                reload: this.loadSocios,
+            }
+            this.useModals.setModal('mConfigCols', 'Configurar columnas', null, send, true)
         },
 
         // --- Carga de Datos ---

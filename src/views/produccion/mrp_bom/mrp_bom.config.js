@@ -16,6 +16,7 @@ export const TABLE_COLUMNS = [
         show: true,
         seek: true,
         sort: true,
+        orden: 1,
     },
     {
         id: 'tipo',
@@ -25,6 +26,7 @@ export const TABLE_COLUMNS = [
         width: '8rem',
         show: true,
         sort: true,
+        orden: 2,
     },
 ]
 

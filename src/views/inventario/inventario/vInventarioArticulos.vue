@@ -16,13 +16,6 @@
                     title="Exportar"
                     @click="$refs['jdtable'].downloadData()"
                 />
-
-                <JdButton
-                    icon="fa-solid fa-gear"
-                    tipo="2"
-                    title="Columnas"
-                    @click="$refs['jdtable'].openConfigCols()"
-                />
             </div>
         </div>
 

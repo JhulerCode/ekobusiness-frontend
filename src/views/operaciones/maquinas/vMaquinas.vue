@@ -31,7 +31,7 @@
                     icon="fa-solid fa-gear"
                     tipo="2"
                     title="Columnas"
-                    @click="$refs['jdtable'].openConfigCols()"
+                    @click="openConfigCols"
                 />
             </div>
         </div>
@@ -42,8 +42,6 @@
             :columns="tableColumns"
             :datos="vista.maquinas || []"
             :colAct="true"
-            :configFiltros="openConfigFiltros"
-            :reload="loadMaquinas"
             :rowOptions="tableRowActions"
             @rowOptionSelected="runMethod"
         />
@@ -51,11 +49,13 @@
 
     <mMaquina v-if="useModals.show.mMaquina" />
 
+    <mConfigCols v-if="useModals.show.mConfigCols" />
     <mConfigFiltros v-if="useModals.show.mConfigFiltros" />
 </template>
 
 <script>
 import { JdButton, mConfigFiltros } from '@jhuler/components'
+import mConfigCols from '@/components/mConfigCols.vue'
 import JdTable from '@/components/JdTable/JdTable.vue'
 import JdBuscador from '@/components/JdBuscador.vue'
 import JdPaginacion from '@/components/JdPaginacion.vue'
@@ -78,6 +78,7 @@ export default {
         JdBuscador,
         JdPaginacion,
 
+        mConfigCols,
         mConfigFiltros,
 
         mMaquina,
@@ -150,6 +151,14 @@ export default {
 
         runMethod(method, item) {
             this[method](item)
+        },
+        openConfigCols() {
+            const send = {
+                table: this.tableName,
+                cols: this.tableColumns,
+                reload: this.loadMaquinas,
+            }
+            this.useModals.setModal('mConfigCols', 'Configurar columnas', null, send, true)
         },
         async editar(item) {
             this.useAuth.setLoading(true, 'Cargando...')

@@ -10,6 +10,7 @@ export const TABLE_COLUMNS = [
         show: true,
         seek: true,
         sort: true,
+        orden: 1,
     },
     {
         id: 'colaborador',
@@ -21,6 +22,7 @@ export const TABLE_COLUMNS = [
         show: true,
         seek: true,
         sort: true,
+        orden: 2,
     },
     {
         id: 'method',
@@ -30,6 +32,7 @@ export const TABLE_COLUMNS = [
         show: true,
         seek: false,
         sort: false,
+        orden: 3,
     },
     {
         id: 'baseUrl',
@@ -39,6 +42,7 @@ export const TABLE_COLUMNS = [
         show: true,
         seek: false,
         sort: false,
+        orden: 4,
     },
     {
         id: 'detail',
@@ -48,6 +52,7 @@ export const TABLE_COLUMNS = [
         show: true,
         seek: false,
         sort: false,
+        orden: 5,
     },
 ]
 

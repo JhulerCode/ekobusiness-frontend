@@ -31,7 +31,7 @@
                     icon="fa-solid fa-gear"
                     tipo="2"
                     title="Columnas"
-                    @click="$refs['jdtable'].openConfigCols()"
+                    @click="openConfigCols"
                 />
             </div>
         </div>
@@ -44,17 +44,18 @@
             :rowOptions="tableRowActions"
             @rowOptionSelected="runMethod"
             ref="jdtable"
-            :reload="loadDocumentos"
         />
     </div>
 
     <mDocumento v-if="useModals.show.mDocumento" />
+    <mConfigCols v-if="useModals.show.mConfigCols" />
     <mConfigFiltros v-if="useModals.show.mConfigFiltros" />
     <mPdfViewer v-if="useModals.show.mPdfViewer" />
 </template>
 
 <script>
 import { JdButton, mConfigFiltros, mPdfViewer } from '@jhuler/components'
+import mConfigCols from '@/components/mConfigCols.vue'
 import JdTable from '@/components/JdTable/JdTable.vue'
 import JdBuscador from '@/components/JdBuscador.vue'
 import JdPaginacion from '@/components/JdPaginacion.vue'
@@ -77,6 +78,7 @@ export default {
         JdBuscador,
         JdPaginacion,
 
+        mConfigCols,
         mConfigFiltros,
 
         mDocumento,
@@ -151,6 +153,14 @@ export default {
 
         runMethod(method, item) {
             this[method](item)
+        },
+        openConfigCols() {
+            const send = {
+                table: this.tableName,
+                cols: this.tableColumns,
+                reload: this.loadDocumentos,
+            }
+            this.useModals.setModal('mConfigCols', 'Configurar columnas', null, send, true)
         },
         async editar(item) {
             this.useAuth.setLoading(true, 'Cargando...')

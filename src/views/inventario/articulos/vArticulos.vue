@@ -48,7 +48,7 @@
                     icon="fa-solid fa-gear"
                     tipo="2"
                     title="Columnas"
-                    @click="$refs['jdtable'].openConfigCols()"
+                    @click="openConfigCols"
                 />
             </div>
         </div>
@@ -64,7 +64,6 @@
             :tableBulkActions="tableBulkActions"
             @bulkActionSelected="runMethod"
             ref="jdtable"
-            :reload="loadArticulos"
         />
     </div>
 
@@ -82,12 +81,13 @@
 
 <script>
 // Componentes base y utilidades
-import { JdButton, mConfigFiltros, mConfigCols, mEditar } from '@jhuler/components'
+import { JdButton, mConfigFiltros, mEditar } from '@jhuler/components'
 import JdButtonsOverflow from '@/components/JdButtonsOverflow.vue'
 import JdBuscador from '@/components/JdBuscador.vue'
 import JdBulkActions from '@/components/JdBulkActions.vue'
 import JdPaginacion from '@/components/JdPaginacion.vue'
 import JdTable from '@/components/JdTable/JdTable.vue'
+import mConfigCols from '@/components/mConfigCols.vue'
 
 // Configuración de la vista
 import {
@@ -357,6 +357,14 @@ export default {
         },
 
         // --- Otros ---
+        openConfigCols() {
+            const send = {
+                table: this.tableName,
+                cols: this.tableColumns,
+                reload: this.loadArticulos,
+            }
+            this.useModals.setModal('mConfigCols', 'Configurar columnas', null, send, true)
+        },
         async openConfigFiltros() {
             await this.loadDatosSistema()
             const cols = this.tableColumns

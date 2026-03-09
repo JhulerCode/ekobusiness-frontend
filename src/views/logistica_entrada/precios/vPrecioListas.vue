@@ -34,7 +34,9 @@
 </template>
 
 <script>
-import { JdButton, JdTable, mConfigFiltros, mConfigCols } from '@jhuler/components'
+import { JdButton, mConfigFiltros } from '@jhuler/components'
+import JdTable from '@/components/JdTable/JdTable.vue'
+import mConfigCols from '@/components/mConfigCols.vue'
 
 import mPrecioLista from '@/views/logistica_entrada/precios/mPrecioLista.vue'
 import mPrecioListaItems from '@/views/logistica_entrada/precios/mPrecioListaItems.vue'
@@ -65,7 +67,7 @@ export default {
         vista: {},
 
         tableName: 'vPrecioListas',
-        columns: [
+        tableColumns: [
             {
                 id: 'nombre',
                 title: 'Nombre',
@@ -188,6 +190,14 @@ export default {
 
         runMethod(method, item) {
             this[method](item)
+        },
+        openConfigCols() {
+            const send = {
+                table: this.tableName,
+                cols: this.tableColumns,
+                reload: this.loadListaPrecios,
+            }
+            this.useModals.setModal('mConfigCols', 'Configurar columnas', null, send, true)
         },
         async editar(item) {
             this.useAuth.setLoading(true, 'Cargando...')

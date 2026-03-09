@@ -33,6 +33,7 @@ export const TABLE_COLUMNS = [
         width: '10rem',
         show: true,
         sort: true,
+        orden: 1,
     },
     {
         id: 'codigo',
@@ -42,6 +43,7 @@ export const TABLE_COLUMNS = [
         show: true,
         seek: true,
         sort: true,
+        orden: 2,
     },
     {
         id: 'socio1.nombres',
@@ -53,6 +55,7 @@ export const TABLE_COLUMNS = [
         show: true,
         seek: true,
         sort: true,
+        orden: 3,
     },
     {
         id: 'pago_condicion',
@@ -62,6 +65,7 @@ export const TABLE_COLUMNS = [
         width: '12rem',
         show: true,
         sort: true,
+        orden: 4,
     },
     {
         id: 'moneda1.nombre',
@@ -72,6 +76,7 @@ export const TABLE_COLUMNS = [
         show: true,
         seek: false,
         sort: true,
+        orden: 5,
     },
     {
         id: 'monto',
@@ -82,6 +87,7 @@ export const TABLE_COLUMNS = [
         width: '8rem',
         show: true,
         sort: true,
+        orden: 6,
     },
     {
         id: 'estado',
@@ -92,6 +98,7 @@ export const TABLE_COLUMNS = [
         width: '8rem',
         show: true,
         sort: true,
+        orden: 7,
     },
     {
         id: 'pagado',
@@ -101,6 +108,7 @@ export const TABLE_COLUMNS = [
         format: 'yesno',
         width: '8rem',
         show: true,
+        orden: 8,
     },
     {
         id: 'listo',
@@ -110,6 +118,7 @@ export const TABLE_COLUMNS = [
         format: 'yesno',
         width: '8rem',
         show: true,
+        orden: 9,
     },
     {
         id: 'entregado',
@@ -119,6 +128,7 @@ export const TABLE_COLUMNS = [
         format: 'yesno',
         width: '8rem',
         show: true,
+        orden: 10,
     },
     {
         id: 'origin',
@@ -126,6 +136,7 @@ export const TABLE_COLUMNS = [
         width: '10rem',
         type: 'text',
         show: true,
+        orden: 11,
     },
     {
         id: 'createdBy1.nombres',
@@ -136,6 +147,7 @@ export const TABLE_COLUMNS = [
         show: true,
         seek: true,
         sort: true,
+        orden: 12,
     },
 ]
 

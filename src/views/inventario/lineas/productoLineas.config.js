@@ -15,6 +15,7 @@ export const TABLE_COLUMNS = [
         show: true,
         seek: true,
         sort: true,
+        orden: 1,
     },
     {
         id: 'activo',
@@ -26,6 +27,7 @@ export const TABLE_COLUMNS = [
         show: true,
         seek: false,
         sort: false,
+        orden: 2,
     },
     {
         id: 'is_ecommerce',
@@ -37,6 +39,7 @@ export const TABLE_COLUMNS = [
         show: true,
         seek: false,
         sort: false,
+        orden: 3,
     },
     {
         id: 'descripcion',
@@ -46,6 +49,7 @@ export const TABLE_COLUMNS = [
         show: true,
         seek: false,
         sort: false,
+        orden: 4,
     },
 ]
 

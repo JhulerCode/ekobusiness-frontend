@@ -15,6 +15,7 @@ export const TABLE_COLUMNS = [
         show: true,
         seek: true,
         sort: true,
+        orden: 1,
     },
     {
         id: 'denominacion_comercial',
@@ -24,6 +25,7 @@ export const TABLE_COLUMNS = [
         show: true,
         seek: true,
         sort: true,
+        orden: 2,
     },
     {
         id: 'registro_sanitario',
@@ -32,6 +34,7 @@ export const TABLE_COLUMNS = [
         width: '12rem',
         show: true,
         sort: true,
+        orden: 3,
     },
     {
         id: 'fecha_emision',
@@ -41,6 +44,7 @@ export const TABLE_COLUMNS = [
         width: '12rem',
         show: true,
         sort: true,
+        orden: 4,
     },
     {
         id: 'fecha_vencimiento',
@@ -50,6 +54,7 @@ export const TABLE_COLUMNS = [
         width: '12rem',
         show: true,
         sort: true,
+        orden: 5,
     },
     {
         id: 'recordar_dias',
@@ -58,6 +63,7 @@ export const TABLE_COLUMNS = [
         width: '8rem',
         show: true,
         sort: true,
+        orden: 6,
     },
     {
         id: 'estado',
@@ -68,6 +74,7 @@ export const TABLE_COLUMNS = [
         width: '10rem',
         show: true,
         sort: true,
+        orden: 7,
     },
 ]
 

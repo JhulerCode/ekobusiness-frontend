@@ -22,6 +22,7 @@ export const TABLE_COLUMNS = [
         show: false,
         seek: false,
         sort: false,
+        orden: 1,
     },
     {
         id: 'nombre',
@@ -31,6 +32,7 @@ export const TABLE_COLUMNS = [
         show: true,
         seek: true,
         sort: true,
+        orden: 2,
     },
     {
         id: 'unidad',
@@ -41,6 +43,7 @@ export const TABLE_COLUMNS = [
         show: true,
         seek: false,
         sort: true,
+        orden: 3,
     },
     {
         id: 'stock',
@@ -52,6 +55,7 @@ export const TABLE_COLUMNS = [
         show: true,
         seek: false,
         sort: true,
+        orden: 4,
     },
     {
         id: 'activo',
@@ -64,6 +68,7 @@ export const TABLE_COLUMNS = [
         show: true,
         seek: false,
         sort: true,
+        orden: 5,
     },
     {
         id: 'codigo_barra',
@@ -73,6 +78,7 @@ export const TABLE_COLUMNS = [
         show: true,
         seek: true,
         sort: true,
+        orden: 6,
     },
     {
         id: 'linea1.nombre',
@@ -84,6 +90,7 @@ export const TABLE_COLUMNS = [
         show: true,
         seek: true,
         sort: true,
+        orden: 7,
     },
     {
         id: 'categoria1.nombre',
@@ -95,6 +102,7 @@ export const TABLE_COLUMNS = [
         show: true,
         seek: true,
         sort: true,
+        orden: 8,
     },
     {
         id: 'filtrantes',
@@ -103,6 +111,7 @@ export const TABLE_COLUMNS = [
         width: '5rem',
         show: true,
         sort: true,
+        orden: 9,
     },
     {
         id: 'contenido_neto',
@@ -111,6 +120,7 @@ export const TABLE_COLUMNS = [
         width: '5rem',
         show: true,
         sort: true,
+        orden: 10,
     },
     {
         id: 'has_fv',
@@ -121,6 +131,7 @@ export const TABLE_COLUMNS = [
         format: 'yesno',
         width: '8rem',
         show: true,
+        orden: 11,
     },
     {
         id: 'igv_afectacion',
@@ -130,6 +141,7 @@ export const TABLE_COLUMNS = [
         editable: true,
         width: '10rem',
         show: true,
+        orden: 12,
     },
     {
         id: 'is_ecommerce',
@@ -140,6 +152,7 @@ export const TABLE_COLUMNS = [
         editable: true,
         width: '10rem',
         show: false,
+        orden: 13,
     },
     {
         id: 'precio',
@@ -148,6 +161,7 @@ export const TABLE_COLUMNS = [
         editable: true,
         width: '10rem',
         show: false,
+        orden: 14,
     },
     {
         id: 'purchase_ok',
@@ -158,6 +172,7 @@ export const TABLE_COLUMNS = [
         editable: true,
         width: '8rem',
         show: false,
+        orden: 15,
     },
     {
         id: 'sale_ok',
@@ -168,6 +183,7 @@ export const TABLE_COLUMNS = [
         editable: true,
         width: '8rem',
         show: false,
+        orden: 16,
     },
     {
         id: 'produce_ok',
@@ -178,6 +194,7 @@ export const TABLE_COLUMNS = [
         editable: true,
         width: '8rem',
         show: false,
+        orden: 17,
     },
 ]
 

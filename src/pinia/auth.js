@@ -124,6 +124,7 @@ export const useAuth = defineStore('auth', {
                         this.tables[tableName].find((b) => b.id === a.id),
                     )
                 }
+                columns.sort((a, b) => (a.orden || 0) - (b.orden || 0))
             }
         },
         setInicialTables(tables) {

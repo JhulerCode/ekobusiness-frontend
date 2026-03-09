@@ -1,14 +1,42 @@
 <template>
     <div class="vista vista-fill">
         <div class="head">
-            <strong>Soporte al cliente</strong>
+            <div class="head-left">
+                <strong>Soporte al cliente</strong>
 
-            <div class="buttons">
                 <JdButton
                     text="Nuevo"
                     title="Crear nuevo"
                     @click="nuevo()"
                     v-if="useAuth.verifyPermiso('vHelpdeskTickets:crear')"
+                />
+            </div>
+
+            <div class="head-center">
+                <JdBuscador
+                    :view="vista"
+                    :columns="columns"
+                    :tableName="tableName"
+                    @open-filters="openConfigFiltros"
+                    @reload="loadHelpdeskTickets"
+                />
+            </div>
+
+            <div class="head-right">
+                <JdPaginacion :view="vista" @reload="loadHelpdeskTickets" />
+
+                <JdButton
+                    icon="fa-solid fa-file-excel"
+                    tipo="2"
+                    title="Exportar"
+                    @click="$refs['jdtable'].downloadData()"
+                />
+
+                <JdButton
+                    icon="fa-solid fa-gear"
+                    tipo="2"
+                    title="Columnas"
+                    @click="$refs['jdtable'].openConfigCols()"
                 />
             </div>
         </div>
@@ -18,25 +46,27 @@
             :columns="columns"
             :datos="vista.helpdesk_tickets || []"
             :colAct="true"
-            :configFiltros="openConfigFiltros"
-            :reload="loadHelpdeskTickets"
             :rowOptions="tableRowOptions"
             @rowOptionSelected="runMethod"
-            :meta="vista.table_meta"
-            @prevPage="((vista.table_page -= 1), loadHelpdeskTickets())"
-            @nextPage="((vista.table_page += 1), loadHelpdeskTickets())"
+            ref="jdtable"
+            :reload="loadHelpdeskTickets"
         />
     </div>
 
     <mHelpdeskTicket v-if="useModals.show.mHelpdeskTicket" />
-
+    <mConfigCols v-if="useModals.show.mConfigCols" />
     <mConfigFiltros v-if="useModals.show.mConfigFiltros" />
 </template>
 
 <script>
-import { JdButton, JdTable, mConfigFiltros } from '@jhuler/components'
+import { JdButton, mConfigFiltros, mConfigCols } from '@jhuler/components'
+import JdBuscador from '@/components/JdBuscador.vue'
+import JdTable from '@/components/JdTable/JdTable.vue'
+import JdPaginacion from '@/components/JdPaginacion.vue'
 
 import mHelpdeskTicket from './mHelpdeskTicket.vue'
+
+import { COLUMNS, TABLE_ROW_OPTIONS } from './helpdesk_tickets.config'
 
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
@@ -46,12 +76,14 @@ import { urls, get, delet } from '@/utils/crud'
 import { jqst } from '@/utils/swal'
 
 export default {
+    name: 'vHelpdeskTickets',
     components: {
         JdButton,
+        JdBuscador,
         JdTable,
-
+        JdPaginacion,
+        mConfigCols,
         mConfigFiltros,
-
         mHelpdeskTicket,
     },
     data: () => ({
@@ -62,100 +94,8 @@ export default {
         vista: {},
 
         tableName: 'vHelpdeskTickets',
-        columns: [
-            {
-                id: 'nombre',
-                title: 'Nombre',
-                type: 'text',
-                width: '10rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'descripcion',
-                title: 'Descripción',
-                type: 'text',
-                width: '15rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'socio1.nombres',
-                title: 'Cliente',
-                prop: 'socio1.nombres',
-                type: 'text',
-                width: '15rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'articulo1.nombre',
-                title: 'Producto',
-                prop: 'articulo1.nombre',
-                type: 'text',
-                width: '15rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'reclamo_fecha',
-                title: 'Fecha de reclamo',
-                format: 'date',
-                type: 'date',
-                width: '10rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'reclamo_fuente',
-                title: 'Fuente de reclamo',
-                type: 'text',
-                width: '10rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'createdAt',
-                title: 'Creado el',
-                format: 'datetime',
-                type: 'datetime',
-                width: '10rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'createdBy1.nombres',
-                title: 'Creado por',
-                prop: 'createdBy1.nombres_apellidos',
-                type: 'text',
-                width: '10rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-        ],
-        tableRowOptions: [
-            {
-                label: 'Editar',
-                icon: 'fa-solid fa-pen-to-square',
-                action: 'editar',
-                permiso: 'vHelpdeskTickets:editar',
-            },
-            {
-                label: 'Eliminar',
-                icon: 'fa-solid fa-trash-can',
-                action: 'eliminar',
-                permiso: 'vHelpdeskTickets:eliminar',
-                ocultar: { estandar: true },
-            },
-        ],
+        columns: JSON.parse(JSON.stringify(COLUMNS)),
+        tableRowOptions: TABLE_ROW_OPTIONS,
     }),
     created() {
         this.vista = this.useVistas.vHelpdeskTickets

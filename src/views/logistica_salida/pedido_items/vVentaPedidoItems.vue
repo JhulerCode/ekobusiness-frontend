@@ -1,26 +1,59 @@
 <template>
     <div class="vista vista-fill">
         <div class="head">
-            <strong>Productos pedidos</strong>
+            <div class="head-left">
+                <strong>Productos pedidos</strong>
+            </div>
+
+            <div class="head-center">
+                <JdBuscador
+                    :view="vista"
+                    :columns="columns"
+                    :tableName="tableName"
+                    @open-filters="openConfigFiltros"
+                    @reload="loadPedidoItems"
+                />
+            </div>
+
+            <div class="head-right">
+                <JdPaginacion :view="vista" @reload="loadPedidoItems" />
+
+                <JdButton
+                    icon="fa-solid fa-file-excel"
+                    tipo="2"
+                    title="Exportar"
+                    @click="$refs['jdtable'].downloadData()"
+                />
+
+                <JdButton
+                    icon="fa-solid fa-gear"
+                    tipo="2"
+                    title="Columnas"
+                    @click="$refs['jdtable'].openConfigCols()"
+                />
+            </div>
         </div>
 
         <JdTable
             :name="tableName"
             :columns="columns"
             :datos="vista.transaccion_items || []"
-            :configFiltros="openConfigFiltros"
+            ref="jdtable"
             :reload="loadPedidoItems"
-            :meta="vista.table_meta"
-            @prevPage="((vista.table_page -= 1), loadPedidoItems())"
-            @nextPage="((vista.table_page += 1), loadPedidoItems())"
         />
     </div>
 
+    <mConfigCols v-if="useModals.show.mConfigCols" />
     <mConfigFiltros v-if="useModals.show.mConfigFiltros" />
 </template>
 
 <script>
-import { JdTable, mConfigFiltros } from '@jhuler/components'
+import { JdButton, mConfigFiltros, mConfigCols } from '@jhuler/components'
+import JdBuscador from '@/components/JdBuscador.vue'
+import JdTable from '@/components/JdTable/JdTable.vue'
+import JdPaginacion from '@/components/JdPaginacion.vue'
+
+import { COLUMNS } from './venta_pedido_items.config'
 
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
@@ -31,105 +64,24 @@ import { urls, get } from '@/utils/crud'
 import dayjs from 'dayjs'
 
 export default {
+    name: 'vVentaPedidoItems',
     components: {
+        JdButton,
+        JdBuscador,
         JdTable,
-
+        JdPaginacion,
+        mConfigCols,
         mConfigFiltros,
     },
     data: () => ({
         useAuth: useAuth(),
         useVistas: useVistas(),
         useModals: useModals(),
-        dayjs,
 
         vista: {},
 
         tableName: 'vVentaPedidoItems',
-        columns: [
-            {
-                id: 'socio_pedido1.fecha',
-                title: 'Fecha',
-                prop: 'socio_pedido1.fecha',
-                type: 'date',
-                format: 'date',
-                width: '8rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'socio_pedido1.codigo',
-                title: 'Nro pedido',
-                prop: 'socio_pedido1.codigo',
-                type: 'text',
-                width: '11rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'socio_pedido1.socio',
-                title: 'Cliente',
-                prop: 'socio_pedido1.socio1.nombres',
-                type: 'select',
-                mostrar: 'nombres_apellidos',
-                width: '15rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'articulo1.nombre',
-                title: 'Artículo',
-                type: 'text',
-                prop: 'articulo1.nombre',
-                width: '20rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'pu',
-                title: 'Valor unitario',
-                type: 'number',
-                toRight: true,
-                width: '8rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'cantidad',
-                title: 'Cantidad',
-                type: 'number',
-                format: 'number',
-                toRight: true,
-                width: '8rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'entregado',
-                title: 'Entregado',
-                type: 'number',
-                format: 'number',
-                toRight: true,
-                width: '8rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-        ],
-        // tableRowOptions: [
-        //     {
-        //         id: 1,
-        //         label: 'Inspeccionar',
-        //         icon: 'fa-solid fa-star',
-        //         action: 'crearFormatoValue',
-        //         permiso: 'vVentaPedidoItems:inspeccion',
-        //     },
-        // ],
+        columns: JSON.parse(JSON.stringify(COLUMNS)),
     }),
     async created() {
         this.vista = this.useVistas.vVentaPedidoItems
@@ -142,9 +94,11 @@ export default {
     },
     methods: {
         initFiltros() {
-            this.columns[0].op = 'Está dentro de'
-            this.columns[0].val = dayjs().startOf('month').format('YYYY-MM-DD')
-            this.columns[0].val1 = dayjs().format('YYYY-MM-DD')
+            if (!this.columns[0].val) {
+                this.columns[0].op = 'Está dentro de'
+                this.columns[0].val = dayjs().startOf('month').format('YYYY-MM-DD')
+                this.columns[0].val1 = dayjs().format('YYYY-MM-DD')
+            }
         },
         setQuery() {
             this.vista.qry = {
@@ -180,7 +134,7 @@ export default {
         async openConfigFiltros() {
             const cols = this.columns
             for (const a of cols) {
-                if (a.id == 'socio_pedido1.socio') a.reload = this.loadSocios
+                if (a.id == 'socio_pedido1.socio1.nombres') a.reload = this.loadSocios
             }
 
             const send = {
@@ -206,15 +160,12 @@ export default {
                 ],
             }
 
-            this.vista.socios = []
             this.useAuth.setLoading(true, 'Cargando...')
             const res = await get(`${urls.socios}?qry=${JSON.stringify(qry)}`)
             this.useAuth.setLoading(false)
 
             if (res.code !== 0) return
-
-            this.vista.socios = res.data
-            return res.data
+            return (this.vista.socios = res.data)
         },
     },
 }

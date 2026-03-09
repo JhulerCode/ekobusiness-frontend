@@ -1,30 +1,62 @@
 <template>
     <div class="vista vista-fill">
         <div class="head">
-            <strong>Artículos vendidos</strong>
+            <div class="head-left">
+                <strong>Artículos vendidos</strong>
+            </div>
+
+            <div class="head-center">
+                <JdBuscador
+                    :view="vista"
+                    :columns="columns"
+                    :tableName="tableName"
+                    @open-filters="openConfigFiltros"
+                    @reload="loadTransaccionItems"
+                />
+            </div>
+
+            <div class="head-right">
+                <JdPaginacion :view="vista" @reload="loadTransaccionItems" />
+
+                <JdButton
+                    icon="fa-solid fa-file-excel"
+                    tipo="2"
+                    title="Exportar"
+                    @click="$refs['jdtable'].downloadData()"
+                />
+
+                <JdButton
+                    icon="fa-solid fa-gear"
+                    tipo="2"
+                    title="Columnas"
+                    @click="$refs['jdtable'].openConfigCols()"
+                />
+            </div>
         </div>
 
         <JdTable
             :name="tableName"
             :columns="columns"
             :datos="vista.transaccion_items || []"
-            :configFiltros="openConfigFiltros"
+            ref="jdtable"
             :reload="loadTransaccionItems"
-            :meta="vista.table_meta"
-            @prevPage="((vista.table_page -= 1), loadTransaccionItems())"
-            @nextPage="((vista.table_page += 1), loadTransaccionItems())"
         />
     </div>
 
     <mFormato v-if="useModals.show.mFormato" @created="setTransaccionItemCalidadRevisado" />
-
+    <mConfigCols v-if="useModals.show.mConfigCols" />
     <mConfigFiltros v-if="useModals.show.mConfigFiltros" />
 </template>
 
 <script>
-import { JdTable, mConfigFiltros } from '@jhuler/components'
+import { JdButton, mConfigFiltros, mConfigCols } from '@jhuler/components'
+import JdBuscador from '@/components/JdBuscador.vue'
+import JdTable from '@/components/JdTable/JdTable.vue'
+import JdPaginacion from '@/components/JdPaginacion.vue'
 
 import mFormato from '@/views/calidad/formatos/mFormato.vue'
+
+import { COLUMNS } from './venta_items.config'
 
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
@@ -35,124 +67,25 @@ import { urls, get } from '@/utils/crud'
 import dayjs from 'dayjs'
 
 export default {
+    name: 'vVentaItems',
     components: {
+        JdButton,
+        JdBuscador,
         JdTable,
-
+        JdPaginacion,
+        mConfigCols,
         mConfigFiltros,
-
         mFormato,
     },
     data: () => ({
         useAuth: useAuth(),
         useVistas: useVistas(),
         useModals: useModals(),
-        dayjs,
 
         vista: {},
 
         tableName: 'vVentaItems',
-        columns: [
-            {
-                id: 'transaccion1.fecha',
-                title: 'Fecha',
-                type: 'date',
-                prop: 'transaccion1.fecha',
-                format: 'date',
-                width: '8rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'transaccion1.guia',
-                title: 'Guía',
-                type: 'text',
-                prop: 'transaccion1.guia',
-                width: '8rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'transaccion1.factura',
-                title: 'Factura',
-                type: 'text',
-                prop: 'transaccion1.factura',
-                width: '8rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'transaccion1.socio',
-                title: 'Cliente',
-                prop: 'transaccion1.socio1.nombres',
-                type: 'select',
-                mostrar: 'nombres_apellidos',
-                width: '15rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'articulo1.nombre',
-                title: 'Artículo',
-                type: 'text',
-                prop: 'articulo1.nombre',
-                width: '20rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'cantidad',
-                title: 'Cantidad',
-                type: 'number',
-                format: 'decimal',
-                width: '8rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'pu',
-                title: 'Valor unitario',
-                type: 'number',
-                format: 'decimal',
-                width: '8rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'lote',
-                title: 'Lote',
-                type: 'select',
-                width: '8rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'fv',
-                title: 'Fecha de vencimiento',
-                type: 'date',
-                format: 'date',
-                width: '8rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-        ],
-        // tableRowOptions: [
-        //     {
-        //         id: 1,
-        //         label: 'Inspeccionar',
-        //         icon: 'fa-solid fa-star',
-        //         action: 'crearFormatoValue',
-        //         permiso: 'vVentaItems:inspeccion',
-        //     },
-        // ],
+        columns: JSON.parse(JSON.stringify(COLUMNS)),
     }),
     async created() {
         this.vista = this.useVistas.vVentaItems
@@ -165,9 +98,11 @@ export default {
     },
     methods: {
         initFiltros() {
-            this.columns[0].op = 'Está dentro de'
-            this.columns[0].val = dayjs().startOf('month').format('YYYY-MM-DD')
-            this.columns[0].val1 = dayjs().format('YYYY-MM-DD')
+            if (!this.columns[0].val) {
+                this.columns[0].op = 'Está dentro de'
+                this.columns[0].val = dayjs().startOf('month').format('YYYY-MM-DD')
+                this.columns[0].val1 = dayjs().format('YYYY-MM-DD')
+            }
         },
         setQuery() {
             this.vista.qry = {
@@ -201,7 +136,7 @@ export default {
         async openConfigFiltros() {
             const cols = this.columns
             for (const a of cols) {
-                if (a.id == 'transaccion1.socio') a.reload = this.loadSocios
+                if (a.id == 'transaccion1.socio1.nombres') a.reload = this.loadSocios
             }
 
             const send = {
@@ -227,15 +162,16 @@ export default {
                 ],
             }
 
-            this.vista.socios = []
             this.useAuth.setLoading(true, 'Cargando...')
             const res = await get(`${urls.socios}?qry=${JSON.stringify(qry)}`)
             this.useAuth.setLoading(false)
 
             if (res.code !== 0) return
-
-            this.vista.socios = res.data
-            return res.data
+            return (this.vista.socios = res.data)
+        },
+        setTransaccionItemCalidadRevisado(item) {
+            const t_item = this.vista.transaccion_items.find((a) => a.id == item.transaccion_item)
+            if (t_item) t_item.calidad_revisado = item.id
         },
     },
 }

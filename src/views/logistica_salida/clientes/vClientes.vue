@@ -1,13 +1,48 @@
 <template>
     <div class="vista vista-fill">
         <div class="head">
-            <strong>Clientes</strong>
+            <div class="head-left">
+                <strong>Clientes</strong>
 
-            <div class="buttons">
                 <JdButton
                     text="Nuevo"
                     @click="nuevo()"
                     v-if="useAuth.verifyPermiso('vClientes:crear')"
+                />
+            </div>
+
+            <div class="head-center">
+                <JdBuscador
+                    :view="vista"
+                    :columns="columns"
+                    :tableName="tableName"
+                    @open-filters="openConfigFiltros"
+                    @reload="loadSocios"
+                />
+            </div>
+
+            <div class="head-right">
+                <JdPaginacion :view="vista" @reload="loadSocios" />
+
+                <JdBulkActions
+                    :view="vista"
+                    :actions="tableActions"
+                    :items="vista.socios || []"
+                    @actionClick="runMethod"
+                />
+
+                <JdButton
+                    icon="fa-solid fa-file-excel"
+                    tipo="2"
+                    title="Exportar"
+                    @click="$refs['jdtable'].downloadData()"
+                />
+
+                <JdButton
+                    icon="fa-solid fa-gear"
+                    tipo="2"
+                    title="Columnas"
+                    @click="$refs['jdtable'].openConfigCols()"
                 />
             </div>
         </div>
@@ -17,19 +52,11 @@
             :columns="columns"
             :datos="vista.socios || []"
             :colAct="true"
-            :configFiltros="openConfigFiltros"
-            :configCols="true"
-            :reload="loadSocios"
-            :actions="tableActions"
-            @actionClick="runMethod"
             :rowOptions="tableRowOptions"
             @rowOptionSelected="runMethod"
-            :meta="vista.table_meta"
-            @prevPage="((vista.table_page -= 1), loadSocios())"
-            @nextPage="((vista.table_page += 1), loadSocios())"
             ref="jdtable"
-        >
-        </JdTable>
+            :reload="loadSocios"
+        />
     </div>
 
     <mSocio v-if="useModals.show.mSocio" />
@@ -40,9 +67,15 @@
 </template>
 
 <script>
-import { JdButton, JdTable, mConfigFiltros, mConfigCols, mEditar } from '@jhuler/components'
+import { JdButton, mConfigFiltros, mConfigCols, mEditar } from '@jhuler/components'
+import JdBulkActions from '@/components/JdBulkActions.vue'
+import JdBuscador from '@/components/JdBuscador.vue'
+import JdTable from '@/components/JdTable/JdTable.vue'
+import JdPaginacion from '@/components/JdPaginacion.vue'
 
 import mSocio from '@/views/logistica_entrada/proveedores/mSocio.vue'
+
+import { COLUMNS, TABLE_ACTIONS, TABLE_ROW_OPTIONS } from './clientes.config'
 
 import { useModals } from '@/pinia/modals'
 import { useAuth } from '@/pinia/auth'
@@ -52,12 +85,14 @@ import { urls, get, delet } from '@/utils/crud'
 import { jqst } from '@/utils/swal'
 
 export default {
+    name: 'vClientes',
     components: {
-        JdTable,
         JdButton,
-
+        JdBuscador,
+        JdTable,
+        JdPaginacion,
+        JdBulkActions,
         mSocio,
-
         mConfigCols,
         mConfigFiltros,
         mEditar,
@@ -70,91 +105,9 @@ export default {
         vista: {},
 
         tableName: 'vClientes',
-        columns: [
-            {
-                id: 'doc_tipo',
-                title: 'Tipo documento',
-                prop: 'doc_tipo1.nombre',
-                type: 'select',
-                editable: true,
-                width: '10rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'doc_numero',
-                title: 'Nro documento',
-                type: 'text',
-                width: '10rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'nombres',
-                title: 'Razón social o nombre',
-                type: 'text',
-                width: '20rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'correo',
-                title: 'E-mail',
-                type: 'text',
-                width: '10rem',
-                show: true,
-                seek: true,
-                sort: false,
-            },
-            {
-                id: 'telefono1',
-                title: 'Teléfono',
-                type: 'text',
-                width: '10rem',
-                show: true,
-                seek: true,
-                sort: false,
-            },
-            {
-                id: 'activo',
-                title: 'Activo?',
-                prop: 'activo1.nombre',
-                format: 'yesno',
-                type: 'select',
-                editable: true,
-                width: '10rem',
-                show: true,
-                seek: false,
-                sort: false,
-            },
-        ],
-        tableActions: [
-            { icon: 'fa-solid fa-pen-to-square', text: 'Editar', action: 'editarBulk' },
-            { icon: 'fa-solid fa-trash-can', text: 'Eliminar', action: 'eliminarBulk' },
-        ],
-        tableRowOptions: [
-            {
-                label: 'Ver',
-                icon: 'fa-regular fa-folder-open',
-                action: 'ver',
-                permiso: 'vClientes:ver',
-            },
-            {
-                label: 'Editar',
-                icon: 'fa-solid fa-pen-to-square',
-                action: 'editar',
-                permiso: 'vClientes:editar',
-            },
-            {
-                label: 'Eliminar',
-                icon: 'fa-solid fa-trash-can',
-                action: 'eliminar',
-                permiso: 'vClientes:eliminar',
-            },
-        ],
+        columns: JSON.parse(JSON.stringify(COLUMNS)),
+        tableActions: TABLE_ACTIONS,
+        tableRowOptions: TABLE_ROW_OPTIONS,
     }),
     created() {
         this.vista = this.useVistas.vClientes
@@ -243,8 +196,8 @@ export default {
         async editarBulk() {
             await this.loadDatosSistema()
 
-            const cols = this.columns
-            for (const a of this.columns) {
+            const cols = JSON.parse(JSON.stringify(COLUMNS))
+            for (const a of cols) {
                 if (a.id == 'doc_tipo') a.lista = this.vista.documentos_identidad
                 if (a.id == 'activo') a.lista = this.vista.estados
             }
@@ -306,21 +259,6 @@ export default {
             this.useVistas.removeItem('vClientes', 'socios', item)
         },
 
-        // async loadListasPrecios() {
-        //     const qry = {
-        //         fltr: { activo: { op: 'Es', val: true } },
-        //         ordr: [['nombre', 'ASC']],
-        //     }
-
-        //     this.vista.precios_listas = []
-        //     this.useAuth.setLoading(true, 'Cargando...')
-        //     const res = await get(`${urls.precio_listas}?qry=${JSON.stringify(qry)}`)
-        //     this.useAuth.setLoading(false)
-
-        //     if (res.code != 0) return
-
-        //     this.vista.precios_listas = res.data
-        // },
         async loadDatosSistema() {
             const qry = ['documentos_identidad', 'estados']
             const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)

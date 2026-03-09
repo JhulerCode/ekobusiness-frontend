@@ -1,9 +1,15 @@
 <template>
     <div class="vista vista-fill">
         <div class="head">
-            <strong>Pedidos de venta</strong>
+            <div class="head-left">
+                <strong>Pedidos de venta</strong>
 
-            <div class="buttons">
+                <JdButton
+                    text="Nuevo"
+                    @click="nuevo()"
+                    v-if="useAuth.verifyPermiso('vVentaPedidos:crear')"
+                />
+
                 <JdButton
                     text="Descargar plantilla"
                     title="Para pedidos de venta"
@@ -19,18 +25,41 @@
                 />
 
                 <JdButton
-                    text="Recuperar guardado"
+                    text="Recuperar"
                     tipo="2"
+                    title="Recuperar guardado"
                     @click="recuperarGuardado()"
                     v-if="
                         useAuth.avances.mVentaPedido && useAuth.verifyPermiso('vVentaPedidos:crear')
                     "
                 />
+            </div>
+
+            <div class="head-center">
+                <JdBuscador
+                    :view="vista"
+                    :columns="columns"
+                    :tableName="tableName"
+                    @open-filters="openConfigFiltros"
+                    @reload="loadPedidos"
+                />
+            </div>
+
+            <div class="head-right">
+                <JdPaginacion :view="vista" @reload="loadPedidos" />
 
                 <JdButton
-                    text="Nuevo"
-                    @click="nuevo()"
-                    v-if="useAuth.verifyPermiso('vVentaPedidos:crear')"
+                    icon="fa-solid fa-file-excel"
+                    tipo="2"
+                    title="Exportar"
+                    @click="$refs['jdtable'].downloadData()"
+                />
+
+                <JdButton
+                    icon="fa-solid fa-gear"
+                    tipo="2"
+                    title="Columnas"
+                    @click="$refs['jdtable'].openConfigCols()"
                 />
             </div>
         </div>
@@ -40,15 +69,11 @@
             :columns="columns"
             :datos="vista.pedidos || []"
             :colAct="true"
-            :configFiltros="openConfigFiltros"
-            :reload="loadPedidos"
             :rowOptions="tableRowOptions"
             @rowOptionSelected="runMethod"
-            :meta="vista.table_meta"
-            @prevPage="((vista.table_page -= 1), loadPedidos())"
-            @nextPage="((vista.table_page += 1), loadPedidos())"
-        >
-        </JdTable>
+            ref="jdtable"
+            :reload="loadPedidos"
+        />
     </div>
 
     <mSocioPedido v-if="useModals.show.mSocioPedido" />
@@ -61,12 +86,17 @@
 </template>
 
 <script>
-import { JdButton, JdTable, mConfigFiltros, mConfigCols } from '@jhuler/components'
+import { JdButton, mConfigFiltros, mConfigCols } from '@jhuler/components'
+import JdBuscador from '@/components/JdBuscador.vue'
+import JdTable from '@/components/JdTable/JdTable.vue'
+import JdPaginacion from '@/components/JdPaginacion.vue'
 
 import mPedidosClientes from './mPedidosClientes.vue'
 import mSocioPedido from '@/views/logistica_entrada/pedidos/mSocioPedido.vue'
 import mSocioPedidoPdf from '@/views/logistica_entrada/pedidos/mSocioPedidoPdf.vue'
 import mTransaccion from '@/views/logistica_entrada/compras/mTransaccion.vue'
+
+import { COLUMNS, TABLE_ROW_OPTIONS } from './venta_pedidos.config'
 
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
@@ -75,15 +105,16 @@ import { useModals } from '@/pinia/modals'
 import { urls, get, delet, patch } from '@/utils/crud'
 import { jqst } from '@/utils/swal'
 import { downloadExcel } from '@/utils/mine'
-// import { generarOcPDF } from '@/utils/jpdf'
 
 import dayjs from 'dayjs'
 
 export default {
+    name: 'vVentaPedidos',
     components: {
         JdButton,
+        JdBuscador,
         JdTable,
-
+        JdPaginacion,
         mConfigCols,
         mConfigFiltros,
         mPedidosClientes,
@@ -96,192 +127,12 @@ export default {
         useAuth: useAuth(),
         useVistas: useVistas(),
         useModals: useModals(),
-        dayjs,
 
         vista: {},
 
         tableName: 'vVentaPedidos',
-        columns: [
-            {
-                id: 'fecha',
-                title: 'Fecha',
-                format: 'date',
-                type: 'date',
-                width: '10rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'codigo',
-                title: 'Nro pedido',
-                type: 'text',
-                width: '12rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'socio',
-                title: 'Cliente',
-                prop: 'socio1.nombres',
-                type: 'select',
-                mostrar: 'nombres_apellidos',
-                width: '20rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'pago_condicion',
-                title: 'Condición de pago',
-                prop: 'pago_condicion1.nombre',
-                type: 'select',
-                width: '12rem',
-                show: true,
-                seek: false,
-                sort: true,
-            },
-            {
-                id: 'moneda',
-                title: 'Moneda',
-                prop: 'moneda1.nombre',
-                type: 'select',
-                width: '8rem',
-                show: true,
-                seek: false,
-                sort: true,
-            },
-            {
-                id: 'monto',
-                title: 'Importe',
-                type: 'number',
-                format: 'decimal',
-                toRight: true,
-                width: '8rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'estado',
-                title: 'Estado',
-                prop: 'estado1.nombre',
-                type: 'select',
-                format: 'estado',
-                width: '8rem',
-                show: true,
-                seek: false,
-                sort: true,
-            },
-            {
-                id: 'pagado',
-                title: 'Pagado?',
-                prop: 'pagado1.nombre',
-                type: 'select',
-                format: 'yesno',
-                width: '8rem',
-                show: true,
-            },
-            {
-                id: 'listo',
-                title: 'Listo para entrega?',
-                prop: 'listo1.nombre',
-                type: 'select',
-                format: 'yesno',
-                width: '8rem',
-                show: true,
-            },
-            {
-                id: 'entregado',
-                title: 'Entregado?',
-                prop: 'entregado1.nombre',
-                type: 'select',
-                format: 'yesno',
-                width: '8rem',
-                show: true,
-            },
-            {
-                id: 'origin',
-                title: 'Origen',
-                width: '10rem',
-                type: 'text',
-                show: true,
-            },
-            {
-                id: 'createdBy',
-                title: 'Creado por',
-                prop: 'createdBy1.nombres_apellidos',
-                filtrable: false,
-                width: '10rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-        ],
-        tableRowOptions: [
-            {
-                label: 'Ver',
-                icon: 'fa-regular fa-folder-open',
-                action: 'ver',
-                permiso: 'vVentaPedidos:ver',
-            },
-            {
-                label: 'Editar',
-                icon: 'fa-solid fa-pen-to-square',
-                action: 'editar',
-                permiso: 'vVentaPedidos:editar',
-                ocultar: { estado: ['0', '2'], origin: 'ecommerce' },
-            },
-            {
-                label: 'Eliminar',
-                icon: 'fa-solid fa-trash-can',
-                action: 'eliminar',
-                permiso: 'vVentaPedidos:eliminar',
-                ocultar: { pagado: true, origin: 'ecommerce' },
-            },
-            {
-                label: 'Exportar en PDF',
-                icon: 'fa-regular fa-file-pdf',
-                action: 'generarPdf',
-                permiso: 'vVentaPedidos:generarPdf',
-            },
-            {
-                label: 'Confirmar pago',
-                icon: 'fa-solid fa-hand-holding-dollar',
-                action: 'confirmarPago',
-                permiso: 'vVentaPedidos:confirmarPago',
-                ocultar: { pagado: true, pago_condicion: ['2', '3'] },
-            },
-            {
-                label: 'Marcar como listo',
-                icon: 'fa-solid fa-check-double',
-                action: 'confirmarListo',
-                permiso: 'vVentaPedidos:confirmarListo',
-                ocultar: { listo: true, pagado: false, pago_condicion: ['2', '3'] },
-            },
-            {
-                label: 'Marcar como listo',
-                icon: 'fa-solid fa-check-double',
-                action: 'confirmarListo',
-                permiso: 'vVentaPedidos:confirmarListo',
-                ocultar: { listo: true, pago_condicion: 1 },
-            },
-            {
-                label: 'Confirmar entrega',
-                icon: 'fa-regular fa-truck',
-                action: 'confirmarEntrega',
-                permiso: 'vVentaPedidos:confirmarEntrega',
-                ocultar: { entregado: true, listo: false },
-            },
-            {
-                label: 'Entregar mercadería',
-                icon: 'fa-regular fa-circle-down',
-                action: 'entregarMercaderia',
-                permiso: 'vVentaPedidos:entregarMercaderia',
-                ocultar: { estado: ['0', '2'] },
-            },
-        ],
+        columns: JSON.parse(JSON.stringify(COLUMNS)),
+        tableRowOptions: TABLE_ROW_OPTIONS,
     }),
     async created() {
         this.vista = this.useVistas.vVentaPedidos
@@ -294,9 +145,11 @@ export default {
     },
     methods: {
         initFiltros() {
-            this.columns[0].op = 'Está dentro de'
-            this.columns[0].val = dayjs().startOf('month').format('YYYY-MM-DD')
-            this.columns[0].val1 = dayjs().format('YYYY-MM-DD')
+            if (!this.columns[0].val) {
+                this.columns[0].op = 'Está dentro de'
+                this.columns[0].val = dayjs().startOf('month').format('YYYY-MM-DD')
+                this.columns[0].val1 = dayjs().format('YYYY-MM-DD')
+            }
         },
         setQuery() {
             this.vista.qry = {
@@ -342,7 +195,7 @@ export default {
                 socio_pedido: this.useAuth.avances.mVentaPedido,
             }
 
-            this.useModals.setModal('mSocioPedido', 'Nuevo pedido de compra', 1, send, true)
+            this.useModals.setModal('mSocioPedido', 'Nuevo pedido de venta', 1, send, true)
         },
         verPedidos() {
             this.useModals.setModal('mPedidosClientes', 'Productos pedidos')
@@ -362,7 +215,7 @@ export default {
 
             const cols = this.columns
             for (const a of cols) {
-                if (a.id == 'socio') a.reload = this.loadSocios
+                if (a.id == 'socio1.nombres') a.reload = this.loadSocios
                 if (a.id == 'pago_condicion') a.lista = this.vista.pago_condiciones
                 if (a.id == 'moneda') a.reload = this.loadMonedas
                 if (a.id == 'estado') a.lista = this.vista.pedido_estados
@@ -410,7 +263,7 @@ export default {
                 monedas: [{ ...res.data.moneda1 }],
             }
 
-            this.useModals.setModal('mSocioPedido', 'Ver pedido de venta Q', 3, send, true)
+            this.useModals.setModal('mSocioPedido', 'Ver pedido de venta', 3, send, true)
         },
         async editar(item) {
             const qry = {
@@ -604,15 +457,12 @@ export default {
                 ],
             }
 
-            this.vista.socios = []
             this.useAuth.setLoading(true, 'Cargando...')
             const res = await get(`${urls.socios}?qry=${JSON.stringify(qry)}`)
             this.useAuth.setLoading(false)
 
             if (res.code !== 0) return
-
-            this.vista.socios = res.data
-            return res.data
+            return (this.vista.socios = res.data)
         },
         async loadMonedas() {
             const qry = {
@@ -629,9 +479,7 @@ export default {
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
-
-            this.vista.monedas = res.data
-            return res.data
+            return (this.vista.monedas = res.data)
         },
         async loadDatosSistema() {
             const qry = ['pedido_estados', 'pago_condiciones', 'estados']

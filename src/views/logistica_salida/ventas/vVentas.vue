@@ -1,12 +1,13 @@
 <template>
     <div class="vista vista-fill">
         <div class="head">
-            <strong>Ventas</strong>
+            <div class="head-left">
+                <strong>Ventas</strong>
 
-            <div class="buttons">
                 <JdButton
-                    text="Recuperar guardado"
+                    text="Recuperar"
                     tipo="2"
+                    title="Recuperar guardado"
                     @click="recuperarGuardado()"
                     v-if="useAuth.avances.mVenta && useAuth.verifyPermiso('vVentas:crear')"
                 />
@@ -17,6 +18,34 @@
                     v-if="useAuth.verifyPermiso('vVentas:crear')"
                 />
             </div>
+
+            <div class="head-center">
+                <JdBuscador
+                    :view="vista"
+                    :columns="columns"
+                    :tableName="tableName"
+                    @open-filters="openConfigFiltros"
+                    @reload="loadTransacciones"
+                />
+            </div>
+
+            <div class="head-right">
+                <JdPaginacion :view="vista" @reload="loadTransacciones" />
+
+                <JdButton
+                    icon="fa-solid fa-file-excel"
+                    tipo="2"
+                    title="Exportar"
+                    @click="$refs['jdtable'].downloadData()"
+                />
+
+                <JdButton
+                    icon="fa-solid fa-gear"
+                    tipo="2"
+                    title="Columnas"
+                    @click="$refs['jdtable'].openConfigCols()"
+                />
+            </div>
         </div>
 
         <JdTable
@@ -24,13 +53,10 @@
             :columns="columns"
             :datos="vista.transacciones || []"
             :colAct="true"
-            :configFiltros="openConfigFiltros"
-            :reload="loadTransacciones"
             :rowOptions="tableRowOptions"
             @rowOptionSelected="runMethod"
-            :meta="vista.table_meta"
-            @prevPage="((vista.table_page -= 1), loadTransacciones())"
-            @nextPage="((vista.table_page += 1), loadTransacciones())"
+            ref="jdtable"
+            :reload="loadTransacciones"
         />
     </div>
 
@@ -44,10 +70,15 @@
 </template>
 
 <script>
-import { JdButton, JdTable, mConfigFiltros, mConfigCols, mAnular } from '@jhuler/components'
+import { JdButton, mConfigFiltros, mConfigCols, mAnular } from '@jhuler/components'
+import JdBuscador from '@/components/JdBuscador.vue'
+import JdTable from '@/components/JdTable/JdTable.vue'
+import JdPaginacion from '@/components/JdPaginacion.vue'
 
 import mFormato from '@/views/calidad/formatos/mFormato.vue'
 import mTransaccion from '@/views/logistica_entrada/compras/mTransaccion.vue'
+
+import { COLUMNS, TABLE_ROW_OPTIONS } from './ventas.config'
 
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
@@ -59,128 +90,28 @@ import { jqst } from '@/utils/swal'
 import dayjs from 'dayjs'
 
 export default {
+    name: 'vVentas',
     components: {
         JdButton,
+        JdBuscador,
         JdTable,
+        JdPaginacion,
         mAnular,
-
         mConfigCols,
         mConfigFiltros,
         mFormato,
-
         mTransaccion,
     },
     data: () => ({
         useAuth: useAuth(),
         useVistas: useVistas(),
         useModals: useModals(),
-        dayjs,
 
         vista: {},
 
         tableName: 'vVentas',
-        columns: [
-            {
-                id: 'fecha',
-                title: 'Fecha',
-                type: 'date',
-                format: 'date',
-                width: '10rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'guia',
-                title: 'Guía',
-                type: 'text',
-                width: '10rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'socio',
-                title: 'Proveedor',
-                prop: 'socio1.nombres',
-                type: 'select',
-                mostrar: 'nombres_apellidos',
-                width: '20rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'pago_condicion',
-                title: 'Condición de pago',
-                prop: 'pago_condicion1.nombre',
-                type: 'select',
-                width: '12rem',
-                show: true,
-                seek: false,
-                sort: true,
-            },
-            {
-                id: 'moneda',
-                title: 'Moneda',
-                prop: 'moneda1.nombre',
-                type: 'select',
-                width: '8rem',
-                show: true,
-                seek: false,
-                sort: true,
-            },
-            {
-                id: 'monto',
-                title: 'Importe',
-                type: 'number',
-                format: 'decimal',
-                toRight: true,
-                width: '8rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'estado',
-                title: 'Estado',
-                type: 'select',
-                prop: 'estado1.nombre',
-                format: 'estado',
-                width: '7rem',
-                show: true,
-                seek: false,
-                sort: true,
-            },
-        ],
-        tableRowOptions: [
-            {
-                label: 'Ver',
-                icon: 'fa-regular fa-folder-open',
-                action: 'ver',
-                permiso: 'vVentas:ver',
-            },
-            {
-                label: 'Editar',
-                icon: 'fa-solid fa-pen-to-square',
-                action: 'editar',
-                permiso: 'vVentas:editar',
-                ocultar: { estado: 2 },
-            },
-            // {
-            //     label: 'Eliminar',
-            //     icon: 'fa-regular fa-trash-can',
-            //     action: 'eliminar',
-            //     permiso: 'vVentas:eliminar',
-            // },
-
-            {
-                label: 'Control de despacho',
-                icon: 'fa-solid fa-star',
-                action: 'controlDespacho',
-                permiso: 'vVentas:controlDespacho',
-            },
-        ],
+        columns: JSON.parse(JSON.stringify(COLUMNS)),
+        tableRowOptions: TABLE_ROW_OPTIONS,
     }),
     async created() {
         this.vista = this.useVistas.vVentas
@@ -193,9 +124,11 @@ export default {
     },
     methods: {
         initFiltros() {
-            this.columns[0].op = 'Está dentro de'
-            this.columns[0].val = dayjs().startOf('month').format('YYYY-MM-DD')
-            this.columns[0].val1 = dayjs().format('YYYY-MM-DD')
+            if (!this.columns[0].val) {
+                this.columns[0].op = 'Está dentro de'
+                this.columns[0].val = dayjs().startOf('month').format('YYYY-MM-DD')
+                this.columns[0].val1 = dayjs().format('YYYY-MM-DD')
+            }
         },
         setQuery() {
             this.vista.qry = {
@@ -249,10 +182,6 @@ export default {
                 if (res.code != 0) return
 
                 send.socio_pedido_items = res.data.socio_pedido_items
-                // send.pedido = {
-                //     id: res.data.id,
-                //     codigo: res.data.codigo,
-                // }
                 send.pedidos = [
                     {
                         id: res.data.id,
@@ -269,7 +198,7 @@ export default {
 
             const cols = this.columns
             for (const a of cols) {
-                if (a.id == 'socio') a.reload = this.loadSocios
+                if (a.id == 'socio1.nombres') a.reload = this.loadSocios
                 if (a.id == 'pago_condicion') a.lista = this.vista.pago_condiciones
                 if (a.id == 'moneda') a.reload = this.loadMonedas
                 if (a.id == 'estado') a.lista = this.vista.transaccion_estados
@@ -421,7 +350,7 @@ export default {
                     transaccion: item.id,
                     transaccion1: res1.data.transaccion1,
                     formato: {
-                        id: res1.data.id,
+                        id: res.data.id,
                         codigo: res.data.id,
                         columns: res.data.columns,
                         instructivo: res.data.instructivo,
@@ -446,15 +375,12 @@ export default {
                 ],
             }
 
-            this.vista.socios = []
             this.useAuth.setLoading(true, 'Cargando...')
             const res = await get(`${urls.socios}?qry=${JSON.stringify(qry)}`)
             this.useAuth.setLoading(false)
 
             if (res.code !== 0) return
-
-            this.vista.socios = res.data
-            return res.data
+            return (this.vista.socios = res.data)
         },
         async loadMonedas() {
             const qry = {
@@ -471,9 +397,7 @@ export default {
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
-
-            this.vista.monedas = res.data
-            return res.data
+            return (this.vista.monedas = res.data)
         },
         async loadDatosSistema() {
             const qry = ['monedas', 'transaccion_estados', 'pago_condiciones']
@@ -486,3 +410,5 @@ export default {
     },
 }
 </script>
+
+<style lang="scss" scoped></style>

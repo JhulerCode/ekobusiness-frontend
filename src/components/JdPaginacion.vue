@@ -1,8 +1,6 @@
 <template>
     <div class="jd-paginacion" v-if="view && view.table_meta">
-        <p class="pagination-info">
-            {{ paginationRange }} / {{ view.table_meta.total_records }}
-        </p>
+        <p class="pagination-info">{{ paginationRange }} / {{ view.table_meta.total_records }}</p>
         <JdButton
             icon="fa-solid fa-chevron-left"
             tipo="2"
@@ -66,7 +64,7 @@ const changePage = (delta) => {
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    gap: 0.2rem;
+    gap: 0.25rem;
 
     .pagination-info {
         font-size: 0.85rem;

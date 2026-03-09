@@ -50,7 +50,7 @@ export default {}
             .head-right {
                 display: flex;
                 align-items: center;
-                gap: 0.5rem;
+                gap: 0.25rem;
                 flex-wrap: wrap;
                 justify-self: end;
             }

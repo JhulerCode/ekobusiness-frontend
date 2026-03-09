@@ -30,7 +30,6 @@
                 @keydown.down.prevent="onArrowDown"
                 @keydown.up.prevent="onArrowUp"
                 @keydown.enter.prevent="onEnter"
-                @keydown.backspace="onBackspace"
                 class="buscador-input"
             />
         </div>
@@ -150,6 +149,9 @@ const handleClickOutside = (event) => {
     if (buscadorRef.value && !buscadorRef.value.contains(event.target)) {
         showOptions.value = false
         showActions.value = false
+        if (query.value) {
+            query.value = ''
+        }
     }
 }
 
@@ -182,20 +184,13 @@ const onEnter = () => {
     }
 }
 
-const onBackspace = () => {
-    if (query.value === '' && activeFilters.value.length > 0) {
-        const lastFilter = activeFilters.value[activeFilters.value.length - 1]
-        removeFilter(lastFilter)
-    }
-}
-
 const selectOption = (col) => {
     const targetCol = props.columns.find((c) => c.id === col.id)
     if (targetCol) {
         targetCol.op = 'Contiene'
         targetCol.val = query.value
     }
-    
+
     auth.saveTableColumns(props.tableName, props.columns)
     props.view.table_page = 1
     emit('reload')
@@ -215,7 +210,7 @@ const removeFilter = (col) => {
     auth.saveTableColumns(props.tableName, props.columns)
     props.view.table_page = 1
     emit('reload')
-    
+
     nextTick(() => focusInput())
 }
 

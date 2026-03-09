@@ -1,14 +1,42 @@
 <template>
     <div class="vista vista-fill">
         <div class="head">
-            <strong>Inspecciones de clientes</strong>
+            <div class="head-left">
+                <strong>Inspecciones de clientes</strong>
 
-            <div class="buttons">
                 <JdButton
                     text="Nuevo"
                     title="Crear nuevo"
                     @click="nuevo()"
                     v-if="useAuth.verifyPermiso('vInspecciones:crear')"
+                />
+            </div>
+
+            <div class="head-center">
+                <JdBuscador
+                    :view="vista"
+                    :columns="columns"
+                    :tableName="tableName"
+                    @open-filters="openConfigFiltros"
+                    @reload="loadInspecciones"
+                />
+            </div>
+
+            <div class="head-right">
+                <JdPaginacion :view="vista" @reload="loadInspecciones" />
+
+                <JdButton
+                    icon="fa-solid fa-file-excel"
+                    tipo="2"
+                    title="Exportar"
+                    @click="$refs['jdtable'].downloadData()"
+                />
+
+                <JdButton
+                    icon="fa-solid fa-gear"
+                    tipo="2"
+                    title="Columnas"
+                    @click="$refs['jdtable'].openConfigCols()"
                 />
             </div>
         </div>
@@ -18,22 +46,27 @@
             :columns="columns"
             :datos="vista.inspecciones || []"
             :colAct="true"
-            :configFiltros="openConfigFiltros"
-            :reload="loadInspecciones"
             :rowOptions="tableRowOptions"
             @rowOptionSelected="runMethod"
-        >
-        </JdTable>
+            ref="jdtable"
+            :reload="loadInspecciones"
+        />
     </div>
 
     <mInspeccion v-if="useModals.show.mInspeccion" />
+    <mConfigCols v-if="useModals.show.mConfigCols" />
     <mConfigFiltros v-if="useModals.show.mConfigFiltros" />
 </template>
 
 <script>
-import { JdButton, JdTable, mConfigFiltros } from '@jhuler/components'
+import { JdButton, mConfigCols, mConfigFiltros } from '@jhuler/components'
+import JdBuscador from '@/components/JdBuscador.vue'
+import JdTable from '@/components/JdTable/JdTable.vue'
+import JdPaginacion from '@/components/JdPaginacion.vue'
 
 import mInspeccion from './mInspeccion.vue'
+
+import { COLUMNS, TABLE_ROW_OPTIONS } from './inspecciones.config'
 
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
@@ -44,10 +77,14 @@ import { jqst } from '@/utils/swal'
 import dayjs from 'dayjs'
 
 export default {
+    name: 'vInspecciones',
     components: {
         JdButton,
+        JdBuscador,
         JdTable,
+        JdPaginacion,
 
+        mConfigCols,
         mConfigFiltros,
 
         mInspeccion,
@@ -60,82 +97,15 @@ export default {
         vista: {},
 
         tableName: 'vInspecciones',
-        columns: [
-            {
-                id: 'fecha',
-                title: 'Fecha',
-                type: 'date',
-                format: 'date',
-                width: '10rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'socio',
-                title: 'Cliente',
-                prop: 'socio1.nombres',
-                type: 'select',
-                mostrar: 'nombres_apellidos',
-                width: '20rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'puntuacion',
-                title: 'Puntuación',
-                type: 'number',
-                width: '10rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'puntuacion_maxima',
-                title: 'Puntuación máxima',
-                type: 'number',
-                width: '10rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            // {
-            //     id: 'documento',
-            //     title: 'Documento',
-            //     type: 'text',
-            //     width: '10rem',
-            //     show: true,
-            //     seek: true,
-            //     sort: false
-            // },
-        ],
-        tableRowOptions: [
-            {
-                label: 'Ver',
-                icon: 'fa-regular fa-folder-open',
-                action: 'ver',
-                permiso: 'vInspecciones:ver',
-            },
-            {
-                label: 'Editar',
-                icon: 'fa-solid fa-pen-to-square',
-                action: 'editar',
-                permiso: 'vInspecciones:editar',
-            },
-            {
-                label: 'Eliminar',
-                icon: 'fa-solid fa-trash-can',
-                action: 'eliminar',
-                permiso: 'vInspecciones:eliminar',
-            },
-        ],
+        columns: JSON.parse(JSON.stringify(COLUMNS)),
+        tableRowOptions: TABLE_ROW_OPTIONS,
     }),
     created() {
         this.vista = this.useVistas.vInspecciones
         this.useAuth.setColumns(this.tableName, this.columns)
 
         if (this.vista.loaded) return
+        this.vista.table_page = 1
         if (this.useAuth.verifyPermiso('vInspecciones:listar') == true) this.loadInspecciones()
     },
     methods: {
@@ -143,6 +113,7 @@ export default {
             this.vista.qry = {
                 fltr: {},
                 incl: ['socio1'],
+                page: this.vista.table_page,
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
@@ -159,6 +130,7 @@ export default {
             if (res.code != 0) return
 
             this.vista.inspecciones = res.data
+            this.vista.table_meta = res.meta
         },
 
         nuevo() {
@@ -211,19 +183,6 @@ export default {
 
             this.useModals.setModal('mInspeccion', 'Editar inspección', 2, res.data)
         },
-        // uploadFile(item) {
-        //     const send = {
-        //         item: {
-        //             id: item.id,
-        //             file: item.documento,
-        //             url: 'documentos',
-        //             route: '/uploadDoc',
-        //         },
-        //         varios: 1
-        //     }
-
-        //     this.useModals.setModal('mUploadFiles', 'Subir documento', null, send, true)
-        // },
         async eliminar(item) {
             const resQst = await jqst('¿Está seguro de eliminar?')
             if (resQst.isConfirmed == false) return
@@ -247,15 +206,12 @@ export default {
                 ],
             }
 
-            this.vista.socios = []
             this.useAuth.setLoading(true, 'Cargando...')
             const res = await get(`${urls.socios}?qry=${JSON.stringify(qry)}`)
             this.useAuth.setLoading(false)
 
             if (res.code !== 0) return
-
-            this.vista.socios = res.data
-            return res.data
+            return (this.vista.socios = res.data)
         },
     },
 }

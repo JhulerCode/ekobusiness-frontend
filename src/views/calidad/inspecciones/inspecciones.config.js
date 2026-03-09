@@ -1,0 +1,62 @@
+export const COLUMNS = [
+    {
+        id: 'fecha',
+        title: 'Fecha',
+        type: 'date',
+        format: 'date',
+        width: '10rem',
+        show: true,
+        seek: true,
+        sort: true,
+    },
+    {
+        id: 'socio',
+        title: 'Cliente',
+        prop: 'socio1.nombres',
+        type: 'select',
+        mostrar: 'nombres_apellidos',
+        width: '20rem',
+        show: true,
+        seek: true,
+        sort: true,
+    },
+    {
+        id: 'puntuacion',
+        title: 'Puntuación',
+        type: 'number',
+        width: '10rem',
+        show: true,
+        seek: true,
+        sort: true,
+    },
+    {
+        id: 'puntuacion_maxima',
+        title: 'Puntuación máxima',
+        type: 'number',
+        width: '10rem',
+        show: true,
+        seek: true,
+        sort: true,
+    },
+]
+
+export const TABLE_ROW_OPTIONS = [
+    {
+        label: 'Ver',
+        icon: 'fa-regular fa-folder-open',
+        action: 'ver',
+        permiso: 'vInspecciones:ver',
+    },
+    {
+        label: 'Editar',
+        icon: 'fa-solid fa-pen-to-square',
+        action: 'editar',
+        permiso: 'vInspecciones:editar',
+    },
+    {
+        label: 'Eliminar',
+        icon: 'fa-solid fa-trash-can',
+        action: 'eliminar',
+        permiso: 'vInspecciones:eliminar',
+    },
+]

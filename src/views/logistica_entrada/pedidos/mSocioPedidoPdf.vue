@@ -33,7 +33,7 @@
                         <strong>ORDEN DE COMPRA</strong>
                     </div>
                     <div>
-                        <strong>{{ modal.item.codigo }}</strong>
+                        <strong>{{ modal.socio_pedido.codigo }}</strong>
                     </div>
                 </div>
             </div>
@@ -42,25 +42,25 @@
                 <li>
                     <strong>Fecha de emisión</strong>
                     <span>:</span>
-                    <span>{{ modal.item.fecha }}</span>
+                    <span>{{ modal.socio_pedido.fecha }}</span>
                 </li>
 
                 <li>
                     <strong>Condición de pago</strong>
                     <span>:</span>
-                    <span>{{ modal.item.pago_condicion1.nombre }}</span>
+                    <span>{{ modal.socio_pedido.pago_condicion1.nombre }}</span>
                 </li>
 
                 <li>
                     <strong>Moneda</strong>
                     <span>:</span>
-                    <span>{{ modal.item.moneda1.nombre }}</span>
+                    <span>{{ modal.socio_pedido.moneda1.nombre }}</span>
                 </li>
 
                 <!-- <li>
                     <strong>Fecha de entrega</strong>
                     <span>:</span>
-                    <span>{{ modal.item.fecha_entrega }}</span>
+                    <span>{{ modal.socio_pedido.fecha_entrega }}</span>
                 </li> -->
                 <li>
                     <strong>Tiempo de entrega</strong>
@@ -71,65 +71,69 @@
                 <li>
                     <strong>Lugar de entrega</strong>
                     <span>:</span>
-                    <span>{{ modal.item.direccion_entrega }}</span>
+                    <span>{{ modal.socio_pedido.direccion_entrega }}</span>
                 </li>
             </ul>
 
             <div class="pdflocutores">
                 <div class="left">
                     <div class="locheader">
-                        <strong>{{ modal.item.tipo == 1 ? 'Proveedor' : 'Cliente' }}</strong>
+                        <strong>{{
+                            modal.socio_pedido.tipo == 1 ? 'Proveedor' : 'Cliente'
+                        }}</strong>
                     </div>
 
                     <ul class="locbody">
                         <li>
                             <strong>Razón social</strong>
                             <span>:</span>
-                            <span>{{ modal.item.socio1.nombres_apellidos }}</span>
+                            <span>{{ modal.socio_pedido.socio1.nombres_apellidos }}</span>
                         </li>
 
                         <li>
                             <strong>Ruc</strong>
                             <span>:</span>
-                            <span>{{ modal.item.socio1.doc_numero }}</span>
+                            <span>{{ modal.socio_pedido.socio1.doc_numero }}</span>
                         </li>
 
                         <li>
                             <strong>Contacto</strong>
                             <span>:</span>
-                            <span>{{ modal.item.contacto_datos?.nombre }}</span>
+                            <span>{{ modal.socio_pedido.contacto_datos?.nombre }}</span>
                         </li>
 
                         <li>
                             <strong>Teléfono</strong>
                             <span>:</span>
-                            <span>{{ modal.item.contacto_datos?.telefono }}</span>
+                            <span>{{ modal.socio_pedido.contacto_datos?.telefono }}</span>
                         </li>
                     </ul>
                 </div>
 
                 <div class="rigth">
                     <div class="locheader">
-                        <strong>{{ modal.item.tipo == 1 ? 'Comprador' : 'Vendedor' }}</strong>
+                        <strong>{{
+                            modal.socio_pedido.tipo == 1 ? 'Comprador' : 'Vendedor'
+                        }}</strong>
                     </div>
 
                     <ul class="locbody">
                         <li>
                             <strong>Contacto</strong>
                             <span>:</span>
-                            <span>{{ modal.item.createdBy1.nombres_apellidos }}</span>
+                            <span>{{ modal.socio_pedido.createdBy1.nombres_apellidos }}</span>
                         </li>
 
                         <li>
                             <strong>Cargo</strong>
                             <span>:</span>
-                            <span>{{ modal.item.createdBy1.cargo }}</span>
+                            <span>{{ modal.socio_pedido.createdBy1.cargo }}</span>
                         </li>
 
                         <li>
                             <strong>Teléfono</strong>
                             <span>:</span>
-                            <span>{{ modal.item.createdBy1.telefono }}</span>
+                            <span>{{ modal.socio_pedido.createdBy1.telefono }}</span>
                         </li>
                     </ul>
                 </div>
@@ -137,7 +141,7 @@
 
             <JdTable
                 :columns="columns"
-                :datos="modal.item.socio_pedido_items || []"
+                :datos="modal.socio_pedido.socio_pedido_items || []"
                 :seeker="false"
                 :download="false"
                 :showResumen="false"
@@ -156,7 +160,7 @@
                             <strong>Observaciones:</strong>
                         </p>
                         <p>
-                            {{ modal.item.observacion }}
+                            {{ modal.socio_pedido.observacion }}
                         </p>
                     </div>
                 </div>
@@ -186,14 +190,14 @@
                     <span>:</span>
                     <p>
                         <strong class="total">
-                            {{ modal.item.moneda1.simbolo }}
+                            {{ modal.socio_pedido.moneda1.simbolo }}
                             {{ redondear(modal.mtoImpVenta) }}
                         </strong>
                     </p>
                 </div>
             </div>
 
-            <div class="bancos" v-if="modal.item.tipo == 2">
+            <div class="bancos" v-if="modal.socio_pedido.tipo == 2">
                 <div class="locheader">
                     <strong>Detalle de bancos</strong>
                 </div>
@@ -293,7 +297,7 @@ export default {
     },
     methods: {
         sumarItems() {
-            for (const a of this.modal.item.socio_pedido_items) this.calcularUno(a)
+            for (const a of this.modal.socio_pedido.socio_pedido_items) this.calcularUno(a)
 
             this.calcularTotales()
         },
@@ -312,7 +316,7 @@ export default {
             this.modal.mtoOperInafectas = 0
             this.modal.mtoIGV = 0
 
-            for (const a of this.modal.item.socio_pedido_items) {
+            for (const a of this.modal.socio_pedido.socio_pedido_items) {
                 if (a.igv_afectacion == '10') {
                     this.modal.mtoOperGravadas += a.mtoValorVenta
                     this.modal.mtoIGV += a.igv
@@ -347,7 +351,7 @@ export default {
 
             const opciones = {
                 margin: 0.5,
-                filename: `oc${this.modal.item.codigo}.pdf`,
+                filename: `oc${this.modal.socio_pedido.codigo}.pdf`,
                 image: { type: 'jpeg', quality: 1 },
                 html2canvas: { scale: 4 },
                 jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' },

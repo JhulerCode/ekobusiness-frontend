@@ -1,9 +1,9 @@
 <template>
     <div class="vista vista-fill">
         <div class="head">
-            <strong>Órdenes de producción</strong>
+            <div class="head-left">
+                <strong>Órdenes de producción</strong>
 
-            <div class="buttons">
                 <JdButton
                     text="Salida de insumos"
                     tipo="2"
@@ -14,7 +14,35 @@
                 <JdButton
                     text="Nuevo"
                     @click="nuevo"
-                    v-if="useAuth.verifyPermiso('vProduccionHistorial:salidaInsumos')"
+                    v-if="useAuth.verifyPermiso('vProduccionHistorial:crear')"
+                />
+            </div>
+
+            <div class="head-center">
+                <JdBuscador
+                    :view="vista"
+                    :columns="columns"
+                    :tableName="tableName"
+                    @open-filters="openConfigFiltros"
+                    @reload="loadProduccionOrdenes"
+                />
+            </div>
+
+            <div class="head-right">
+                <JdPaginacion :view="vista" @reload="loadProduccionOrdenes" />
+
+                <JdButton
+                    icon="fa-solid fa-file-excel"
+                    tipo="2"
+                    title="Exportar"
+                    @click="$refs['jdtable'].downloadData()"
+                />
+
+                <JdButton
+                    icon="fa-solid fa-gear"
+                    tipo="2"
+                    title="Columnas"
+                    @click="$refs['jdtable'].openConfigCols()"
                 />
             </div>
         </div>
@@ -24,14 +52,10 @@
             :columns="columns"
             :datos="vista.produccion_ordenes || []"
             :colAct="true"
-            :configFiltros="openConfigFiltros"
-            :configCols="true"
-            :reload="loadProduccionOrdenes"
             :rowOptions="tableRowOptions"
             @rowOptionSelected="runMethod"
-            :meta="vista.table_meta"
-            @prevPage="((vista.table_page -= 1), loadProduccionOrdenes())"
-            @nextPage="((vista.table_page += 1), loadProduccionOrdenes())"
+            ref="jdtable"
+            :reload="loadProduccionOrdenes"
         />
     </div>
 
@@ -52,7 +76,10 @@
 </template>
 
 <script>
-import { JdTable, JdButton, mConfigCols, mConfigFiltros } from '@jhuler/components'
+import { JdButton, mConfigCols, mConfigFiltros } from '@jhuler/components'
+import JdBuscador from '@/components/JdBuscador.vue'
+import JdTable from '@/components/JdTable/JdTable.vue'
+import JdPaginacion from '@/components/JdPaginacion.vue'
 
 import mProduccionOrden from '@/views/produccion/historial/mProduccionOrden.vue'
 import mProduccionInsumos from '@/views/produccion/historial/mProduccionInsumos.vue'
@@ -62,19 +89,24 @@ import mProduccionTrazabilidad from '@/views/produccion/historial/mProduccionTra
 import mProductosFaltantes from '@/views/produccion/mProductosFaltantes.vue'
 import mProduccionInsumosCompartidos from '@/views/produccion/historial/mProduccionInsumosCompartidos.vue'
 
+import { COLUMNS, TABLE_ROW_OPTIONS } from './produccion_historial.config'
+
 import { useModals } from '@/pinia/modals'
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
 
 import { urls, get, patch, delet } from '@/utils/crud'
-
-import dayjs from 'dayjs'
 import { jmsg, jqst } from '@/utils/swal'
 
+import dayjs from 'dayjs'
+
 export default {
+    name: 'vProduccionHistorial',
     components: {
-        JdTable,
         JdButton,
+        JdBuscador,
+        JdTable,
+        JdPaginacion,
 
         mConfigCols,
         mConfigFiltros,
@@ -91,210 +123,12 @@ export default {
         useModals: useModals(),
         useAuth: useAuth(),
         useVistas: useVistas(),
-        dayjs,
 
         vista: {},
 
         tableName: 'vProduccionHistorial',
-        columns: [
-            {
-                id: 'fecha',
-                title: 'Fecha',
-                type: 'date',
-                format: 'date',
-                width: '10rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'articulo1.nombre',
-                title: 'Producto',
-                prop: 'articulo1.nombre',
-                type: 'text',
-                width: '25rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'cantidad',
-                title: 'Cantidad planificada',
-                type: 'number',
-                format: 'decimal',
-                toRight: true,
-                width: '8rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'estado',
-                title: 'Estado',
-                prop: 'estado1.nombre',
-                type: 'select',
-                format: 'estado',
-                width: '8rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'productos_terminados',
-                title: 'Productos terminados',
-                type: 'number',
-                format: 'decimal',
-                filtrable: false,
-                toRight: true,
-                width: '8rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'linea',
-                title: 'Tipo de producción',
-                type: 'select',
-                prop: 'linea1.nombre',
-                width: '10rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'maquina',
-                title: 'Máquina',
-                type: 'select',
-                prop: 'maquina1.nombre',
-                width: '10rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'responsable',
-                title: 'Responsable',
-                prop: 'responsable1.nombres_apellidos',
-                type: 'select',
-                mostrar: 'nombres_apellidos',
-                width: '10rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'inicio',
-                title: 'Hora inicio',
-                format: 'datetime',
-                width: '11rem',
-                show: true,
-                filtrable: false,
-            },
-            {
-                id: 'fin',
-                title: 'Hora fin',
-                format: 'datetime',
-                width: '11rem',
-                show: true,
-                filtrable: false,
-            },
-            {
-                id: 'estado_calidad_revisado',
-                title: 'Control de pesos',
-                prop: 'estado_calidad_revisado1.nombre',
-                format: 'estado',
-                filtrable: false,
-                width: '10rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'estado_cf_ppc',
-                title: 'Control del PPC',
-                prop: 'estado_cf_ppc1.nombre',
-                format: 'estado',
-                filtrable: false,
-                width: '10rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'createdBy',
-                title: 'Creado por',
-                prop: 'createdBy1.nombres_apellidos',
-                filtrable: false,
-                width: '10rem',
-                show: true,
-            },
-        ],
-        tableRowOptions: [
-            {
-                label: 'Ver',
-                icon: 'fa-solid fa-folder-open',
-                action: 'ver',
-                permiso: 'vProduccionHistorial:ver',
-            },
-            {
-                label: 'Editar',
-                icon: 'fa-solid fa-pen-to-square',
-                action: 'editar',
-                permiso: 'vProduccionHistorial:editar',
-                ocultar: { estado: 2 },
-            },
-            {
-                label: 'Eliminar',
-                icon: 'fa-solid fa-trash-can',
-                action: 'eliminar',
-                permiso: 'vProduccionHistorial:eliminar',
-                ocultar: { estado: 2 },
-            },
-            {
-                label: 'Terminar',
-                icon: 'fa-solid fa-check-double',
-                action: 'terminar',
-                permiso: 'vProduccionHistorial:terminar',
-                ocultar: { estado: 2 },
-            },
-            {
-                label: 'Abrir',
-                icon: 'fa-solid fa-check-double',
-                action: 'abrir',
-                permiso: 'vProduccionHistorial:terminar',
-                ocultar: { estado: 1 },
-            },
-            {
-                label: 'Salida de insumos',
-                icon: 'fa-regular fa-circle-down',
-                action: 'salidaInsumos',
-                permiso: 'vProduccionHistorial:salidaInsumos',
-            },
-            {
-                label: 'Productos terminados',
-                icon: 'fa-solid fa-boxes-stacked',
-                action: 'productosTerminados',
-                permiso: 'vProduccionHistorial:productosTerminados',
-            },
-            {
-                label: 'Ver trazabilidad',
-                icon: 'fa-solid fa-diagram-project',
-                action: 'verTrazabilidad',
-                permiso: 'vProduccionHistorial:trazabilidad',
-            },
-            {
-                label: 'Control de pesos',
-                icon: 'fa-solid fa-star',
-                action: 'controlPesos',
-                permiso: 'vProduccionHistorial:controlPesos',
-            },
-            {
-                label: 'Control del PPC',
-                icon: 'fa-solid fa-star',
-                action: 'controlPpc',
-                permiso: 'vProduccionHistorial:controlPpc',
-            },
-        ],
+        columns: JSON.parse(JSON.stringify(COLUMNS)),
+        tableRowOptions: TABLE_ROW_OPTIONS,
     }),
     created() {
         this.vista = this.useVistas.vProduccionHistorial
@@ -308,9 +142,11 @@ export default {
     },
     methods: {
         initFiltros() {
-            this.columns[0].op = 'Está dentro de'
-            this.columns[0].val = dayjs().startOf('month').format('YYYY-MM-DD')
-            this.columns[0].val1 = dayjs().format('YYYY-MM-DD')
+            if (!this.columns[0].val) {
+                this.columns[0].op = 'Está dentro de'
+                this.columns[0].val = dayjs().startOf('month').format('YYYY-MM-DD')
+                this.columns[0].val1 = dayjs().format('YYYY-MM-DD')
+            }
         },
         setQuery() {
             this.vista.qry = {
@@ -343,77 +179,11 @@ export default {
             this.vista.produccion_ordenes = res.data
             this.vista.table_meta = res.meta
         },
-        async loadDatosSistema() {
-            const qry = ['produccion_orden_estados']
-            const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
-
-            if (res.code != 0) return
-
-            Object.assign(this.vista, res.data)
-        },
-        async loadLineas() {
-            const qry = {
-                fltr: {},
-                cols: ['nombre'],
-                ordr: [['nombre', 'ASC']],
-            }
-
-            this.vista.articulo_lineas = []
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.articulo_lineas}?qry=${JSON.stringify(qry)}`)
-            this.useAuth.setLoading(false)
-
-            if (res.code != 0) return
-
-            this.vista.articulo_lineas = res.data
-            return res.data
-        },
-        async loadMaquinas() {
-            const qry = {
-                fltr: { tipo: { op: 'Es', val: 1 } },
-                cols: ['codigo', 'nombre', 'linea', 'velocidad', 'limpieza_tiempo'],
-                ordr: [['nombre', 'ASC']],
-            }
-
-            this.vista.maquinas = []
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.maquinas}?qry=${JSON.stringify(qry)}`)
-            this.useAuth.setLoading(false)
-
-            if (res.code != 0) return
-
-            this.vista.maquinas = res.data
-            return res.data
-        },
-        async loadColaboradores() {
-            this.vista.colaboradores = []
-
-            const qry = {
-                fltr: {
-                    activo: { op: 'Es', val: true },
-                },
-                cols: ['nombres', 'apellidos', 'nombres_apellidos', 'produccion_codigo'],
-                ordr: [
-                    ['nombres', 'ASC'],
-                    ['apellidos', 'ASC'],
-                ],
-            }
-
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.colaboradores}?qry=${JSON.stringify(qry)}`)
-            this.useAuth.setLoading(false)
-
-            if (res.code != 0) return
-
-            this.vista.colaboradores = res.data
-            return res.data
-        },
 
         nuevo() {
             const send = {
                 produccion_orden: {
                     fecha: dayjs().format('YYYY-MM-DD'),
-                    // linea: this.columns[6].val,
                     estado: 1,
                 },
                 origin: 'vProduccionHistorial',
@@ -488,7 +258,6 @@ export default {
 
             if (res.data.maquina) {
                 if (!this.vista.maquinas) await this.loadMaquinas()
-
                 send.maquinas = this.vista.maquinas
             }
 
@@ -521,7 +290,6 @@ export default {
 
             if (res.data.maquina) {
                 if (!this.vista.maquinas) await this.loadMaquinas()
-
                 send.maquinas = this.vista.maquinas
             }
 
@@ -623,7 +391,7 @@ export default {
         },
         setProduccionProductos(item) {
             const pr = this.vista.produccion_ordenes.find((a) => a.id == item.id)
-            pr.productos_terminados = item.productos_terminados
+            if (pr) pr.productos_terminados = item.productos_terminados
         },
         async verTrazabilidad(item) {
             const qry = {
@@ -759,6 +527,8 @@ export default {
             const produccion_orden = this.vista.produccion_ordenes.find(
                 (a) => a.id == item.produccion_orden,
             )
+            if (!produccion_orden) return
+
             if (
                 item.codigo == 'RE-BPM-06' ||
                 item.codigo == 'RE-BPM-07' ||
@@ -770,6 +540,60 @@ export default {
             if (item.codigo == 'RE-HACCP 03') {
                 produccion_orden.cf_ppc = item.id
             }
+        },
+
+        async loadDatosSistema() {
+            const qry = ['produccion_orden_estados']
+            const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
+
+            if (res.code != 0) return
+
+            Object.assign(this.vista, res.data)
+        },
+        async loadLineas() {
+            const qry = {
+                fltr: {},
+                cols: ['nombre'],
+                ordr: [['nombre', 'ASC']],
+            }
+
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.articulo_lineas}?qry=${JSON.stringify(qry)}`)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+            return (this.vista.articulo_lineas = res.data)
+        },
+        async loadMaquinas() {
+            const qry = {
+                fltr: { tipo: { op: 'Es', val: 1 } },
+                cols: ['codigo', 'nombre', 'linea', 'velocidad', 'limpieza_tiempo'],
+                ordr: [['nombre', 'ASC']],
+            }
+
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.maquinas}?qry=${JSON.stringify(qry)}`)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+            return (this.vista.maquinas = res.data)
+        },
+        async loadColaboradores() {
+            const qry = {
+                fltr: { activo: { op: 'Es', val: true } },
+                cols: ['nombres', 'apellidos', 'nombres_apellidos', 'produccion_codigo'],
+                ordr: [
+                    ['nombres', 'ASC'],
+                    ['apellidos', 'ASC'],
+                ],
+            }
+
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.colaboradores}?qry=${JSON.stringify(qry)}`)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+            return (this.vista.colaboradores = res.data)
         },
     },
 }

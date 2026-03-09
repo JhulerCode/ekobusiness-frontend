@@ -1,13 +1,42 @@
 <template>
     <div class="vista vista-fill">
         <div class="head">
-            <strong>Ingreso de productos terminados</strong>
+            <div class="head-left">
+                <strong>Ingreso de productos terminados</strong>
 
-            <div class="buttons">
                 <JdButton
                     text="Ver cuarentena"
+                    tipo="2"
                     @click="verCuarentena()"
                     v-if="useAuth.verifyPermiso('vPtsIngresos:verCuarentena')"
+                />
+            </div>
+
+            <div class="head-center">
+                <JdBuscador
+                    :view="vista"
+                    :columns="columns"
+                    :tableName="tableName"
+                    @open-filters="openConfigFiltros"
+                    @reload="loadTransacciones"
+                />
+            </div>
+
+            <div class="head-right">
+                <JdPaginacion :view="vista" @reload="loadTransacciones" />
+
+                <JdButton
+                    icon="fa-solid fa-file-excel"
+                    tipo="2"
+                    title="Exportar"
+                    @click="$refs['jdtable'].downloadData()"
+                />
+
+                <JdButton
+                    icon="fa-solid fa-gear"
+                    tipo="2"
+                    title="Columnas"
+                    @click="$refs['jdtable'].openConfigCols()"
                 />
             </div>
         </div>
@@ -17,13 +46,10 @@
             :columns="columns"
             :datos="vista.produccion_productos || []"
             :colAct="true"
-            :configFiltros="openConfigFiltros"
-            :reload="loadTransacciones"
             :rowOptions="tableRowOptions"
             @rowOptionSelected="runMethod"
-            :meta="vista.table_meta"
-            @prevPage="((vista.table_page -= 1), loadTransacciones())"
-            @nextPage="((vista.table_page += 1), loadTransacciones())"
+            ref="jdtable"
+            :reload="loadTransacciones"
         />
     </div>
 
@@ -31,15 +57,21 @@
     <mProduccionTrazabilidad v-if="useModals.show.mProduccionTrazabilidad" />
     <mProductosCuarentena v-if="useModals.show.mProductosCuarentena" />
 
+    <mConfigCols v-if="useModals.show.mConfigCols" />
     <mConfigFiltros v-if="useModals.show.mConfigFiltros" />
 </template>
 
 <script>
-import { JdButton, JdTable, mConfigFiltros } from '@jhuler/components'
+import { JdButton, mConfigCols, mConfigFiltros } from '@jhuler/components'
+import JdBuscador from '@/components/JdBuscador.vue'
+import JdTable from '@/components/JdTable/JdTable.vue'
+import JdPaginacion from '@/components/JdPaginacion.vue'
 
 import mProductosCuarentena from '@/views/produccion/ingreso_pt/mProductosCuarentena.vue'
 import mFormato from '@/views/calidad/formatos/mFormato.vue'
 import mProduccionTrazabilidad from '@/views/produccion/historial/mProduccionTrazabilidad.vue'
+
+import { COLUMNS, TABLE_ROW_OPTIONS } from './pts_ingresos.config'
 
 import { useModals } from '@/pinia/modals'
 import { useAuth } from '@/pinia/auth'
@@ -51,10 +83,14 @@ import { jmsg } from '@/utils/swal.js'
 import dayjs from 'dayjs'
 
 export default {
+    name: 'vPtsIngresos',
     components: {
         JdButton,
+        JdBuscador,
         JdTable,
+        JdPaginacion,
 
+        mConfigCols,
         mConfigFiltros,
 
         mProductosCuarentena,
@@ -65,97 +101,12 @@ export default {
         useModals: useModals(),
         useAuth: useAuth(),
         useVistas: useVistas(),
-        dayjs,
 
         vista: {},
 
         tableName: 'vPtsIngresos',
-        columns: [
-            {
-                id: 'fecha',
-                title: 'Fecha',
-                type: 'date',
-                format: 'date',
-                width: '8rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'produccion_orden1.linea',
-                title: 'Tipo',
-                type: 'select',
-                prop: 'produccion_orden1.linea1.nombre',
-                width: '10rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'maquina',
-                title: 'Máquina',
-                type: 'select',
-                prop: 'maquina1.nombre',
-                width: '8rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'articulo1.nombre',
-                title: 'Producto',
-                type: 'text',
-                prop: 'articulo1.nombre',
-                width: '25rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'lote',
-                title: 'Lote',
-                type: 'text',
-                width: '7rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'fv',
-                title: 'F. vencimiento',
-                type: 'date',
-                format: 'date',
-                width: '8rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'cantidad',
-                title: 'Cantidad',
-                type: 'number',
-                format: 'number',
-                toRight: true,
-                width: '8rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-        ],
-        tableRowOptions: [
-            // {
-            //     label: 'Liberación de lote',
-            //     icon: 'fa-solid fa-star',
-            //     action: 'liberarLote',
-            //     permiso: 'vPtsIngresos:liberar_lote',
-            // },
-            {
-                label: 'Ver trazabilidad',
-                icon: 'fa-solid fa-diagram-project',
-                action: 'verTrazabilidad',
-                permiso: 'vPtsIngresos:trazabilidad',
-            },
-        ],
+        columns: JSON.parse(JSON.stringify(COLUMNS)),
+        tableRowOptions: TABLE_ROW_OPTIONS,
     }),
     async created() {
         this.vista = this.useVistas.vPtsIngresos
@@ -168,9 +119,11 @@ export default {
     },
     methods: {
         initFiltros() {
-            this.columns[0].op = 'Está dentro de'
-            this.columns[0].val = dayjs().startOf('month').format('YYYY-MM-DD')
-            this.columns[0].val1 = dayjs().format('YYYY-MM-DD')
+            if (!this.columns[0].val) {
+                this.columns[0].op = 'Está dentro de'
+                this.columns[0].val = dayjs().startOf('month').format('YYYY-MM-DD')
+                this.columns[0].val1 = dayjs().format('YYYY-MM-DD')
+            }
         },
         setQuery() {
             this.vista.qry = {
@@ -190,10 +143,9 @@ export default {
             this.useAuth.updateQuery(this.columns, this.vista.qry)
         },
         async loadTransacciones() {
-            this.vista.produccion_productos = []
-
             this.setQuery()
 
+            this.vista.produccion_productos = []
             this.useAuth.setLoading(true, 'Cargando...')
             const res = await get(`${urls.kardex}?qry=${JSON.stringify(this.vista.qry)}`)
             this.useAuth.setLoading(false)
@@ -205,22 +157,8 @@ export default {
             this.vista.table_meta = res.meta
         },
 
-        async verCuarentena() {
-            // const send = {
-            //     transaccion: {
-            //         tipo: 4,
-            //         fecha: dayjs().format('YYYY-MM-DD'),
-            //         estado: 1,
-            //     },
-            // }
-
-            this.useModals.setModal(
-                'mProductosCuarentena',
-                'Productos en cuarentena',
-                null,
-                null,
-                // true,
-            )
+        verCuarentena() {
+            this.useModals.setModal('mProductosCuarentena', 'Productos en cuarentena')
         },
 
         async openConfigFiltros() {
@@ -294,7 +232,7 @@ export default {
             const cuanrentena_producto = this.vista.produccion_productos.find(
                 (a) => a.id == item.cuarentena_producto,
             )
-            cuanrentena_producto.cf_liberacion_lote = item.id
+            if (cuanrentena_producto) cuanrentena_producto.cf_liberacion_lote = item.id
         },
         async verTrazabilidad(item) {
             const qry = {
@@ -336,15 +274,12 @@ export default {
                 ordr: [['nombre', 'ASC']],
             }
 
-            this.vista.articulo_lineas = []
             this.useAuth.setLoading(true, 'Cargando...')
             const res = await get(`${urls.articulo_lineas}?qry=${JSON.stringify(qry)}`)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
-
-            this.vista.articulo_lineas = res.data
-            return res.data
+            return (this.vista.articulo_lineas = res.data)
         },
         async loadMaquinas() {
             const qry = {
@@ -353,15 +288,12 @@ export default {
                 ordr: [['nombre', 'ASC']],
             }
 
-            this.vista.maquinas = []
             this.useAuth.setLoading(true, 'Cargando...')
             const res = await get(`${urls.maquinas}?qry=${JSON.stringify(qry)}`)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
-
-            this.vista.maquinas = res.data
-            return res.data
+            return (this.vista.maquinas = res.data)
         },
     },
 }

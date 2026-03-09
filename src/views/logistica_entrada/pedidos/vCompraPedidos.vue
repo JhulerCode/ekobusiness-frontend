@@ -289,11 +289,18 @@ export default {
                     createdBy1: { cols: ['cargo', 'telefono'] },
                 },
             }
+
             this.useAuth.setLoading(true, 'Cargando...')
             const res = await get(`${urls.socio_pedidos}/uno/${item.id}?qry=${JSON.stringify(qry)}`)
             this.useAuth.setLoading(false)
+
             if (res.code != 0) return
-            this.useModals.setModal('mSocioPedidoPdf', 'Orden de compra', null, res.data, true)
+
+            const send = {
+                socio_pedido: res.data,
+            }
+
+            this.useModals.setModal('mSocioPedidoPdf', 'Orden de compra', null, send, true)
         },
         async terminar(item) {
             const resQst = await jqst('¿Está seguro de terminar el pedido?')

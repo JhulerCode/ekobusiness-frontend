@@ -1,6 +1,6 @@
 <template>
-    <div class="tablero">
-        <div class="head">
+    <div class="vista">
+        <div class="head-left">
             <strong>Programa de producción</strong>
 
             <div class="buttons">
@@ -1094,6 +1094,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.vista {
+    overflow-y: auto;
+}
+
 .buttons {
     display: flex;
     gap: 1rem;
@@ -1123,6 +1127,7 @@ export default {
     .falta {
         color: var(--rojo);
     }
+    margin-bottom: 1rem;
 }
 
 .asdasd {

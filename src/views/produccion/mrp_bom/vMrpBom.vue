@@ -1,10 +1,42 @@
 <template>
     <div class="vista vista-fill">
         <div class="head">
-            <strong>Lista de materiales</strong>
+            <div class="head-left">
+                <strong>Lista de materiales</strong>
 
-            <div class="buttons">
-                <JdButton @click="nuevo" text="Nuevo" />
+                <JdButton
+                    @click="nuevo"
+                    text="Nuevo"
+                    v-if="useAuth.verifyPermiso('vMrpBom:crear')"
+                />
+            </div>
+
+            <div class="head-center">
+                <JdBuscador
+                    :view="vista"
+                    :columns="columns"
+                    :tableName="tableName"
+                    @open-filters="openConfigFiltros"
+                    @reload="loadMrpBoms"
+                />
+            </div>
+
+            <div class="head-right">
+                <JdPaginacion :view="vista" @reload="loadMrpBoms" />
+
+                <JdButton
+                    icon="fa-solid fa-file-excel"
+                    tipo="2"
+                    title="Exportar"
+                    @click="$refs['jdtable'].downloadData()"
+                />
+
+                <JdButton
+                    icon="fa-solid fa-gear"
+                    tipo="2"
+                    title="Columnas"
+                    @click="$refs['jdtable'].openConfigCols()"
+                />
             </div>
         </div>
 
@@ -13,95 +45,59 @@
             :columns="columns"
             :datos="vista.mrp_boms || []"
             :colAct="true"
-            :configFiltros="openConfigFiltros"
-            :reload="loadMrpBoms"
             :rowOptions="tableRowOptions"
             @rowOptionSelected="runMethod"
-            :meta="vista.table_meta"
-            @prevPage="((vista.table_page -= 1), loadMrpBoms())"
-            @nextPage="((vista.table_page += 1), loadMrpBoms())"
+            ref="jdtable"
+            :reload="loadMrpBoms"
         />
     </div>
 
-    <mConfigFiltros v-if="useModals.show.mConfigFiltros" />
-
     <mMrpBom v-if="useModals.show.mMrpBom" />
+
+    <mConfigCols v-if="useModals.show.mConfigCols" />
+    <mConfigFiltros v-if="useModals.show.mConfigFiltros" />
 </template>
 
 <script>
-import { JdTable, mConfigFiltros, JdButton } from '@jhuler/components'
+import { JdButton, mConfigCols, mConfigFiltros } from '@jhuler/components'
+import JdBuscador from '@/components/JdBuscador.vue'
+import JdTable from '@/components/JdTable/JdTable.vue'
+import JdPaginacion from '@/components/JdPaginacion.vue'
+
+import mMrpBom from './mMrpBom.vue'
+
+import { COLUMNS, TABLE_ROW_OPTIONS } from './mrp_bom.config'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
 import { useVistas } from '@/pinia/vistas'
 
-import mMrpBom from './mMrpBom.vue'
-
 import { urls, get, delet } from '@/utils/crud'
 import { jqst } from '@/utils/swal'
-import { redondear } from '@/utils/mine'
-
-import dayjs from 'dayjs'
 
 export default {
+    name: 'vMrpBom',
     components: {
         JdButton,
+        JdBuscador,
         JdTable,
+        JdPaginacion,
+
+        mConfigCols,
         mConfigFiltros,
+
         mMrpBom,
     },
     data: () => ({
         useAuth: useAuth(),
         useModals: useModals(),
         useVistas: useVistas(),
-        dayjs,
-        redondear,
 
         vista: {},
 
         tableName: 'vMrpBom',
-        columns: [
-            {
-                id: 'articulo',
-                title: 'Producto',
-                prop: 'articulo1.nombre',
-                type: 'text',
-                width: '30rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'tipo',
-                title: 'Tipo',
-                type: 'select',
-                prop: 'tipo1.nombre',
-                width: '8rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-        ],
-        tableRowOptions: [
-            {
-                label: 'Editar',
-                icon: 'fa-solid fa-pen-to-square',
-                action: 'editar',
-                permiso: 'vMrpBom:editar',
-            },
-            {
-                label: 'Eliminar',
-                icon: 'fa-solid fa-trash-can',
-                action: 'eliminar',
-                permiso: 'vMrpBom:eliminar',
-            },
-            {
-                label: 'Clonar',
-                icon: 'fa-solid fa-copy',
-                action: 'clonar',
-                permiso: 'vMrpBom:editar',
-            },
-        ],
+        columns: JSON.parse(JSON.stringify(COLUMNS)),
+        tableRowOptions: TABLE_ROW_OPTIONS,
     }),
     created() {
         this.vista = this.useVistas.vMrpBom
@@ -124,10 +120,9 @@ export default {
             this.vista.qry.cols.push('tipo1')
         },
         async loadMrpBoms() {
-            this.vista.mrp_boms = []
-
             this.setQuery()
 
+            this.vista.mrp_boms = []
             this.useAuth.setLoading(true, 'Cargando...')
             const res = await get(`${urls.mrp_boms}?qry=${JSON.stringify(this.vista.qry)}`)
             this.useAuth.setLoading(false)
@@ -137,15 +132,6 @@ export default {
 
             this.vista.mrp_boms = res.data
             this.vista.table_meta = res.meta
-        },
-
-        async loadDatosSistema() {
-            const qry = ['mrp_bom_tipos']
-            const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
-
-            if (res.code != 0) return
-
-            Object.assign(this.vista, res.data)
         },
 
         nuevo() {
@@ -204,8 +190,6 @@ export default {
             this.useAuth.setLoading(false)
 
             if (res1.code != 0) return
-
-            if (res.code != 0) return
 
             const qry2 = {
                 fltr: {
@@ -320,14 +304,17 @@ export default {
 
             this.useModals.setModal('mMrpBom', 'Nueva lista de materiales', 1, send, true)
         },
+
+        async loadDatosSistema() {
+            const qry = ['mrp_bom_tipos']
+            const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
+
+            if (res.code != 0) return
+
+            Object.assign(this.vista, res.data)
+        },
     },
 }
 </script>
 
-<style lang="scss" scoped>
-.container-datos {
-    display: grid;
-    grid-template-columns: 20rem;
-    margin-bottom: 2rem;
-}
-</style>
+<style lang="scss" scoped></style>

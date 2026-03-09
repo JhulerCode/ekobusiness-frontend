@@ -1,3 +1,12 @@
+export const HEADER_ACTIONS = [
+    {
+        text: 'Ver cuarentena',
+        action: 'verCuarentena',
+        permiso: 'vPtsIngresos:verCuarentena',
+        tipo: '2',
+    },
+]
+
 export const TABLE_COLUMNS = [
     {
         id: 'fecha',

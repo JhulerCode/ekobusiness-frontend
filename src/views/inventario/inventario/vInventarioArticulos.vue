@@ -1,12 +1,33 @@
 <template>
     <div class="vista vista-fill">
         <div class="head">
-            <strong>Inventario</strong>
+            <div class="head-left" style="flex-wrap: nowrap">
+                <strong style="white-space: nowrap">Inventario</strong>
 
-            <div class="buttons"></div>
+                <JdButtonsOverflow :buttons="headerActions" @runMethod="runMethod" />
+            </div>
+
+            <div class="head-center"></div>
+
+            <div class="head-right">
+                <JdButton
+                    icon="fa-solid fa-file-excel"
+                    tipo="2"
+                    title="Exportar"
+                    @click="$refs['jdtable'].downloadData()"
+                />
+
+                <JdButton
+                    icon="fa-solid fa-gear"
+                    tipo="2"
+                    title="Columnas"
+                    @click="$refs['jdtable'].openConfigCols()"
+                />
+            </div>
         </div>
 
         <JdTable
+            ref="jdtable"
             :columns="tableColumns"
             :datos="vista.inventario || []"
             :configFiltros="openConfigFiltros"
@@ -18,9 +39,10 @@
 </template>
 
 <script>
-import { JdTable, mConfigFiltros } from '@jhuler/components'
+import { JdTable, mConfigFiltros, JdButton } from '@jhuler/components'
+import JdButtonsOverflow from '@/components/JdButtonsOverflow.vue'
 
-import { TABLE_COLUMNS } from './inventario.config'
+import { TABLE_COLUMNS, HEADER_ACTIONS } from './inventario.config.js'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
@@ -36,6 +58,8 @@ export default {
     components: {
         JdTable,
         mConfigFiltros,
+        JdButton,
+        JdButtonsOverflow,
     },
     data: () => ({
         useAuth: useAuth(),
@@ -47,6 +71,7 @@ export default {
         vista: {},
 
         tableName: 'vInventarioArticulos',
+        headerActions: HEADER_ACTIONS,
         tableColumns: JSON.parse(JSON.stringify(TABLE_COLUMNS)),
     }),
     created() {
@@ -55,6 +80,9 @@ export default {
         this.useAuth.setColumns(this.tableName, this.tableColumns)
     },
     methods: {
+        runMethod(method, item) {
+            this[method](item)
+        },
         initFiltros() {
             this.tableColumns[0].op = 'Es igual o anterior a'
             this.tableColumns[0].val = dayjs().format('YYYY-MM-DD')

@@ -69,7 +69,7 @@ import mSocioPedido from '@/views/logistica_entrada/pedidos/mSocioPedido.vue'
 import mSocioPedidoPdf from '@/views/logistica_entrada/pedidos/mSocioPedidoPdf.vue'
 import mTransaccion from '@/views/logistica_entrada/compras/mTransaccion.vue'
 
-import { TABLE_COLUMNS, TABLE_ROW_ACTIONS, HEADER_ACTIONS } from './venta_pedidos.config'
+import { TABLE_COLUMNS, TABLE_ROW_ACTIONS, HEADER_ACTIONS } from './venta_pedidos.config.js'
 
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'

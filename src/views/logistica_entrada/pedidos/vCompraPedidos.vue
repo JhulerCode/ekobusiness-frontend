@@ -1,26 +1,10 @@
 <template>
     <div class="vista vista-fill">
         <div class="head">
-            <div class="head-left">
-                <strong>Pedidos de compra</strong>
+            <div class="head-left" style="flex-wrap: nowrap">
+                <strong style="white-space: nowrap">Pedidos de compra</strong>
 
-                <JdButton
-                    text="Recuperar"
-                    tipo="2"
-                    title="Recuperar guardado"
-                    @click="recuperarGuardado"
-                    v-if="
-                        useAuth.avances.mCompraPedido &&
-                        useAuth.verifyPermiso('vCompraPedidos:crear')
-                    "
-                />
-
-                <JdButton
-                    text="Nuevo"
-                    title="Crear nuevo"
-                    @click="nuevo"
-                    v-if="useAuth.verifyPermiso('vCompraPedidos:crear')"
-                />
+                <JdButtonsOverflow :buttons="headerActions" @runMethod="runMethod" />
             </div>
 
             <div class="head-center">
@@ -81,13 +65,14 @@ import JdTable from '@/components/JdTable/JdTable.vue'
 import JdPaginacion from '@/components/JdPaginacion.vue'
 
 // Configuración de la vista
-import { TABLE_COLUMNS, TABLE_ROW_ACTIONS } from './compra_pedidos.config'
+import { TABLE_COLUMNS, TABLE_ROW_ACTIONS, HEADER_ACTIONS } from './compra_pedidos.config.js'
 
 // Modales específicos
 import mSocioPedido from '@/views/logistica_entrada/pedidos/mSocioPedido.vue'
 import mSocioPedidoPdf from '@/views/logistica_entrada/pedidos/mSocioPedidoPdf.vue'
 import mTransaccion from '@/views/logistica_entrada/compras/mTransaccion.vue'
 import mStockPicking from '@/views/logistica_entrada/pedidos/mStockPicking.vue'
+import JdButtonsOverflow from '@/components/JdButtonsOverflow.vue'
 
 // Pinia y Utils
 import { useAuth } from '@/pinia/auth'
@@ -110,6 +95,7 @@ export default {
         mSocioPedidoPdf,
         mTransaccion,
         mStockPicking,
+        JdButtonsOverflow,
     },
     data: () => ({
         useAuth: useAuth(),
@@ -120,6 +106,7 @@ export default {
         tableName: 'vCompraPedidos',
 
         // Configuraciones traídas de compra_pedidos.config.js
+        headerActions: HEADER_ACTIONS,
         tableColumns: JSON.parse(JSON.stringify(TABLE_COLUMNS)),
         tableRowActions: TABLE_ROW_ACTIONS,
     }),

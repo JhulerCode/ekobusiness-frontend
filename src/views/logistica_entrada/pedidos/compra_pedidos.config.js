@@ -1,3 +1,18 @@
+export const HEADER_ACTIONS = [
+    {
+        text: 'Nuevo',
+        action: 'nuevo',
+        permiso: 'vCompraPedidos:crear',
+    },
+    {
+        text: 'Recuperar',
+        action: 'recuperarGuardado',
+        permiso: 'vCompraPedidos:crear',
+        tipo: '2',
+        showIfAvance: 'mCompraPedido',
+    },
+]
+
 export const TABLE_COLUMNS = [
     {
         id: 'fecha',

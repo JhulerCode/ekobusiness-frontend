@@ -1,3 +1,18 @@
+export const HEADER_ACTIONS = [
+    {
+        text: 'Nuevo',
+        action: 'nuevo',
+        permiso: 'vArticulos:crear',
+    },
+    {
+        icon: 'fa-solid fa-file-excel',
+        text: 'Importar',
+        action: 'abrirExcel',
+        permiso: 'vArticulos:importar',
+        tipo: '2',
+    },
+]
+
 export const TABLE_COLUMNS = [
     {
         id: 'id',

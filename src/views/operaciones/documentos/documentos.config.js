@@ -1,4 +1,12 @@
-export const columns = [
+export const HEADER_ACTIONS = [
+    {
+        text: 'Nuevo',
+        action: 'nuevo',
+        permiso: 'vDocumentos:crear',
+    },
+]
+
+export const TABLE_COLUMNS = [
     {
         id: 'nombre',
         title: 'Nombre',
@@ -50,7 +58,7 @@ export const columns = [
     },
 ]
 
-export const tableRowOptions = [
+export const TABLE_ROW_ACTIONS = [
     {
         label: 'Editar',
         icon: 'fa-solid fa-pen-to-square',

@@ -66,7 +66,7 @@
                 </div>
 
                 <JdTable
-                    :columns="tableColumns"
+                    :columns="columns"
                     :datos="produccion_ordenes_hoy"
                     :seeker="false"
                     :colAct="true"
@@ -133,7 +133,7 @@
                     </div>
 
                     <JdTable
-                        :columns="tableColumns"
+                        :columns="columns"
                         :datos="a.produccion_ordenes || []"
                         :seeker="false"
                         :colAct="true"
@@ -424,13 +424,13 @@ export default {
         produccion_ordenes_hoy() {
             if (!this.vista.produccion_ordenes) return []
 
-            return this.vista.produccion_ordenes.filter((a) => a.fecha == this.tableColumns[0].val)
+            return this.vista.produccion_ordenes.filter((a) => a.fecha == this.columns[0].val)
         },
         maquinas_produccion() {
             if (!this.vista.produccion_ordenes || !this.vista.maquinas) return []
 
             const mapaProducciones = JSON.parse(JSON.stringify(this.vista.produccion_ordenes))
-                .filter((a) => a.fecha == this.tableColumns[0].val)
+                .filter((a) => a.fecha == this.columns[0].val)
                 .reduce((acc, prod) => {
                     if (!acc[prod.maquina]) {
                         acc[prod.maquina] = []
@@ -450,9 +450,9 @@ export default {
                 }, {})
 
             const arr =
-                this.tableColumns[1].val == null
+                this.columns[1].val == null
                     ? this.vista.maquinas
-                    : this.vista.maquinas.filter((a) => a.id == this.tableColumns[1].val)
+                    : this.vista.maquinas.filter((a) => a.id == this.columns[1].val)
 
             return arr.map((m) => {
                 const produccion_ordenes = mapaProducciones[m.id] || []
@@ -510,7 +510,7 @@ export default {
     async created() {
         this.vista = this.useVistas.vPrograma
         this.initFiltros()
-        this.useAuth.setColumns(this.tableName, this.tableColumns)
+        this.useAuth.setColumns(this.tableName, this.columns)
 
         if (!this.vista.lineasLoaded) await this.loadArticuloLineas()
 
@@ -522,42 +522,42 @@ export default {
     },
     methods: {
         initFiltros() {
-            this.tableColumns[0].op = 'Es'
-            this.tableColumns[0].val = dayjs().format('YYYY-MM-DD')
+            this.columns[0].op = 'Es'
+            this.columns[0].val = dayjs().format('YYYY-MM-DD')
         },
         async setFecha() {
-            if (this.tableColumns[0].val == null) {
-                delete this.tableColumns[0].op
+            if (this.columns[0].val == null) {
+                delete this.columns[0].op
             } else {
-                this.tableColumns[0].op = 'Es'
+                this.columns[0].op = 'Es'
             }
 
-            this.useAuth.saveTableColumns(this.tableName, this.tableColumns)
+            this.useAuth.saveTableColumns(this.tableName, this.columns)
 
             this.loadProduccionOrdenes()
         },
         async setLinea() {
-            if (this.tableColumns[6].val == null) {
-                delete this.tableColumns[6].op
+            if (this.columns[6].val == null) {
+                delete this.columns[6].op
             } else {
-                this.tableColumns[6].op = 'Es'
+                this.columns[6].op = 'Es'
             }
 
-            this.useAuth.saveTableColumns(this.tableName, this.tableColumns)
+            this.useAuth.saveTableColumns(this.tableName, this.columns)
 
             await this.loadMaquinas()
-            this.tableColumns[1].op = null
-            this.tableColumns[1].val = null
+            this.columns[1].op = null
+            this.columns[1].val = null
             this.loadProduccionOrdenes()
         },
         async setMaquina() {
-            if (this.tableColumns[1].val == null) {
-                delete this.tableColumns[1].op
+            if (this.columns[1].val == null) {
+                delete this.columns[1].op
             } else {
-                this.tableColumns[1].op = 'Es'
+                this.columns[1].op = 'Es'
             }
 
-            this.useAuth.saveTableColumns(this.tableName, this.tableColumns)
+            this.useAuth.saveTableColumns(this.tableName, this.columns)
 
             this.loadProduccionOrdenes()
         },
@@ -581,13 +581,13 @@ export default {
             this.vista.articulo_lineas = res.data
         },
         async loadMaquinas() {
-            if (this.tableColumns[6].val == null) {
+            if (this.columns[6].val == null) {
                 jmsg('warning', 'Seleccione una línea de producción')
                 return
             }
 
             const qry = {
-                fltr: { linea: { op: 'Es', val: this.tableColumns[6].val } },
+                fltr: { linea: { op: 'Es', val: this.columns[6].val } },
                 cols: ['codigo', 'nombre', 'linea', 'velocidad', 'limpieza_tiempo'],
                 ordr: [['orden', 'ASC']],
             }
@@ -606,7 +606,7 @@ export default {
 
         setQuery() {
             this.vista.qry = {
-                // fltr: { tipo: { op: 'Es', val: this.tableColumns[6].val } },
+                // fltr: { tipo: { op: 'Es', val: this.columns[6].val } },
                 fltr: {},
                 incl: ['articulo1', 'responsable1'],
                 sqls: ['productos_terminados'],
@@ -614,7 +614,7 @@ export default {
 
             // if (this.vista.maquina != null)
             //     this.vista.qry.fltr.maquina = { op: 'Es', val: this.vista.maquina }
-            this.useAuth.updateQuery(this.tableColumns, this.vista.qry)
+            this.useAuth.updateQuery(this.columns, this.vista.qry)
             this.vista.qry.cols.push(
                 'fecha',
                 'maquina',
@@ -629,12 +629,12 @@ export default {
             )
         },
         async loadProduccionOrdenes() {
-            if (!this.tableColumns[0].val) {
+            if (!this.columns[0].val) {
                 jmsg('warning', 'Seleccione una fecha')
                 return
             }
 
-            if (!this.tableColumns[6].val) {
+            if (!this.columns[6].val) {
                 jmsg('warning', 'Seleccione una línea de producción')
                 return
             }
@@ -684,7 +684,7 @@ export default {
                     {
                         id: res.data.maquina,
                         ...res.data.maquina1,
-                        linea: this.tableColumns[6].val,
+                        linea: this.columns[6].val,
                     },
                 ],
                 origin: 'vPrograma',
@@ -865,8 +865,8 @@ export default {
         nuevo(maquina) {
             const send = {
                 produccion_orden: {
-                    fecha: this.tableColumns[0].val,
-                    linea: this.tableColumns[6].val,
+                    fecha: this.columns[0].val,
+                    linea: this.columns[6].val,
                     estado: 1,
                 },
                 maquinas: this.vista.maquinas,
@@ -1038,7 +1038,7 @@ export default {
         },
         async verPedidos() {
             const send = {
-                linea: this.tableColumns[6].val,
+                linea: this.columns[6].val,
             }
 
             this.useModals.setModal('mProductosFaltantes', 'Productos pedidos', null, send, true)
@@ -1047,7 +1047,7 @@ export default {
             const send = {
                 transaccion: {
                     tipo: 2,
-                    fecha: this.tableColumns[0].val,
+                    fecha: this.columns[0].val,
                     maquina: a.id,
                 },
                 maquinas: this.maquinas_produccion,

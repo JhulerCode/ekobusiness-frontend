@@ -1,22 +1,10 @@
 <template>
     <div class="vista vista-fill">
         <div class="head">
-            <div class="head-left">
-                <strong>Ventas</strong>
+            <div class="head-left" style="flex-wrap: nowrap">
+                <strong style="white-space: nowrap">Ventas</strong>
 
-                <JdButton
-                    text="Recuperar"
-                    tipo="2"
-                    title="Recuperar guardado"
-                    @click="recuperarGuardado()"
-                    v-if="useAuth.avances.mVenta && useAuth.verifyPermiso('vVentas:crear')"
-                />
-
-                <JdButton
-                    text="Nuevo"
-                    @click="nuevo()"
-                    v-if="useAuth.verifyPermiso('vVentas:crear')"
-                />
+                <JdButtonsOverflow :buttons="headerActions" @runMethod="runMethod" />
             </div>
 
             <div class="head-center">
@@ -77,8 +65,9 @@ import JdPaginacion from '@/components/JdPaginacion.vue'
 
 import mFormato from '@/views/calidad/formatos/mFormato.vue'
 import mTransaccion from '@/views/logistica_entrada/compras/mTransaccion.vue'
+import JdButtonsOverflow from '@/components/JdButtonsOverflow.vue'
 
-import { TABLE_COLUMNS, TABLE_ROW_ACTIONS } from './ventas.config'
+import { TABLE_COLUMNS, TABLE_ROW_ACTIONS, HEADER_ACTIONS } from './ventas.config.js'
 
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
@@ -101,6 +90,7 @@ export default {
         mConfigFiltros,
         mFormato,
         mTransaccion,
+        JdButtonsOverflow,
     },
     data: () => ({
         useAuth: useAuth(),
@@ -110,6 +100,7 @@ export default {
         vista: {},
 
         tableName: 'vVentas',
+        headerActions: HEADER_ACTIONS,
         tableColumns: JSON.parse(JSON.stringify(TABLE_COLUMNS)),
         tableRowActions: TABLE_ROW_ACTIONS,
     }),

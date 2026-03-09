@@ -1,15 +1,10 @@
 <template>
     <div class="vista vista-fill">
         <div class="head">
-            <div class="head-left">
-                <strong>Categorías</strong>
+            <div class="head-left" style="flex-wrap: nowrap">
+                <strong style="white-space: nowrap">Categorías</strong>
 
-                <JdButton
-                    text="Nuevo"
-                    title="Crear nuevo"
-                    @click="nuevo"
-                    v-if="useAuth.verifyPermiso('vArticuloCategorias:crear')"
-                />
+                <JdButtonsOverflow :buttons="headerActions" @runMethod="runMethod" />
             </div>
 
             <div class="head-center">
@@ -68,11 +63,12 @@ import JdTable from '@/components/JdTable/JdTable.vue'
 import JdPaginacion from '@/components/JdPaginacion.vue'
 
 // Configuración de la vista
-import { TABLE_COLUMNS, TABLE_ROW_ACTIONS } from './articuloCategorias.config'
+import { TABLE_COLUMNS, TABLE_ROW_ACTIONS, HEADER_ACTIONS } from './articuloCategorias.config.js'
 
 // Modales específicos
 import mArticuloCategoria from '@/views/inventario/categorias/mArticuloCategoria.vue'
 import mUploadFiles from '@/components/mUploadFiles.vue'
+import JdButtonsOverflow from '@/components/JdButtonsOverflow.vue'
 
 // Pinia y Utils
 import { useAuth } from '@/pinia/auth'
@@ -88,6 +84,7 @@ export default {
         JdBuscador,
         JdTable,
         JdPaginacion,
+        JdButtonsOverflow,
         mConfigCols,
         mConfigFiltros,
         mArticuloCategoria,
@@ -101,6 +98,7 @@ export default {
         vista: {},
         tableName: 'vArticuloCategorias',
 
+        headerActions: HEADER_ACTIONS,
         tableColumns: JSON.parse(JSON.stringify(TABLE_COLUMNS)),
         tableRowActions: TABLE_ROW_ACTIONS,
     }),

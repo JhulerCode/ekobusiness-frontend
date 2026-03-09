@@ -1,16 +1,10 @@
 <template>
     <div class="vista vista-fill">
         <div class="head">
-            <div class="head-left">
-                <strong>Documentos clave</strong>
+            <div class="head-left" style="flex-wrap: nowrap">
+                <strong style="white-space: nowrap">Documentos clave</strong>
 
-                <div class="buttons">
-                    <JdButton
-                        text="Nuevo"
-                        @click="nuevo()"
-                        v-if="useAuth.verifyPermiso('vDocumentos:crear')"
-                    />
-                </div>
+                <JdButtonsOverflow :buttons="headerActions" @runMethod="runMethod" />
             </div>
 
             <div class="head-center">
@@ -43,22 +37,19 @@
         </div>
 
         <JdTable
-            ref="jdtable"
             :name="tableName"
             :columns="tableColumns"
             :datos="vista.documentos || []"
             :colAct="true"
-            :configFiltros="openConfigFiltros"
-            :reload="loadDocumentos"
             :rowOptions="tableRowActions"
             @rowOptionSelected="runMethod"
+            ref="jdtable"
+            :reload="loadDocumentos"
         />
     </div>
 
     <mDocumento v-if="useModals.show.mDocumento" />
-
     <mConfigFiltros v-if="useModals.show.mConfigFiltros" />
-
     <mPdfViewer v-if="useModals.show.mPdfViewer" />
 </template>
 
@@ -67,7 +58,8 @@ import { JdButton, mConfigFiltros, mPdfViewer } from '@jhuler/components'
 import JdTable from '@/components/JdTable/JdTable.vue'
 import JdBuscador from '@/components/JdBuscador.vue'
 import JdPaginacion from '@/components/JdPaginacion.vue'
-import { columns, tableRowActions } from './documentos.config.js'
+import JdButtonsOverflow from '@/components/JdButtonsOverflow.vue'
+import { TABLE_COLUMNS, TABLE_ROW_ACTIONS, HEADER_ACTIONS } from './documentos.config.js'
 
 import mDocumento from './mDocumento.vue'
 
@@ -90,6 +82,7 @@ export default {
         mDocumento,
 
         mPdfViewer,
+        JdButtonsOverflow,
     },
     data: () => ({
         useAuth: useAuth(),
@@ -99,8 +92,9 @@ export default {
         vista: {},
 
         tableName: 'vDocumentos',
-        columns,
-        tableRowActions,
+        headerActions: HEADER_ACTIONS,
+        tableColumns: JSON.parse(JSON.stringify(TABLE_COLUMNS)),
+        tableRowActions: TABLE_ROW_ACTIONS,
     }),
     created() {
         this.vista = this.useVistas.vDocumentos

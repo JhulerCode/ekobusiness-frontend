@@ -1,14 +1,10 @@
 <template>
     <div class="vista vista-fill">
         <div class="head">
-            <div class="head-left">
-                <strong>Lista de materiales</strong>
+            <div class="head-left" style="flex-wrap: nowrap">
+                <strong style="white-space: nowrap">Lista de materiales</strong>
 
-                <JdButton
-                    @click="nuevo"
-                    text="Nuevo"
-                    v-if="useAuth.verifyPermiso('vMrpBom:crear')"
-                />
+                <JdButtonsOverflow :buttons="headerActions" @runMethod="runMethod" />
             </div>
 
             <div class="head-center">
@@ -65,8 +61,9 @@ import JdTable from '@/components/JdTable/JdTable.vue'
 import JdPaginacion from '@/components/JdPaginacion.vue'
 
 import mMrpBom from './mMrpBom.vue'
+import JdButtonsOverflow from '@/components/JdButtonsOverflow.vue'
 
-import { TABLE_COLUMNS, TABLE_ROW_ACTIONS } from './mrp_bom.config'
+import { TABLE_COLUMNS, TABLE_ROW_ACTIONS, HEADER_ACTIONS } from './mrp_bom.config.js'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
@@ -87,6 +84,7 @@ export default {
         mConfigFiltros,
 
         mMrpBom,
+        JdButtonsOverflow,
     },
     data: () => ({
         useAuth: useAuth(),
@@ -96,6 +94,7 @@ export default {
         vista: {},
 
         tableName: 'vMrpBom',
+        headerActions: HEADER_ACTIONS,
         tableColumns: JSON.parse(JSON.stringify(TABLE_COLUMNS)),
         tableRowActions: TABLE_ROW_ACTIONS,
     }),

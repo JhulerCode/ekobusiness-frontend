@@ -1,23 +1,10 @@
 <template>
     <div class="vista vista-fill">
         <div class="head">
-            <div class="head-left">
-                <strong>Compras</strong>
+            <div class="head-left" style="flex-wrap: nowrap">
+                <strong style="white-space: nowrap">Compras</strong>
 
-                <JdButton
-                    text="Recuperar"
-                    tipo="2"
-                    title="Recuperar guardado"
-                    @click="recuperarGuardado"
-                    v-if="useAuth.avances.mCompra && useAuth.verifyPermiso('vCompras:crear')"
-                />
-
-                <JdButton
-                    text="Nuevo"
-                    title="Crear nuevo"
-                    @click="nuevo"
-                    v-if="useAuth.verifyPermiso('vCompras:crear')"
-                />
+                <JdButtonsOverflow :buttons="headerActions" @runMethod="runMethod" />
             </div>
 
             <div class="head-center">
@@ -76,10 +63,11 @@ import JdTable from '@/components/JdTable/JdTable.vue'
 import JdPaginacion from '@/components/JdPaginacion.vue'
 
 // Configuración de la vista
-import { TABLE_COLUMNS, TABLE_ROW_ACTIONS } from './compras.config'
+import { TABLE_COLUMNS, TABLE_ROW_ACTIONS, HEADER_ACTIONS } from './compras.config.js'
 
 // Modales específicos
 import mTransaccion from '@/views/logistica_entrada/compras/mTransaccion.vue'
+import JdButtonsOverflow from '@/components/JdButtonsOverflow.vue'
 
 // Pinia y Utils
 import { useAuth } from '@/pinia/auth'
@@ -100,6 +88,7 @@ export default {
         mConfigFiltros,
         mAnular,
         mTransaccion,
+        JdButtonsOverflow,
     },
     data: () => ({
         useAuth: useAuth(),
@@ -109,6 +98,7 @@ export default {
         vista: {},
         tableName: 'vCompras',
 
+        headerActions: HEADER_ACTIONS,
         tableColumns: JSON.parse(JSON.stringify(TABLE_COLUMNS)),
         tableRowActions: TABLE_ROW_ACTIONS,
     }),

@@ -1,3 +1,11 @@
+export const HEADER_ACTIONS = [
+    {
+        text: 'Nuevo',
+        action: 'nuevo',
+        permiso: 'vRegistrosSanitarios:crear',
+    },
+]
+
 export const TABLE_COLUMNS = [
     {
         id: 'denominacion_legal',

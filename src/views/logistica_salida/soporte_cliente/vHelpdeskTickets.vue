@@ -1,15 +1,10 @@
 <template>
     <div class="vista vista-fill">
         <div class="head">
-            <div class="head-left">
-                <strong>Soporte al cliente</strong>
+            <div class="head-left" style="flex-wrap: nowrap">
+                <strong style="white-space: nowrap">Soporte al cliente</strong>
 
-                <JdButton
-                    text="Nuevo"
-                    title="Crear nuevo"
-                    @click="nuevo()"
-                    v-if="useAuth.verifyPermiso('vHelpdeskTickets:crear')"
-                />
+                <JdButtonsOverflow :buttons="headerActions" @runMethod="runMethod" />
             </div>
 
             <div class="head-center">
@@ -65,8 +60,9 @@ import JdTable from '@/components/JdTable/JdTable.vue'
 import JdPaginacion from '@/components/JdPaginacion.vue'
 
 import mHelpdeskTicket from './mHelpdeskTicket.vue'
+import JdButtonsOverflow from '@/components/JdButtonsOverflow.vue'
 
-import { TABLE_COLUMNS, TABLE_ROW_ACTIONS } from './helpdesk_tickets.config'
+import { TABLE_COLUMNS, TABLE_ROW_ACTIONS, HEADER_ACTIONS } from './helpdesk_tickets.config.js'
 
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
@@ -85,6 +81,7 @@ export default {
         mConfigCols,
         mConfigFiltros,
         mHelpdeskTicket,
+        JdButtonsOverflow,
     },
     data: () => ({
         useAuth: useAuth(),
@@ -94,6 +91,7 @@ export default {
         vista: {},
 
         tableName: 'vHelpdeskTickets',
+        headerActions: HEADER_ACTIONS,
         tableColumns: JSON.parse(JSON.stringify(TABLE_COLUMNS)),
         tableRowActions: TABLE_ROW_ACTIONS,
     }),

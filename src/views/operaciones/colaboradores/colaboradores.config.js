@@ -1,4 +1,12 @@
-export const columns = [
+export const HEADER_ACTIONS = [
+    {
+        text: 'Nuevo',
+        action: 'nuevo',
+        permiso: 'vColaboradores:crear',
+    },
+]
+
+export const TABLE_COLUMNS = [
     {
         id: 'nombres',
         title: 'Nombres y apellidos',
@@ -106,7 +114,7 @@ export const columns = [
     },
 ]
 
-export const tableRowOptions = [
+export const TABLE_ROW_ACTIONS = [
     {
         label: 'Ver',
         icon: 'fa-regular fa-folder-open',

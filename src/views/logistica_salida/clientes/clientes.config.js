@@ -1,3 +1,11 @@
+export const HEADER_ACTIONS = [
+    {
+        text: 'Nuevo',
+        action: 'nuevo',
+        permiso: 'vClientes:crear',
+    },
+]
+
 export const TABLE_COLUMNS = [
     {
         id: 'doc_tipo',

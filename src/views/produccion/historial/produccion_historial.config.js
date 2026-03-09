@@ -1,3 +1,17 @@
+export const HEADER_ACTIONS = [
+    {
+        text: 'Salida de insumos',
+        action: 'salidaInsumosCompartidos',
+        permiso: 'vProduccionHistorial:salidaInsumos',
+        tipo: '2',
+    },
+    {
+        text: 'Nuevo',
+        action: 'nuevo',
+        permiso: 'vProduccionHistorial:crear',
+    },
+]
+
 export const TABLE_COLUMNS = [
     {
         id: 'fecha',

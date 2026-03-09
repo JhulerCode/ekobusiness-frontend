@@ -1,4 +1,12 @@
-export const columns = [
+export const HEADER_ACTIONS = [
+    {
+        text: 'Nuevo',
+        action: 'nuevo',
+        permiso: 'vEquipos:crear',
+    },
+]
+
+export const TABLE_COLUMNS = [
     {
         id: 'codigo',
         title: 'Código',
@@ -29,7 +37,7 @@ export const columns = [
     },
 ]
 
-export const tableRowOptions = [
+export const TABLE_ROW_ACTIONS = [
     {
         id: 1,
         label: 'Editar',

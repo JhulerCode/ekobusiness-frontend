@@ -1,4 +1,6 @@
-export const columns = [
+export const HEADER_ACTIONS = []
+
+export const TABLE_COLUMNS = [
     {
         id: 'createdAt',
         title: 'Fecha',
@@ -49,4 +51,4 @@ export const columns = [
     },
 ]
 
-export const tableRowOptions = []
+export const TABLE_ROW_ACTIONS = []

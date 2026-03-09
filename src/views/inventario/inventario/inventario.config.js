@@ -1,3 +1,5 @@
+export const HEADER_ACTIONS = []
+
 export const TABLE_COLUMNS = [
     {
         id: 'kardexes.fecha',

@@ -1,15 +1,10 @@
 <template>
     <div class="vista vista-fill">
         <div class="head">
-            <div class="head-left">
-                <strong>Inspecciones de clientes</strong>
+            <div class="head-left" style="flex-wrap: nowrap">
+                <strong style="white-space: nowrap">Inspecciones de clientes</strong>
 
-                <JdButton
-                    text="Nuevo"
-                    title="Crear nuevo"
-                    @click="nuevo()"
-                    v-if="useAuth.verifyPermiso('vInspecciones:crear')"
-                />
+                <JdButtonsOverflow :buttons="headerActions" @runMethod="runMethod" />
             </div>
 
             <div class="head-center">
@@ -65,8 +60,9 @@ import JdTable from '@/components/JdTable/JdTable.vue'
 import JdPaginacion from '@/components/JdPaginacion.vue'
 
 import mInspeccion from './mInspeccion.vue'
+import JdButtonsOverflow from '@/components/JdButtonsOverflow.vue'
 
-import { TABLE_COLUMNS, TABLE_ROW_ACTIONS } from './inspecciones.config'
+import { TABLE_COLUMNS, TABLE_ROW_ACTIONS, HEADER_ACTIONS } from './inspecciones.config.js'
 
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
@@ -88,6 +84,7 @@ export default {
         mConfigFiltros,
 
         mInspeccion,
+        JdButtonsOverflow,
     },
     data: () => ({
         useAuth: useAuth(),
@@ -97,8 +94,9 @@ export default {
         vista: {},
 
         tableName: 'vInspecciones',
+        headerActions: HEADER_ACTIONS,
         tableColumns: JSON.parse(JSON.stringify(TABLE_COLUMNS)),
-        tableRowActions: TABLE_ROW_ACTIONS
+        tableRowActions: TABLE_ROW_ACTIONS,
     }),
     created() {
         this.vista = this.useVistas.vInspecciones

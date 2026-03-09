@@ -1,8 +1,10 @@
 <template>
     <div class="vista vista-fill">
         <div class="head">
-            <div class="head-left">
-                <strong>Artículos vendidos</strong>
+            <div class="head-left" style="flex-wrap: nowrap">
+                <strong style="white-space: nowrap">Artículos vendidos</strong>
+
+                <JdButtonsOverflow :buttons="headerActions" @runMethod="runMethod" />
             </div>
 
             <div class="head-center">
@@ -56,7 +58,8 @@ import JdPaginacion from '@/components/JdPaginacion.vue'
 
 import mFormato from '@/views/calidad/formatos/mFormato.vue'
 
-import { TABLE_COLUMNS } from './venta_items.config'
+import { TABLE_COLUMNS, HEADER_ACTIONS } from './venta_items.config.js'
+import JdButtonsOverflow from '@/components/JdButtonsOverflow.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
@@ -76,6 +79,7 @@ export default {
         mConfigCols,
         mConfigFiltros,
         mFormato,
+        JdButtonsOverflow,
     },
     data: () => ({
         useAuth: useAuth(),
@@ -85,6 +89,7 @@ export default {
         vista: {},
 
         tableName: 'vVentaItems',
+        headerActions: HEADER_ACTIONS,
         tableColumns: JSON.parse(JSON.stringify(TABLE_COLUMNS)),
     }),
     async created() {

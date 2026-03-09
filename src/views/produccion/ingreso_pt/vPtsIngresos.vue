@@ -1,15 +1,10 @@
 <template>
     <div class="vista vista-fill">
         <div class="head">
-            <div class="head-left">
-                <strong>Ingreso de productos terminados</strong>
+            <div class="head-left" style="flex-wrap: nowrap">
+                <strong style="white-space: nowrap">Ingreso de productos terminados</strong>
 
-                <JdButton
-                    text="Ver cuarentena"
-                    tipo="2"
-                    @click="verCuarentena()"
-                    v-if="useAuth.verifyPermiso('vPtsIngresos:verCuarentena')"
-                />
+                <JdButtonsOverflow :buttons="headerActions" @runMethod="runMethod" />
             </div>
 
             <div class="head-center">
@@ -70,8 +65,9 @@ import JdPaginacion from '@/components/JdPaginacion.vue'
 import mProductosCuarentena from '@/views/produccion/ingreso_pt/mProductosCuarentena.vue'
 import mFormato from '@/views/calidad/formatos/mFormato.vue'
 import mProduccionTrazabilidad from '@/views/produccion/historial/mProduccionTrazabilidad.vue'
+import JdButtonsOverflow from '@/components/JdButtonsOverflow.vue'
 
-import { TABLE_COLUMNS, TABLE_ROW_ACTIONS } from './pts_ingresos.config'
+import { TABLE_COLUMNS, TABLE_ROW_ACTIONS, HEADER_ACTIONS } from './pts_ingresos.config.js'
 
 import { useModals } from '@/pinia/modals'
 import { useAuth } from '@/pinia/auth'
@@ -96,6 +92,7 @@ export default {
         mProductosCuarentena,
         mFormato,
         mProduccionTrazabilidad,
+        JdButtonsOverflow,
     },
     data: () => ({
         useModals: useModals(),
@@ -105,6 +102,7 @@ export default {
         vista: {},
 
         tableName: 'vPtsIngresos',
+        headerActions: HEADER_ACTIONS,
         tableColumns: JSON.parse(JSON.stringify(TABLE_COLUMNS)),
         tableRowActions: TABLE_ROW_ACTIONS,
     }),

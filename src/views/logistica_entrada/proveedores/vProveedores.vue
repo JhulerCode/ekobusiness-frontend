@@ -1,15 +1,10 @@
 <template>
     <div class="vista vista-fill">
         <div class="head">
-            <div class="head-left">
-                <strong>Proveedores</strong>
+            <div class="head-left" style="flex-wrap: nowrap">
+                <strong style="white-space: nowrap">Proveedores</strong>
 
-                <JdButton
-                    text="Nuevo"
-                    title="Crear nuevo"
-                    @click="nuevo"
-                    v-if="useAuth.verifyPermiso('vProveedores:crear')"
-                />
+                <JdButtonsOverflow :buttons="headerActions" @runMethod="runMethod" />
             </div>
 
             <div class="head-center">
@@ -81,10 +76,16 @@ import JdTable from '@/components/JdTable/JdTable.vue'
 import JdPaginacion from '@/components/JdPaginacion.vue'
 
 // Configuración de la vista
-import { TABLE_COLUMNS, TABLE_BULK_ACTIONS, TABLE_ROW_ACTIONS } from './proveedores.config'
+import {
+    TABLE_COLUMNS,
+    TABLE_BULK_ACTIONS,
+    TABLE_ROW_ACTIONS,
+    HEADER_ACTIONS,
+} from './proveedores.config.js'
 
 // Modales específicos
 import mSocio from '@/views/logistica_entrada/proveedores/mSocio.vue'
+import JdButtonsOverflow from '@/components/JdButtonsOverflow.vue'
 
 // Pinia y Utils
 import { useAuth } from '@/pinia/auth'
@@ -105,6 +106,7 @@ export default {
         mConfigFiltros,
         mEditar,
         mSocio,
+        JdButtonsOverflow,
     },
     data: () => ({
         useAuth: useAuth(),
@@ -115,6 +117,7 @@ export default {
         tableName: 'vProveedores',
 
         // Configuraciones traídas de proveedores.config.js
+        headerActions: HEADER_ACTIONS,
         tableColumns: JSON.parse(JSON.stringify(TABLE_COLUMNS)),
         tableBulkActions: TABLE_BULK_ACTIONS,
         tableRowActions: TABLE_ROW_ACTIONS,

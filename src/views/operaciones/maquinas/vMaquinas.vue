@@ -1,17 +1,10 @@
 <template>
     <div class="vista vista-fill">
         <div class="head">
-            <div class="head-left">
-                <strong>Maquinas</strong>
+            <div class="head-left" style="flex-wrap: nowrap">
+                <strong style="white-space: nowrap">Maquinas</strong>
 
-                <div class="buttons">
-                    <JdButton
-                        text="Nuevo"
-                        title="Crear nuevo"
-                        @click="nuevo()"
-                        v-if="useAuth.verifyPermiso('vMaquinas:crear')"
-                    />
-                </div>
+                <JdButtonsOverflow :buttons="headerActions" @runMethod="runMethod" />
             </div>
 
             <div class="head-center">
@@ -66,7 +59,8 @@ import { JdButton, mConfigFiltros } from '@jhuler/components'
 import JdTable from '@/components/JdTable/JdTable.vue'
 import JdBuscador from '@/components/JdBuscador.vue'
 import JdPaginacion from '@/components/JdPaginacion.vue'
-import { columns, tableRowActions } from './maquinas.config.js'
+import JdButtonsOverflow from '@/components/JdButtonsOverflow.vue'
+import { TABLE_COLUMNS, TABLE_ROW_ACTIONS, HEADER_ACTIONS } from './maquinas.config.js'
 
 import mMaquina from '@/views/operaciones/maquinas/mMaquina.vue'
 
@@ -87,6 +81,7 @@ export default {
         mConfigFiltros,
 
         mMaquina,
+        JdButtonsOverflow,
     },
     data: () => ({
         useAuth: useAuth(),
@@ -96,8 +91,9 @@ export default {
         vista: {},
 
         tableName: 'vMaquinas',
-        columns,
-        tableRowActions,
+        headerActions: HEADER_ACTIONS,
+        tableColumns: JSON.parse(JSON.stringify(TABLE_COLUMNS)),
+        tableRowActions: TABLE_ROW_ACTIONS,
     }),
     created() {
         this.vista = this.useVistas.vMaquinas

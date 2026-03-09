@@ -1,21 +1,10 @@
 <template>
     <div class="vista vista-fill">
         <div class="head">
-            <div class="head-left">
-                <strong>Órdenes de producción</strong>
+            <div class="head-left" style="flex-wrap: nowrap">
+                <strong style="white-space: nowrap">Órdenes de producción</strong>
 
-                <JdButton
-                    text="Salida de insumos"
-                    tipo="2"
-                    @click="salidaInsumosCompartidos"
-                    v-if="useAuth.verifyPermiso('vProduccionHistorial:salidaInsumos')"
-                />
-
-                <JdButton
-                    text="Nuevo"
-                    @click="nuevo"
-                    v-if="useAuth.verifyPermiso('vProduccionHistorial:crear')"
-                />
+                <JdButtonsOverflow :buttons="headerActions" @runMethod="runMethod" />
             </div>
 
             <div class="head-center">
@@ -88,8 +77,9 @@ import mFormato from '@/views/calidad/formatos/mFormato.vue'
 import mProduccionTrazabilidad from '@/views/produccion/historial/mProduccionTrazabilidad.vue'
 import mProductosFaltantes from '@/views/produccion/mProductosFaltantes.vue'
 import mProduccionInsumosCompartidos from '@/views/produccion/historial/mProduccionInsumosCompartidos.vue'
+import JdButtonsOverflow from '@/components/JdButtonsOverflow.vue'
 
-import { TABLE_COLUMNS, TABLE_ROW_ACTIONS } from './produccion_historial.config'
+import { TABLE_COLUMNS, TABLE_ROW_ACTIONS, HEADER_ACTIONS } from './produccion_historial.config.js'
 
 import { useModals } from '@/pinia/modals'
 import { useAuth } from '@/pinia/auth'
@@ -118,6 +108,7 @@ export default {
         mFormato,
         mProduccionTrazabilidad,
         mProduccionInsumosCompartidos,
+        JdButtonsOverflow,
     },
     data: () => ({
         useModals: useModals(),
@@ -127,6 +118,7 @@ export default {
         vista: {},
 
         tableName: 'vProduccionHistorial',
+        headerActions: HEADER_ACTIONS,
         tableColumns: JSON.parse(JSON.stringify(TABLE_COLUMNS)),
         tableRowActions: TABLE_ROW_ACTIONS,
     }),

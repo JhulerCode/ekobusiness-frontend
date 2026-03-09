@@ -1,15 +1,10 @@
 <template>
     <div class="vista vista-fill">
         <div class="head">
-            <div class="head-left">
-                <strong>Artículos</strong>
+            <div class="head-left" style="flex-wrap: nowrap">
+                <strong style="white-space: nowrap">Artículos</strong>
 
-                <JdButton
-                    text="Nuevo"
-                    title="Crear nuevo"
-                    @click="nuevo"
-                    v-if="useAuth.verifyPermiso('vArticulos:crear')"
-                />
+                <JdButtonsOverflow :buttons="headerActions" @runMethod="runMethod" />
 
                 <input
                     ref="excel"
@@ -17,14 +12,6 @@
                     accept=".xlsx, .xls, .csv"
                     hidden
                     @change="importar"
-                />
-
-                <JdButton
-                    icon="fa-solid fa-file-excel"
-                    text="Importar"
-                    tipo="2"
-                    @click="$refs.excel.click()"
-                    v-if="useAuth.verifyPermiso('vArticulos:importar')"
                 />
             </div>
 
@@ -96,13 +83,19 @@
 <script>
 // Componentes base y utilidades
 import { JdButton, mConfigFiltros, mConfigCols, mEditar } from '@jhuler/components'
-import JdBulkActions from '@/components/JdBulkActions.vue'
+import JdButtonsOverflow from '@/components/JdButtonsOverflow.vue'
 import JdBuscador from '@/components/JdBuscador.vue'
-import JdTable from '@/components/JdTable/JdTable.vue'
+import JdBulkActions from '@/components/JdBulkActions.vue'
 import JdPaginacion from '@/components/JdPaginacion.vue'
+import JdTable from '@/components/JdTable/JdTable.vue'
 
 // Configuración de la vista
-import { TABLE_COLUMNS, TABLE_BULK_ACTIONS, TABLE_ROW_ACTIONS } from './articulos.config'
+import {
+    HEADER_ACTIONS,
+    TABLE_COLUMNS,
+    TABLE_BULK_ACTIONS,
+    TABLE_ROW_ACTIONS,
+} from './articulos.config.js'
 
 // Modales específicos
 import mImportarArticulos from '@/views/inventario/articulos/mImportarArticulos.vue'
@@ -129,6 +122,7 @@ export default {
         JdBuscador,
         JdTable,
         JdPaginacion,
+        JdButtonsOverflow,
         mConfigCols,
         mConfigFiltros,
         mEditar,
@@ -148,6 +142,7 @@ export default {
         tableName: 'articulos',
 
         // Configuraciones traídas de articulos.config.js
+        headerActions: HEADER_ACTIONS,
         tableColumns: JSON.parse(JSON.stringify(TABLE_COLUMNS)),
         tableBulkActions: TABLE_BULK_ACTIONS,
         tableRowActions: TABLE_ROW_ACTIONS,
@@ -169,6 +164,9 @@ export default {
         // --- Gestión de Tabla ---
         runMethod(method, item) {
             this[method](item)
+        },
+        abrirExcel() {
+            this.$refs.excel.click()
         },
 
         // --- Carga de Datos ---

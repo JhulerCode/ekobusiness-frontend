@@ -1,8 +1,10 @@
 <template>
     <div class="vista vista-fill">
         <div class="head">
-            <div class="head-left">
-                <strong>Artículos comprados</strong>
+            <div class="head-left" style="flex-wrap: nowrap">
+                <strong style="white-space: nowrap">Artículos comprados</strong>
+
+                <JdButtonsOverflow :buttons="headerActions" @runMethod="runMethod" />
             </div>
 
             <div class="head-center">
@@ -57,7 +59,8 @@ import JdTable from '@/components/JdTable/JdTable.vue'
 import JdPaginacion from '@/components/JdPaginacion.vue'
 
 // Configuración de la vista
-import { TABLE_COLUMNS } from './compra_items.config'
+import { TABLE_COLUMNS, HEADER_ACTIONS } from './compra_items.config.js'
+import JdButtonsOverflow from '@/components/JdButtonsOverflow.vue'
 
 // Modales específicos
 import mFormato from '@/views/calidad/formatos/mFormato.vue'
@@ -79,6 +82,7 @@ export default {
         mConfigCols,
         mConfigFiltros,
         mFormato,
+        JdButtonsOverflow,
     },
     data: () => ({
         useAuth: useAuth(),
@@ -88,6 +92,7 @@ export default {
         vista: {},
         tableName: 'vCompraItems',
 
+        headerActions: HEADER_ACTIONS,
         tableColumns: JSON.parse(JSON.stringify(TABLE_COLUMNS)),
     }),
     async created() {
@@ -197,6 +202,9 @@ export default {
             }
             const send = { table: this.tableName, cols, reload: this.loadTransaccionItems }
             this.useModals.setModal('mConfigFiltros', 'Filtros', null, send, true)
+        },
+        runMethod(method, item) {
+            this[method](item)
         },
     },
 }

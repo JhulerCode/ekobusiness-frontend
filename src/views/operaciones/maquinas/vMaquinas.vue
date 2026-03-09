@@ -1,19 +1,50 @@
 <template>
     <div class="vista vista-fill">
         <div class="head">
-            <strong>Maquinas</strong>
+            <div class="head-left">
+                <strong>Maquinas</strong>
 
-            <div class="buttons">
+                <div class="buttons">
+                    <JdButton
+                        text="Nuevo"
+                        title="Crear nuevo"
+                        @click="nuevo()"
+                        v-if="useAuth.verifyPermiso('vMaquinas:crear')"
+                    />
+                </div>
+            </div>
+
+            <div class="head-center">
+                <JdBuscador
+                    :view="vista"
+                    :columns="columns"
+                    :tableName="tableName"
+                    @open-filters="openConfigFiltros"
+                    @reload="loadMaquinas"
+                />
+            </div>
+
+            <div class="head-right">
+                <JdPaginacion :view="vista" @reload="loadMaquinas" />
+
                 <JdButton
-                    text="Nuevo"
-                    title="Crear nuevo"
-                    @click="nuevo()"
-                    v-if="useAuth.verifyPermiso('vMaquinas:crear')"
+                    icon="fa-solid fa-file-excel"
+                    tipo="2"
+                    title="Exportar"
+                    @click="$refs['jdtable'].downloadData()"
+                />
+
+                <JdButton
+                    icon="fa-solid fa-gear"
+                    tipo="2"
+                    title="Columnas"
+                    @click="$refs['jdtable'].openConfigCols()"
                 />
             </div>
         </div>
 
         <JdTable
+            ref="jdtable"
             :name="tableName"
             :columns="columns"
             :datos="vista.maquinas || []"
@@ -22,8 +53,7 @@
             :reload="loadMaquinas"
             :rowOptions="tableRowOptions"
             @rowOptionSelected="runMethod"
-        >
-        </JdTable>
+        />
     </div>
 
     <mMaquina v-if="useModals.show.mMaquina" />
@@ -32,7 +62,11 @@
 </template>
 
 <script>
-import { JdButton, JdTable, mConfigFiltros } from '@jhuler/components'
+import { JdButton, mConfigFiltros } from '@jhuler/components'
+import JdTable from '@/components/JdTable/JdTable.vue'
+import JdBuscador from '@/components/JdBuscador.vue'
+import JdPaginacion from '@/components/JdPaginacion.vue'
+import { columns, tableRowOptions } from './maquinas.config.js'
 
 import mMaquina from '@/views/operaciones/maquinas/mMaquina.vue'
 
@@ -47,6 +81,8 @@ export default {
     components: {
         JdButton,
         JdTable,
+        JdBuscador,
+        JdPaginacion,
 
         mConfigFiltros,
 
@@ -60,61 +96,8 @@ export default {
         vista: {},
 
         tableName: 'vMaquinas',
-        columns: [
-            {
-                id: 'nombre',
-                title: 'Nombre',
-                type: 'text',
-                width: '15rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'linea',
-                title: 'Tipo de producción',
-                prop: 'linea1.nombre',
-                type: 'select',
-                width: '15rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'velocidad',
-                title: 'Velocidad (und/min)',
-                type: 'number',
-                width: '8rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'limpieza_tiempo',
-                title: 'Tiempo de limpieza (min)',
-                type: 'number',
-                width: '8rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-        ],
-        tableRowOptions: [
-            {
-                id: 1,
-                label: 'Editar',
-                icon: 'fa-solid fa-pen-to-square',
-                action: 'editar',
-                permiso: 'vMaquinas:editar',
-            },
-            {
-                id: 2,
-                label: 'Eliminar',
-                icon: 'fa-solid fa-trash-can',
-                action: 'eliminar',
-                permiso: 'vMaquinas:eliminar',
-            },
-        ],
+        columns,
+        tableRowOptions,
     }),
     created() {
         this.vista = this.useVistas.vMaquinas

@@ -1,18 +1,49 @@
 <template>
     <div class="vista vista-fill">
         <div class="head">
-            <strong>Documentos clave</strong>
+            <div class="head-left">
+                <strong>Documentos clave</strong>
 
-            <div class="buttons">
+                <div class="buttons">
+                    <JdButton
+                        text="Nuevo"
+                        @click="nuevo()"
+                        v-if="useAuth.verifyPermiso('vDocumentos:crear')"
+                    />
+                </div>
+            </div>
+
+            <div class="head-center">
+                <JdBuscador
+                    :view="vista"
+                    :columns="columns"
+                    :tableName="tableName"
+                    @open-filters="openConfigFiltros"
+                    @reload="loadDocumentos"
+                />
+            </div>
+
+            <div class="head-right">
+                <JdPaginacion :view="vista" @reload="loadDocumentos" />
+
                 <JdButton
-                    text="Nuevo"
-                    @click="nuevo()"
-                    v-if="useAuth.verifyPermiso('vDocumentos:crear')"
+                    icon="fa-solid fa-file-excel"
+                    tipo="2"
+                    title="Exportar"
+                    @click="$refs['jdtable'].downloadData()"
+                />
+
+                <JdButton
+                    icon="fa-solid fa-gear"
+                    tipo="2"
+                    title="Columnas"
+                    @click="$refs['jdtable'].openConfigCols()"
                 />
             </div>
         </div>
 
         <JdTable
+            ref="jdtable"
             :name="tableName"
             :columns="columns"
             :datos="vista.documentos || []"
@@ -21,8 +52,7 @@
             :reload="loadDocumentos"
             :rowOptions="tableRowOptions"
             @rowOptionSelected="runMethod"
-        >
-        </JdTable>
+        />
     </div>
 
     <mDocumento v-if="useModals.show.mDocumento" />
@@ -33,7 +63,11 @@
 </template>
 
 <script>
-import { JdButton, JdTable, mConfigFiltros, mPdfViewer } from '@jhuler/components'
+import { JdButton, mConfigFiltros, mPdfViewer } from '@jhuler/components'
+import JdTable from '@/components/JdTable/JdTable.vue'
+import JdBuscador from '@/components/JdBuscador.vue'
+import JdPaginacion from '@/components/JdPaginacion.vue'
+import { columns, tableRowOptions } from './documentos.config.js'
 
 import mDocumento from './mDocumento.vue'
 
@@ -48,6 +82,8 @@ export default {
     components: {
         JdButton,
         JdTable,
+        JdBuscador,
+        JdPaginacion,
 
         mConfigFiltros,
 
@@ -63,78 +99,8 @@ export default {
         vista: {},
 
         tableName: 'vDocumentos',
-        columns: [
-            {
-                id: 'nombre',
-                title: 'Nombre',
-                type: 'text',
-                width: '20rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'fecha_emision',
-                title: 'Fecha de emisión',
-                type: 'date',
-                format: 'date',
-                width: '12rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'fecha_vencimiento',
-                title: 'Fecha de vencimiento',
-                type: 'date',
-                format: 'date',
-                width: '12rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'recordar_dias',
-                title: 'Recordatorio',
-                type: 'number',
-                width: '8rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'estado',
-                title: 'Estado',
-                prop: 'estado1.nombre',
-                type: 'select',
-                format: 'estado',
-                width: '10rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-        ],
-        tableRowOptions: [
-            {
-                label: 'Editar',
-                icon: 'fa-solid fa-pen-to-square',
-                action: 'editar',
-                permiso: 'vDocumentos:editar',
-            },
-            {
-                label: 'Ver pdf',
-                icon: 'fa-regular fa-file-pdf',
-                action: 'verFile',
-                permiso: 'vRegistrosSanitarios:editar',
-                ocultar: { file: {} },
-            },
-            {
-                label: 'Eliminar',
-                icon: 'fa-solid fa-trash-can',
-                action: 'eliminar',
-                permiso: 'vDocumentos:eliminar',
-            },
-        ],
+        columns,
+        tableRowOptions,
     }),
     created() {
         this.vista = this.useVistas.vDocumentos

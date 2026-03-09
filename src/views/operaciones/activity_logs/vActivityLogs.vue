@@ -1,10 +1,41 @@
 <template>
     <div class="vista vista-fill">
         <div class="head">
-            <strong>Activity Logs</strong>
+            <div class="head-left">
+                <strong>Activity Logs</strong>
+            </div>
+
+            <div class="head-center">
+                <JdBuscador
+                    :view="vista"
+                    :columns="columns"
+                    :tableName="tableName"
+                    @open-filters="openConfigFiltros"
+                    @reload="loadActivityLogs"
+                />
+            </div>
+
+            <div class="head-right">
+                <JdPaginacion :view="vista" @reload="loadActivityLogs" />
+
+                <JdButton
+                    icon="fa-solid fa-file-excel"
+                    tipo="2"
+                    title="Exportar"
+                    @click="$refs['jdtable'].downloadData()"
+                />
+
+                <JdButton
+                    icon="fa-solid fa-gear"
+                    tipo="2"
+                    title="Columnas"
+                    @click="$refs['jdtable'].openConfigCols()"
+                />
+            </div>
         </div>
 
         <JdTable
+            ref="jdtable"
             :name="tableName"
             :columns="columns"
             :datos="vista.activity_logs || []"
@@ -14,6 +45,8 @@
             :meta="vista.table_meta"
             @prevPage="((vista.table_page -= 1), loadActivityLogs())"
             @nextPage="((vista.table_page += 1), loadActivityLogs())"
+            :rowOptions="tableRowOptions"
+            @rowOptionSelected="runMethod"
         />
     </div>
 
@@ -21,7 +54,11 @@
 </template>
 
 <script>
-import { JdTable, mConfigFiltros } from '@jhuler/components'
+import { mConfigFiltros, JdButton } from '@jhuler/components'
+import JdTable from '@/components/JdTable/JdTable.vue'
+import JdBuscador from '@/components/JdBuscador.vue'
+import JdPaginacion from '@/components/JdPaginacion.vue'
+import { columns, tableRowOptions } from './activity_logs.config.js'
 
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
@@ -33,7 +70,9 @@ import dayjs from 'dayjs'
 export default {
     components: {
         JdTable,
-
+        JdBuscador,
+        JdPaginacion,
+        JdButton,
         mConfigFiltros,
     },
     data: () => ({
@@ -44,56 +83,8 @@ export default {
         vista: {},
 
         tableName: 'vActivityLogs',
-        columns: [
-            {
-                id: 'createdAt',
-                title: 'Fecha',
-                type: 'datetime',
-                format: 'datetime',
-                width: '15rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'colaborador',
-                title: 'Colaborador',
-                prop: 'colaborador1.nombres',
-                type: 'select',
-                mostrar: 'nombres',
-                width: '15rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'method',
-                title: 'Acción',
-                type: 'text',
-                width: '5rem',
-                show: true,
-                seek: false,
-                sort: false,
-            },
-            {
-                id: 'baseUrl',
-                title: 'Recurso',
-                type: 'text',
-                width: '15rem',
-                show: true,
-                seek: false,
-                sort: false,
-            },
-            {
-                id: 'detail',
-                title: 'Detalle',
-                type: 'text',
-                width: '15rem',
-                show: true,
-                seek: false,
-                sort: false,
-            },
-        ],
+        columns,
+        tableRowOptions,
     }),
     created() {
         this.vista = this.useVistas.vActivityLogs
@@ -166,6 +157,9 @@ export default {
 
             this.vista.colaboradores = res.data
             return res.data
+        },
+        runMethod(method, item) {
+            this[method](item)
         },
     },
 }

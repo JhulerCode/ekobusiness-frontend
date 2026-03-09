@@ -1,18 +1,49 @@
 <template>
     <div class="vista vista-fill">
         <div class="head">
-            <strong>Asistencias</strong>
+            <div class="head-left">
+                <strong>Asistencias</strong>
 
-            <div class="buttons">
+                <div class="buttons">
+                    <JdButton
+                        text="Crear"
+                        @click="nuevo()"
+                        v-if="useAuth.verifyPermiso('vAsistencias:crear')"
+                    />
+                </div>
+            </div>
+
+            <div class="head-center">
+                <JdBuscador
+                    :view="vista"
+                    :columns="columns"
+                    :tableName="tableName"
+                    @open-filters="openConfigFiltros"
+                    @reload="loadAsistencias"
+                />
+            </div>
+
+            <div class="head-right">
+                <JdPaginacion :view="vista" @reload="loadAsistencias" />
+
                 <JdButton
-                    text="Crear"
-                    @click="nuevo()"
-                    v-if="useAuth.verifyPermiso('vAsistencias:crear')"
+                    icon="fa-solid fa-file-excel"
+                    tipo="2"
+                    title="Exportar"
+                    @click="$refs['jdtable'].downloadData()"
+                />
+
+                <JdButton
+                    icon="fa-solid fa-gear"
+                    tipo="2"
+                    title="Columnas"
+                    @click="$refs['jdtable'].openConfigCols()"
                 />
             </div>
         </div>
 
         <JdTable
+            ref="jdtable"
             :name="tableName"
             :columns="columns"
             :datos="vista.asistencias || []"
@@ -21,8 +52,7 @@
             :colAct="true"
             :rowOptions="tableRowOptions"
             @rowOptionSelected="runMethod"
-        >
-        </JdTable>
+        />
     </div>
 
     <mAsistencia v-if="useModals.show.mAsistencia" />
@@ -32,7 +62,11 @@
 </template>
 
 <script>
-import { JdButton, JdTable, mConfigFiltros, mConfigCols } from '@jhuler/components'
+import { JdButton, mConfigFiltros, mConfigCols } from '@jhuler/components'
+import JdTable from '@/components/JdTable/JdTable.vue'
+import JdBuscador from '@/components/JdBuscador.vue'
+import JdPaginacion from '@/components/JdPaginacion.vue'
+import { columns, tableRowOptions } from './asistencias.config.js'
 
 import mAsistencia from './mAsistencia.vue'
 
@@ -49,6 +83,8 @@ export default {
     components: {
         JdButton,
         JdTable,
+        JdBuscador,
+        JdPaginacion,
 
         mConfigCols,
         mConfigFiltros,
@@ -63,71 +99,8 @@ export default {
         vista: {},
 
         tableName: 'vAsistencias',
-        columns: [
-            {
-                id: 'colaborador',
-                title: 'Colaborador',
-                prop: 'colaborador1.nombres',
-                type: 'select',
-                mostrar: 'nombres',
-                width: '15rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'fecha_entrada',
-                title: 'Fecha de entrada',
-                format: 'date',
-                type: 'date',
-                width: '8rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'hora_entrada',
-                title: 'Hora de entrada',
-                type: 'time',
-                width: '8rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'fecha_salida',
-                title: 'Fecha de salida',
-                format: 'date',
-                type: 'date',
-                width: '8rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'hora_salida',
-                title: 'Hora de salida',
-                type: 'time',
-                width: '8rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-        ],
-        tableRowOptions: [
-            {
-                label: 'Editar',
-                icon: 'fa-solid fa-pen-to-square',
-                action: 'editar',
-                permiso: 'vAsistencias:editar',
-            },
-            {
-                label: 'Eliminar',
-                icon: 'fa-solid fa-trash-can',
-                action: 'eliminar',
-                permiso: 'vAsistencias:eliminar',
-            },
-        ],
+        columns,
+        tableRowOptions,
     }),
     created() {
         this.vista = this.useVistas.vAsistencias

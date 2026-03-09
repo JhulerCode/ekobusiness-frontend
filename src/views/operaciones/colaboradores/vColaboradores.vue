@@ -1,19 +1,50 @@
 <template>
     <div class="vista vista-fill">
         <div class="head">
-            <strong>Colaboradores</strong>
+            <div class="head-left">
+                <strong>Colaboradores</strong>
 
-            <div class="buttons">
+                <div class="buttons">
+                    <JdButton
+                        text="Nuevo"
+                        title="Crear nuevo"
+                        @click="nuevo()"
+                        v-if="useAuth.verifyPermiso('vColaboradores:crear')"
+                    />
+                </div>
+            </div>
+
+            <div class="head-center">
+                <JdBuscador
+                    :view="vista"
+                    :columns="columns"
+                    :tableName="tableName"
+                    @open-filters="openConfigFiltros"
+                    @reload="loadColaboradores"
+                />
+            </div>
+
+            <div class="head-right">
+                <JdPaginacion :view="vista" @reload="loadColaboradores" />
+
                 <JdButton
-                    text="Nuevo"
-                    title="Crear nuevo"
-                    @click="nuevo()"
-                    v-if="useAuth.verifyPermiso('vColaboradores:crear')"
+                    icon="fa-solid fa-file-excel"
+                    tipo="2"
+                    title="Exportar"
+                    @click="$refs['jdtable'].downloadData()"
+                />
+
+                <JdButton
+                    icon="fa-solid fa-gear"
+                    tipo="2"
+                    title="Columnas"
+                    @click="$refs['jdtable'].openConfigCols()"
                 />
             </div>
         </div>
 
         <JdTable
+            ref="jdtable"
             :name="tableName"
             :columns="columns"
             :datos="vista.colaboradores || []"
@@ -23,8 +54,7 @@
             :reload="loadColaboradores"
             :rowOptions="tableRowOptions"
             @rowOptionSelected="runMethod"
-        >
-        </JdTable>
+        />
     </div>
 
     <mColaborador v-if="useModals.show.mColaborador" />
@@ -34,7 +64,11 @@
 </template>
 
 <script>
-import { JdButton, JdTable, mConfigFiltros, mConfigCols } from '@jhuler/components'
+import { JdButton, mConfigFiltros, mConfigCols } from '@jhuler/components'
+import JdTable from '@/components/JdTable/JdTable.vue'
+import JdBuscador from '@/components/JdBuscador.vue'
+import JdPaginacion from '@/components/JdPaginacion.vue'
+import { columns, tableRowOptions } from './colaboradores.config.js'
 
 import mColaborador from './mColaborador.vue'
 
@@ -49,6 +83,8 @@ export default {
     components: {
         JdButton,
         JdTable,
+        JdBuscador,
+        JdPaginacion,
 
         mConfigCols,
         mConfigFiltros,
@@ -63,133 +99,8 @@ export default {
         vista: {},
 
         tableName: 'vColaboradores',
-        columns: [
-            {
-                id: 'nombres',
-                title: 'Nombres y apellidos',
-                type: 'text',
-                width: '10rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'doc_tipo',
-                title: 'Tipo de documento',
-                prop: 'doc_tipo1.nombre',
-                type: 'select',
-                width: '10rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'doc_numero',
-                title: 'Número de documento',
-                type: 'text',
-                width: '10rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'fecha_nacimiento',
-                title: 'Fecha de nacimiento',
-                type: 'date',
-                width: '8rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'sexo',
-                title: 'Sexo',
-                prop: 'sexo1.nombre',
-                type: 'select',
-                width: '8rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'correo',
-                title: 'Email',
-                type: 'text',
-                width: '10rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'telefono',
-                title: 'Teléfono',
-                type: 'text',
-                width: '10rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'direccion',
-                title: 'Dirección',
-                type: 'text',
-                width: '10rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'cargo',
-                title: 'Cargo',
-                type: 'text',
-                width: '10rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'activo',
-                title: 'Activo?',
-                prop: 'activo1.nombre',
-                type: 'select',
-                format: 'yesno',
-                width: '5rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'has_signin',
-                title: 'Tiene usuario?',
-                prop: 'has_signin1.nombre',
-                type: 'select',
-                format: 'yesno',
-                width: '5rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-        ],
-        tableRowOptions: [
-            {
-                label: 'Ver',
-                icon: 'fa-regular fa-folder-open',
-                action: 'ver',
-                permiso: 'vColaboradores:ver',
-            },
-            {
-                label: 'Editar',
-                icon: 'fa-solid fa-pen-to-square',
-                action: 'editar',
-                permiso: 'vColaboradores:editar',
-            },
-            {
-                label: 'Eliminar',
-                icon: 'fa-solid fa-trash-can',
-                action: 'eliminar',
-                permiso: 'vColaboradores:eliminar',
-            },
-        ],
+        columns,
+        tableRowOptions,
     }),
     created() {
         this.vista = this.useVistas.vColaboradores

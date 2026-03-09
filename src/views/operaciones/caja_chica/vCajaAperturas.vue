@@ -1,19 +1,50 @@
 <template>
     <div class="vista vista-fill">
         <div class="head">
-            <strong>Caja chica</strong>
+            <div class="head-left">
+                <strong>Caja chica</strong>
 
-            <div class="buttons">
+                <div class="buttons">
+                    <JdButton
+                        text="Nuevo"
+                        title="Crear nuevo"
+                        @click="nuevo()"
+                        v-if="useAuth.verifyPermiso('vCajaAperturas:aperturarCaja')"
+                    />
+                </div>
+            </div>
+
+            <div class="head-center">
+                <JdBuscador
+                    :view="vista"
+                    :columns="columns"
+                    :tableName="tableName"
+                    @open-filters="openConfigFiltros"
+                    @reload="loadCajaAperturas"
+                />
+            </div>
+
+            <div class="head-right">
+                <JdPaginacion :view="vista" @reload="loadCajaAperturas" />
+
                 <JdButton
-                    text="Nuevo"
-                    title="Crear nuevo"
-                    @click="nuevo()"
-                    v-if="useAuth.verifyPermiso('vCajaAperturas:aperturarCaja')"
+                    icon="fa-solid fa-file-excel"
+                    tipo="2"
+                    title="Exportar"
+                    @click="$refs['jdtable'].downloadData()"
+                />
+
+                <JdButton
+                    icon="fa-solid fa-gear"
+                    tipo="2"
+                    title="Columnas"
+                    @click="$refs['jdtable'].openConfigCols()"
                 />
             </div>
         </div>
 
         <JdTable
+            ref="jdtable"
             :name="tableName"
             :columns="columns"
             :datos="vista.caja_aperturas || []"
@@ -22,8 +53,7 @@
             :reload="loadCajaAperturas"
             :rowOptions="tableRowOptions"
             @rowOptionSelected="runMethod"
-        >
-        </JdTable>
+        />
     </div>
 
     <mCajaApertura v-if="useModals.show.mCajaApertura" />
@@ -33,7 +63,11 @@
 </template>
 
 <script>
-import { JdButton, JdTable, mConfigFiltros, mConfigCols } from '@jhuler/components'
+import { JdButton, mConfigFiltros, mConfigCols } from '@jhuler/components'
+import JdTable from '@/components/JdTable/JdTable.vue'
+import JdBuscador from '@/components/JdBuscador.vue'
+import JdPaginacion from '@/components/JdPaginacion.vue'
+import { columns, tableRowOptions } from './caja_aperturas.config.js'
 
 import mCajaApertura from './mCajaApertura.vue'
 
@@ -49,7 +83,8 @@ export default {
     components: {
         JdButton,
         JdTable,
-
+        JdBuscador,
+        JdPaginacion,
         mConfigCols,
         mConfigFiltros,
 
@@ -63,100 +98,8 @@ export default {
         vista: {},
 
         tableName: 'vCajaAperturas',
-        columns: [
-            {
-                id: 'fecha_apertura',
-                title: 'Fecha apertura',
-                type: 'date',
-                format: 'date',
-                width: '12rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'monto_apertura',
-                title: 'Monto apertura',
-                type: 'number',
-                format: 'decimal',
-                width: '12rem',
-                show: true,
-                seek: false,
-                sort: false,
-            },
-            {
-                id: 'fecha_cierre',
-                title: 'Fecha cierre',
-                type: 'date',
-                format: 'date',
-                width: '12rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            // {
-            //     id: 'monto_cierre',
-            //     title: 'Monto cierre',
-            //     type: 'number',
-            //     format: 'decimal',
-            //     width: '12rem',
-            //     show: true,
-            //     seek: false,
-            //     sort: false,
-            // },
-            {
-                id: 'estado',
-                title: 'Estado',
-                type: 'select',
-                prop: 'estado1.nombre',
-                format: 'estado',
-                width: '10rem',
-                show: true,
-                seek: false,
-                sort: false,
-            },
-            // {
-            //     id: 'createdBy',
-            //     title: 'Solicitado por',
-            //     prop: 'createdBy1.nombres',
-            //     width: '10rem',
-            //     filtrable: false,
-            //     show: true,
-            // },
-        ],
-        tableRowOptions: [
-            {
-                id: 1,
-                label: 'Ver',
-                icon: 'fa-solid fa-up-right-from-square',
-                action: 'ver',
-                permiso: 'vCajaAperturas:ver',
-            },
-            {
-                id: 3,
-                label: 'Eliminar',
-                icon: 'fa-solid fa-trash-can',
-                action: 'eliminar',
-                permiso: 'vCajaAperturas:eliminar',
-                ocultar: { estado: 2 },
-            },
-            {
-                id: 4,
-                label: 'Movimientos',
-                icon: 'fa-solid fa-right-left',
-                action: 'agregarMovimientos',
-                permiso: 'vCajaMovimientos:listar',
-                ocultar: { estado: 2 },
-            },
-            {
-                id: 2,
-                label: 'Cerrar caja',
-                icon: 'fa-solid fa-check-double',
-                action: 'cerrarCaja',
-                permiso: 'vCajaAperturas:cerrarCaja',
-                ocultar: { estado: 2 },
-            },
-        ],
+        columns,
+        tableRowOptions,
     }),
     created() {
         this.vista = this.useVistas.vCajaAperturas

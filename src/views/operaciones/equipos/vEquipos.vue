@@ -1,19 +1,50 @@
 <template>
     <div class="vista vista-fill">
         <div class="head">
-            <strong>Equipos</strong>
+            <div class="head-left">
+                <strong>Equipos</strong>
 
-            <div class="buttons">
+                <div class="buttons">
+                    <JdButton
+                        text="Nuevo"
+                        title="Crear nuevo"
+                        @click="nuevo()"
+                        v-if="useAuth.verifyPermiso('vEquipos:crear')"
+                    />
+                </div>
+            </div>
+
+            <div class="head-center">
+                <JdBuscador
+                    :view="vista"
+                    :columns="columns"
+                    :tableName="tableName"
+                    @open-filters="openConfigFiltros"
+                    @reload="loadMaquinas"
+                />
+            </div>
+
+            <div class="head-right">
+                <JdPaginacion :view="vista" @reload="loadMaquinas" />
+
                 <JdButton
-                    text="Nuevo"
-                    title="Crear nuevo"
-                    @click="nuevo()"
-                    v-if="useAuth.verifyPermiso('vEquipos:crear')"
+                    icon="fa-solid fa-file-excel"
+                    tipo="2"
+                    title="Exportar"
+                    @click="$refs['jdtable'].downloadData()"
+                />
+
+                <JdButton
+                    icon="fa-solid fa-gear"
+                    tipo="2"
+                    title="Columnas"
+                    @click="$refs['jdtable'].openConfigCols()"
                 />
             </div>
         </div>
 
         <JdTable
+            ref="jdtable"
             :name="tableName"
             :columns="columns"
             :datos="vista.maquinas || []"
@@ -22,8 +53,7 @@
             :reload="loadMaquinas"
             :rowOptions="tableRowOptions"
             @rowOptionSelected="runMethod"
-        >
-        </JdTable>
+        />
     </div>
 
     <mMaquina v-if="useModals.show.mMaquina" />
@@ -32,7 +62,11 @@
 </template>
 
 <script>
-import { JdButton, JdTable, mConfigFiltros } from '@jhuler/components'
+import { JdButton, mConfigFiltros } from '@jhuler/components'
+import JdTable from '@/components/JdTable/JdTable.vue'
+import JdBuscador from '@/components/JdBuscador.vue'
+import JdPaginacion from '@/components/JdPaginacion.vue'
+import { columns, tableRowOptions } from './equipos.config.js'
 
 import mMaquina from '@/views/operaciones/maquinas/mMaquina.vue'
 
@@ -47,6 +81,8 @@ export default {
     components: {
         JdButton,
         JdTable,
+        JdBuscador,
+        JdPaginacion,
 
         mConfigFiltros,
 
@@ -60,52 +96,8 @@ export default {
         vista: {},
 
         tableName: 'vEquipos',
-        columns: [
-            {
-                id: 'codigo',
-                title: 'Código',
-                type: 'text',
-                width: '8rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'nombre',
-                title: 'Nombre',
-                type: 'text',
-                width: '20rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'fecha_compra',
-                title: 'Fecha de compra',
-                type: 'date',
-                format: 'date',
-                width: '8rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-        ],
-        tableRowOptions: [
-            {
-                id: 1,
-                label: 'Editar',
-                icon: 'fa-solid fa-pen-to-square',
-                action: 'editar',
-                permiso: 'vEquipos:editar',
-            },
-            {
-                id: 2,
-                label: 'Eliminar',
-                icon: 'fa-solid fa-trash-can',
-                action: 'eliminar',
-                permiso: 'vEquipos:eliminar',
-            },
-        ],
+        columns,
+        tableRowOptions,
     }),
     created() {
         this.vista = this.useVistas.vEquipos

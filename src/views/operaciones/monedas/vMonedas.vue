@@ -1,19 +1,50 @@
 <template>
     <div class="vista vista-fill">
         <div class="head">
-            <strong>Monedas</strong>
+            <div class="head-left">
+                <strong>Monedas</strong>
 
-            <div class="buttons">
+                <div class="buttons">
+                    <JdButton
+                        text="Nuevo"
+                        title="Crear nuevo"
+                        @click="nuevo()"
+                        v-if="useAuth.verifyPermiso('vMonedas:crear')"
+                    />
+                </div>
+            </div>
+
+            <div class="head-center">
+                <JdBuscador
+                    :view="vista"
+                    :columns="columns"
+                    :tableName="tableName"
+                    @open-filters="openConfigFiltros"
+                    @reload="loadMonedas"
+                />
+            </div>
+
+            <div class="head-right">
+                <JdPaginacion :view="vista" @reload="loadMonedas" />
+
                 <JdButton
-                    text="Nuevo"
-                    title="Crear nuevo"
-                    @click="nuevo()"
-                    v-if="useAuth.verifyPermiso('vMonedas:crear')"
+                    icon="fa-solid fa-file-excel"
+                    tipo="2"
+                    title="Exportar"
+                    @click="$refs['jdtable'].downloadData()"
+                />
+
+                <JdButton
+                    icon="fa-solid fa-gear"
+                    tipo="2"
+                    title="Columnas"
+                    @click="$refs['jdtable'].openConfigCols()"
                 />
             </div>
         </div>
 
         <JdTable
+            ref="jdtable"
             :name="tableName"
             :columns="columns"
             :datos="vista.monedas || []"
@@ -32,7 +63,11 @@
 </template>
 
 <script>
-import { JdButton, JdTable, mConfigFiltros } from '@jhuler/components'
+import { JdButton, mConfigFiltros } from '@jhuler/components'
+import JdTable from '@/components/JdTable/JdTable.vue'
+import JdBuscador from '@/components/JdBuscador.vue'
+import JdPaginacion from '@/components/JdPaginacion.vue'
+import { columns, tableRowOptions } from './monedas.config.js'
 
 import mMoneda from './mMoneda.vue'
 import mTipoCambios from './mTipoCambios.vue'
@@ -48,6 +83,8 @@ export default {
     components: {
         JdButton,
         JdTable,
+        JdBuscador,
+        JdPaginacion,
 
         mConfigFiltros,
 
@@ -62,69 +99,8 @@ export default {
         vista: {},
 
         tableName: 'vMonedas',
-        columns: [
-            {
-                id: 'nombre',
-                title: 'Nombre',
-                type: 'text',
-                width: '10rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'codigo',
-                title: 'Código',
-                type: 'text',
-                width: '8rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'simbolo',
-                title: 'Símbolo',
-                type: 'text',
-                width: '5rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'plural',
-                title: 'En plural',
-                type: 'text',
-                width: '10rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-        ],
-        tableRowOptions: [
-            {
-                id: 1,
-                label: 'Editar',
-                icon: 'fa-solid fa-pen-to-square',
-                action: 'editar',
-                permiso: 'vMonedas:editar',
-            },
-            {
-                id: 2,
-                label: 'Eliminar',
-                icon: 'fa-solid fa-trash-can',
-                action: 'eliminar',
-                permiso: 'vMonedas:eliminar',
-                ocultar: { estandar: true },
-            },
-            {
-                id: 3,
-                label: 'Tipos de cambio',
-                icon: 'fa-solid fa-dollar-sign',
-                action: 'openTiposCambio',
-                permiso: 'vTipoCambios:listar',
-                ocultar: { estandar: true },
-            },
-        ],
+        columns,
+        tableRowOptions,
     }),
     created() {
         this.vista = this.useVistas.vMonedas

@@ -15,7 +15,7 @@
             <div class="head-center">
                 <JdBuscador
                     :view="vista"
-                    :columns="columns"
+                    :columns="tableColumns"
                     :tableName="tableName"
                     @open-filters="openConfigFiltros"
                     @reload="loadDocumentos"
@@ -43,10 +43,10 @@
 
         <JdTable
             :name="tableName"
-            :columns="columns"
+            :columns="tableColumns"
             :datos="vista.documentos || []"
             :colAct="true"
-            :rowOptions="tableRowOptions"
+            :rowOptions="tableRowActions"
             @rowOptionSelected="runMethod"
             ref="jdtable"
             :reload="loadDocumentos"
@@ -66,7 +66,7 @@ import JdPaginacion from '@/components/JdPaginacion.vue'
 
 import mDocumento from '@/views/operaciones/documentos/mDocumento.vue'
 
-import { COLUMNS, TABLE_ROW_OPTIONS } from './registros_sanitarios.config'
+import { TABLE_COLUMNS, TABLE_ROW_ACTIONS } from './registros_sanitarios.config'
 
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
@@ -96,12 +96,12 @@ export default {
         vista: {},
 
         tableName: 'vRegistrosSanitarios',
-        columns: JSON.parse(JSON.stringify(COLUMNS)),
-        tableRowOptions: TABLE_ROW_OPTIONS,
+        tableColumns: JSON.parse(JSON.stringify(TABLE_COLUMNS)),
+        tableRowActions: TABLE_ROW_ACTIONS,
     }),
     created() {
         this.vista = this.useVistas.vRegistrosSanitarios
-        this.useAuth.setColumns(this.tableName, this.columns)
+        this.useAuth.setColumns(this.tableName, this.tableColumns)
 
         if (this.vista.loaded) return
         this.vista.table_page = 1
@@ -114,7 +114,7 @@ export default {
                 page: this.vista.table_page,
             }
 
-            this.useAuth.updateQuery(this.columns, this.vista.qry)
+            this.useAuth.updateQuery(this.tableColumns, this.vista.qry)
         },
         async loadDocumentos() {
             this.setQuery()
@@ -140,7 +140,7 @@ export default {
         async openConfigFiltros() {
             await this.loadDatosSistema()
 
-            const cols = this.columns
+            const cols = this.tableColumns
             for (const a of cols) {
                 if (a.id == 'activo') a.lista = this.vista.documentos_estados
             }

@@ -17,7 +17,7 @@
             <div class="head-center">
                 <JdBuscador
                     :view="vista"
-                    :columns="columns"
+                    :columns="tableColumns"
                     :tableName="tableName"
                     @open-filters="openConfigFiltros"
                     @reload="loadColaboradores"
@@ -46,13 +46,13 @@
         <JdTable
             ref="jdtable"
             :name="tableName"
-            :columns="columns"
+            :columns="tableColumns"
             :datos="vista.colaboradores || []"
             :colAct="true"
             :configFiltros="openConfigFiltros"
             :configCols="true"
             :reload="loadColaboradores"
-            :rowOptions="tableRowOptions"
+            :rowOptions="tableRowActions"
             @rowOptionSelected="runMethod"
         />
     </div>
@@ -68,7 +68,7 @@ import { JdButton, mConfigFiltros, mConfigCols } from '@jhuler/components'
 import JdTable from '@/components/JdTable/JdTable.vue'
 import JdBuscador from '@/components/JdBuscador.vue'
 import JdPaginacion from '@/components/JdPaginacion.vue'
-import { columns, tableRowOptions } from './colaboradores.config.js'
+import { columns, tableRowActions } from './colaboradores.config.js'
 
 import mColaborador from './mColaborador.vue'
 
@@ -100,11 +100,11 @@ export default {
 
         tableName: 'vColaboradores',
         columns,
-        tableRowOptions,
+        tableRowActions,
     }),
     created() {
         this.vista = this.useVistas.vColaboradores
-        this.useAuth.setColumns(this.tableName, this.columns)
+        this.useAuth.setColumns(this.tableName, this.tableColumns)
 
         if (this.vista.loaded) return
 
@@ -117,7 +117,7 @@ export default {
                 ordr: [['nombres', 'ASC']],
             }
 
-            this.useAuth.updateQuery(this.columns, this.vista.qry)
+            this.useAuth.updateQuery(this.tableColumns, this.vista.qry)
         },
         async loadColaboradores() {
             this.setQuery()
@@ -142,7 +142,7 @@ export default {
         async openConfigFiltros() {
             await this.loadDatosSistema()
 
-            const cols = this.columns
+            const cols = this.tableColumns
             for (const a of cols) {
                 if (a.id == 'sexo') a.lista = this.vista.generos
                 if (a.id == 'doc_tipo') a.lista = this.vista.documentos_identidad

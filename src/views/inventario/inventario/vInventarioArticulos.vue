@@ -7,7 +7,7 @@
         </div>
 
         <JdTable
-            :columns="columns"
+            :columns="tableColumns"
             :datos="vista.inventario || []"
             :configFiltros="openConfigFiltros"
             :reload="loadInventario"
@@ -19,6 +19,8 @@
 
 <script>
 import { JdTable, mConfigFiltros } from '@jhuler/components'
+
+import { TABLE_COLUMNS } from './inventario.config'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
@@ -45,104 +47,20 @@ export default {
         vista: {},
 
         tableName: 'vInventarioArticulos',
-        columns: [
-            {
-                id: 'kardexes.fecha',
-                title: 'Fecha',
-                type: 'date',
-                show: false,
-            },
-            {
-                id: 'nombre',
-                title: 'Nombre',
-                type: 'text',
-                width: '30rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'categoria',
-                title: 'Categoría',
-                prop: 'categoria1.nombre',
-                type: 'select',
-                width: '12rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'unidad',
-                title: 'Unidad',
-                filtrable: false,
-                width: '7rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'cantidad',
-                title: 'Stock',
-                format: 'decimal',
-                toRight: true,
-                filtrable: false,
-                width: '7rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'articulo_movimientos_valorizado',
-                title: 'Valor',
-                format: 'decimal',
-                toRight: true,
-                filtrable: false,
-                width: '7rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'purchase_ok',
-                title: 'Se compra',
-                prop: 'purchase_ok1.nombre',
-                type: 'select',
-                format: 'yesno',
-                width: '8rem',
-                show: false,
-            },
-            {
-                id: 'sale_ok',
-                title: 'Se vende',
-                prop: 'sale_ok1.nombre',
-                type: 'select',
-                format: 'yesno',
-                width: '8rem',
-                show: false,
-            },
-            {
-                id: 'produce_ok',
-                title: 'Se produce',
-                prop: 'produce_ok1.nombre',
-                type: 'select',
-                format: 'yesno',
-                width: '8rem',
-                show: false,
-            },
-        ],
+        tableColumns: JSON.parse(JSON.stringify(TABLE_COLUMNS)),
     }),
     created() {
         this.vista = this.useVistas.vInventarioArticulos
         this.initFiltros()
-        this.useAuth.setColumns(this.tableName, this.columns)
+        this.useAuth.setColumns(this.tableName, this.tableColumns)
     },
     methods: {
         initFiltros() {
-            this.columns[0].op = 'Es igual o anterior a'
-            this.columns[0].val = dayjs().format('YYYY-MM-DD')
+            this.tableColumns[0].op = 'Es igual o anterior a'
+            this.tableColumns[0].val = dayjs().format('YYYY-MM-DD')
         },
         checkDatos() {
-            if (!this.columns[0].val) {
+            if (!this.tableColumns[0].val) {
                 jmsg('error', 'Ingrese la fecha límite')
                 return true
             }
@@ -165,7 +83,7 @@ export default {
                 ordr: [['nombre', 'ASC']],
             }
 
-            this.useAuth.updateQuery(this.columns, this.vista.qry)
+            this.useAuth.updateQuery(this.tableColumns, this.vista.qry)
         },
         async loadInventario() {
             if (this.checkDatos()) return
@@ -186,7 +104,7 @@ export default {
         async openConfigFiltros() {
             await this.loadDatosSistema()
 
-            const cols = this.columns
+            const cols = this.tableColumns
             for (const a of cols) {
                 if (a.id == 'categoria') a.reload = this.loadCategorias
                 if (a.id == 'purchase_ok') a.lista = this.vista.estados

@@ -15,7 +15,7 @@
             <div class="head-center">
                 <JdBuscador
                     :view="vista"
-                    :columns="columns"
+                    :columns="tableColumns"
                     :tableName="tableName"
                     @open-filters="openConfigFiltros"
                     @reload="loadHelpdeskTickets"
@@ -43,10 +43,10 @@
 
         <JdTable
             :name="tableName"
-            :columns="columns"
+            :columns="tableColumns"
             :datos="vista.helpdesk_tickets || []"
             :colAct="true"
-            :rowOptions="tableRowOptions"
+            :rowOptions="tableRowActions"
             @rowOptionSelected="runMethod"
             ref="jdtable"
             :reload="loadHelpdeskTickets"
@@ -66,7 +66,7 @@ import JdPaginacion from '@/components/JdPaginacion.vue'
 
 import mHelpdeskTicket from './mHelpdeskTicket.vue'
 
-import { COLUMNS, TABLE_ROW_OPTIONS } from './helpdesk_tickets.config'
+import { TABLE_COLUMNS, TABLE_ROW_ACTIONS } from './helpdesk_tickets.config'
 
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
@@ -94,12 +94,12 @@ export default {
         vista: {},
 
         tableName: 'vHelpdeskTickets',
-        columns: JSON.parse(JSON.stringify(COLUMNS)),
-        tableRowOptions: TABLE_ROW_OPTIONS,
+        tableColumns: JSON.parse(JSON.stringify(TABLE_COLUMNS)),
+        tableRowActions: TABLE_ROW_ACTIONS,
     }),
     created() {
         this.vista = this.useVistas.vHelpdeskTickets
-        this.useAuth.setColumns(this.tableName, this.columns)
+        this.useAuth.setColumns(this.tableName, this.tableColumns)
 
         if (this.vista.loaded) return
         this.vista.table_page = 1
@@ -114,7 +114,7 @@ export default {
                 page: this.vista.table_page,
             }
 
-            this.useAuth.updateQuery(this.columns, this.vista.qry)
+            this.useAuth.updateQuery(this.tableColumns, this.vista.qry)
             this.vista.qry.cols.push('estandar')
         },
         async loadHelpdeskTickets() {
@@ -139,7 +139,7 @@ export default {
         },
 
         async openConfigFiltros() {
-            const cols = this.columns
+            const cols = this.tableColumns
 
             const send = {
                 table: this.tableName,

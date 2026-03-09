@@ -1,4 +1,4 @@
-export const COLUMNS = [
+export const TABLE_COLUMNS = [
     {
         id: 'doc_tipo',
         title: 'Tipo documento',
@@ -60,7 +60,7 @@ export const COLUMNS = [
     },
 ]
 
-export const TABLE_ACTIONS = [
+export const TABLE_BULK_ACTIONS = [
     {
         icon: 'fa-solid fa-pen-to-square',
         text: 'Editar',
@@ -75,7 +75,7 @@ export const TABLE_ACTIONS = [
     },
 ]
 
-export const TABLE_ROW_OPTIONS = [
+export const TABLE_ROW_ACTIONS = [
     {
         label: 'Ver',
         icon: 'fa-regular fa-folder-open',

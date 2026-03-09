@@ -1,13 +1,29 @@
 <template>
     <div class="contactos">
         <div class="container-datos">
-            <JdInput label="Nombre" :nec="true" v-model="nuevo.nombre" :disabled="modal.mode == 3" />
+            <JdInput
+                label="Nombre"
+                :nec="true"
+                v-model="nuevo.nombre"
+                :disabled="modal.mode == 3"
+            />
 
             <JdInput label="Cargo" :nec="true" v-model="nuevo.cargo" :disabled="modal.mode == 3" />
 
-            <JdInput label="Celular" type="tel" :nec="true" v-model="nuevo.telefono" :disabled="modal.mode == 3" />
+            <JdInput
+                label="Celular"
+                type="tel"
+                :nec="true"
+                v-model="nuevo.telefono"
+                :disabled="modal.mode == 3"
+            />
 
-            <JdInput label="Correo" type="email" v-model="nuevo.correo" :disabled="modal.mode == 3" />
+            <JdInput
+                label="Correo"
+                type="email"
+                v-model="nuevo.correo"
+                :disabled="modal.mode == 3"
+            />
 
             <JdSwitch label="Principal?" v-model="nuevo.principal" :disabled="modal.mode == 3" />
 
@@ -19,9 +35,16 @@
             </div>
         </div>
 
-        <JdTable :columns="columns" :datos="socio.contactos || []" height="15rem" :seeker="false" :rowSelectable="true"
-            :download="false" :rsUno="true" @rowSelected="setExistente">
-
+        <JdTable
+            :columns="columns"
+            :datos="socio.contactos || []"
+            height="15rem"
+            :seeker="false"
+            :rowSelectable="true"
+            :download="false"
+            :rsUno="true"
+            @rowSelected="setExistente"
+        >
             <template v-slot:cNombre="{ item }">
                 <i class="fa-regular fa-star" v-if="item.principal"></i>
                 {{ item.nombre }}
@@ -57,7 +80,14 @@ export default {
         nuevo: { principal: false },
 
         columns: [
-            { id: 'nombre', title: 'Nombre', slot: 'cNombre', width: '15rem', show: true, sort: true },
+            {
+                id: 'nombre',
+                title: 'Nombre',
+                slot: 'cNombre',
+                width: '15rem',
+                show: true,
+                sort: true,
+            },
         ],
     }),
     created() {
@@ -73,8 +103,7 @@ export default {
         setExistente(item) {
             if (item.selected == false) {
                 this.nuevo = {}
-            }
-            else {
+            } else {
                 this.nuevo = { ...item }
             }
         },
@@ -86,14 +115,18 @@ export default {
                 return true
             }
 
-            const i = this.socio.contactos.findIndex(a => a.nombre == this.nuevo.nombre && a.id != this.nuevo.id)
+            const i = this.socio.contactos.findIndex(
+                (a) => a.nombre == this.nuevo.nombre && a.id != this.nuevo.id,
+            )
             if (i !== -1) {
                 jmsg('error', 'El nombre de contacto ya existe')
                 return true
             }
 
             if (this.nuevo.principal == true) {
-                const j = this.socio.contactos.some(a => a.principal == true && a.id != this.nuevo.id)
+                const j = this.socio.contactos.some(
+                    (a) => a.principal == true && a.id != this.nuevo.id,
+                )
                 if (j == true) {
                     jmsg('error', 'Ya existe un contacto principal')
                     return true
@@ -113,13 +146,13 @@ export default {
 
             this.socio.contactos.push({
                 id: crypto.randomUUID(),
-                ...this.nuevo
+                ...this.nuevo,
             })
 
             this.setNuevo()
         },
         eliminar() {
-            const i = this.socio.contactos.findIndex(a => a.id == this.nuevo.id)
+            const i = this.socio.contactos.findIndex((a) => a.id == this.nuevo.id)
             this.socio.contactos.splice(i, 1)
 
             this.setNuevo()
@@ -128,12 +161,12 @@ export default {
             if (this.checkDatos()) return
             this.shapeDatos()
 
-            const i = this.socio.contactos.findIndex(a => a.id == this.nuevo.id)
+            const i = this.socio.contactos.findIndex((a) => a.id == this.nuevo.id)
             this.socio.contactos.splice(i, 1, this.nuevo)
 
             this.setNuevo()
-        }
-    }
+        },
+    },
 }
 </script>
 

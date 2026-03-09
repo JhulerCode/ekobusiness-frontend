@@ -110,7 +110,7 @@
                 maxHeight="30rem"
                 :colAct="modal.mode != 3"
                 :reload="loadCajaMovimientos"
-                :rowOptions="tableRowOptions"
+                :rowOptions="tableRowActions"
                 @rowOptionSelected="runMethod"
                 ref="jdtable"
             >
@@ -203,7 +203,7 @@ export default {
                 seek: true,
             },
         ],
-        tableRowOptions: [
+        tableRowActions: [
             {
                 // id: 1,
                 label: 'Editar',

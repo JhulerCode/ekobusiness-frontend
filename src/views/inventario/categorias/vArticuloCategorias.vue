@@ -15,7 +15,7 @@
             <div class="head-center">
                 <JdBuscador
                     :view="vista"
-                    :columns="columns"
+                    :columns="tableColumns"
                     :tableName="tableName"
                     @open-filters="openConfigFiltros"
                     @reload="loadCategorias"
@@ -43,10 +43,10 @@
 
         <JdTable
             :name="tableName"
-            :columns="columns"
+            :columns="tableColumns"
             :datos="vista.articulo_categorias || []"
             :colAct="true"
-            :rowOptions="tableRowOptions"
+            :rowOptions="tableRowActions"
             @rowOptionSelected="runMethod"
             ref="jdtable"
             :reload="loadCategorias"
@@ -68,7 +68,7 @@ import JdTable from '@/components/JdTable/JdTable.vue'
 import JdPaginacion from '@/components/JdPaginacion.vue'
 
 // Configuración de la vista
-import { COLUMNS, TABLE_ROW_OPTIONS } from './articuloCategorias.config'
+import { TABLE_COLUMNS, TABLE_ROW_ACTIONS } from './articuloCategorias.config'
 
 // Modales específicos
 import mArticuloCategoria from '@/views/inventario/categorias/mArticuloCategoria.vue'
@@ -101,13 +101,12 @@ export default {
         vista: {},
         tableName: 'vArticuloCategorias',
 
-        // Configuraciones traídas de articuloCategorias.config.js
-        columns: JSON.parse(JSON.stringify(COLUMNS)),
-        tableRowOptions: TABLE_ROW_OPTIONS,
+        tableColumns: JSON.parse(JSON.stringify(TABLE_COLUMNS)),
+        tableRowActions: TABLE_ROW_ACTIONS,
     }),
     created() {
         this.vista = this.useVistas.vArticuloCategorias
-        this.useAuth.setColumns(this.tableName, this.columns)
+        this.useAuth.setColumns(this.tableName, this.tableColumns)
 
         if (this.vista.loaded) return
         this.vista.table_page = 1
@@ -127,7 +126,7 @@ export default {
                 page: this.vista.table_page,
             }
 
-            this.useAuth.updateQuery(this.columns, this.vista.qry)
+            this.useAuth.updateQuery(this.tableColumns, this.vista.qry)
             this.vista.qry.cols.push('fotos')
         },
         async loadCategorias() {
@@ -205,7 +204,7 @@ export default {
         async openConfigFiltros() {
             await this.loadDatosSistema()
 
-            const cols = this.columns
+            const cols = this.tableColumns
             for (const a of cols) {
                 if (a.id == 'activo') a.lista = this.vista.estados
             }

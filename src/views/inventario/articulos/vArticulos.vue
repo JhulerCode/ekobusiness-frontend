@@ -33,14 +33,14 @@
                     v-if="cantidadSeleccionados > 0"
                     :view="vista"
                     dataKey="articulos"
-                    :bulkActions="tableActions"
+                    :tableBulkActions="tableBulkActions"
                     @bulkActionSelected="runMethod"
                 />
 
                 <JdBuscador
                     v-else
                     :view="vista"
-                    :columns="columns"
+                    :columns="tableColumns"
                     :tableName="tableName"
                     @open-filters="openConfigFiltros"
                     @reload="loadArticulos"
@@ -68,13 +68,13 @@
 
         <JdTable
             :name="tableName"
-            :columns="columns"
+            :columns="tableColumns"
             :datos="vista.articulos || []"
             :colAct="true"
-            :rowOptions="tableRowOptions"
+            :rowOptions="tableRowActions"
             @rowOptionSelected="runMethod"
             :rowSelectable="true"
-            :bulkActions="tableActions"
+            :tableBulkActions="tableBulkActions"
             @bulkActionSelected="runMethod"
             ref="jdtable"
             :reload="loadArticulos"
@@ -102,7 +102,7 @@ import JdTable from '@/components/JdTable/JdTable.vue'
 import JdPaginacion from '@/components/JdPaginacion.vue'
 
 // Configuración de la vista
-import { COLUMNS, TABLE_ACTIONS, TABLE_ROW_OPTIONS } from './articulos.config'
+import { TABLE_COLUMNS, TABLE_BULK_ACTIONS, TABLE_ROW_ACTIONS } from './articulos.config'
 
 // Modales específicos
 import mImportarArticulos from '@/views/inventario/articulos/mImportarArticulos.vue'
@@ -148,9 +148,9 @@ export default {
         tableName: 'articulos',
 
         // Configuraciones traídas de articulos.config.js
-        columns: JSON.parse(JSON.stringify(COLUMNS)),
-        tableActions: TABLE_ACTIONS,
-        tableRowOptions: TABLE_ROW_OPTIONS,
+        tableColumns: JSON.parse(JSON.stringify(TABLE_COLUMNS)),
+        tableBulkActions: TABLE_BULK_ACTIONS,
+        tableRowActions: TABLE_ROW_ACTIONS,
     }),
     computed: {
         cantidadSeleccionados() {
@@ -159,7 +159,7 @@ export default {
     },
     async created() {
         this.vista = this.useVistas.vArticulos
-        this.useAuth.setColumns(this.tableName, this.columns)
+        this.useAuth.setColumns(this.tableName, this.tableColumns)
 
         if (this.vista.loaded) return
         this.vista.table_page = 1
@@ -180,9 +180,9 @@ export default {
                 ordr: [['nombre', 'ASC']],
                 page: this.vista.table_page,
             }
-            this.useAuth.updateQuery(this.columns, this.vista.qry)
+            this.useAuth.updateQuery(this.tableColumns, this.vista.qry)
             this.vista.qry.cols.push('fotos')
-            if (this.columns[3].show == true) {
+            if (this.tableColumns[3].show == true) {
                 this.vista.qry.sqls.push('articulo_stock')
             }
         },
@@ -328,7 +328,7 @@ export default {
         },
         async editarBulk() {
             await this.loadDatosSistema()
-            const cols = this.columns
+            const cols = this.tableColumns
             for (const a of cols) {
                 if (a.id == 'unidad') a.lista = this.vista.unidades
                 if (
@@ -361,7 +361,7 @@ export default {
         // --- Otros ---
         async openConfigFiltros() {
             await this.loadDatosSistema()
-            const cols = this.columns
+            const cols = this.tableColumns
             for (const a of cols) {
                 if (a.id == 'unidad') a.lista = this.vista.unidades
                 if (

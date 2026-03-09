@@ -25,7 +25,7 @@
             :datos="modal.kardex || []"
             :reload="loadKardex"
             :colAct="true"
-            :rowOptions="tableRowOptions"
+            :rowOptions="tableRowActions"
             maxHeight="70vh"
             @rowOptionSelected="runMethod"
             :meta="modal.table_meta"
@@ -165,7 +165,7 @@ export default {
             //     sort: false,
             // },
         ],
-        tableRowOptions: [
+        tableRowActions: [
             {
                 label: 'Eliminar',
                 icon: 'fa-regular fa-trash-can',

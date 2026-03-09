@@ -8,7 +8,7 @@
             <div class="head-center">
                 <JdBuscador
                     :view="vista"
-                    :columns="columns"
+                    :columns="tableColumns"
                     :tableName="tableName"
                     @open-filters="openConfigFiltros"
                     @reload="loadTransaccionItems"
@@ -36,7 +36,7 @@
 
         <JdTable
             :name="tableName"
-            :columns="columns"
+            :columns="tableColumns"
             :datos="vista.transaccion_items || []"
             ref="jdtable"
             :reload="loadTransaccionItems"
@@ -57,7 +57,7 @@ import JdTable from '@/components/JdTable/JdTable.vue'
 import JdPaginacion from '@/components/JdPaginacion.vue'
 
 // Configuración de la vista
-import { COLUMNS } from './compra_items.config'
+import { TABLE_COLUMNS } from './compra_items.config'
 
 // Modales específicos
 import mFormato from '@/views/calidad/formatos/mFormato.vue'
@@ -88,13 +88,12 @@ export default {
         vista: {},
         tableName: 'vCompraItems',
 
-        // Configuraciones traídas de compra_items.config.js
-        columns: JSON.parse(JSON.stringify(COLUMNS)),
+        tableColumns: JSON.parse(JSON.stringify(TABLE_COLUMNS)),
     }),
     async created() {
         this.vista = this.useVistas.vCompraItems
         this.initFiltros()
-        this.useAuth.setColumns(this.tableName, this.columns)
+        this.useAuth.setColumns(this.tableName, this.tableColumns)
 
         if (this.vista.loaded) return
         this.vista.table_page = 1
@@ -103,10 +102,10 @@ export default {
     methods: {
         // --- Carga de Datos ---
         initFiltros() {
-            if (!this.columns[0].val) {
-                this.columns[0].op = 'Está dentro de'
-                this.columns[0].val = dayjs().startOf('month').format('YYYY-MM-DD')
-                this.columns[0].val1 = dayjs().format('YYYY-MM-DD')
+            if (!this.tableColumns[0].val) {
+                this.tableColumns[0].op = 'Está dentro de'
+                this.tableColumns[0].val = dayjs().startOf('month').format('YYYY-MM-DD')
+                this.tableColumns[0].val1 = dayjs().format('YYYY-MM-DD')
             }
         },
         setQuery() {
@@ -118,7 +117,7 @@ export default {
                 },
                 page: this.vista.table_page,
             }
-            this.useAuth.updateQuery(this.columns, this.vista.qry)
+            this.useAuth.updateQuery(this.tableColumns, this.vista.qry)
         },
         async loadTransaccionItems() {
             this.setQuery()
@@ -192,7 +191,7 @@ export default {
 
         // --- Otros ---
         async openConfigFiltros() {
-            const cols = this.columns
+            const cols = this.tableColumns
             for (const a of cols) {
                 if (a.id == 'transaccion1.socio') a.reload = this.loadSocios
             }

@@ -16,7 +16,7 @@
             <div class="head-center">
                 <JdBuscador
                     :view="vista"
-                    :columns="columns"
+                    :columns="tableColumns"
                     :tableName="tableName"
                     @open-filters="openConfigFiltros"
                     @reload="loadAsistencias"
@@ -45,12 +45,12 @@
         <JdTable
             ref="jdtable"
             :name="tableName"
-            :columns="columns"
+            :columns="tableColumns"
             :datos="vista.asistencias || []"
             :configFiltros="openConfigFiltros"
             :reload="loadAsistencias"
             :colAct="true"
-            :rowOptions="tableRowOptions"
+            :rowOptions="tableRowActions"
             @rowOptionSelected="runMethod"
         />
     </div>
@@ -66,7 +66,7 @@ import { JdButton, mConfigFiltros, mConfigCols } from '@jhuler/components'
 import JdTable from '@/components/JdTable/JdTable.vue'
 import JdBuscador from '@/components/JdBuscador.vue'
 import JdPaginacion from '@/components/JdPaginacion.vue'
-import { columns, tableRowOptions } from './asistencias.config.js'
+import { columns, tableRowActions } from './asistencias.config.js'
 
 import mAsistencia from './mAsistencia.vue'
 
@@ -100,12 +100,12 @@ export default {
 
         tableName: 'vAsistencias',
         columns,
-        tableRowOptions,
+        tableRowActions,
     }),
     created() {
         this.vista = this.useVistas.vAsistencias
         this.initFiltros()
-        this.useAuth.setColumns(this.tableName, this.columns)
+        this.useAuth.setColumns(this.tableName, this.tableColumns)
 
         if (this.vista.loaded) return
 
@@ -113,9 +113,9 @@ export default {
     },
     methods: {
         initFiltros() {
-            this.columns[1].op = 'Está dentro de'
-            this.columns[1].val = dayjs().startOf('month').format('YYYY-MM-DD')
-            this.columns[1].val1 = dayjs().format('YYYY-MM-DD')
+            this.tableColumns[1].op = 'Está dentro de'
+            this.tableColumns[1].val = dayjs().startOf('month').format('YYYY-MM-DD')
+            this.tableColumns[1].val1 = dayjs().format('YYYY-MM-DD')
         },
         setQuery() {
             this.vista.qry = {
@@ -123,7 +123,7 @@ export default {
                 incl: ['colaborador1'],
             }
 
-            this.useAuth.updateQuery(this.columns, this.vista.qry)
+            this.useAuth.updateQuery(this.tableColumns, this.vista.qry)
         },
         async loadAsistencias() {
             this.setQuery()
@@ -151,7 +151,7 @@ export default {
         },
 
         async openConfigFiltros() {
-            const cols = this.columns
+            const cols = this.tableColumns
             for (const a of cols) {
                 if (a.id == 'colaborador') a.reload = this.loadColaboradores
             }

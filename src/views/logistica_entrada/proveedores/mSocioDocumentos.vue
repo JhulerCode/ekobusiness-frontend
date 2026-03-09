@@ -1,8 +1,18 @@
 <template>
     <div class="direcciones">
         <div class="container-datos">
-            <JdInput label="Nombre" :nec="true" v-model="nuevo.nombre" :disabled="modal.mode == 3" />
-            <JdTextArea label="Frecuencia" :nec="true" v-model="nuevo.frecuencia" :disabled="modal.mode == 3" />
+            <JdInput
+                label="Nombre"
+                :nec="true"
+                v-model="nuevo.nombre"
+                :disabled="modal.mode == 3"
+            />
+            <JdTextArea
+                label="Frecuencia"
+                :nec="true"
+                v-model="nuevo.frecuencia"
+                :disabled="modal.mode == 3"
+            />
 
             <div class="botones" v-if="modal.mode != 3">
                 <JdButton text="Agregar" tipo="3" @click="agregar()" v-if="!this.nuevo.id" />
@@ -12,9 +22,16 @@
             </div>
         </div>
 
-        <JdTable :columns="columns" :datos="socio.documentos || []" height="15rem" :seeker="false" :rowSelectable="true"
-            :download="false" :rsUno="true" @rowSelected="setExistente">
-
+        <JdTable
+            :columns="columns"
+            :datos="socio.documentos || []"
+            height="15rem"
+            :seeker="false"
+            :rowSelectable="true"
+            :download="false"
+            :rsUno="true"
+            @rowSelected="setExistente"
+        >
             <!-- <template v-slot:cNombre="{ item }">
                 <i class="fa-regular fa-star" v-if="item.principal"></i>
                 {{ item.nombre }}
@@ -50,9 +67,7 @@ export default {
         socio: {},
         nuevo: {},
 
-        columns: [
-            { id: 'nombre', title: 'Nombre', width: '15rem', show: true, sort: true },
-        ],
+        columns: [{ id: 'nombre', title: 'Nombre', width: '15rem', show: true, sort: true }],
     }),
     created() {
         this.modal = this.useModals.mSocio
@@ -67,8 +82,7 @@ export default {
         setExistente(item) {
             if (item.selected == false) {
                 this.nuevo = {}
-            }
-            else {
+            } else {
                 this.nuevo = { ...item }
             }
         },
@@ -80,7 +94,9 @@ export default {
                 return true
             }
 
-            const i = this.socio.documentos.findIndex(a => a.nombre == this.nuevo.nombre && a.id != this.nuevo.id)
+            const i = this.socio.documentos.findIndex(
+                (a) => a.nombre == this.nuevo.nombre && a.id != this.nuevo.id,
+            )
             if (i !== -1) {
                 jmsg('error', 'El nombre de dirección ya existe')
                 return true
@@ -107,13 +123,13 @@ export default {
 
             this.socio.documentos.push({
                 id: crypto.randomUUID()(),
-                ...this.nuevo
+                ...this.nuevo,
             })
 
             this.setNuevo()
         },
         eliminar() {
-            const i = this.socio.documentos.findIndex(a => a.id == this.nuevo.id)
+            const i = this.socio.documentos.findIndex((a) => a.id == this.nuevo.id)
             this.socio.documentos.splice(i, 1)
             this.setNuevo()
         },
@@ -121,12 +137,12 @@ export default {
             if (this.checkDatos()) return
             this.shapeDatos()
 
-            const i = this.socio.documentos.findIndex(a => a.id == this.nuevo.id)
+            const i = this.socio.documentos.findIndex((a) => a.id == this.nuevo.id)
             this.socio.documentos.splice(i, 1, this.nuevo)
 
             this.setNuevo()
-        }
-    }
+        },
+    },
 }
 </script>
 

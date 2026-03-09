@@ -17,7 +17,7 @@
             <div class="head-center">
                 <JdBuscador
                     :view="vista"
-                    :columns="columns"
+                    :columns="tableColumns"
                     :tableName="tableName"
                     @open-filters="openConfigFiltros"
                     @reload="loadMonedas"
@@ -46,12 +46,12 @@
         <JdTable
             ref="jdtable"
             :name="tableName"
-            :columns="columns"
+            :columns="tableColumns"
             :datos="vista.monedas || []"
             :colAct="true"
             :configFiltros="openConfigFiltros"
             :reload="loadMonedas"
-            :rowOptions="tableRowOptions"
+            :rowOptions="tableRowActions"
             @rowOptionSelected="runMethod"
         />
     </div>
@@ -67,7 +67,7 @@ import { JdButton, mConfigFiltros } from '@jhuler/components'
 import JdTable from '@/components/JdTable/JdTable.vue'
 import JdBuscador from '@/components/JdBuscador.vue'
 import JdPaginacion from '@/components/JdPaginacion.vue'
-import { columns, tableRowOptions } from './monedas.config.js'
+import { columns, tableRowActions } from './monedas.config.js'
 
 import mMoneda from './mMoneda.vue'
 import mTipoCambios from './mTipoCambios.vue'
@@ -100,11 +100,11 @@ export default {
 
         tableName: 'vMonedas',
         columns,
-        tableRowOptions,
+        tableRowActions,
     }),
     created() {
         this.vista = this.useVistas.vMonedas
-        this.useAuth.setColumns(this.tableName, this.columns)
+        this.useAuth.setColumns(this.tableName, this.tableColumns)
 
         if (this.vista.loaded) return
 
@@ -117,7 +117,7 @@ export default {
                 ordr: [['nombre', 'ASC']],
             }
 
-            this.useAuth.updateQuery(this.columns, this.vista.qry)
+            this.useAuth.updateQuery(this.tableColumns, this.vista.qry)
             this.vista.qry.cols.push('estandar')
         },
         async loadMonedas() {
@@ -141,7 +141,7 @@ export default {
         },
 
         async openConfigFiltros() {
-            const cols = this.columns
+            const cols = this.tableColumns
 
             const send = {
                 table: this.tableName,

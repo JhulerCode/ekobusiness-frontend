@@ -17,7 +17,7 @@
             <div class="head-center">
                 <JdBuscador
                     :view="vista"
-                    :columns="columns"
+                    :columns="tableColumns"
                     :tableName="tableName"
                     @open-filters="openConfigFiltros"
                     @reload="loadMaquinas"
@@ -46,12 +46,12 @@
         <JdTable
             ref="jdtable"
             :name="tableName"
-            :columns="columns"
+            :columns="tableColumns"
             :datos="vista.maquinas || []"
             :colAct="true"
             :configFiltros="openConfigFiltros"
             :reload="loadMaquinas"
-            :rowOptions="tableRowOptions"
+            :rowOptions="tableRowActions"
             @rowOptionSelected="runMethod"
         />
     </div>
@@ -66,7 +66,7 @@ import { JdButton, mConfigFiltros } from '@jhuler/components'
 import JdTable from '@/components/JdTable/JdTable.vue'
 import JdBuscador from '@/components/JdBuscador.vue'
 import JdPaginacion from '@/components/JdPaginacion.vue'
-import { columns, tableRowOptions } from './equipos.config.js'
+import { columns, tableRowActions } from './equipos.config.js'
 
 import mMaquina from '@/views/operaciones/maquinas/mMaquina.vue'
 
@@ -97,11 +97,11 @@ export default {
 
         tableName: 'vEquipos',
         columns,
-        tableRowOptions,
+        tableRowActions,
     }),
     created() {
         this.vista = this.useVistas.vEquipos
-        this.useAuth.setColumns(this.tableName, this.columns)
+        this.useAuth.setColumns(this.tableName, this.tableColumns)
 
         if (this.vista.loaded) return
         if (this.useAuth.verifyPermiso('vEquipos:listar') == true) this.loadMaquinas()
@@ -114,7 +114,7 @@ export default {
                 ordr: [['nombre', 'ASC']],
             }
 
-            this.useAuth.updateQuery(this.columns, this.vista.qry)
+            this.useAuth.updateQuery(this.tableColumns, this.vista.qry)
         },
         async loadMaquinas() {
             this.setQuery()
@@ -139,7 +139,7 @@ export default {
         async openConfigFiltros() {
             await this.loadDatosSistema()
 
-            const cols = this.columns
+            const cols = this.tableColumns
 
             const send = {
                 table: this.tableName,

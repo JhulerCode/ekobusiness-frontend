@@ -15,12 +15,12 @@
 
         <JdTable
             :name="tableName"
-            :columns="columns"
+            :columns="tableColumns"
             :datos="vista.precio_listas || []"
             :colAct="true"
             :configFiltros="openConfigFiltros"
             :reload="loadListaPrecios"
-            :rowOptions="tableRowOptions"
+            :rowOptions="tableRowActions"
             @rowOptionSelected="runMethod"
         >
         </JdTable>
@@ -106,7 +106,7 @@ export default {
                 sort: false,
             },
         ],
-        tableRowOptions: [
+        tableRowActions: [
             {
                 id: 1,
                 label: 'Editar',
@@ -132,7 +132,7 @@ export default {
     }),
     created() {
         this.vista = this.useVistas.vPrecioListas
-        this.useAuth.setColumns(this.tableName, this.columns)
+        this.useAuth.setColumns(this.tableName, this.tableColumns)
 
         if (this.vista.loaded) return
 
@@ -146,7 +146,7 @@ export default {
                 ordr: [['nombre', 'ASC']],
             }
 
-            this.useAuth.updateQuery(this.columns, this.vista.qry)
+            this.useAuth.updateQuery(this.tableColumns, this.vista.qry)
         },
         async loadListaPrecios() {
             this.setQuery()
@@ -171,7 +171,7 @@ export default {
         async openConfigFiltros() {
             await this.loadDatosSistema()
 
-            const cols = this.columns
+            const cols = this.tableColumns
             for (const a of cols) {
                 if (a.id == 'activo') a.lista = this.vista.estados
                 if (a.id == 'moneda') a.reload = this.loadMonedas

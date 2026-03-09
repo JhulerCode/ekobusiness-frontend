@@ -101,9 +101,7 @@ export default {
     methods: {
         async loadPedidos() {
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(
-                `${urls.socio_pedidos}/pendientes?linea=${this.modal.linea}`,
-            )
+            const res = await get(`${urls.socio_pedidos}/pendientes?linea=${this.modal.linea}`)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return

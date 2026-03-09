@@ -213,7 +213,7 @@ export default {
                 toRight: true,
             },
         ],
-        // tableRowOptions: [
+        // tableRowActions: [
         //     {
         //         label: 'Duplicar',
         //         icon: 'fa-solid fa-copy',

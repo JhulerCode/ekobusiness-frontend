@@ -17,7 +17,7 @@
             <div class="head-center">
                 <JdBuscador
                     :view="vista"
-                    :columns="columns"
+                    :columns="tableColumns"
                     :tableName="tableName"
                     @open-filters="openConfigFiltros"
                     @reload="loadMaquinas"
@@ -46,12 +46,12 @@
         <JdTable
             ref="jdtable"
             :name="tableName"
-            :columns="columns"
+            :columns="tableColumns"
             :datos="vista.maquinas || []"
             :colAct="true"
             :configFiltros="openConfigFiltros"
             :reload="loadMaquinas"
-            :rowOptions="tableRowOptions"
+            :rowOptions="tableRowActions"
             @rowOptionSelected="runMethod"
         />
     </div>
@@ -66,7 +66,7 @@ import { JdButton, mConfigFiltros } from '@jhuler/components'
 import JdTable from '@/components/JdTable/JdTable.vue'
 import JdBuscador from '@/components/JdBuscador.vue'
 import JdPaginacion from '@/components/JdPaginacion.vue'
-import { columns, tableRowOptions } from './maquinas.config.js'
+import { columns, tableRowActions } from './maquinas.config.js'
 
 import mMaquina from '@/views/operaciones/maquinas/mMaquina.vue'
 
@@ -97,11 +97,11 @@ export default {
 
         tableName: 'vMaquinas',
         columns,
-        tableRowOptions,
+        tableRowActions,
     }),
     created() {
         this.vista = this.useVistas.vMaquinas
-        this.useAuth.setColumns(this.tableName, this.columns)
+        this.useAuth.setColumns(this.tableName, this.tableColumns)
 
         if (this.vista.loaded) return
         if (this.useAuth.verifyPermiso('vMaquinas:listar') == true) this.loadMaquinas()
@@ -115,7 +115,7 @@ export default {
                 incl: ['linea1'],
             }
 
-            this.useAuth.updateQuery(this.columns, this.vista.qry)
+            this.useAuth.updateQuery(this.tableColumns, this.vista.qry)
         },
         async loadMaquinas() {
             this.setQuery()
@@ -138,7 +138,7 @@ export default {
         },
 
         async openConfigFiltros() {
-            const cols = this.columns
+            const cols = this.tableColumns
             for (const a of cols) {
                 if (a.id == 'linea') a.reload = this.loadLineas
             }

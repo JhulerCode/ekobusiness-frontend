@@ -318,7 +318,7 @@ defineExpose({ downloadData, openConfigCols })
 
 .row-options-case {
     position: absolute;
-    z-index: 1000;
+    z-index: 2;
     user-select: none;
     max-height: 15rem;
     overflow-y: auto;

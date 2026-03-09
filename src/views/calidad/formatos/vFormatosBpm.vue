@@ -13,8 +13,8 @@
             </div>
         </div>
 
-        <JdTable :name="tableName" :columns="columns" :datos="vista.formatos || []" :colAct="true"
-            :reload="loadFormatos" :rowOptions="tableRowOptions" @rowOptionSelected="runMethod"
+        <JdTable :name="tableName" :columns="tableColumns" :datos="vista.formatos || []" :colAct="true"
+            :reload="loadFormatos" :rowOptions="tableRowActions" @rowOptionSelected="runMethod"
             v-if="vista.formato_id == null">
         </JdTable>
 
@@ -71,7 +71,7 @@ export default {
                 sort: true
             },
         ],
-        tableRowOptions: [
+        tableRowActions: [
             { id: 1, label: 'Ver', icon: 'fa-regular fa-folder-open', action: 'ver', permiso: 'vFormatosBpm:listar' },
         ],
 
@@ -84,7 +84,7 @@ export default {
     }),
     created() {
         this.vista = this.useVistas.vFormatosBpm
-        this.useAuth.setColumns(this.tableName, this.columns)
+        this.useAuth.setColumns(this.tableName, this.tableColumns)
 
         if (this.vista.loaded) return
         this.loadFormatos()
@@ -120,7 +120,7 @@ export default {
 
             if (res.code != 0) return
 
-            this.columns1 = res.data.columns
+            this.tableColumns1 = res.data.columns
 
             this.vista.formato_id = res.data.id
             this.vista.formato_nombre = res.data.nombre
@@ -141,25 +141,25 @@ export default {
                 cols: [],
             }
 
-            const hasTransaccionItem = this.columns1.some(a => a.relacion == 'transaccion_items')
+            const hasTransaccionItem = this.tableColumns1.some(a => a.relacion == 'transaccion_items')
             if (hasTransaccionItem) qry.cols.push('transaccion_item')
 
-            const hasProduccionOrden = this.columns1.some(a => a.relacion == 'produccion_ordenes')
+            const hasProduccionOrden = this.tableColumns1.some(a => a.relacion == 'produccion_ordenes')
             if (hasProduccionOrden) qry.cols.push('produccion_orden')
 
-            const hasTransaccion = this.columns1.some(a => a.relacion == 'transacciones')
+            const hasTransaccion = this.tableColumns1.some(a => a.relacion == 'transacciones')
             if (hasTransaccion) qry.cols.push('transaccion')
 
-            // const hasCuarentenaProducto = this.columns1.some(a => a.relacion == 'cuarentena_productos')
+            // const hasCuarentenaProducto = this.tableColumns1.some(a => a.relacion == 'cuarentena_productos')
             // if (hasCuarentenaProducto) qry.cols.push('cuarentena_producto')
 
-            const hasMaquina = this.columns1.some(a => a.relacion == 'maquinas')
+            const hasMaquina = this.tableColumns1.some(a => a.relacion == 'maquinas')
             if (hasMaquina) qry.cols.push('maquina')
 
-            const hasArticulo = this.columns1.some(a => a.relacion == 'articulos')
+            const hasArticulo = this.tableColumns1.some(a => a.relacion == 'articulos')
             if (hasArticulo) qry.cols.push('articulo')
 
-            const hasColaborador = this.columns1.some(a => a.relacion == 'colaboradores')
+            const hasColaborador = this.tableColumns1.some(a => a.relacion == 'colaboradores')
             if (hasColaborador) qry.cols.push('colaborador')
 
             this.useAuth.setLoading(true, 'Cargando...')

@@ -8,7 +8,7 @@
             <div class="head-center">
                 <JdBuscador
                     :view="vista"
-                    :columns="columns"
+                    :columns="tableColumns"
                     :tableName="tableName"
                     @open-filters="openConfigFiltros"
                     @reload="loadActivityLogs"
@@ -37,7 +37,7 @@
         <JdTable
             ref="jdtable"
             :name="tableName"
-            :columns="columns"
+            :columns="tableColumns"
             :datos="vista.activity_logs || []"
             :reload="loadActivityLogs"
             :configFiltros="openConfigFiltros"
@@ -45,7 +45,7 @@
             :meta="vista.table_meta"
             @prevPage="((vista.table_page -= 1), loadActivityLogs())"
             @nextPage="((vista.table_page += 1), loadActivityLogs())"
-            :rowOptions="tableRowOptions"
+            :rowOptions="tableRowActions"
             @rowOptionSelected="runMethod"
         />
     </div>
@@ -58,7 +58,7 @@ import { mConfigFiltros, JdButton } from '@jhuler/components'
 import JdTable from '@/components/JdTable/JdTable.vue'
 import JdBuscador from '@/components/JdBuscador.vue'
 import JdPaginacion from '@/components/JdPaginacion.vue'
-import { columns, tableRowOptions } from './activity_logs.config.js'
+import { columns, tableRowActions } from './activity_logs.config.js'
 
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
@@ -84,12 +84,12 @@ export default {
 
         tableName: 'vActivityLogs',
         columns,
-        tableRowOptions,
+        tableRowActions,
     }),
     created() {
         this.vista = this.useVistas.vActivityLogs
         this.initFiltros()
-        this.useAuth.setColumns(this.tableName, this.columns)
+        this.useAuth.setColumns(this.tableName, this.tableColumns)
 
         if (this.vista.loaded) return
         this.vista.table_page = 1
@@ -97,10 +97,10 @@ export default {
     },
     methods: {
         initFiltros() {
-            this.columns[0].op = 'Es posterior a'
-            this.columns[0].val = dayjs().format('YYYY-MM-DDT00:00')
-            // this.columns[0].val = dayjs().startOf('week').format('YYYY-MM-DDTHH:mm')
-            // this.columns[0].val1 = dayjs().format('YYYY-MM-DDTHH:mm')
+            this.tableColumns[0].op = 'Es posterior a'
+            this.tableColumns[0].val = dayjs().format('YYYY-MM-DDT00:00')
+            // this.tableColumns[0].val = dayjs().startOf('week').format('YYYY-MM-DDTHH:mm')
+            // this.tableColumns[0].val1 = dayjs().format('YYYY-MM-DDTHH:mm')
         },
         setQuery() {
             this.vista.qry = {
@@ -109,7 +109,7 @@ export default {
                 page: this.vista.table_page,
             }
 
-            this.useAuth.updateQuery(this.columns, this.vista.qry)
+            this.useAuth.updateQuery(this.tableColumns, this.vista.qry)
         },
         async loadActivityLogs() {
             this.setQuery()
@@ -126,7 +126,7 @@ export default {
             this.vista.table_meta = res.meta
         },
         async openConfigFiltros() {
-            const cols = this.columns
+            const cols = this.tableColumns
             for (const a of cols) {
                 if (a.id == 'colaborador') a.reload = this.loadColaboradores
             }

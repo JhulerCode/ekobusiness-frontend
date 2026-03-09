@@ -1,4 +1,4 @@
-export const COLUMNS = [
+export const TABLE_COLUMNS = [
     {
         id: 'socio_pedido1.fecha',
         title: 'Fecha',

@@ -16,7 +16,7 @@
             <div class="head-center">
                 <JdBuscador
                     :view="vista"
-                    :columns="columns"
+                    :columns="tableColumns"
                     :tableName="tableName"
                     @open-filters="openConfigFiltros"
                     @reload="loadDocumentos"
@@ -45,12 +45,12 @@
         <JdTable
             ref="jdtable"
             :name="tableName"
-            :columns="columns"
+            :columns="tableColumns"
             :datos="vista.documentos || []"
             :colAct="true"
             :configFiltros="openConfigFiltros"
             :reload="loadDocumentos"
-            :rowOptions="tableRowOptions"
+            :rowOptions="tableRowActions"
             @rowOptionSelected="runMethod"
         />
     </div>
@@ -67,7 +67,7 @@ import { JdButton, mConfigFiltros, mPdfViewer } from '@jhuler/components'
 import JdTable from '@/components/JdTable/JdTable.vue'
 import JdBuscador from '@/components/JdBuscador.vue'
 import JdPaginacion from '@/components/JdPaginacion.vue'
-import { columns, tableRowOptions } from './documentos.config.js'
+import { columns, tableRowActions } from './documentos.config.js'
 
 import mDocumento from './mDocumento.vue'
 
@@ -100,11 +100,11 @@ export default {
 
         tableName: 'vDocumentos',
         columns,
-        tableRowOptions,
+        tableRowActions,
     }),
     created() {
         this.vista = this.useVistas.vDocumentos
-        this.useAuth.setColumns(this.tableName, this.columns)
+        this.useAuth.setColumns(this.tableName, this.tableColumns)
 
         if (this.vista.loaded) return
         if (this.useAuth.verifyPermiso('vDocumentos:listar') == true) this.loadDocumentos()
@@ -115,7 +115,7 @@ export default {
                 fltr: { tipo: { op: 'Es', val: 1 } },
             }
 
-            this.useAuth.updateQuery(this.columns, this.vista.qry)
+            this.useAuth.updateQuery(this.tableColumns, this.vista.qry)
             this.vista.qry.cols.push('file')
         },
         async loadDocumentos() {
@@ -141,7 +141,7 @@ export default {
         async openConfigFiltros() {
             await this.loadDatosSistema()
 
-            const cols = this.columns
+            const cols = this.tableColumns
             for (const a of cols) {
                 if (a.id == 'estado') a.lista = this.vista.documentos_estados
             }

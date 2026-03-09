@@ -1,4 +1,4 @@
-export const COLUMNS = [
+export const TABLE_COLUMNS = [
     {
         id: 'nombre',
         title: 'Nombre',
@@ -76,7 +76,7 @@ export const COLUMNS = [
     },
 ]
 
-export const TABLE_ROW_OPTIONS = [
+export const TABLE_ROW_ACTIONS = [
     {
         label: 'Editar',
         icon: 'fa-solid fa-pen-to-square',

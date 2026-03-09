@@ -22,7 +22,7 @@
             <div class="head-center">
                 <JdBuscador
                     :view="vista"
-                    :columns="columns"
+                    :columns="tableColumns"
                     :tableName="tableName"
                     @open-filters="openConfigFiltros"
                     @reload="loadTransacciones"
@@ -50,10 +50,10 @@
 
         <JdTable
             :name="tableName"
-            :columns="columns"
+            :columns="tableColumns"
             :datos="vista.transacciones || []"
             :colAct="true"
-            :rowOptions="tableRowOptions"
+            :rowOptions="tableRowActions"
             @rowOptionSelected="runMethod"
             ref="jdtable"
             :reload="loadTransacciones"
@@ -78,7 +78,7 @@ import JdPaginacion from '@/components/JdPaginacion.vue'
 import mFormato from '@/views/calidad/formatos/mFormato.vue'
 import mTransaccion from '@/views/logistica_entrada/compras/mTransaccion.vue'
 
-import { COLUMNS, TABLE_ROW_OPTIONS } from './ventas.config'
+import { TABLE_COLUMNS, TABLE_ROW_ACTIONS } from './ventas.config'
 
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
@@ -110,13 +110,13 @@ export default {
         vista: {},
 
         tableName: 'vVentas',
-        columns: JSON.parse(JSON.stringify(COLUMNS)),
-        tableRowOptions: TABLE_ROW_OPTIONS,
+        tableColumns: JSON.parse(JSON.stringify(TABLE_COLUMNS)),
+        tableRowActions: TABLE_ROW_ACTIONS,
     }),
     async created() {
         this.vista = this.useVistas.vVentas
         this.initFiltros()
-        this.useAuth.setColumns(this.tableName, this.columns)
+        this.useAuth.setColumns(this.tableName, this.tableColumns)
 
         if (this.vista.loaded) return
         this.vista.table_page = 1
@@ -124,10 +124,10 @@ export default {
     },
     methods: {
         initFiltros() {
-            if (!this.columns[0].val) {
-                this.columns[0].op = 'Está dentro de'
-                this.columns[0].val = dayjs().startOf('month').format('YYYY-MM-DD')
-                this.columns[0].val1 = dayjs().format('YYYY-MM-DD')
+            if (!this.tableColumns[0].val) {
+                this.tableColumns[0].op = 'Está dentro de'
+                this.tableColumns[0].val = dayjs().startOf('month').format('YYYY-MM-DD')
+                this.tableColumns[0].val1 = dayjs().format('YYYY-MM-DD')
             }
         },
         setQuery() {
@@ -137,7 +137,7 @@ export default {
                 page: this.vista.table_page,
             }
 
-            this.useAuth.updateQuery(this.columns, this.vista.qry)
+            this.useAuth.updateQuery(this.tableColumns, this.vista.qry)
             this.vista.qry.cols.push('tipo', 'calidad_revisado_despacho')
         },
         async loadTransacciones() {
@@ -196,7 +196,7 @@ export default {
         async openConfigFiltros() {
             await this.loadDatosSistema()
 
-            const cols = this.columns
+            const cols = this.tableColumns
             for (const a of cols) {
                 if (a.id == 'socio1.nombres') a.reload = this.loadSocios
                 if (a.id == 'pago_condicion') a.lista = this.vista.pago_condiciones

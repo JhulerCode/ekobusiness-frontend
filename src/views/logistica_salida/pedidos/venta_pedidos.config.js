@@ -1,4 +1,30 @@
-export const COLUMNS = [
+export const HEADER_ACTIONS = [
+    {
+        text: 'Nuevo',
+        action: 'nuevo',
+        permiso: 'vVentaPedidos:crear',
+    },
+    {
+        text: 'Recuperar',
+        action: 'recuperarGuardado',
+        permiso: 'vVentaPedidos:crear',
+        tipo: '2',
+        showIfAvance: 'mVentaPedido',
+    },
+    {
+        text: 'Descargar plantilla',
+        action: 'descargarPlantilla',
+        tipo: '2',
+    },
+    {
+        text: 'Ver productos pedidos',
+        action: 'verPedidos',
+        permiso: 'vVentaPedidos:verProductosPedidos',
+        tipo: '2',
+    },
+]
+
+export const TABLE_COLUMNS = [
     {
         id: 'fecha',
         title: 'Fecha',
@@ -113,7 +139,7 @@ export const COLUMNS = [
     },
 ]
 
-export const TABLE_ROW_OPTIONS = [
+export const TABLE_ROW_ACTIONS = [
     {
         label: 'Ver',
         icon: 'fa-regular fa-folder-open',

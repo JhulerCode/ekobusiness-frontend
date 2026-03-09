@@ -14,7 +14,7 @@
             <div class="head-center">
                 <JdBuscador
                     :view="vista"
-                    :columns="columns"
+                    :columns="tableColumns"
                     :tableName="tableName"
                     @open-filters="openConfigFiltros"
                     @reload="loadMrpBoms"
@@ -42,10 +42,10 @@
 
         <JdTable
             :name="tableName"
-            :columns="columns"
+            :columns="tableColumns"
             :datos="vista.mrp_boms || []"
             :colAct="true"
-            :rowOptions="tableRowOptions"
+            :rowOptions="tableRowActions"
             @rowOptionSelected="runMethod"
             ref="jdtable"
             :reload="loadMrpBoms"
@@ -66,7 +66,7 @@ import JdPaginacion from '@/components/JdPaginacion.vue'
 
 import mMrpBom from './mMrpBom.vue'
 
-import { COLUMNS, TABLE_ROW_OPTIONS } from './mrp_bom.config'
+import { TABLE_COLUMNS, TABLE_ROW_ACTIONS } from './mrp_bom.config'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
@@ -96,12 +96,12 @@ export default {
         vista: {},
 
         tableName: 'vMrpBom',
-        columns: JSON.parse(JSON.stringify(COLUMNS)),
-        tableRowOptions: TABLE_ROW_OPTIONS,
+        tableColumns: JSON.parse(JSON.stringify(TABLE_COLUMNS)),
+        tableRowActions: TABLE_ROW_ACTIONS,
     }),
     created() {
         this.vista = this.useVistas.vMrpBom
-        this.useAuth.setColumns(this.tableName, this.columns)
+        this.useAuth.setColumns(this.tableName, this.tableColumns)
 
         if (this.vista.loaded) return
         this.vista.table_page = 1
@@ -116,7 +116,7 @@ export default {
                 page: this.vista.table_page,
             }
 
-            this.useAuth.updateQuery(this.columns, this.vista.qry)
+            this.useAuth.updateQuery(this.tableColumns, this.vista.qry)
             this.vista.qry.cols.push('tipo1')
         },
         async loadMrpBoms() {
@@ -148,7 +148,7 @@ export default {
         async openConfigFiltros() {
             await this.loadDatosSistema()
 
-            const cols = this.columns
+            const cols = this.tableColumns
             for (const a of cols) {
                 if (a.id == 'tipo') a.lista = this.vista.mrp_bom_tipos
             }

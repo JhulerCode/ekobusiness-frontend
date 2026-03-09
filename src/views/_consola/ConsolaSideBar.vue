@@ -66,10 +66,7 @@
 
                 <transition name="to-width-cero">
                     <div class="user-texts" v-if="useAuth.showNavbar">
-                        <p
-                            class="user-name max-1line"
-                            :title="``"
-                        >
+                        <p class="user-name max-1line" :title="``">
                             {{ useAuth.usuario.nombres }}
                         </p>
                         <p class="max-1line" :title="useAuth.usuario.cargo">
@@ -100,10 +97,7 @@
                     {{ useAuth.usuario.nombres[0] }}
                 </div>
                 <div class="user-details">
-                    <p
-                        class="user-name max-1line"
-                        :title="``"
-                    >
+                    <p class="user-name max-1line" :title="``">
                         {{ useAuth.usuario.nombres }}
                     </p>
                     <p class="max-1line" :title="useAuth.usuario.cargo">
@@ -170,10 +164,10 @@ export default {
         },
     },
     mounted() {
-        document.addEventListener('click', this.handleClickOutside)
+        document.addEventListener('mousedown', this.handleClickOutside)
     },
     unmounted() {
-        document.removeEventListener('click', this.handleClickOutside)
+        document.removeEventListener('mousedown', this.handleClickOutside)
     },
     methods: {
         toogleNavbar() {

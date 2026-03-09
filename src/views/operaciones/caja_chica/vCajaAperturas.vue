@@ -17,7 +17,7 @@
             <div class="head-center">
                 <JdBuscador
                     :view="vista"
-                    :columns="columns"
+                    :columns="tableColumns"
                     :tableName="tableName"
                     @open-filters="openConfigFiltros"
                     @reload="loadCajaAperturas"
@@ -46,12 +46,12 @@
         <JdTable
             ref="jdtable"
             :name="tableName"
-            :columns="columns"
+            :columns="tableColumns"
             :datos="vista.caja_aperturas || []"
             :colAct="true"
             :configFiltros="openConfigFiltros"
             :reload="loadCajaAperturas"
-            :rowOptions="tableRowOptions"
+            :rowOptions="tableRowActions"
             @rowOptionSelected="runMethod"
         />
     </div>
@@ -67,7 +67,7 @@ import { JdButton, mConfigFiltros, mConfigCols } from '@jhuler/components'
 import JdTable from '@/components/JdTable/JdTable.vue'
 import JdBuscador from '@/components/JdBuscador.vue'
 import JdPaginacion from '@/components/JdPaginacion.vue'
-import { columns, tableRowOptions } from './caja_aperturas.config.js'
+import { columns, tableRowActions } from './caja_aperturas.config.js'
 
 import mCajaApertura from './mCajaApertura.vue'
 
@@ -99,11 +99,11 @@ export default {
 
         tableName: 'vCajaAperturas',
         columns,
-        tableRowOptions,
+        tableRowActions,
     }),
     created() {
         this.vista = this.useVistas.vCajaAperturas
-        this.useAuth.setColumns(this.tableName, this.columns)
+        this.useAuth.setColumns(this.tableName, this.tableColumns)
 
         if (this.vista.loaded) return
         if (this.useAuth.verifyPermiso('vCajaAperturas:listar') == true) this.loadCajaAperturas()
@@ -116,7 +116,7 @@ export default {
                 },
             }
 
-            this.useAuth.updateQuery(this.columns, this.vista.qry)
+            this.useAuth.updateQuery(this.tableColumns, this.vista.qry)
         },
         async loadCajaAperturas() {
             this.setQuery()
@@ -141,7 +141,7 @@ export default {
         async openConfigFiltros() {
             await this.loadDatosSistema()
 
-            const cols = this.columns
+            const cols = this.tableColumns
             for (const a of cols) {
                 if (a.id == 'estado') a.lista = this.vista.caja_apertura_estados
             }

@@ -1,5 +1,9 @@
 <template>
-    <JdModal modal="mPedidoMrpBomLines" :buttons="buttons" @button-click="(action) => this[action]()">
+    <JdModal
+        modal="mPedidoMrpBomLines"
+        :buttons="buttons"
+        @button-click="(action) => this[action]()"
+    >
         <JdTable
             :columns="columns"
             :datos="modal.articulos || []"

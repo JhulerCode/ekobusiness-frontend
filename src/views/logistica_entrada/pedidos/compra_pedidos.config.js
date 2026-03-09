@@ -1,4 +1,4 @@
-export const COLUMNS = [
+export const TABLE_COLUMNS = [
     {
         id: 'fecha',
         title: 'Fecha',
@@ -79,7 +79,7 @@ export const COLUMNS = [
     },
 ]
 
-export const TABLE_ROW_OPTIONS = [
+export const TABLE_ROW_ACTIONS = [
     {
         label: 'Ver',
         icon: 'fa-regular fa-folder-open',

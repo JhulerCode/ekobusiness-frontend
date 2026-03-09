@@ -86,7 +86,7 @@ export default {
     }),
     created() {
         this.vista = this.useVistas.vSessions
-        this.useAuth.setColumns(this.tableName, this.columns)
+        this.useAuth.setColumns(this.tableName, this.tableColumns)
 
         if (this.vista.loaded) return
 
@@ -175,7 +175,7 @@ export default {
                 fltr: {},
             }
 
-            this.useAuth.updateQuery(this.columns, this.vista.qry)
+            this.useAuth.updateQuery(this.tableColumns, this.vista.qry)
         },
         async loadSessions() {
             this.setQuery()

@@ -17,14 +17,14 @@
                     v-if="cantidadSeleccionados > 0"
                     :view="vista"
                     dataKey="socios"
-                    :bulkActions="tableActions"
+                    :tableBulkActions="tableBulkActions"
                     @bulkActionSelected="runMethod"
                 />
 
                 <JdBuscador
                     v-else
                     :view="vista"
-                    :columns="columns"
+                    :columns="tableColumns"
                     :tableName="tableName"
                     @open-filters="openConfigFiltros"
                     @reload="loadSocios"
@@ -52,13 +52,13 @@
 
         <JdTable
             :name="tableName"
-            :columns="columns"
+            :columns="tableColumns"
             :datos="vista.socios || []"
             :colAct="true"
-            :rowOptions="tableRowOptions"
+            :rowOptions="tableRowActions"
             @rowOptionSelected="runMethod"
             :rowSelectable="true"
-            :bulkActions="tableActions"
+            :tableBulkActions="tableBulkActions"
             @bulkActionSelected="runMethod"
             ref="jdtable"
             :reload="loadSocios"
@@ -81,7 +81,7 @@ import JdTable from '@/components/JdTable/JdTable.vue'
 import JdPaginacion from '@/components/JdPaginacion.vue'
 
 // Configuración de la vista
-import { COLUMNS, TABLE_ACTIONS, TABLE_ROW_OPTIONS } from './proveedores.config'
+import { TABLE_COLUMNS, TABLE_BULK_ACTIONS, TABLE_ROW_ACTIONS } from './proveedores.config'
 
 // Modales específicos
 import mSocio from '@/views/logistica_entrada/proveedores/mSocio.vue'
@@ -115,9 +115,9 @@ export default {
         tableName: 'vProveedores',
 
         // Configuraciones traídas de proveedores.config.js
-        columns: JSON.parse(JSON.stringify(COLUMNS)),
-        tableActions: TABLE_ACTIONS,
-        tableRowOptions: TABLE_ROW_OPTIONS,
+        tableColumns: JSON.parse(JSON.stringify(TABLE_COLUMNS)),
+        tableBulkActions: TABLE_BULK_ACTIONS,
+        tableRowActions: TABLE_ROW_ACTIONS,
     }),
     computed: {
         cantidadSeleccionados() {
@@ -126,7 +126,7 @@ export default {
     },
     async created() {
         this.vista = this.useVistas.vProveedores
-        this.useAuth.setColumns(this.tableName, this.columns)
+        this.useAuth.setColumns(this.tableName, this.tableColumns)
 
         if (this.vista.loaded) return
         this.vista.table_page = 1
@@ -145,7 +145,7 @@ export default {
                 ordr: [['nombres', 'ASC']],
                 page: this.vista.table_page,
             }
-            this.useAuth.updateQuery(this.columns, this.vista.qry)
+            this.useAuth.updateQuery(this.tableColumns, this.vista.qry)
         },
         async loadSocios() {
             this.setQuery()
@@ -221,7 +221,7 @@ export default {
         },
         async editarBulk() {
             await this.loadDatosSistema()
-            const cols = this.columns
+            const cols = this.tableColumns
             for (const a of cols) {
                 if (a.id == 'doc_tipo') a.lista = this.vista.documentos_identidad
                 if (a.id == 'activo') a.lista = this.vista.estados
@@ -242,7 +242,7 @@ export default {
         // --- Otros ---
         async openConfigFiltros() {
             await this.loadDatosSistema()
-            const cols = this.columns
+            const cols = this.tableColumns
             for (const a of cols) {
                 if (a.id == 'doc_tipo') a.lista = this.vista.documentos_identidad
                 if (a.id == 'activo') a.lista = this.vista.estados

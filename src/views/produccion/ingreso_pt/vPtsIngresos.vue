@@ -15,7 +15,7 @@
             <div class="head-center">
                 <JdBuscador
                     :view="vista"
-                    :columns="columns"
+                    :columns="tableColumns"
                     :tableName="tableName"
                     @open-filters="openConfigFiltros"
                     @reload="loadTransacciones"
@@ -43,10 +43,10 @@
 
         <JdTable
             :name="tableName"
-            :columns="columns"
+            :columns="tableColumns"
             :datos="vista.produccion_productos || []"
             :colAct="true"
-            :rowOptions="tableRowOptions"
+            :rowOptions="tableRowActions"
             @rowOptionSelected="runMethod"
             ref="jdtable"
             :reload="loadTransacciones"
@@ -71,7 +71,7 @@ import mProductosCuarentena from '@/views/produccion/ingreso_pt/mProductosCuaren
 import mFormato from '@/views/calidad/formatos/mFormato.vue'
 import mProduccionTrazabilidad from '@/views/produccion/historial/mProduccionTrazabilidad.vue'
 
-import { COLUMNS, TABLE_ROW_OPTIONS } from './pts_ingresos.config'
+import { TABLE_COLUMNS, TABLE_ROW_ACTIONS } from './pts_ingresos.config'
 
 import { useModals } from '@/pinia/modals'
 import { useAuth } from '@/pinia/auth'
@@ -105,13 +105,13 @@ export default {
         vista: {},
 
         tableName: 'vPtsIngresos',
-        columns: JSON.parse(JSON.stringify(COLUMNS)),
-        tableRowOptions: TABLE_ROW_OPTIONS,
+        tableColumns: JSON.parse(JSON.stringify(TABLE_COLUMNS)),
+        tableRowActions: TABLE_ROW_ACTIONS,
     }),
     async created() {
         this.vista = this.useVistas.vPtsIngresos
         this.initFiltros()
-        this.useAuth.setColumns(this.tableName, this.columns)
+        this.useAuth.setColumns(this.tableName, this.tableColumns)
 
         if (this.vista.loaded) return
         this.vista.table_page = 1
@@ -119,10 +119,10 @@ export default {
     },
     methods: {
         initFiltros() {
-            if (!this.columns[0].val) {
-                this.columns[0].op = 'Está dentro de'
-                this.columns[0].val = dayjs().startOf('month').format('YYYY-MM-DD')
-                this.columns[0].val1 = dayjs().format('YYYY-MM-DD')
+            if (!this.tableColumns[0].val) {
+                this.tableColumns[0].op = 'Está dentro de'
+                this.tableColumns[0].val = dayjs().startOf('month').format('YYYY-MM-DD')
+                this.tableColumns[0].val1 = dayjs().format('YYYY-MM-DD')
             }
         },
         setQuery() {
@@ -140,7 +140,7 @@ export default {
                 page: this.vista.table_page,
             }
 
-            this.useAuth.updateQuery(this.columns, this.vista.qry)
+            this.useAuth.updateQuery(this.tableColumns, this.vista.qry)
         },
         async loadTransacciones() {
             this.setQuery()
@@ -162,7 +162,7 @@ export default {
         },
 
         async openConfigFiltros() {
-            const cols = this.columns
+            const cols = this.tableColumns
             for (const a of cols) {
                 if (a.id == 'produccion_orden1.linea') a.reload = this.loadLineas
                 if (a.id == 'maquina') a.reload = this.loadMaquinas

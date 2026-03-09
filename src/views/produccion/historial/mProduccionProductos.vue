@@ -53,7 +53,7 @@
             :seeker="false"
             :download="false"
             :reload="loadProduccionProductos"
-            :rowOptions="tableRowOptions"
+            :rowOptions="tableRowActions"
             @rowOptionSelected="runMethod"
         >
         </JdTable>
@@ -118,7 +118,7 @@ export default {
                 show: true,
             },
         ],
-        tableRowOptions: [
+        tableRowActions: [
             {
                 label: 'Editar',
                 icon: 'fa-solid fa-pen-to-square',

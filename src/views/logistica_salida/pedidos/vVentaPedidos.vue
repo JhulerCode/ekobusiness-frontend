@@ -1,44 +1,16 @@
 <template>
     <div class="vista vista-fill">
         <div class="head">
-            <div class="head-left">
-                <strong>Pedidos de venta</strong>
+            <div class="head-left" style="flex-wrap: nowrap">
+                <strong style="white-space: nowrap">Pedidos de venta</strong>
 
-                <JdButton
-                    text="Nuevo"
-                    @click="nuevo()"
-                    v-if="useAuth.verifyPermiso('vVentaPedidos:crear')"
-                />
-
-                <JdButton
-                    text="Descargar plantilla"
-                    title="Para pedidos de venta"
-                    tipo="2"
-                    @click="descargarPlantilla"
-                />
-
-                <JdButton
-                    text="Ver productos pedidos"
-                    tipo="2"
-                    @click="verPedidos()"
-                    v-if="useAuth.verifyPermiso('vVentaPedidos:verProductosPedidos')"
-                />
-
-                <JdButton
-                    text="Recuperar"
-                    tipo="2"
-                    title="Recuperar guardado"
-                    @click="recuperarGuardado()"
-                    v-if="
-                        useAuth.avances.mVentaPedido && useAuth.verifyPermiso('vVentaPedidos:crear')
-                    "
-                />
+                <JdButtonsOverflow :buttons="headerActions" @runMethod="runMethod" />
             </div>
 
             <div class="head-center">
                 <JdBuscador
                     :view="vista"
-                    :columns="columns"
+                    :columns="tableColumns"
                     :tableName="tableName"
                     @open-filters="openConfigFiltros"
                     @reload="loadPedidos"
@@ -66,10 +38,10 @@
 
         <JdTable
             :name="tableName"
-            :columns="columns"
+            :columns="tableColumns"
             :datos="vista.pedidos || []"
             :colAct="true"
-            :rowOptions="tableRowOptions"
+            :rowOptions="tableRowActions"
             @rowOptionSelected="runMethod"
             ref="jdtable"
             :reload="loadPedidos"
@@ -87,16 +59,17 @@
 
 <script>
 import { JdButton, mConfigFiltros, mConfigCols } from '@jhuler/components'
+import JdButtonsOverflow from '@/components/JdButtonsOverflow.vue'
 import JdBuscador from '@/components/JdBuscador.vue'
-import JdTable from '@/components/JdTable/JdTable.vue'
 import JdPaginacion from '@/components/JdPaginacion.vue'
+import JdTable from '@/components/JdTable/JdTable.vue'
 
 import mPedidosClientes from './mPedidosClientes.vue'
 import mSocioPedido from '@/views/logistica_entrada/pedidos/mSocioPedido.vue'
 import mSocioPedidoPdf from '@/views/logistica_entrada/pedidos/mSocioPedidoPdf.vue'
 import mTransaccion from '@/views/logistica_entrada/compras/mTransaccion.vue'
 
-import { COLUMNS, TABLE_ROW_OPTIONS } from './venta_pedidos.config'
+import { TABLE_COLUMNS, TABLE_ROW_ACTIONS, HEADER_ACTIONS } from './venta_pedidos.config'
 
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
@@ -112,9 +85,11 @@ export default {
     name: 'vVentaPedidos',
     components: {
         JdButton,
+        JdButtonsOverflow,
         JdBuscador,
         JdTable,
         JdPaginacion,
+
         mConfigCols,
         mConfigFiltros,
         mPedidosClientes,
@@ -130,14 +105,15 @@ export default {
 
         vista: {},
 
+        headerActions: HEADER_ACTIONS,
         tableName: 'vVentaPedidos',
-        columns: JSON.parse(JSON.stringify(COLUMNS)),
-        tableRowOptions: TABLE_ROW_OPTIONS,
+        tableColumns: JSON.parse(JSON.stringify(TABLE_COLUMNS)),
+        tableRowActions: TABLE_ROW_ACTIONS,
     }),
     async created() {
         this.vista = this.useVistas.vVentaPedidos
         this.initFiltros()
-        this.useAuth.setColumns(this.tableName, this.columns)
+        this.useAuth.setColumns(this.tableName, this.tableColumns)
 
         if (this.vista.loaded) return
         this.vista.table_page = 1
@@ -145,10 +121,10 @@ export default {
     },
     methods: {
         initFiltros() {
-            if (!this.columns[0].val) {
-                this.columns[0].op = 'Está dentro de'
-                this.columns[0].val = dayjs().startOf('month').format('YYYY-MM-DD')
-                this.columns[0].val1 = dayjs().format('YYYY-MM-DD')
+            if (!this.tableColumns[0].val) {
+                this.tableColumns[0].op = 'Está dentro de'
+                this.tableColumns[0].val = dayjs().startOf('month').format('YYYY-MM-DD')
+                this.tableColumns[0].val1 = dayjs().format('YYYY-MM-DD')
             }
         },
         setQuery() {
@@ -159,7 +135,7 @@ export default {
                 page: this.vista.table_page,
             }
 
-            this.useAuth.updateQuery(this.columns, this.vista.qry)
+            this.useAuth.updateQuery(this.tableColumns, this.vista.qry)
         },
         async loadPedidos() {
             this.setQuery()
@@ -213,7 +189,7 @@ export default {
         async openConfigFiltros() {
             await this.loadDatosSistema()
 
-            const cols = this.columns
+            const cols = this.tableColumns
             for (const a of cols) {
                 if (a.id == 'socio1.nombres') a.reload = this.loadSocios
                 if (a.id == 'pago_condicion') a.lista = this.vista.pago_condiciones

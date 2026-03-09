@@ -15,7 +15,7 @@
             <div class="head-center">
                 <JdBuscador
                     :view="vista"
-                    :columns="columns"
+                    :columns="tableColumns"
                     :tableName="tableName"
                     @open-filters="openConfigFiltros"
                     @reload="loadInspecciones"
@@ -43,10 +43,10 @@
 
         <JdTable
             :name="tableName"
-            :columns="columns"
+            :columns="tableColumns"
             :datos="vista.inspecciones || []"
             :colAct="true"
-            :rowOptions="tableRowOptions"
+            :rowOptions="tableRowActions"
             @rowOptionSelected="runMethod"
             ref="jdtable"
             :reload="loadInspecciones"
@@ -66,7 +66,7 @@ import JdPaginacion from '@/components/JdPaginacion.vue'
 
 import mInspeccion from './mInspeccion.vue'
 
-import { COLUMNS, TABLE_ROW_OPTIONS } from './inspecciones.config'
+import { TABLE_COLUMNS, TABLE_ROW_ACTIONS } from './inspecciones.config'
 
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
@@ -97,12 +97,12 @@ export default {
         vista: {},
 
         tableName: 'vInspecciones',
-        columns: JSON.parse(JSON.stringify(COLUMNS)),
-        tableRowOptions: TABLE_ROW_OPTIONS,
+        tableColumns: JSON.parse(JSON.stringify(TABLE_COLUMNS)),
+        tableRowActions: TABLE_ROW_ACTIONS
     }),
     created() {
         this.vista = this.useVistas.vInspecciones
-        this.useAuth.setColumns(this.tableName, this.columns)
+        this.useAuth.setColumns(this.tableName, this.tableColumns)
 
         if (this.vista.loaded) return
         this.vista.table_page = 1
@@ -116,7 +116,7 @@ export default {
                 page: this.vista.table_page,
             }
 
-            this.useAuth.updateQuery(this.columns, this.vista.qry)
+            this.useAuth.updateQuery(this.tableColumns, this.vista.qry)
         },
         async loadInspecciones() {
             this.setQuery()
@@ -143,7 +143,7 @@ export default {
         },
 
         async openConfigFiltros() {
-            const cols = this.columns
+            const cols = this.tableColumns
             for (const a of cols) {
                 if (a.id == 'socio') a.reload = this.loadSocios
             }

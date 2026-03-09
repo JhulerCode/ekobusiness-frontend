@@ -20,13 +20,9 @@ export default {}
         padding: 1.5rem 2rem;
 
         > .head {
-            // display: flex;
-            // justify-content: space-between;
-            // align-items: center;
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 1rem;
-            flex-wrap: wrap;
+            grid-template-columns: 1fr 1.25fr 1fr;
+            gap: 1rem 2rem;
             margin-bottom: 1rem;
 
             .head-left {
@@ -34,6 +30,7 @@ export default {}
                 align-items: center;
                 gap: 0.5rem;
                 flex-wrap: wrap;
+                min-width: 0;
 
                 strong {
                     font-size: 1.4rem;
@@ -45,20 +42,40 @@ export default {}
                 justify-content: center;
                 gap: 0.5rem;
                 flex-wrap: wrap;
+                min-width: 0;
             }
 
             .head-right {
                 display: flex;
                 align-items: center;
+                justify-content: end;
                 gap: 0.25rem;
                 flex-wrap: wrap;
-                justify-self: end;
+                min-width: 0;
             }
 
-            .buttons {
-                display: flex;
-                gap: 0.5rem;
-                flex-wrap: wrap;
+            @media (max-width: 1024px) {
+                grid-template-columns: 1fr 1fr;
+
+                .head-center {
+                    grid-column: 1 / -1;
+                    grid-row: 2;
+                }
+            }
+
+            @media (max-width: 768px) {
+                grid-template-columns: 1fr;
+
+                .head-center {
+                    grid-column: 1 / -1;
+                    grid-row: 3;
+                    justify-content: flex-start;
+                }
+
+                .head-right {
+                    grid-row: 2;
+                    justify-content: start;
+                }
             }
         }
     }

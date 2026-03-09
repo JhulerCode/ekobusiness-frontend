@@ -6,7 +6,7 @@
                     :nec="true"
                     :label="modal.transaccion.tipo == 1 ? 'Proveedor' : 'Cliente'"
                     :lista="modal.socios || []"
-                    mostrar="nombres_apellidos"
+                    mostrar="nombres"
                     :loaded="modal.sociosLoaded"
                     @reload="loadSocios"
                     @elegir="setSocio"
@@ -411,19 +411,9 @@ export default {
                     tipo: { op: 'Es', val: this.modal.transaccion.tipo == 1 ? 1 : 2 },
                     activo: { op: 'Es', val: true },
                 },
-                cols: [
-                    'nombres',
-                    'apellidos',
-                    'nombres_apellidos',
-                    'contactos',
-                    'direcciones',
-                    'precio_lista',
-                ],
+                cols: ['nombres', 'contactos', 'direcciones', 'precio_lista'],
                 incl: ['precio_lista1'],
-                ordr: [
-                    ['nombres', 'ASC'],
-                    ['apellidos', 'ASC'],
-                ],
+                ordr: [['nombres', 'ASC']],
             }
 
             this.modal.socios = []

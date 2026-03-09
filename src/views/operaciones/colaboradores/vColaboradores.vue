@@ -66,16 +66,7 @@ export default {
         columns: [
             {
                 id: 'nombres',
-                title: 'Nombres',
-                type: 'text',
-                width: '10rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'apellidos',
-                title: 'Apellidos',
+                title: 'Nombres y apellidos',
                 type: 'text',
                 width: '10rem',
                 show: true,

@@ -7,7 +7,7 @@
                 <JdInput label="Fecha" v-model="modal.transaccion_item1.transaccion1.fecha" :disabled="true" />
                 <JdInput label="Guía" v-model="modal.transaccion_item1.transaccion1.guia" :disabled="true" />
                 <JdInput :label="modal.transaccion_item1.transaccion1.tipo == 1 ? 'Proveedor' : 'Cliente'"
-                    v-model="modal.transaccion_item1.transaccion1.socio1.nombres_apellidos" :disabled="true" />
+                    v-model="modal.transaccion_item1.transaccion1.socio1.nombres" :disabled="true" />
                 <JdInput label="Artículo" v-model="modal.transaccion_item1.articulo1.nombre" :disabled="true" />
                 <JdInput label="Cantidad" v-model="modal.transaccion_item1.cantidad" :disabled="true" />
                 <JdInput label="Lote" v-model="modal.transaccion_item1.lote" :disabled="true" />
@@ -24,7 +24,7 @@
             <template v-if="modal.transaccion1">
                 <JdInput label="Fecha" v-model="modal.transaccion1.fecha" :disabled="true" />
                 <JdInput label="Guía de remisión" v-model="modal.transaccion1.guia" :disabled="true" />
-                <JdInput label="Destino" v-model="modal.transaccion1.socio1.nombres_apellidos" :disabled="true" />
+                <JdInput label="Destino" v-model="modal.transaccion1.socio1.nombres" :disabled="true" />
             </template>
 
             <template v-if="modal.cuarentena_producto1">

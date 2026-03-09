@@ -324,7 +324,7 @@ export default {
         async loadColaboradores() {
             const qry = {
                 fltr: {},
-                cols: ['nombres', 'apellidos', 'nombres_apellidos'],
+                cols: ['nombres', 'nombres'],
                 ordr: [['nombres', 'ASC']],
             }
 

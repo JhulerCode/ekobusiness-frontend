@@ -55,7 +55,7 @@
 
 <script>
 import { JdSelectQuery, JdButton } from '@jhuler/components'
-import JdTable from '@/components/JdTable.vue'
+import JdTable from '@/components/JdTable/JdTable.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'

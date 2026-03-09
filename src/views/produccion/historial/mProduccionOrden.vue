@@ -91,7 +91,7 @@
                 label="Responsable"
                 :nec="true"
                 :lista="modal.colaboradores"
-                mostrar="nombres_apellidos"
+                mostrar="nombres"
                 :loaded="modal.colaboradores_loaded && modal.produccion_orden.articulo != null"
                 @reload="loadColaboradores"
                 v-model="modal.produccion_orden.responsable"
@@ -297,11 +297,8 @@ export default {
                 fltr: {
                     activo: { op: 'Es', val: true },
                 },
-                cols: ['nombres', 'apellidos', 'nombres_apellidos', 'produccion_codigo'],
-                ordr: [
-                    ['nombres', 'ASC'],
-                    ['apellidos', 'ASC'],
-                ],
+                cols: ['nombres', 'produccion_codigo'],
+                ordr: [['nombres', 'ASC']],
             }
 
             this.useAuth.setLoading(true, 'Cargando...')

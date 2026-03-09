@@ -16,7 +16,6 @@ export const COLUMNS = [
         prop: 'tipo1.nombre',
         width: '8rem',
         show: true,
-        seek: true,
         sort: true,
     },
 ]

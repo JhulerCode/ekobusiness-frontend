@@ -34,7 +34,7 @@ export const COLUMNS = [
         title: 'Proveedor',
         prop: 'transaccion1.socio1.nombres',
         type: 'select',
-        mostrar: 'nombres_apellidos',
+        mostrar: 'nombres',
         width: '15rem',
         show: true,
         seek: true,

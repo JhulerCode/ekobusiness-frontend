@@ -6,7 +6,7 @@
                 :nec="true"
                 v-model="modal.asistencia.colaborador"
                 :lista="modal.colaboradores || []"
-                mostrar="nombres_apellidos"
+                mostrar="nombres"
                 :disabled="modal.mode == 3"
             />
 

@@ -87,7 +87,7 @@
                         <li>
                             <strong>Razón social</strong>
                             <span>:</span>
-                            <span>{{ modal.socio_pedido.socio1.nombres_apellidos }}</span>
+                            <span>{{ modal.socio_pedido.socio1.nombres }}</span>
                         </li>
 
                         <li>
@@ -121,7 +121,7 @@
                         <li>
                             <strong>Contacto</strong>
                             <span>:</span>
-                            <span>{{ modal.socio_pedido.createdBy1.nombres_apellidos }}</span>
+                            <span>{{ modal.socio_pedido.createdBy1.nombres }}</span>
                         </li>
 
                         <li>

@@ -1,7 +1,7 @@
 <template>
     <div class="finanzas">
         <div class="container-datos1">
-            <JdSelect
+            <!-- <JdSelect
                 label="Lista de precios"
                 v-model="socio.precio_lista"
                 :lista="modal.precio_listas"
@@ -10,7 +10,7 @@
                 :disabled="modal.mode == 3"
                 style="grid-column: 1/4"
                 v-if="this.socio.tipo == 1"
-            />
+            /> -->
 
             <!-- <JdInput label="Condición de pago" type="number" v-model="socio.pago_condicion" :disabled="modal.mode == 3"
                 style="grid-column: 4/6;" /> -->

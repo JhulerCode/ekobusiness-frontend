@@ -5,7 +5,7 @@
                 label="Cliente"
                 v-model="modal.socio"
                 :lista="modal.clientes || []"
-                mostrar="nombres_apellidos"
+                mostrar="nombres"
                 :loaded="modal.clientesLoaded"
                 @reload="loadClientes"
             />
@@ -116,11 +116,8 @@ export default {
         async loadClientes() {
             const qry = {
                 fltr: { tipo: { op: 'Es', val: 2 }, activo: { op: 'Es', val: true } },
-                cols: ['nombres', 'apellidos', 'nombres_apellidos'],
-                ordr: [
-                    ['nombres', 'ASC'],
-                    ['apellidos', 'ASC'],
-                ],
+                cols: ['nombres'],
+                ordr: [['nombres', 'ASC']],
             }
 
             this.modal.clientesLoaded = false

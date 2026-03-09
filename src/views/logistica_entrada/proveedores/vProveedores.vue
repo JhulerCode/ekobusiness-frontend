@@ -186,7 +186,6 @@ export default {
             if (res.code != 0) return
             const send = {
                 item: res.data,
-                precio_listas: [{ ...res.data.precio_lista1 }],
             }
             this.useModals.setModal('mSocio', 'Ver proveedor', 3, send, true)
         },
@@ -195,7 +194,10 @@ export default {
             const res = await get(`${urls.socios}/uno/${item.id}`)
             this.useAuth.setLoading(false)
             if (res.code != 0) return
-            this.useModals.setModal('mSocio', 'Editar proveedor', 2, res.data, true)
+            const send = {
+                item: res.data,
+            }
+            this.useModals.setModal('mSocio', 'Editar proveedor', 2, send, true)
         },
         async eliminar(item) {
             const resQst = await jqst('¿Está seguro de eliminar?')

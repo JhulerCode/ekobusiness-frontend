@@ -37,8 +37,7 @@ export function useTable(props, emit) {
     }
 
     function sortData(column, orden) {
-        const { id, prop, sort } = column
-        if (!sort) return
+        const { id, prop } = column
 
         const col = props.columns.find((a) => a.id == id)
         if (orden) {

@@ -68,9 +68,9 @@
                     <div class="user-texts" v-if="useAuth.showNavbar">
                         <p
                             class="user-name max-1line"
-                            :title="`${useAuth.usuario.nombres} ${useAuth.usuario.apellidos}`"
+                            :title="``"
                         >
-                            {{ useAuth.usuario.nombres }} {{ useAuth.usuario.apellidos }}
+                            {{ useAuth.usuario.nombres }}
                         </p>
                         <p class="max-1line" :title="useAuth.usuario.cargo">
                             <small>{{ useAuth.usuario.cargo }}</small>
@@ -102,9 +102,9 @@
                 <div class="user-details">
                     <p
                         class="user-name max-1line"
-                        :title="`${useAuth.usuario.nombres} ${useAuth.usuario.apellidos}`"
+                        :title="``"
                     >
-                        {{ useAuth.usuario.nombres }} {{ useAuth.usuario.apellidos }}
+                        {{ useAuth.usuario.nombres }}
                     </p>
                     <p class="max-1line" :title="useAuth.usuario.cargo">
                         <small>{{ useAuth.usuario.cargo }}</small>

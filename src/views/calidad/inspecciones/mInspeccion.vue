@@ -12,7 +12,7 @@
                 label="Cliente"
                 :nec="true"
                 :lista="modal.socios"
-                mostrar="nombres_apellidos"
+                mostrar="nombres"
                 v-model="inspeccion.socio"
                 :disabled="modal.mode == 3"
             />
@@ -187,11 +187,8 @@ export default {
         async loadSocios() {
             const qry = {
                 fltr: { tipo: { op: 'Es', val: 2 }, activo: { op: 'Es', val: true } },
-                cols: ['nombres', 'apellidos', 'nombres_apellidos'],
-                ordr: [
-                    ['nombres', 'ASC'],
-                    ['apellidos', 'ASC'],
-                ],
+                cols: ['nombres'],
+                ordr: [['nombres', 'ASC']],
             }
 
             this.modal.socios = []

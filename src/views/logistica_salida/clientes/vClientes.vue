@@ -121,10 +121,7 @@ export default {
         setQuery() {
             this.vista.qry = {
                 fltr: { tipo: { op: 'Es', val: 2 } },
-                ordr: [
-                    ['nombres', 'ASC'],
-                    ['apellidos', 'ASC'],
-                ],
+                ordr: [['nombres', 'ASC']],
                 page: this.vista.table_page,
             }
 

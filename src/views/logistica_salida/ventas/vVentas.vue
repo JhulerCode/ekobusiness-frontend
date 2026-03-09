@@ -368,11 +368,8 @@ export default {
         async loadSocios() {
             const qry = {
                 fltr: { tipo: { op: 'Es', val: 2 }, activo: { op: 'Es', val: true } },
-                cols: ['nombres', 'apellidos', 'nombres_apellidos'],
-                ordr: [
-                    ['nombres', 'ASC'],
-                    ['apellidos', 'ASC'],
-                ],
+                cols: ['nombres'],
+                ordr: [['nombres', 'ASC']],
             }
 
             this.useAuth.setLoading(true, 'Cargando...')

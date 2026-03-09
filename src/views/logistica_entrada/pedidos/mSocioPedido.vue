@@ -7,7 +7,7 @@
                     :nec="true"
                     v-model="modal.socio_pedido.socio"
                     :lista="modal.socios || []"
-                    mostrar="nombres_apellidos"
+                    mostrar="nombres"
                     @elegir="setSocio"
                     :loaded="modal.sociosLoaded"
                     @reload="loadSocios"
@@ -366,20 +366,9 @@ export default {
                     tipo: { op: 'Es', val: this.modal.socio_pedido.tipo },
                     activo: { op: 'Es', val: true },
                 },
-                cols: [
-                    'nombres',
-                    'apellidos',
-                    'nombres_apellidos',
-                    'contactos',
-                    'direcciones',
-                    'precio_lista',
-                    'pago_condicion',
-                ],
+                cols: ['nombres', 'contactos', 'direcciones', 'precio_lista', 'pago_condicion'],
                 incl: ['precio_lista1'],
-                ordr: [
-                    ['nombres', 'ASC'],
-                    ['apellidos', 'ASC'],
-                ],
+                ordr: [['nombres', 'ASC']],
             }
 
             this.modal.socios = []

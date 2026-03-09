@@ -67,7 +67,7 @@ export const COLUMNS = [
     {
         id: 'createdBy1.nombres',
         title: 'Creado por',
-        prop: 'createdBy1.nombres_apellidos',
+        prop: 'createdBy1.nombres',
         type: 'text',
         width: '10rem',
         show: true,

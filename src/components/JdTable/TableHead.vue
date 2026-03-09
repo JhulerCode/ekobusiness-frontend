@@ -23,10 +23,7 @@
                 v-show="col.show"
                 :class="['th-vfor', { 'th-vfor-right': col.toRight }]"
             >
-                <div
-                    :class="['th-vfor-title', { 'th-vfor-sortable': col.sort }]"
-                    @click="$emit('sort', col)"
-                >
+                <div class="th-vfor-title th-vfor-sortable" @click="$emit('sort', col)">
                     <i v-if="col.sortDirection === 'desc'" class="fa-solid fa-arrow-up"></i>
                     <i v-if="col.sortDirection === 'asc'" class="fa-solid fa-arrow-down"></i>
                     <span>{{ col.title }}</span>

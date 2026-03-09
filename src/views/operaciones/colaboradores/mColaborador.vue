@@ -18,15 +18,9 @@
                 />
 
                 <JdInput
-                    label="Nombres"
+                    label="Nombres y apellidos"
                     :nec="true"
                     v-model="colaborador.nombres"
-                    :disabled="modal.mode == 3"
-                />
-                <JdInput
-                    label="Apellidos"
-                    :nec="true"
-                    v-model="colaborador.apellidos"
                     :disabled="modal.mode == 3"
                 />
 
@@ -235,15 +229,7 @@ export default {
         },
 
         checkDatos() {
-            const props = [
-                'nombres',
-                'apellidos',
-                'doc_tipo',
-                'doc_numero',
-                'cargo',
-                'activo',
-                'has_signin',
-            ]
+            const props = ['nombres', 'doc_tipo', 'doc_numero', 'cargo', 'activo', 'has_signin']
 
             if (this.colaborador.has_signin) props.push('vista_inicial', 'usuario', 'contrasena')
 

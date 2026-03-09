@@ -6,7 +6,7 @@
                     :nec="true"
                     :label="modal.transaccion.tipo == 1 ? 'Proveedor' : 'Cliente'"
                     :lista="modal.socios || []"
-                    mostrar="nombres_apellidos"
+                    mostrar="nombres"
                     :loaded="modal.sociosLoaded"
                     @reload="loadSocios"
                     v-model="modal.transaccion.socio"
@@ -162,8 +162,7 @@ export default {
         //         },
         //         cols: [
         //             'nombres',
-        //             'apellidos',
-        //             'nombres_apellidos',
+        //             //             'nombres',
         //             'contactos',
         //             'direcciones',
         //             'precio_lista',
@@ -171,7 +170,7 @@ export default {
         //         incl: ['precio_lista1'],
         //         ordr: [
         //             ['nombres', 'ASC'],
-        //             ['apellidos', 'ASC'],
+        //             ['ASC'],
         //         ],
         //     }
 

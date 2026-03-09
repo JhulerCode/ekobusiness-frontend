@@ -23,7 +23,6 @@ export const COLUMNS = [
         type: 'date',
         width: '12rem',
         show: true,
-        seek: true,
         sort: true,
     },
     {
@@ -33,7 +32,6 @@ export const COLUMNS = [
         format: 'date',
         width: '12rem',
         show: true,
-        seek: true,
         sort: true,
     },
     {
@@ -43,7 +41,6 @@ export const COLUMNS = [
         format: 'date',
         width: '12rem',
         show: true,
-        seek: true,
         sort: true,
     },
     {
@@ -52,7 +49,6 @@ export const COLUMNS = [
         type: 'number',
         width: '8rem',
         show: true,
-        seek: true,
         sort: true,
     },
     {
@@ -63,7 +59,6 @@ export const COLUMNS = [
         format: 'estado',
         width: '10rem',
         show: true,
-        seek: true,
         sort: true,
     },
 ]

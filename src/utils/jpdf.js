@@ -253,7 +253,7 @@ export const generarOcPDF = async (data) => {
                                 [
                                     { text: 'Contacto', bold: true },
                                     { text: ':' },
-                                    { text: data.createdBy1.nombres + ' ' + data.createdBy1.apellidos },
+                                    { text: data.createdBy1.nombres },
                                 ],
                                 [
                                     { text: 'Cargo', bold: true },

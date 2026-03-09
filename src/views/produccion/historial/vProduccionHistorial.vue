@@ -581,11 +581,8 @@ export default {
         async loadColaboradores() {
             const qry = {
                 fltr: { activo: { op: 'Es', val: true } },
-                cols: ['nombres', 'apellidos', 'nombres_apellidos', 'produccion_codigo'],
-                ordr: [
-                    ['nombres', 'ASC'],
-                    ['apellidos', 'ASC'],
-                ],
+                cols: ['nombres', 'produccion_codigo'],
+                ordr: [['nombres', 'ASC']],
             }
 
             this.useAuth.setLoading(true, 'Cargando...')

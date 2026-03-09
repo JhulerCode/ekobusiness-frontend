@@ -58,9 +58,9 @@ export default {
             {
                 id: 'colaborador',
                 title: 'Colaborador',
-                prop: 'colaborador1.nombres_apellidos',
+                prop: 'colaborador1.nombres',
                 type: 'select',
-                mostrar: 'nombres_apellidos',
+                mostrar: 'nombres',
                 width: '15rem',
                 show: true,
                 seek: true,
@@ -152,7 +152,7 @@ export default {
         async loadColaboradores() {
             const qry = {
                 fltr: {},
-                cols: ['nombres', 'apellidos', 'nombres_apellidos'],
+                cols: ['nombres'],
                 ordr: [['nombres', 'ASC']],
             }
 

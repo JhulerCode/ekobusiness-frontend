@@ -6,15 +6,14 @@ export const COLUMNS = [
         format: 'date',
         width: '10rem',
         show: true,
-        seek: true,
         sort: true,
     },
     {
-        id: 'socio',
+        id: 'socio1.nombres',
         title: 'Cliente',
         prop: 'socio1.nombres',
         type: 'select',
-        mostrar: 'nombres_apellidos',
+        mostrar: 'nombres',
         width: '20rem',
         show: true,
         seek: true,
@@ -26,7 +25,6 @@ export const COLUMNS = [
         type: 'number',
         width: '10rem',
         show: true,
-        seek: true,
         sort: true,
     },
     {
@@ -35,7 +33,6 @@ export const COLUMNS = [
         type: 'number',
         width: '10rem',
         show: true,
-        seek: true,
         sort: true,
     },
 ]

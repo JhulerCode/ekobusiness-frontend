@@ -212,7 +212,7 @@ export default {
             {
                 id: 'responsable',
                 title: 'Nombre',
-                prop: 'responsable1.nombres_apellidos',
+                prop: 'responsable1.nombres',
                 width: '12rem',
                 show: true,
                 seek: true,

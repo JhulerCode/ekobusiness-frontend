@@ -21,7 +21,7 @@ export const COLUMNS = [
     },
     {
         id: 'nombres',
-        title: 'Razón social o nombre',
+        title: 'Razón social o nombres',
         type: 'text',
         width: '20rem',
         show: true,

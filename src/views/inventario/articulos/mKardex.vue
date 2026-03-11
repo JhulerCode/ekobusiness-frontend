@@ -3,13 +3,11 @@
         <div class="header">
             <p>{{ modal.articulo.nombre }} ({{ modal.articulo.unidad }})</p>
 
-            <JdPaginacion :view="modal" @reload="loadKardex" />
-
-            <div>
-                <p>
+            <div class="resumen">
+                <!-- <p>
                     <small>Stock filtrado:</small>
                     {{ calculateStockFiltered() }}
-                </p>
+                </p> -->
                 <p>
                     <small>Stock:</small>
                     {{ redondear(modal.stock) }}
@@ -19,6 +17,16 @@
                     <small>Valor:</small>
                     {{ redondear(modal.valor) }}
                 </p>
+            </div>
+
+            <div class="header-right">
+                <JdPaginacion :view="modal" @reload="loadKardex" />
+                <JdButton
+                    icon="fa-solid fa-rotate-right"
+                    tipo="2"
+                    title="Recargar"
+                    @click="loadKardex"
+                />
             </div>
         </div>
 
@@ -37,10 +45,10 @@
 </template>
 
 <script>
-import { JdModal } from '@jhuler/components'
+import { JdModal, JdButton } from '@jhuler/components'
 import JdTable from '@/components/JdTable/JdTable.vue'
-import mTransaccion from '@/views/logistica_entrada/compras/mTransaccion.vue'
-import JdPaginacion from '@/components/JdPaginacion.vue'
+import mTransaccion from '@/views/compras/compras/mTransaccion.vue'
+import JdPaginacion from '@/components/VistaLayout/JdPaginacion.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
@@ -55,6 +63,7 @@ import dayjs from 'dayjs'
 export default {
     components: {
         JdModal,
+        JdButton,
         JdTable,
         mTransaccion,
         JdPaginacion,
@@ -305,12 +314,18 @@ export default {
 .header {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     gap: 2rem;
     margin-bottom: 2rem;
 
-    div {
+    .resumen {
         display: flex;
         gap: 1rem;
+    }
+
+    .header-right {
+        display: flex;
+        gap: 0.25rem;
     }
 }
 

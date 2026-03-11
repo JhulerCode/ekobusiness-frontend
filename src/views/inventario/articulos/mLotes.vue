@@ -29,7 +29,7 @@
 
 <script>
 import { JdModal, JdTable } from '@jhuler/components'
-import mTransaccion from '@/views/logistica_entrada/compras/mTransaccion.vue'
+import mTransaccion from '@/views/compras/compras/mTransaccion.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'

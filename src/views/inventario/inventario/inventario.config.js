@@ -1,4 +1,11 @@
-export const HEADER_ACTIONS = []
+export const HEADER_ACTIONS = [
+    {
+        icon: 'fa-solid fa-download',
+        text: 'Exportar página actual',
+        action: 'vista.downloadActualTablePage',
+        tipo: '2',
+    }
+]
 
 export const TABLE_COLUMNS = [
     {

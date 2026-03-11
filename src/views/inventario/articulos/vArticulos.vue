@@ -1,101 +1,33 @@
 <template>
-    <div class="vista vista-fill">
-        <div class="head">
-            <div class="head-left" style="flex-wrap: nowrap">
-                <strong style="white-space: nowrap">Artículos</strong>
-
-                <JdButtonsOverflow :buttons="headerActions" @runMethod="runMethod" />
-
-                <input
-                    ref="excel"
-                    type="file"
-                    accept=".xlsx, .xls, .csv"
-                    hidden
-                    @change="importar"
-                />
-            </div>
-
-            <div class="head-center">
-                <JdBulkActions
-                    v-if="cantidadSeleccionados > 0"
-                    :view="vista"
-                    dataKey="articulos"
-                    :tableBulkActions="tableBulkActions"
-                    @bulkActionSelected="runMethod"
-                />
-
-                <JdBuscador
-                    v-else
-                    :view="vista"
-                    :columns="tableColumns"
-                    :tableName="tableName"
-                    @open-filters="openConfigFiltros"
-                    @reload="loadArticulos"
-                />
-            </div>
-
-            <div class="head-right">
-                <JdPaginacion :view="vista" @reload="loadArticulos" />
-
-                <JdButton
-                    icon="fa-solid fa-file-excel"
-                    tipo="2"
-                    title="Exportar"
-                    @click="$refs['jdtable'].downloadData()"
-                />
-
-                <JdButton
-                    icon="fa-solid fa-gear"
-                    tipo="2"
-                    title="Columnas"
-                    @click="openConfigCols"
-                />
-            </div>
-        </div>
+    <VistaLayout :vista="vista">
+        <template #header-left>
+            <input ref="excel" type="file" accept=".xlsx, .xls, .csv" hidden @change="importar" />
+        </template>
 
         <JdTable
-            :name="tableName"
-            :columns="tableColumns"
-            :datos="vista.articulos || []"
-            :colAct="true"
-            :rowOptions="tableRowActions"
-            @rowOptionSelected="runMethod"
+            :name="vista.name"
+            :columns="vista.tableColumns"
+            :datos="vista.tableData || []"
             :rowSelectable="true"
-            :tableBulkActions="tableBulkActions"
-            @bulkActionSelected="runMethod"
-            ref="jdtable"
+            :colAct="true"
+            :rowOptions="vista.tableRowActions"
+            @rowOptionSelected="vista.runMethod"
         />
-    </div>
+    </VistaLayout>
 
     <!-- Modales -->
-    <mImportarArticulos v-if="useModals.show.mImportarArticulos" />
-    <mArticulo v-if="useModals.show.mArticulo" />
-    <mKardex v-if="useModals.show.mKardex" />
-    <mLotes v-if="useModals.show.mLotes" />
-    <mAjusteStock v-if="useModals.show.mAjusteStock" />
-    <mUploadFiles v-if="useModals.show.mUploadFiles" />
-    <mConfigCols v-if="useModals.show.mConfigCols" />
-    <mConfigFiltros v-if="useModals.show.mConfigFiltros" />
-    <mEditar v-if="useModals.show.mEditar" @updated="updatedBulk" />
+    <mImportarArticulos v-if="modals.show.mImportarArticulos" />
+    <mArticulo v-if="modals.show.mArticulo" />
+    <mKardex v-if="modals.show.mKardex" />
+    <mLotes v-if="modals.show.mLotes" />
+    <mAjusteStock v-if="modals.show.mAjusteStock" />
+    <mUploadFiles v-if="modals.show.mUploadFiles" />
 </template>
 
 <script>
 // Componentes base y utilidades
-import { JdButton, mConfigFiltros, mEditar } from '@jhuler/components'
-import JdButtonsOverflow from '@/components/JdButtonsOverflow.vue'
-import JdBuscador from '@/components/JdBuscador.vue'
-import JdBulkActions from '@/components/JdBulkActions.vue'
-import JdPaginacion from '@/components/JdPaginacion.vue'
+import VistaLayout from '@/components/VistaLayout/VistaLayout.vue'
 import JdTable from '@/components/JdTable/JdTable.vue'
-import mConfigCols from '@/components/mConfigCols.vue'
-
-// Configuración de la vista
-import {
-    HEADER_ACTIONS,
-    TABLE_COLUMNS,
-    TABLE_BULK_ACTIONS,
-    TABLE_ROW_ACTIONS,
-} from './articulos.config.js'
 
 // Modales específicos
 import mImportarArticulos from '@/views/inventario/articulos/mImportarArticulos.vue'
@@ -105,27 +37,23 @@ import mLotes from '@/views/inventario/articulos/mLotes.vue'
 import mAjusteStock from '@/views/inventario/articulos/mAjusteStock.vue'
 import mUploadFiles from '@/components/mUploadFiles.vue'
 
+// Configuración de la vista
+import VIEW_CONFIG from './articulos.config.js'
+
 // Pinia y Utils
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
 import { useModals } from '@/pinia/modals'
-import { urls, get, delet } from '@/utils/crud'
+import { urls, get } from '@/utils/crud'
 import { tryOficialExcel } from '@/utils/mine'
-import { jqst, jmsg } from '@/utils/swal'
+import { jmsg } from '@/utils/swal'
 import dayjs from 'dayjs'
 
 export default {
     name: 'vArticulos',
     components: {
-        JdButton,
-        JdBulkActions,
-        JdBuscador,
+        VistaLayout,
         JdTable,
-        JdPaginacion,
-        JdButtonsOverflow,
-        mConfigCols,
-        mConfigFiltros,
-        mEditar,
         mImportarArticulos,
         mArticulo,
         mKardex,
@@ -133,43 +61,35 @@ export default {
         mAjusteStock,
         mUploadFiles,
     },
-    data: () => ({
-        useAuth: useAuth(),
-        useVistas: useVistas(),
-        useModals: useModals(),
-
-        vista: {},
-        tableName: 'articulos',
-
-        // Configuraciones traídas de articulos.config.js
-        headerActions: HEADER_ACTIONS,
-        tableColumns: JSON.parse(JSON.stringify(TABLE_COLUMNS)),
-        tableBulkActions: TABLE_BULK_ACTIONS,
-        tableRowActions: TABLE_ROW_ACTIONS,
-    }),
     computed: {
-        cantidadSeleccionados() {
-            return (this.vista.articulos || []).filter((a) => a.selected).length
+        auth: () => useAuth(),
+        vistas: () => useVistas(),
+        modals: () => useModals(),
+        vista() {
+            return this.vistas[VIEW_CONFIG.name]
         },
     },
-    async created() {
-        this.vista = this.useVistas.vArticulos
-        this.useAuth.setColumns(this.tableName, this.tableColumns)
+    created() {
+        // 1. Inicialización de la vista
+        this.vistas.initVista(VIEW_CONFIG.name, {
+            ...JSON.parse(JSON.stringify(VIEW_CONFIG)),
+            apiUrl: urls[VIEW_CONFIG.apiPath],
+            runMethod: this.runMethod,
+        })
 
-        if (this.vista.loaded) return
-        this.vista.table_page = 1
-        if (this.useAuth.verifyPermiso('vArticulos:listar')) this.loadArticulos()
+        // 2. Carga inicial
+        this.auth.setColumns(this.vista.name, this.vista.tableColumns)
+        if (!this.vista.loaded && this.auth.verifyPermiso(`${VIEW_CONFIG.name}:listar`)) {
+            this.vista.loadTableData()
+        }
+    },
+    unmounted() {
+        if (this.vista) this.vista.runMethod = null
     },
     methods: {
-        // --- Gestión de Tabla ---
         runMethod(method, item) {
-            this[method](item)
+            this.vistas.runMethod(this, method, item)
         },
-        abrirExcel() {
-            this.$refs.excel.click()
-        },
-
-        // --- Carga de Datos ---
         setQuery() {
             this.vista.qry = {
                 fltr: {},
@@ -178,52 +98,14 @@ export default {
                 ordr: [['nombre', 'ASC']],
                 page: this.vista.table_page,
             }
-            this.useAuth.updateQuery(this.tableColumns, this.vista.qry)
+            this.auth.updateQuery(this.vista.tableColumns, this.vista.qry)
             this.vista.qry.cols.push('fotos')
-            if (this.tableColumns[3].show == true) {
+            if (this.vista.tableColumns[3].show == true) {
                 this.vista.qry.sqls.push('articulo_stock')
             }
         },
-        async loadArticulos() {
-            this.setQuery()
-            this.vista.articulos = []
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.articulos}?qry=${JSON.stringify(this.vista.qry)}`)
-            this.useAuth.setLoading(false)
-            this.vista.loaded = true
-            if (res.code != 0) return
-            this.vista.articulos = res.data
-            this.vista.table_meta = res.meta
-        },
 
-        // --- Datos de Apoyo ---
-        async loadLineas() {
-            const qry = { fltr: {}, cols: ['nombre'], ordr: [['nombre', 'ASC']] }
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.articulo_lineas}?qry=${JSON.stringify(qry)}`)
-            this.useAuth.setLoading(false)
-            if (res.code != 0) return
-            return (this.vista.articulo_lineas = res.data)
-        },
-        async loadCategorias() {
-            const qry = {
-                cols: ['nombre'],
-                fltr: { activo: { op: 'Es', val: true } },
-                ordr: [['nombre', 'ASC']],
-            }
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.articulo_categorias}?qry=${JSON.stringify(qry)}`)
-            this.useAuth.setLoading(false)
-            if (res.code != 0) return
-            return (this.vista.articulo_categorias = res.data)
-        },
-        async loadDatosSistema() {
-            const qry = ['igv_afectaciones', 'unidades', 'estados', 'articulo_tipos']
-            const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
-            if (res.code == 0) Object.assign(this.vista, res.data)
-        },
-
-        // --- Acciones de Registro ---
+        // Header actions
         nuevo() {
             const send = {
                 articulo: {
@@ -239,15 +121,21 @@ export default {
                 },
                 pestana: 1,
             }
-            this.useModals.setModal('mArticulo', 'Nuevo artículo', 1, send, true)
+            this.modals.setModal('mArticulo', 'Nuevo artículo', 1, send, true)
         },
+        abrirExcel() {
+            this.$refs.excel.click()
+        },
+
+        // Table row actions
         async editar(item) {
             const qry = {
                 incl: ['categoria1', 'linea1', 'articulo_suppliers', 'combo_componentes'],
             }
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.articulos}/uno/${item.id}?qry=${JSON.stringify(qry)}`)
-            this.useAuth.setLoading(false)
+
+            this.auth.setLoading(true, 'Cargando...')
+            const res = await get(`${this.vista.apiUrl}/uno/${item.id}?qry=${JSON.stringify(qry)}`)
+            this.auth.setLoading(false)
             if (res.code != 0) return
             const send = {
                 articulo: { ...res.data },
@@ -255,15 +143,15 @@ export default {
                 articulo_categorias: [{ ...res.data.categoria1 }],
                 articulo_lineas: [{ ...res.data.linea1 }],
             }
-            this.useModals.setModal('mArticulo', 'Editar artículo', 2, send, true)
+            this.modals.setModal('mArticulo', 'Editar artículo', 2, send, true)
         },
         async clonar(item) {
             const qry = {
                 incl: ['categoria1', 'linea1', 'articulo_suppliers', 'combo_componentes'],
             }
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.articulos}/uno/${item.id}?qry=${JSON.stringify(qry)}`)
-            this.useAuth.setLoading(false)
+            this.auth.setLoading(true, 'Cargando...')
+            const res = await get(`${this.vista.apiUrl}/uno/${item.id}?qry=${JSON.stringify(qry)}`)
+            this.auth.setLoading(false)
             if (res.code != 0) return
             const send = {
                 articulo: { ...res.data, id: null },
@@ -271,25 +159,17 @@ export default {
                 articulo_categorias: [{ ...res.data.categoria1 }],
                 articulo_lineas: [{ ...res.data.linea1 }],
             }
-            this.useModals.setModal('mArticulo', 'Nuevo artículo', 1, send, true)
+            this.modals.setModal('mArticulo', 'Nuevo artículo', 1, send, true)
         },
-        async eliminar(item) {
-            const resQst = await jqst('¿Está seguro de eliminar?')
-            if (resQst.isConfirmed == false) return
-            this.useAuth.setLoading(true, 'Eliminando...')
-            const res = await delet(urls.articulos, item)
-            this.useAuth.setLoading(false)
-            if (res.code == 0) this.useVistas.removeItem('vArticulos', 'articulos', item)
-        },
-        async verKardex(item) {
+        verKardex(item) {
             const send = { articulo: { id: item.id, nombre: item.nombre, unidad: item.unidad } }
-            this.useModals.setModal('mKardex', 'Kardex de artículo', null, send, true)
+            this.modals.setModal('mKardex', 'Kardex de artículo', null, send, true)
         },
         verLotes(item) {
             const send = { articulo: { id: item.id, nombre: item.nombre, unidad: item.unidad } }
-            this.useModals.setModal('mLotes', 'Lotes del artículo', null, send, true)
+            this.modals.setModal('mLotes', 'Lotes del artículo', null, send, true)
         },
-        async ajusteStock(item) {
+        ajusteStock(item) {
             const send = {
                 transaccion: { fecha: dayjs().format('YYYY-MM-DD'), articulo: item.id },
                 articulo1: { igv_afectacion: item.igv_afectacion, has_fv: item.has_fv },
@@ -297,99 +177,24 @@ export default {
                 articulo_tipo: 1,
                 is_nuevo_lote: false,
             }
-            this.useModals.setModal('mAjusteStock', 'Ajuste de stock', null, send, true)
+            this.modals.setModal('mAjusteStock', 'Ajuste de stock', null, send, true)
         },
         openUploadFiles(item) {
             const send = {
                 item: { id: item.id, nombre: item.nombre, archivos: item.fotos || [] },
                 accept: 'image/*',
                 cantidad: 10,
-                url: `${urls.articulos}/fotos`,
-                vista: 'vArticulos',
-                tabla: 'articulos',
+                url: `${this.vista.apiUrl}/fotos`,
+                vista: this.vista.name,
+                tabla: 'tableData',
                 prop: 'fotos',
             }
-            this.useModals.setModal('mUploadFiles', 'Actualizar fotos', 2, send, true)
+            this.modals.setModal('mUploadFiles', 'Actualizar fotos', 2, send, true)
         },
 
-        // --- Acciones Masivas ---
-        async eliminarBulk() {
-            const selected = this.vista.articulos.filter((a) => a.selected)
-            const ids = selected.map((b) => b.id)
-            const resQst = await jqst(`¿Está seguro de eliminar ${ids.length} registros?`)
-            if (resQst.isConfirmed == false) return
-            this.useAuth.setLoading(true, 'Eliminando...')
-            const res = await delet(`${urls.articulos}/bulk`, { id: 'bulk', ids })
-            this.useAuth.setLoading(false)
-            if (res.code == 0)
-                this.vista.articulos = this.vista.articulos.filter((a) => !a.selected)
-        },
-        async editarBulk() {
-            await this.loadDatosSistema()
-            const cols = this.tableColumns
-            for (const a of cols) {
-                if (a.id == 'unidad') a.lista = this.vista.unidades
-                if (
-                    [
-                        'has_fv',
-                        'activo',
-                        'is_ecommerce',
-                        'purchase_ok',
-                        'sale_ok',
-                        'produce_ok',
-                    ].includes(a.id)
-                )
-                    a.lista = this.vista.estados
-                if (a.id == 'igv_afectacion') a.lista = this.vista.igv_afectaciones
-                if (a.id == 'categoria') a.reload = this.loadCategorias
-            }
-            const ids = this.vista.articulos.filter((a) => a.selected).map((b) => b.id)
-            const send = { uri: 'articulos', nuevo: {}, cols, ids }
-            this.useModals.setModal('mEditar', `Editar ${ids.length} registros`, null, send, true)
-        },
-        updatedBulk(item) {
-            for (const a of this.vista.articulos) {
-                if (!item.ids.includes(a.id)) continue
-                a.selected = false
-                a[item.prop] = item.val
-                if (item.val1) a[`${item.prop}1`] = item.val1
-            }
-        },
-
-        // --- Otros ---
-        openConfigCols() {
-            const send = {
-                table: this.tableName,
-                cols: this.tableColumns,
-                reload: this.loadArticulos,
-            }
-            this.useModals.setModal('mConfigCols', 'Configurar columnas', null, send, true)
-        },
-        async openConfigFiltros() {
-            await this.loadDatosSistema()
-            const cols = this.tableColumns
-            for (const a of cols) {
-                if (a.id == 'unidad') a.lista = this.vista.unidades
-                if (
-                    [
-                        'has_fv',
-                        'activo',
-                        'is_ecommerce',
-                        'purchase_ok',
-                        'sale_ok',
-                        'produce_ok',
-                    ].includes(a.id)
-                )
-                    a.lista = this.vista.estados
-                if (a.id == 'igv_afectacion') a.lista = this.vista.igv_afectaciones
-                if (a.id == 'categoria') a.reload = this.loadCategorias
-                if (a.id == 'linea') a.reload = this.loadLineas
-            }
-            const send = { table: this.tableName, cols, reload: this.loadArticulos }
-            this.useModals.setModal('mConfigFiltros', 'Filtros', null, send, true)
-        },
+        // @actions
         async importar(event) {
-            this.useAuth.setLoading(true, 'Cargando archivo...')
+            this.auth.setLoading(true, 'Cargando archivo...')
             const file = event.target.files[0]
             const reader = new FileReader()
             reader.onload = async () => {
@@ -407,7 +212,7 @@ export default {
                 ]
                 const res = await tryOficialExcel(this.$refs.excel, file, reader, headers)
                 if (res.code != 0) {
-                    this.useAuth.setLoading(false)
+                    this.auth.setLoading(false)
                     return jmsg('error', res.msg)
                 }
                 await this.loadDatosSistema()
@@ -430,7 +235,7 @@ export default {
                     a.nombre = a.Nombre
                     a.codigo_barra = a.EAN
                     a.type1 = articulo_tiposMap[a.Tipo]
-                    a.type = a.type1.id
+                    a.type = a.type1?.id
                     a.purchase_ok = a['Se compra'] == 'Sí'
                     a.sale_ok = a['Se vende'] == 'Sí'
                     a.igv_afectacion1 = igv_afectacionesMap[a.Tributo]
@@ -441,8 +246,8 @@ export default {
                     a.marca = a.Marca
                     a.has_fv = a['Tiene fv'] == 'Sí'
                 }
-                this.useAuth.setLoading(false)
-                this.useModals.setModal(
+                this.auth.setLoading(false)
+                this.modals.setModal(
                     'mImportarArticulos',
                     'Importar artículos',
                     null,

@@ -5,7 +5,6 @@ import { useVistas } from '@/pinia/vistas'
 import menuConfig from '@/config/menu.js'
 const viewsModules = import.meta.glob('../views/**/*.vue')
 
-
 // ----- RUTAS HIJAS DE LA CONSOLA (DINÁMICAS) ----- //
 const consolaChildren = []
 

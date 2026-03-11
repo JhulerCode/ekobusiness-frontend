@@ -242,7 +242,7 @@ import { useModals } from '@/pinia/modals'
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
 
-import { urls, get, post, delet, patch } from '@/utils/crud'
+import { urls, get, delet, patch } from '@/utils/crud'
 import { jmsg, jqst } from '@/utils/swal'
 import { redondear } from '@/utils/mine'
 
@@ -422,14 +422,14 @@ export default {
     }),
     computed: {
         produccion_ordenes_hoy() {
-            if (!this.vista.produccion_ordenes) return []
+            if (!this.vista.tableData) return []
 
-            return this.vista.produccion_ordenes.filter((a) => a.fecha == this.columns[0].val)
+            return this.vista.tableData.filter((a) => a.fecha == this.columns[0].val)
         },
         maquinas_produccion() {
-            if (!this.vista.produccion_ordenes || !this.vista.maquinas) return []
+            if (!this.vista.tableData || !this.vista.maquinas) return []
 
-            const mapaProducciones = JSON.parse(JSON.stringify(this.vista.produccion_ordenes))
+            const mapaProducciones = JSON.parse(JSON.stringify(this.vista.tableData))
                 .filter((a) => a.fecha == this.columns[0].val)
                 .reduce((acc, prod) => {
                     if (!acc[prod.maquina]) {
@@ -484,9 +484,9 @@ export default {
             })
         },
         insumos_necesitados() {
-            if (!this.vista.produccion_ordenes || !this.vista.maquinas) return []
+            if (!this.vista.tableData || !this.vista.maquinas) return []
 
-            const resumenInsumos = this.vista.produccion_ordenes.reduce((acc, item) => {
+            const resumenInsumos = this.vista.tableData.reduce((acc, item) => {
                 for (const r of item.receta || []) {
                     if (!acc[r.articulo]) {
                         acc[r.articulo] = {
@@ -641,7 +641,7 @@ export default {
 
             this.setQuery()
 
-            this.vista.produccion_ordenes = []
+            this.vista.tableData = []
             this.useAuth.setLoading(true, 'Cargando...')
             const res = await get(
                 `${urls.produccion_ordenes}?qry=${JSON.stringify(this.vista.qry)}`,
@@ -651,7 +651,7 @@ export default {
 
             if (res.code != 0) return
 
-            this.vista.produccion_ordenes = res.data
+            this.vista.tableData = res.data
             // this.calcularHoras()
         },
 
@@ -817,7 +817,7 @@ export default {
             )
         },
         setProduccionProductos(item) {
-            const pr = this.vista.produccion_ordenes.find((a) => a.id == item.id)
+            const pr = this.vista.tableData.find((a) => a.id == item.id)
             pr.productos_terminados = item.productos_terminados
         },
 
@@ -838,8 +838,8 @@ export default {
 
             if (res.code != 0) return
 
-            const i = this.vista.produccion_ordenes.findIndex((a) => a.id == item.id)
-            this.vista.produccion_ordenes[i].inicio = send.inicio
+            const i = this.vista.tableData.findIndex((a) => a.id == item.id)
+            this.vista.tableData[i].inicio = send.inicio
         },
         async setFin(item) {
             const resQst = await jqst(
@@ -858,8 +858,8 @@ export default {
 
             if (res.code != 0) return
 
-            const i = this.vista.produccion_ordenes.findIndex((a) => a.id == item.id)
-            this.vista.produccion_ordenes[i].fin = send.fin
+            const i = this.vista.tableData.findIndex((a) => a.id == item.id)
+            this.vista.tableData[i].fin = send.fin
         },
 
         nuevo(maquina) {
@@ -884,15 +884,16 @@ export default {
                     this.maquinas_produccion.find((a) => a.id == maquina.id).produccion_ordenes
                         .length + 1
             } else {
-                send.produccion_orden.orden = this.vista.produccion_ordenes.length + 1
+                send.produccion_orden.orden = this.vista.tableData.length + 1
             }
 
             this.useModals.setModal('mProduccionOrden', 'Nueva órden de producción', 1, send, true)
         },
         async exportarPrograma() {
             await this.calcularInsumosNecesarios()
+            // throw new Error()
 
-            const fecha_programa = dayjs(this.vista.produccion_ordenes[0].fecha).format(
+            const fecha_programa = dayjs(this.vista.tableData[0].fecha).format(
                 'DD-MM-YYYY',
             )
             const nombre = `Programa de producción del ${fecha_programa}`
@@ -906,7 +907,7 @@ export default {
                 `Orden de producción`,
                 '',
                 '',
-                // this.vista.produccion_ordenes[0].fecha,
+                // this.vista.tableData[0].fecha,
                 fecha_programa,
                 '',
             ])
@@ -1024,17 +1025,34 @@ export default {
             saveAs(blob, `${nombre}.xlsx`)
         },
         async calcularInsumosNecesarios() {
-            const send = {
-                articulos: this.vista.produccion_ordenes.map((a) => ({ ...a, id: a.articulo })),
+            const qry = {
+                fltr: {
+                    articulos: {
+                        op: 'Es',
+                        val: this.vista.tableData.map((a) => a.mrp_bom),
+                    },
+                },
+                incl: ['articulo1'],
+                cols: ['mrp_bom', 'articulo', 'cantidad', 'orden'],
             }
 
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await post(`${urls.receta_insumos}/calcular-necesidad`, send, false)
+            const res = await get(`${urls.mrp_bom_lines}?qry=${JSON.stringify(qry)}`)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
 
-            this.vista.produccion_ordenes = res.data
+            for (const a of this.vista.tableData) {
+                const receta = res.data.filter((b) => b.mrp_bom == a.mrp_bom)
+
+                for (const b of receta) {
+                    b.cantidad_necesitada = a.cantidad * b.cantidad
+                }
+
+                a.receta = JSON.parse(JSON.stringify(receta))
+            }
+
+            // this.vista.tableData = res.data
         },
         async verPedidos() {
             const send = {
@@ -1067,8 +1085,8 @@ export default {
             return (prod.cantidad * prod.articulo_info?.filtrantes) / prod.maquina_info?.velocidad
         },
         calcularProducto(item) {
-            const i = this.vista.produccion_ordenes.findIndex((a) => a.id == item.id)
-            this.vista.produccion_ordenes[i].cantidad = item.cantidad
+            const i = this.vista.tableData.findIndex((a) => a.id == item.id)
+            this.vista.tableData[i].cantidad = item.cantidad
         },
         async modificarProduccionOrden(item) {
             if (!item.cantidad) {

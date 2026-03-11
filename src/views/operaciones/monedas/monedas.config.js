@@ -4,6 +4,12 @@ export const HEADER_ACTIONS = [
         action: 'nuevo',
         permiso: 'vMonedas:crear',
     },
+    {
+        icon: 'fa-solid fa-download',
+        text: 'Exportar página actual',
+        action: 'vista.downloadActualTablePage',
+        tipo: '2',
+    }
 ]
 
 export const TABLE_COLUMNS = [
@@ -61,7 +67,7 @@ export const TABLE_ROW_ACTIONS = [
         id: 2,
         label: 'Eliminar',
         icon: 'fa-solid fa-trash-can',
-        action: 'eliminar',
+        action: 'vista.eliminar',
         permiso: 'vMonedas:eliminar',
         ocultar: { estandar: true },
     },

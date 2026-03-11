@@ -4,21 +4,25 @@
             <JdInput
                 label="Nombre"
                 :nec="true"
-                v-model="articulo_linea.nombre"
+                v-model="modal.articulo_linea.nombre"
                 :disabled="modal.mode == 3"
             />
 
             <JdTextArea
                 label="Descripción"
-                v-model="articulo_linea.descripcion"
+                v-model="modal.articulo_linea.descripcion"
                 :disabled="modal.mode == 3"
             />
 
-            <JdSwitch label="Activo" v-model="articulo_linea.activo" :disabled="modal.mode == 3" />
+            <JdSwitch
+                label="Activo"
+                v-model="modal.articulo_linea.activo"
+                :disabled="modal.mode == 3"
+            />
 
             <JdSwitch
                 label="Ecommerce?"
-                v-model="articulo_linea.is_ecommerce"
+                v-model="modal.articulo_linea.is_ecommerce"
                 :disabled="modal.mode == 3"
             />
         </div>
@@ -50,7 +54,6 @@ export default {
         urls,
 
         modal: {},
-        articulo_linea: {},
 
         buttons: [
             { text: 'Grabar', action: 'crear', spin: false },
@@ -59,7 +62,6 @@ export default {
     }),
     created() {
         this.modal = this.useModals.mArticuloLinea
-        this.articulo_linea = this.useModals.mArticuloLinea.item
 
         this.showButtons()
     },
@@ -73,7 +75,7 @@ export default {
         },
 
         checkDatos() {
-            if (incompleteData(this.articulo_linea, ['nombre'])) {
+            if (incompleteData(this.modal.articulo_linea, ['nombre'])) {
                 jmsg('warning', 'Ingrese los datos necesarios')
                 return true
             }
@@ -84,24 +86,24 @@ export default {
             if (this.checkDatos()) return
 
             this.useAuth.setLoading(true)
-            const res = await post(urls.articulo_lineas, this.articulo_linea)
+            const res = await post(urls.articulo_lineas, this.modal.articulo_linea)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
 
-            this.useVistas.addItem('vProductoLineas', 'articulo_lineas', res.data)
+            this.useVistas.addItem('vProductoLineas', 'tableData', res.data)
             this.useModals.show.mArticuloLinea = false
         },
         async modificar() {
             if (this.checkDatos()) return
 
             this.useAuth.setLoading(true)
-            const res = await patch(urls.articulo_lineas, this.articulo_linea)
+            const res = await patch(urls.articulo_lineas, this.modal.articulo_linea)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
 
-            this.useVistas.updateItem('vProductoLineas', 'articulo_lineas', res.data)
+            this.useVistas.updateItem('vProductoLineas', 'tableData', res.data)
             this.useModals.show.mArticuloLinea = false
         },
     },

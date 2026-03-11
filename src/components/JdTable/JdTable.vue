@@ -112,8 +112,8 @@ import { computed, nextTick } from 'vue'
 import { JdButton, JdInput } from '@jhuler/components'
 import { useAuth } from '@/pinia/auth'
 import { useTable } from './useTable'
-import TableHead from './TableHead.vue'
-import TableRow from './TableRow.vue'
+import TableHead from './JdTableHead.vue'
+import TableRow from './JdTableRow.vue'
 
 const props = defineProps({
     name: String,
@@ -145,7 +145,6 @@ const emit = defineEmits([
     'onReorder',
     'onChange',
     'onInput',
-    'bulkActionSelected',
 ])
 
 const auth = useAuth()
@@ -157,7 +156,6 @@ const {
     allSelected,
     sortData,
     selectRow,
-    downloadData,
 } = useTable(props, emit)
 
 const dynamicSlots = computed(() => props.columns.filter((c) => c.slot).map((c) => c.slot))
@@ -276,7 +274,7 @@ const comparar = (a, op, b) => {
 }
 
 // Expose methods for parent
-defineExpose({ downloadData })
+defineExpose({})
 </script>
 
 <style lang="scss" scoped>

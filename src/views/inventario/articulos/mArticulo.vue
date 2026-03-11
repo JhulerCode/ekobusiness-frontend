@@ -358,7 +358,7 @@ export default {
 
             if (res.code != 0) return
 
-            this.useVistas.addItem('vArticulos', 'articulos', res.data)
+            this.useVistas.addItem('vArticulos', 'tableData', res.data)
             this.useModals.show.mArticulo = false
         },
         async modificar() {
@@ -371,7 +371,7 @@ export default {
 
             if (res.code != 0) return
 
-            this.useVistas.updateItem('vArticulos', 'articulos', res.data)
+            this.useVistas.updateItem('vArticulos', 'tableData', res.data)
             this.useModals.show.mArticulo = false
         },
     },

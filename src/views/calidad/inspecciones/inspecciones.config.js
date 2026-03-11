@@ -65,7 +65,7 @@ export const TABLE_ROW_ACTIONS = [
     {
         label: 'Eliminar',
         icon: 'fa-solid fa-trash-can',
-        action: 'eliminar',
+        action: 'vista.eliminar',
         permiso: 'vInspecciones:eliminar',
     },
 ]

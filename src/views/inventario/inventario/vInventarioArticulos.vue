@@ -9,18 +9,10 @@
 
             <div class="head-center"></div>
 
-            <div class="head-right">
-                <JdButton
-                    icon="fa-solid fa-file-excel"
-                    tipo="2"
-                    title="Exportar"
-                    @click="$refs['jdtable'].downloadData()"
-                />
-            </div>
+            <div class="head-right"></div>
         </div>
 
         <JdTable
-            ref="jdtable"
             :columns="tableColumns"
             :datos="vista.inventario || []"
             :configFiltros="openConfigFiltros"
@@ -32,7 +24,7 @@
 </template>
 
 <script>
-import { JdTable, mConfigFiltros, JdButton } from '@jhuler/components'
+import { JdTable, mConfigFiltros } from '@jhuler/components'
 import JdButtonsOverflow from '@/components/JdButtonsOverflow.vue'
 
 import { TABLE_COLUMNS, HEADER_ACTIONS } from './inventario.config.js'
@@ -51,7 +43,6 @@ export default {
     components: {
         JdTable,
         mConfigFiltros,
-        JdButton,
         JdButtonsOverflow,
     },
     data: () => ({

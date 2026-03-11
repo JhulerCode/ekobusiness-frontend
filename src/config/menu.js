@@ -77,7 +77,7 @@ export default [
                 label: 'Proveedores',
                 goto: 'vProveedores',
                 path: 'compras/proveedores',
-                view: 'logistica_entrada/proveedores/vProveedores.vue',
+                view: 'compras/proveedores/vProveedores.vue',
                 permisos: [
                     { id: 'vProveedores:listar', label: 'Listar' },
                     { id: 'vProveedores:crear', label: 'Crear' },
@@ -92,7 +92,7 @@ export default [
                 label: 'Pedidos',
                 goto: 'vCompraPedidos',
                 path: 'compras/pedidos',
-                view: 'logistica_entrada/pedidos/vCompraPedidos.vue',
+                view: 'compras/pedidos/vCompraPedidos.vue',
                 permisos: [
                     { id: 'vCompraPedidos:listar', label: 'Listar' },
                     { id: 'vCompraPedidos:crear', label: 'Crear' },
@@ -110,14 +110,14 @@ export default [
                 label: 'Pedidos detalle',
                 goto: 'vCompraPedidoItems',
                 path: 'compras/pedido-items',
-                view: 'logistica_entrada/pedido_items/vCompraPedidoItems.vue',
+                view: 'compras/pedido_items/vCompraPedidoItems.vue',
                 permisos: [{ id: 'vCompraPedidoItems:listar', label: 'Listar' }],
             },
             {
                 label: 'Compras',
                 goto: 'vCompras',
                 path: 'compras/compras',
-                view: 'logistica_entrada/compras/vCompras.vue',
+                view: 'compras/compras/vCompras.vue',
                 permisos: [
                     { id: 'vCompras:listar', label: 'Listar' },
                     { id: 'vCompras:crear', label: 'Crear' },
@@ -129,7 +129,7 @@ export default [
                 label: 'Compras detalle',
                 goto: 'vCompraItems',
                 path: 'compras/compra-items',
-                view: 'logistica_entrada/compra_items/vCompraItems.vue',
+                view: 'compras/compra_items/vCompraItems.vue',
                 permisos: [
                     { id: 'vCompraItems:listar', label: 'Listar' },
                     { id: 'vCompraItems:inspeccion', label: 'Inspeccionar' },
@@ -146,7 +146,7 @@ export default [
                 label: 'Clientes',
                 goto: 'vClientes',
                 path: 'ventas/clientes',
-                view: 'logistica_salida/clientes/vClientes.vue',
+                view: 'ventas/clientes/vClientes.vue',
                 permisos: [
                     { id: 'vClientes:listar', label: 'Listar' },
                     { id: 'vClientes:crear', label: 'Crear' },
@@ -159,7 +159,7 @@ export default [
                 label: 'Pedidos',
                 goto: 'vVentaPedidos',
                 path: 'ventas/pedidos',
-                view: 'logistica_salida/pedidos/vVentaPedidos.vue',
+                view: 'ventas/pedidos/vVentaPedidos.vue',
                 permisos: [
                     { id: 'vVentaPedidos:listar', label: 'Listar' },
                     { id: 'vVentaPedidos:crear', label: 'Crear' },
@@ -178,14 +178,14 @@ export default [
                 label: 'Pedidos detalle',
                 goto: 'vVentaPedidoItems',
                 path: 'ventas/pedido-items',
-                view: 'logistica_salida/pedido_items/vVentaPedidoItems.vue',
+                view: 'ventas/pedido_items/vVentaPedidoItems.vue',
                 permisos: [{ id: 'vVentaPedidoItems:listar', label: 'Listar' }],
             },
             {
                 label: 'Ventas',
                 goto: 'vVentas',
                 path: 'ventas/ventas',
-                view: 'logistica_salida/ventas/vVentas.vue',
+                view: 'ventas/ventas/vVentas.vue',
                 permisos: [
                     { id: 'vVentas:listar', label: 'Listar' },
                     { id: 'vVentas:crear', label: 'Crear' },
@@ -198,14 +198,14 @@ export default [
                 label: 'Ventas detalle',
                 goto: 'vVentaItems',
                 path: 'ventas/venta-items',
-                view: 'logistica_salida/venta_items/vVentaItems.vue',
+                view: 'ventas/venta_items/vVentaItems.vue',
                 permisos: [{ id: 'vVentaItems:listar', label: 'Listar' }],
             },
             {
                 label: 'Soporte al cliente',
                 goto: 'vHelpdeskTickets',
                 path: 'ventas/soporte',
-                view: 'logistica_salida/soporte_cliente/vHelpdeskTickets.vue',
+                view: 'ventas/soporte_cliente/vHelpdeskTickets.vue',
                 permisos: [
                     { id: 'vHelpdeskTickets:listar', label: 'Listar' },
                     { id: 'vHelpdeskTickets:crear', label: 'Crear' },
@@ -224,7 +224,7 @@ export default [
             {
                 label: 'Lista de materiales',
                 goto: 'vMrpBom',
-                path: 'produccion/bom',
+                path: 'produccion/mrp-bom',
                 view: 'produccion/mrp_bom/vMrpBom.vue',
                 permisos: [
                     { id: 'vMrpBom:listar', label: 'Listar' },

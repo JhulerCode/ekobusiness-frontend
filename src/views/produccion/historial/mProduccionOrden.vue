@@ -455,7 +455,7 @@ export default {
 
             if (res.code != 0) return
 
-            this.useVistas.addItem(this.modal.origin, 'produccion_ordenes', {
+            this.useVistas.addItem(this.modal.origin, 'tableData', {
                 ...res.data,
                 receta: this.insumos_necesitados,
             })
@@ -470,7 +470,7 @@ export default {
 
             if (res.code != 0) return
 
-            this.useVistas.updateItem(this.modal.origin, 'produccion_ordenes', {
+            this.useVistas.updateItem(this.modal.origin, 'tableData', {
                 ...res.data,
                 receta: this.insumos_necesitados,
             })

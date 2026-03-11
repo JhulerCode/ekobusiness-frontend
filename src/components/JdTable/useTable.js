@@ -1,5 +1,4 @@
 import { computed, ref } from 'vue'
-import { downloadExcel } from '@/utils/mine'
 
 export function useTable(props, emit) {
     const draggedRowIndex = ref(null)
@@ -72,13 +71,6 @@ export function useTable(props, emit) {
         }
     }
 
-    function downloadData() {
-        downloadExcel(
-            props.columns.filter((a) => a.show),
-            props.datos,
-        )
-    }
-
     return {
         draggedRowIndex,
         optionsCaseItem,
@@ -88,6 +80,5 @@ export function useTable(props, emit) {
         getNestedProp,
         sortData,
         selectRow,
-        downloadData,
     }
 }

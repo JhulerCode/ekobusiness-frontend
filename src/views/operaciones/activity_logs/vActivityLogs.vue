@@ -9,7 +9,6 @@
 
             <div class="head-center">
                 <JdBuscador
-                    :view="vista"
                     :columns="tableColumns"
                     :tableName="tableName"
                     @open-filters="openConfigFiltros"
@@ -21,14 +20,7 @@
                 <JdPaginacion :view="vista" @reload="loadActivityLogs" />
 
                 <JdButton
-                    icon="fa-solid fa-file-excel"
-                    tipo="2"
-                    title="Exportar"
-                    @click="$refs['jdtable'].downloadData()"
-                />
-
-                <JdButton
-                    icon="fa-solid fa-gear"
+                    icon="fa-solid fa-sliders"
                     tipo="2"
                     title="Columnas"
                     @click="$refs['jdtable'].openConfigCols()"
@@ -41,12 +33,7 @@
             :name="tableName"
             :columns="tableColumns"
             :datos="vista.activity_logs || []"
-            :reload="loadActivityLogs"
-            :configFiltros="openConfigFiltros"
             :colAct="true"
-            :meta="vista.table_meta"
-            @prevPage="((vista.table_page -= 1), loadActivityLogs())"
-            @nextPage="((vista.table_page += 1), loadActivityLogs())"
             :rowOptions="tableRowActions"
             @rowOptionSelected="runMethod"
         />
@@ -116,7 +103,8 @@ export default {
 
             this.useAuth.updateQuery(this.tableColumns, this.vista.qry)
         },
-        async loadActivityLogs() {
+        async loadActivityLogs(init_page = false) {
+            if (init_page) this.vista.table_page = 1
             this.setQuery()
 
             this.vista.activity_logs = []

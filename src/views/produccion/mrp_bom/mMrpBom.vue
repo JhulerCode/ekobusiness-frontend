@@ -145,7 +145,7 @@ export default {
 
             if (res.code !== 0) return
 
-            this.useVistas.addItem('vMrpBom', 'mrp_boms', res.data)
+            this.useVistas.addItem('vMrpBom', 'tableData', res.data)
             this.useModals.show.mMrpBom = false
         },
         async modificar() {
@@ -157,7 +157,7 @@ export default {
 
             if (res.code != 0) return false
 
-            this.useVistas.updateItem('mMrpBom', 'mrp_boms', res.data)
+            this.useVistas.updateItem('mMrpBom', 'tableData', res.data)
             this.useModals.show.mMrpBom = false
         },
     },

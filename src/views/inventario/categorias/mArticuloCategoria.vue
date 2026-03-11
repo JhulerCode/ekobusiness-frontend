@@ -8,33 +8,33 @@
             <JdInput
                 label="Nombre"
                 :nec="true"
-                v-model="articulo_categoria.nombre"
+                v-model="modal.articulo_categoria.nombre"
                 :disabled="modal.mode == 3"
             />
 
             <JdTextArea
                 label="Descripción"
-                v-model="articulo_categoria.descripcion"
+                v-model="modal.articulo_categoria.descripcion"
                 :disabled="modal.mode == 3"
             />
 
             <JdSwitch
                 label="Activo"
-                v-model="articulo_categoria.activo"
+                v-model="modal.articulo_categoria.activo"
                 :disabled="modal.mode == 3"
             />
 
             <JdSwitch
                 label="Ecommerce?"
-                v-model="articulo_categoria.is_ecommerce"
+                v-model="modal.articulo_categoria.is_ecommerce"
                 :disabled="modal.mode == 3"
             />
 
             <JdSwitch
                 label="Destacado"
-                v-model="articulo_categoria.is_destacado"
+                v-model="modal.articulo_categoria.is_destacado"
                 :disabled="modal.mode == 3"
-                v-if="articulo_categoria.is_ecommerce == true"
+                v-if="modal.articulo_categoria.is_ecommerce == true"
             />
         </div>
     </JdModal>
@@ -65,7 +65,6 @@ export default {
         urls,
 
         modal: {},
-        articulo_categoria: {},
 
         buttons: [
             { text: 'Grabar', action: 'crear', spin: false },
@@ -74,7 +73,6 @@ export default {
     }),
     created() {
         this.modal = this.useModals.mArticuloCategoria
-        this.articulo_categoria = this.useModals.mArticuloCategoria.item
 
         this.showButtons()
     },
@@ -88,7 +86,7 @@ export default {
         },
 
         checkDatos() {
-            if (incompleteData(this.articulo_categoria, ['tipo', 'nombre'])) {
+            if (incompleteData(this.modal.articulo_categoria, ['tipo', 'nombre'])) {
                 jmsg('warning', 'Ingrese los datos necesarios')
                 return true
             }
@@ -99,32 +97,24 @@ export default {
             if (this.checkDatos()) return
 
             this.useAuth.setLoading(true)
-            const res = await post(urls.articulo_categorias, this.articulo_categoria)
+            const res = await post(urls.articulo_categorias, this.modal.articulo_categoria)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
 
-            this.useVistas.addItem(
-                this.articulo_categoria.tipo == 1 ? 'vArticuloCategorias' : 'vProductoCategorias',
-                'articulo_categorias',
-                res.data,
-            )
+            this.useVistas.addItem('vArticuloCategorias', 'tableData', res.data)
             this.useModals.show.mArticuloCategoria = false
         },
         async modificar() {
             if (this.checkDatos()) return
 
             this.useAuth.setLoading(true)
-            const res = await patch(urls.articulo_categorias, this.articulo_categoria)
+            const res = await patch(urls.articulo_categorias, this.modal.articulo_categoria)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
 
-            this.useVistas.updateItem(
-                this.articulo_categoria.tipo == 1 ? 'vArticuloCategorias' : 'vProductoCategorias',
-                'articulo_categorias',
-                res.data,
-            )
+            this.useVistas.updateItem('vArticuloCategorias', 'tableData', res.data)
             this.useModals.show.mArticuloCategoria = false
         },
     },

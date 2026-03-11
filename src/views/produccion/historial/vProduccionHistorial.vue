@@ -1,75 +1,34 @@
 <template>
-    <div class="vista vista-fill">
-        <div class="head">
-            <div class="head-left" style="flex-wrap: nowrap">
-                <strong style="white-space: nowrap">Órdenes de producción</strong>
-
-                <JdButtonsOverflow :buttons="headerActions" @runMethod="runMethod" />
-            </div>
-
-            <div class="head-center">
-                <JdBuscador
-                    :view="vista"
-                    :columns="tableColumns"
-                    :tableName="tableName"
-                    @open-filters="openConfigFiltros"
-                    @reload="loadProduccionOrdenes"
-                />
-            </div>
-
-            <div class="head-right">
-                <JdPaginacion :view="vista" @reload="loadProduccionOrdenes" />
-
-                <JdButton
-                    icon="fa-solid fa-file-excel"
-                    tipo="2"
-                    title="Exportar"
-                    @click="$refs['jdtable'].downloadData()"
-                />
-
-                <JdButton
-                    icon="fa-solid fa-gear"
-                    tipo="2"
-                    title="Columnas"
-                    @click="openConfigCols"
-                />
-            </div>
-        </div>
-
+    <VistaLayout :vista="vista">
         <JdTable
-            :name="tableName"
-            :columns="tableColumns"
-            :datos="vista.produccion_ordenes || []"
+            :name="vista.name"
+            :columns="vista.tableColumns"
+            :datos="vista.tableData || []"
             :colAct="true"
-            :rowOptions="tableRowActions"
-            @rowOptionSelected="runMethod"
-            ref="jdtable"
+            :rowOptions="vista.tableRowActions"
+            @rowOptionSelected="vista.runMethod"
         />
-    </div>
+    </VistaLayout>
 
-    <mProduccionOrden v-if="useModals.show.mProduccionOrden" />
-    <mProduccionInsumos v-if="useModals.show.mProduccionInsumos" />
+    <!-- Modales -->
+    <mProduccionOrden v-if="modals.show.mProduccionOrden" />
+    <mProduccionInsumos v-if="modals.show.mProduccionInsumos" />
     <mProduccionProductos
-        v-if="useModals.show.mProduccionProductos"
+        v-if="modals.show.mProduccionProductos"
         @productosCargados="setProduccionProductos"
     />
-    <mFormato v-if="useModals.show.mFormato" @created="setFormatoCalidad" />
-    <mProduccionTrazabilidad v-if="useModals.show.mProduccionTrazabilidad" />
-
-    <mProductosFaltantes v-if="useModals.show.mProductosFaltantes" />
-    <mProduccionInsumosCompartidos v-if="useModals.show.mProduccionInsumosCompartidos" />
-
-    <mConfigCols v-if="useModals.show.mConfigCols" />
-    <mConfigFiltros v-if="useModals.show.mConfigFiltros" />
+    <mFormato v-if="modals.show.mFormato" @created="setFormatoCalidad" />
+    <mProduccionTrazabilidad v-if="modals.show.mProduccionTrazabilidad" />
+    <mProductosFaltantes v-if="modals.show.mProductosFaltantes" />
+    <mProduccionInsumosCompartidos v-if="modals.show.mProduccionInsumosCompartidos" />
 </template>
 
 <script>
-import { JdButton, mConfigFiltros } from '@jhuler/components'
-import mConfigCols from '@/components/mConfigCols.vue'
-import JdBuscador from '@/components/JdBuscador.vue'
+// Componentes base y utilidades
+import VistaLayout from '@/components/VistaLayout/VistaLayout.vue'
 import JdTable from '@/components/JdTable/JdTable.vue'
-import JdPaginacion from '@/components/JdPaginacion.vue'
 
+// Modales específicos
 import mProduccionOrden from '@/views/produccion/historial/mProduccionOrden.vue'
 import mProduccionInsumos from '@/views/produccion/historial/mProduccionInsumos.vue'
 import mProduccionProductos from '@/views/produccion/historial/mProduccionProductos.vue'
@@ -77,67 +36,66 @@ import mFormato from '@/views/calidad/formatos/mFormato.vue'
 import mProduccionTrazabilidad from '@/views/produccion/historial/mProduccionTrazabilidad.vue'
 import mProductosFaltantes from '@/views/produccion/mProductosFaltantes.vue'
 import mProduccionInsumosCompartidos from '@/views/produccion/historial/mProduccionInsumosCompartidos.vue'
-import JdButtonsOverflow from '@/components/JdButtonsOverflow.vue'
 
-import { TABLE_COLUMNS, TABLE_ROW_ACTIONS, HEADER_ACTIONS } from './produccion_historial.config.js'
+// Configuración de la vista
+import VIEW_CONFIG from './produccion_historial.config.js'
 
-import { useModals } from '@/pinia/modals'
+// Pinia y Utils
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
-
-import { urls, get, patch, delet } from '@/utils/crud'
-import { jmsg, jqst } from '@/utils/swal'
-
+import { useModals } from '@/pinia/modals'
+import { urls, get, patch } from '@/utils/crud'
 import dayjs from 'dayjs'
+import { jmsg, jqst } from '@/utils/swal'
 
 export default {
     name: 'vProduccionHistorial',
     components: {
-        JdButton,
-        JdBuscador,
+        VistaLayout,
         JdTable,
-        JdPaginacion,
-
-        mConfigCols,
-        mConfigFiltros,
-
         mProduccionOrden,
         mProduccionInsumos,
         mProduccionProductos,
-        mProductosFaltantes,
         mFormato,
         mProduccionTrazabilidad,
+        mProductosFaltantes,
         mProduccionInsumosCompartidos,
-        JdButtonsOverflow,
     },
-    data: () => ({
-        useModals: useModals(),
-        useAuth: useAuth(),
-        useVistas: useVistas(),
-
-        vista: {},
-
-        tableName: 'vProduccionHistorial',
-        headerActions: HEADER_ACTIONS,
-        tableColumns: JSON.parse(JSON.stringify(TABLE_COLUMNS)),
-        tableRowActions: TABLE_ROW_ACTIONS,
-    }),
+    computed: {
+        auth: () => useAuth(),
+        vistas: () => useVistas(),
+        modals: () => useModals(),
+        vista() {
+            return this.vistas[VIEW_CONFIG.name]
+        },
+    },
     created() {
-        this.vista = this.useVistas.vProduccionHistorial
+        // 1. Inicialización de la vista
+        this.vistas.initVista(VIEW_CONFIG.name, {
+            ...JSON.parse(JSON.stringify(VIEW_CONFIG)),
+            apiUrl: urls[VIEW_CONFIG.apiPath],
+            runMethod: this.runMethod,
+        })
         this.initFiltros()
-        this.useAuth.setColumns(this.tableName, this.tableColumns)
 
-        if (this.vista.loaded) return
-        this.vista.table_page = 1
-        if (this.useAuth.verifyPermiso('vProduccionHistorial:listar') == true)
-            this.loadProduccionOrdenes()
+        // 2. Carga inicial
+        this.auth.setColumns(this.vista.name, this.vista.tableColumns)
+        if (!this.vista.loaded && this.auth.verifyPermiso(`${VIEW_CONFIG.name}:listar`)) {
+            this.vista.loadTableData()
+        }
+    },
+    unmounted() {
+        if (this.vista) this.vista.runMethod = null
     },
     methods: {
+        runMethod(method, item) {
+            this.vistas.runMethod(this, method, item)
+        },
         initFiltros() {
-            if (!this.tableColumns[0].val) {
-                this.tableColumns[0].op = 'Está dentro de'
-                this.tableColumns[0].val = dayjs().startOf('month').format('YYYY-MM-DD')
-                this.tableColumns[0].val1 = dayjs().format('YYYY-MM-DD')
+            if (!this.vista.tableColumns[0].val) {
+                this.vista.tableColumns[0].op = 'Está dentro de'
+                this.vista.tableColumns[0].val = dayjs().startOf('month').format('YYYY-MM-DD')
+                this.vista.tableColumns[0].val1 = dayjs().format('YYYY-MM-DD')
             }
         },
         setQuery() {
@@ -152,26 +110,11 @@ export default {
                 page: this.vista.table_page,
             }
 
-            this.useAuth.updateQuery(this.tableColumns, this.vista.qry)
+            this.auth.updateQuery(this.vista.tableColumns, this.vista.qry)
             this.vista.qry.cols.push('articulo', 'mrp_bom')
         },
-        async loadProduccionOrdenes() {
-            this.setQuery()
 
-            this.vista.produccion_ordenes = []
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(
-                `${urls.produccion_ordenes}?qry=${JSON.stringify(this.vista.qry)}`,
-            )
-            this.useAuth.setLoading(false)
-            this.vista.loaded = true
-
-            if (res.code != 0) return
-
-            this.vista.produccion_ordenes = res.data
-            this.vista.table_meta = res.meta
-        },
-
+        // --- Acciones de Registro ---
         nuevo() {
             const send = {
                 produccion_orden: {
@@ -180,8 +123,7 @@ export default {
                 },
                 origin: 'vProduccionHistorial',
             }
-
-            this.useModals.setModal('mProduccionOrden', 'Nueva órden de producción', 1, send, true)
+            this.modals.setModal('mProduccionOrden', 'Nueva órden de producción', 1, send, true)
         },
         salidaInsumosCompartidos() {
             const send = {
@@ -190,8 +132,7 @@ export default {
                     fecha: dayjs().format('YYYY-MM-DD'),
                 },
             }
-
-            this.useModals.setModal(
+            this.modals.setModal(
                 'mProduccionInsumosCompartidos',
                 `Salida de insumos`,
                 null,
@@ -199,172 +140,76 @@ export default {
                 true,
             )
         },
-
-        async openConfigFiltros() {
-            await this.loadDatosSistema()
-
-            const cols = this.tableColumns
-            for (const a of cols) {
-                if (a.id == 'linea') a.reload = this.loadLineas
-                if (a.id == 'maquina') a.reload = this.loadMaquinas
-                if (a.id == 'responsable') a.reload = this.loadColaboradores
-                if (a.id == 'estado') a.lista = this.vista.produccion_orden_estados
-            }
-
-            const send = {
-                table: this.tableName,
-                cols,
-                reload: this.loadProduccionOrdenes,
-            }
-
-            this.useModals.setModal('mConfigFiltros', 'Filtros', null, send, true)
-        },
-
-        runMethod(method, item) {
-            this[method](item)
-        },
-        openConfigCols() {
-            const send = {
-                table: this.tableName,
-                cols: this.tableColumns,
-                reload: this.loadProduccionOrdenes,
-            }
-            this.useModals.setModal('mConfigCols', 'Configurar columnas', null, send, true)
-        },
         async ver(item) {
-            const qry = {
-                incl: ['maquina1', 'articulo1', 'mrp_bom1'],
-            }
-
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(
-                `${urls.produccion_ordenes}/uno/${item.id}?qry=${JSON.stringify(qry)}`,
-            )
-            this.useAuth.setLoading(false)
-
+            const qry = { incl: ['maquina1', 'articulo1', 'mrp_bom1'] }
+            this.auth.setLoading(true, 'Cargando...')
+            const res = await get(`${this.vista.apiUrl}/uno/${item.id}?qry=${JSON.stringify(qry)}`)
+            this.auth.setLoading(false)
             if (res.code != 0) return
 
             const send = {
                 produccion_orden: res.data,
-                articulos: [
-                    {
-                        id: res.data.articulo,
-                        ...res.data.articulo_info,
-                    },
-                ],
+                articulos: [{ id: res.data.articulo, ...res.data.articulo_info }],
                 mrp_boms: [{ ...res.data.mrp_bom1 }],
                 origin: 'vProduccionHistorial',
             }
-
-            if (res.data.maquina) {
-                if (!this.vista.maquinas) await this.loadMaquinas()
-                send.maquinas = this.vista.maquinas
-            }
-
-            this.useModals.setModal('mProduccionOrden', 'Ver órden de producción', 3, send, true)
+            this.modals.setModal('mProduccionOrden', 'Ver órden de producción', 3, send, true)
         },
         async editar(item) {
-            const qry = {
-                incl: ['maquina1', 'articulo1', 'mrp_bom1'],
-            }
-
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(
-                `${urls.produccion_ordenes}/uno/${item.id}?qry=${JSON.stringify(qry)}`,
-            )
-            this.useAuth.setLoading(false)
-
+            const qry = { incl: ['maquina1', 'articulo1', 'mrp_bom1'] }
+            this.auth.setLoading(true, 'Cargando...')
+            const res = await get(`${this.vista.apiUrl}/uno/${item.id}?qry=${JSON.stringify(qry)}`)
+            this.auth.setLoading(false)
             if (res.code != 0) return
 
             const send = {
                 produccion_orden: res.data,
-                articulos: [
-                    {
-                        id: res.data.articulo,
-                        ...res.data.articulo_info,
-                    },
-                ],
+                articulos: [{ id: res.data.articulo, ...res.data.articulo_info }],
                 mrp_boms: [{ ...res.data.mrp_bom1 }],
                 origin: 'vProduccionHistorial',
             }
-
-            if (res.data.maquina) {
-                if (!this.vista.maquinas) await this.loadMaquinas()
-                send.maquinas = this.vista.maquinas
-            }
-
-            this.useModals.setModal('mProduccionOrden', 'Editar órden de producción', 2, send, true)
-        },
-        async eliminar(item) {
-            const resQst = await jqst('¿Está seguro de eliminar?')
-            if (resQst.isConfirmed == false) return
-
-            this.useAuth.setLoading(true, 'Eliminando...')
-            const res = await delet(urls.produccion_ordenes, item)
-            this.useAuth.setLoading(false)
-
-            if (res.code != 0) return
-
-            this.useVistas.removeItem('vProduccionHistorial', 'produccion_ordenes', item)
+            this.modals.setModal('mProduccionOrden', 'Editar órden de producción', 2, send, true)
         },
         async terminar(item) {
             const resQst = await jqst('¿Está seguro de terminar la orden de producción?')
             if (resQst.isConfirmed == false) return
 
-            this.useAuth.setLoading(true, 'Cargando...')
+            this.auth.setLoading(true, 'Cargando...')
             const res = await patch(
-                `${urls.produccion_ordenes}/terminar`,
+                `${this.vista.apiUrl}/terminar`,
                 item,
                 'Orden de producción terminada',
             )
-            this.useAuth.setLoading(false)
-
+            this.auth.setLoading(false)
             if (res.code != 0) return
 
-            this.useVistas.updateItem('vProduccionHistorial', 'produccion_ordenes', {
-                ...item,
-                estado: 2,
-            })
+            this.vistas.updateItem('vProduccionHistorial', 'tableData', { ...item, estado: 2 })
         },
         async abrir(item) {
             const resQst = await jqst('¿Está seguro de abrir la orden de producción?')
             if (resQst.isConfirmed == false) return
 
-            this.useAuth.setLoading(true, 'Cargando...')
+            this.auth.setLoading(true, 'Cargando...')
             const res = await patch(
-                `${urls.produccion_ordenes}/abrir`,
+                `${this.vista.apiUrl}/abrir`,
                 item,
                 'Orden de producción abierta',
             )
-            this.useAuth.setLoading(false)
-
+            this.auth.setLoading(false)
             if (res.code != 0) return
 
-            this.useVistas.updateItem('vProduccionHistorial', 'produccion_ordenes', {
-                ...item,
-                estado: 1,
-            })
+            this.vistas.updateItem('vProduccionHistorial', 'tableData', { ...item, estado: 1 })
         },
         async salidaInsumos(item) {
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.produccion_ordenes}/uno/${item.id}`)
-            this.useAuth.setLoading(false)
-
-            if (res.code != 0) return
-
             const qry1 = {
-                fltr: {
-                    mrp_bom: { op: 'Es', val: item.mrp_bom },
-                },
+                fltr: { mrp_bom: { op: 'Es', val: item.mrp_bom } },
                 cols: ['articulo', 'cantidad', 'orden'],
                 incl: ['articulo1'],
                 ordr: [['orden', 'ASC']],
             }
-
-            this.useAuth.setLoading(true, 'Cargando...')
+            this.auth.setLoading(true, 'Cargando...')
             const res1 = await get(`${urls.mrp_bom_lines}?qry=${JSON.stringify(qry1)}`)
-            this.useAuth.setLoading(false)
-
+            this.auth.setLoading(false)
             if (res1.code != 0) return
 
             const send = {
@@ -372,228 +217,102 @@ export default {
                 produccion_orden: { ...item },
                 mrp_bom_lines: res1.data,
             }
-
-            this.useModals.setModal('mProduccionInsumos', `Salida de insumos`, 1, send, true)
+            this.modals.setModal('mProduccionInsumos', `Salida de insumos`, 1, send, true)
         },
         productosTerminados(item) {
-            const send = {
-                produccion_orden: { ...item },
-                lote_manual: false,
-            }
-
-            this.useModals.setModal(
-                'mProduccionProductos',
-                `Productos terminados`,
-                null,
-                send,
-                true,
-            )
+            const send = { produccion_orden: { ...item }, lote_manual: false }
+            this.modals.setModal('mProduccionProductos', `Productos terminados`, null, send, true)
         },
         setProduccionProductos(item) {
-            const pr = this.vista.produccion_ordenes.find((a) => a.id == item.id)
+            const pr = this.vista.tableData.find((a) => a.id == item.id)
             if (pr) pr.productos_terminados = item.productos_terminados
         },
         async verTrazabilidad(item) {
-            const qry = {
-                incl: ['articulo1', 'maquina1'],
-            }
-
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(
-                `${urls.produccion_ordenes}/uno/${item.id}?qry=${JSON.stringify(qry)}`,
-            )
-            this.useAuth.setLoading(false)
-
+            const qry = { incl: ['articulo1', 'maquina1'] }
+            this.auth.setLoading(true, 'Cargando...')
+            const res = await get(`${this.vista.apiUrl}/uno/${item.id}?qry=${JSON.stringify(qry)}`)
+            this.auth.setLoading(false)
             if (res.code != 0) return
             if (res.data == null) return jmsg('warning', 'La órden de producción no existe')
 
             const send = {
                 produccion_orden: res.data,
-                articulos: [
-                    {
-                        id: res.data.articulo,
-                        ...res.data.articulo1,
-                    },
-                ],
-                maquinas: [
-                    {
-                        id: res.data.maquina,
-                        ...res.data.maquina1,
-                    },
-                ],
+                articulos: [{ id: res.data.articulo, ...res.data.articulo1 }],
+                maquinas: [{ id: res.data.maquina, ...res.data.maquina1 }],
             }
-
-            this.useModals.setModal('mProduccionTrazabilidad', 'Trazabilidad', null, send, true)
+            this.modals.setModal('mProduccionTrazabilidad', 'Trazabilidad', null, send, true)
         },
         async controlPesos(item) {
             let formato_id = 'RE-BPM-06'
+            if (item.linea == 2) formato_id = 'RE-BPM-08'
+            else if (item.linea == 3) formato_id = 'RE-BPM-07'
 
-            if (item.linea == 2) {
-                formato_id = 'RE-BPM-08'
-            } else if (item.linea == 3) {
-                formato_id = 'RE-BPM-07'
-            }
-
-            this.useAuth.setLoading(true, 'Cargando...')
+            this.auth.setLoading(true, 'Cargando...')
             const res = await get(`${urls.formatos}/uno/${formato_id}`)
-            this.useAuth.setLoading(false)
-
+            this.auth.setLoading(false)
             if (res.code != 0) return
 
-            this.useAuth.setLoading(true, 'Cargando...')
+            this.auth.setLoading(true, 'Cargando...')
             const res1 = await get(`${urls.formato_values}/uno/${item.calidad_revisado}`)
-            this.useAuth.setLoading(false)
-
+            this.auth.setLoading(false)
             if (res1.code != 0) return
 
-            if (res1.data == null) {
-                const send = {
-                    produccion_orden: item.id,
-                    produccion_orden1: { ...item },
-                    formato: {
-                        codigo: res.data.id,
-                        columns: res.data.columns,
-                        instructivo: res.data.instructivo,
-                    },
-                }
-
-                this.useModals.setModal('mFormato', formato_id, 1, send, true)
-            } else {
-                for (const a of res.data.columns) {
-                    a.value = res1.data[a.id]
-                }
-
-                const send = {
-                    produccion_orden: item.id,
-                    produccion_orden1: res1.data.produccion_orden1,
-                    formato: {
-                        id: res1.data.id,
-                        codigo: res.data.id,
-                        columns: res.data.columns,
-                        instructivo: res.data.instructivo,
-                    },
-                }
-
-                this.useModals.setModal('mFormato', formato_id, 2, send, true)
+            const send = {
+                produccion_orden: item.id,
+                produccion_orden1: res1.data ? res1.data.produccion_orden1 : { ...item },
+                formato: {
+                    id: res1.data?.id,
+                    codigo: res.data.id,
+                    columns: res.data.columns,
+                    instructivo: res.data.instructivo,
+                },
             }
+            if (res1.data) {
+                for (const a of res.data.columns) a.value = res1.data[a.id]
+            }
+            this.modals.setModal('mFormato', formato_id, res1.data ? 2 : 1, send, true)
         },
         async controlPpc(item) {
             let formato_id = 'RE-HACCP 03'
-
-            this.useAuth.setLoading(true, 'Cargando...')
+            this.auth.setLoading(true, 'Cargando...')
             const res = await get(`${urls.formatos}/uno/${formato_id}`)
-            this.useAuth.setLoading(false)
-
+            this.auth.setLoading(false)
             if (res.code != 0) return
 
-            this.useAuth.setLoading(true, 'Cargando...')
+            this.auth.setLoading(true, 'Cargando...')
             const res1 = await get(`${urls.formato_values}/uno/${item.cf_ppc}`)
-            this.useAuth.setLoading(false)
-
+            this.auth.setLoading(false)
             if (res1.code != 0) return
 
-            if (res1.data == null) {
-                const send = {
-                    produccion_orden: item.id,
-                    produccion_orden1: { ...item },
-                    formato: {
-                        codigo: res.data.id,
-                        columns: res.data.columns,
-                        instructivo: res.data.instructivo,
-                    },
-                }
-
-                this.useModals.setModal('mFormato', formato_id, 1, send, true)
-            } else {
-                for (const a of res.data.columns) {
-                    a.value = res1.data[a.id]
-                }
-
-                const send = {
-                    produccion_orden: item.id,
-                    produccion_orden1: res1.data.produccion_orden1,
-                    formato: {
-                        id: res1.data.id,
-                        codigo: res.data.id,
-                        columns: res.data.columns,
-                        instructivo: res.data.instructivo,
-                    },
-                }
-
-                this.useModals.setModal('mFormato', formato_id, 2, send, true)
+            const send = {
+                produccion_orden: item.id,
+                produccion_orden1: res1.data ? res1.data.produccion_orden1 : { ...item },
+                formato: {
+                    id: res1.data?.id,
+                    codigo: res.data.id,
+                    columns: res.data.columns,
+                    instructivo: res.data.instructivo,
+                },
             }
+            if (res1.data) {
+                for (const a of res.data.columns) a.value = res1.data[a.id]
+            }
+            this.modals.setModal('mFormato', formato_id, res1.data ? 2 : 1, send, true)
         },
         setFormatoCalidad(item) {
-            const produccion_orden = this.vista.produccion_ordenes.find(
-                (a) => a.id == item.produccion_orden,
-            )
+            const produccion_orden = this.vista.tableData.find((a) => a.id == item.produccion_orden)
             if (!produccion_orden) return
 
-            if (
-                item.codigo == 'RE-BPM-06' ||
-                item.codigo == 'RE-BPM-07' ||
-                item.codigo == 'RE-BPM-08'
-            ) {
+            if (['RE-BPM-06', 'RE-BPM-07', 'RE-BPM-08'].includes(item.codigo)) {
                 produccion_orden.calidad_revisado = item.id
             }
-
             if (item.codigo == 'RE-HACCP 03') {
                 produccion_orden.cf_ppc = item.id
             }
         },
-
-        async loadDatosSistema() {
-            const qry = ['produccion_orden_estados']
-            const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
-
-            if (res.code != 0) return
-
-            Object.assign(this.vista, res.data)
-        },
-        async loadLineas() {
-            const qry = {
-                fltr: {},
-                cols: ['nombre'],
-                ordr: [['nombre', 'ASC']],
-            }
-
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.articulo_lineas}?qry=${JSON.stringify(qry)}`)
-            this.useAuth.setLoading(false)
-
-            if (res.code != 0) return
-            return (this.vista.articulo_lineas = res.data)
-        },
-        async loadMaquinas() {
-            const qry = {
-                fltr: { tipo: { op: 'Es', val: 1 } },
-                cols: ['codigo', 'nombre', 'linea', 'velocidad', 'limpieza_tiempo'],
-                ordr: [['nombre', 'ASC']],
-            }
-
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.maquinas}?qry=${JSON.stringify(qry)}`)
-            this.useAuth.setLoading(false)
-
-            if (res.code != 0) return
-            return (this.vista.maquinas = res.data)
-        },
-        async loadColaboradores() {
-            const qry = {
-                fltr: { activo: { op: 'Es', val: true } },
-                cols: ['nombres', 'produccion_codigo'],
-                ordr: [['nombres', 'ASC']],
-            }
-
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.colaboradores}?qry=${JSON.stringify(qry)}`)
-            this.useAuth.setLoading(false)
-
-            if (res.code != 0) return
-            return (this.vista.colaboradores = res.data)
-        },
     },
 }
 </script>
+
 
 <style lang="scss" scoped></style>

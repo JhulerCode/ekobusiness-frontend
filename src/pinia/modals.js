@@ -1,4 +1,4 @@
-import { defineStore } from "pinia"
+import { defineStore } from 'pinia'
 
 export const useModals = defineStore('modals', {
     state: () => ({
@@ -7,6 +7,9 @@ export const useModals = defineStore('modals', {
     actions: {
         initVars() {
             this.show = {}
+            for (const key of Object.keys(this.$state)) {
+                delete this.$state[key]
+            }
         },
         setModal(modal, title, mode, variables, many = false) {
             this[modal] = {}
@@ -16,8 +19,7 @@ export const useModals = defineStore('modals', {
             if (variables !== null) {
                 if (many == true) {
                     Object.assign(this[modal], variables)
-                }
-                else {
+                } else {
                     this[modal].item = variables
                 }
             }

@@ -9,7 +9,6 @@
 
             <div class="head-center">
                 <JdBuscador
-                    :view="vista"
                     :columns="tableColumns"
                     :tableName="tableName"
                     @open-filters="openConfigFiltros"
@@ -21,14 +20,7 @@
                 <JdPaginacion :view="vista" @reload="loadMaquinas" />
 
                 <JdButton
-                    icon="fa-solid fa-file-excel"
-                    tipo="2"
-                    title="Exportar"
-                    @click="$refs['jdtable'].downloadData()"
-                />
-
-                <JdButton
-                    icon="fa-solid fa-gear"
+                    icon="fa-solid fa-sliders"
                     tipo="2"
                     title="Columnas"
                     @click="openConfigCols"
@@ -114,7 +106,8 @@ export default {
 
             this.useAuth.updateQuery(this.tableColumns, this.vista.qry)
         },
-        async loadMaquinas() {
+        async loadMaquinas(init_page = false) {
+            if (init_page) this.vista.table_page = 1
             this.setQuery()
 
             this.vista.maquinas = []

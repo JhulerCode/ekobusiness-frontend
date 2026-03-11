@@ -1,82 +1,82 @@
 <template>
-    <div class="vista vista-fill">
-        <div class="head">
-            <div class="head-left" style="flex-wrap: nowrap">
-                <strong style="white-space: nowrap">Inventario</strong>
-
-                <JdButtonsOverflow :buttons="headerActions" @runMethod="runMethod" />
-            </div>
-
-            <div class="head-center"></div>
-
-            <div class="head-right"></div>
-        </div>
-
+    <VistaLayout :vista="vista">
         <JdTable
-            :columns="tableColumns"
-            :datos="vista.inventario || []"
-            :configFiltros="openConfigFiltros"
-            :reload="loadInventario"
+            :name="vista.name"
+            :columns="vista.tableColumns"
+            :datos="vista.tableData || []"
+            :colAct="false"
         />
-    </div>
-
-    <mConfigFiltros v-if="useModals.show.mConfigFiltros" />
+    </VistaLayout>
 </template>
 
 <script>
-import { JdTable, mConfigFiltros } from '@jhuler/components'
-import JdButtonsOverflow from '@/components/JdButtonsOverflow.vue'
+// Componentes base y utilidades
+import VistaLayout from '@/components/VistaLayout/VistaLayout.vue'
+import JdTable from '@/components/JdTable/JdTable.vue'
 
-import { TABLE_COLUMNS, HEADER_ACTIONS } from './inventario.config.js'
+// Configuración de la vista
+import VIEW_CONFIG from './inventario.config.js'
 
+// Pinia y Utils
 import { useAuth } from '@/pinia/auth'
-import { useModals } from '@/pinia/modals'
 import { useVistas } from '@/pinia/vistas'
-
+import { useModals } from '@/pinia/modals'
 import { urls, get } from '@/utils/crud'
-import { redondear } from '@/utils/mine'
-
 import dayjs from 'dayjs'
 import { jmsg } from '@/utils/swal'
 
 export default {
+    name: 'vInventarioArticulos',
     components: {
+        VistaLayout,
         JdTable,
-        mConfigFiltros,
-        JdButtonsOverflow,
     },
-    data: () => ({
-        useAuth: useAuth(),
-        useModals: useModals(),
-        useVistas: useVistas(),
-        dayjs,
-        redondear,
-
-        vista: {},
-
-        tableName: 'vInventarioArticulos',
-        headerActions: HEADER_ACTIONS,
-        tableColumns: JSON.parse(JSON.stringify(TABLE_COLUMNS)),
-    }),
+    computed: {
+        auth: () => useAuth(),
+        vistas: () => useVistas(),
+        modals: () => useModals(),
+        vista() {
+            return this.vistas[VIEW_CONFIG.name]
+        },
+    },
     created() {
-        this.vista = this.useVistas.vInventarioArticulos
+        // 1. Inicialización de la vista
+        this.vistas.initVista(VIEW_CONFIG.name, {
+            ...JSON.parse(JSON.stringify(VIEW_CONFIG)),
+            apiUrl: urls[VIEW_CONFIG.apiPath],
+            runMethod: this.runMethod,
+        })
+
+        // 2. Override de métodos de carga
+        this.vista.loadTableData = this.loadTableData
+        this.vista.openConfigFiltros = this.openConfigFiltros
+
+        // 3. Carga inicial
         this.initFiltros()
-        this.useAuth.setColumns(this.tableName, this.tableColumns)
+        this.auth.setColumns(this.vista.name, this.vista.tableColumns)
+
+        if (!this.vista.loaded) {
+            this.loadTableData()
+        }
+    },
+    unmounted() {
+        if (this.vista) this.vista.runMethod = null
     },
     methods: {
         runMethod(method, item) {
-            this[method](item)
+            this.vistas.runMethod(this, method, item)
         },
         initFiltros() {
-            this.tableColumns[0].op = 'Es igual o anterior a'
-            this.tableColumns[0].val = dayjs().format('YYYY-MM-DD')
+            if (this.vista.tableColumns && this.vista.tableColumns.length > 0) {
+                this.vista.tableColumns[0].op = 'Es igual o anterior a'
+                this.vista.tableColumns[0].val = dayjs().format('YYYY-MM-DD')
+            }
         },
         checkDatos() {
-            if (!this.tableColumns[0].val) {
+            if (!this.vista.tableColumns[0].val) {
                 jmsg('error', 'Ingrese la fecha límite')
                 return true
             }
-
             return false
         },
         setQuery() {
@@ -88,35 +88,36 @@ export default {
                     },
                 },
                 sqls: ['articulo_movimientos_cantidad', 'articulo_movimientos_valorizado'],
-                fltr: {
-                    // tipo: { op: 'Es', val: 1 },
-                },
+                fltr: {},
                 grop: ['id'],
                 ordr: [['nombre', 'ASC']],
+                page: this.vista.table_page,
             }
 
-            this.useAuth.updateQuery(this.tableColumns, this.vista.qry)
+            this.auth.updateQuery(this.vista.tableColumns, this.vista.qry)
         },
-        async loadInventario() {
+        async loadTableData(init_page) {
+            if (init_page) this.vista.table_page = 1
             if (this.checkDatos()) return
 
             this.setQuery()
 
-            this.vista.inventario = []
-            this.useAuth.setLoading(true, 'Cargando...')
+            this.vista.tableData = []
+            this.auth.setLoading(true, 'Cargando...')
             const res = await get(`${urls.kardex}/inventario?qry=${JSON.stringify(this.vista.qry)}`)
-            this.useAuth.setLoading(false)
+            this.auth.setLoading(false)
             this.vista.loaded = true
 
-            if (res.code != 0) return
-
-            this.vista.inventario = res.data
+            if (res.code === 0) {
+                this.vista.tableData = res.data
+                this.vista.table_meta = res.meta
+            }
         },
 
         async openConfigFiltros() {
             await this.loadDatosSistema()
 
-            const cols = this.tableColumns
+            const cols = this.vista.tableColumns
             for (const a of cols) {
                 if (a.id == 'categoria') a.reload = this.loadCategorias
                 if (a.id == 'purchase_ok') a.lista = this.vista.estados
@@ -125,12 +126,12 @@ export default {
             }
 
             const send = {
-                table: this.tableName,
+                table: this.vista.name,
                 cols,
-                reload: this.loadInventario,
+                reload: this.loadTableData,
             }
 
-            this.useModals.setModal('mConfigFiltros', 'Filtros', null, send, true)
+            this.modals.setModal('mConfigFiltros', 'Filtros', null, send, true)
         },
         async loadDatosSistema() {
             const qry = ['igv_afectaciones', 'unidades', 'estados', 'articulo_tipos']
@@ -151,9 +152,9 @@ export default {
             }
 
             this.vista.articulo_categorias = []
-            this.useAuth.setLoading(true, 'Cargando...')
+            this.auth.setLoading(true, 'Cargando...')
             const res = await get(`${urls.articulo_categorias}?qry=${JSON.stringify(qry)}`)
-            this.useAuth.setLoading(false)
+            this.auth.setLoading(false)
 
             if (res.code != 0) return
 

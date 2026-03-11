@@ -89,6 +89,18 @@ export default [
                 ],
             },
             {
+                label: 'Precios',
+                goto: 'vPreciosCompra',
+                path: 'compras/precios-compra',
+                view: 'compras/precios_compra/vPreciosCompra.vue',
+                permisos: [
+                    { id: 'vPreciosCompra:listar', label: 'Listar' },
+                    { id: 'vPreciosCompra:crear', label: 'Crear' },
+                    { id: 'vPreciosCompra:editar', label: 'Editar' },
+                    { id: 'vPreciosCompra:eliminar', label: 'Eliminar' },
+                ],
+            },
+            {
                 label: 'Pedidos',
                 goto: 'vCompraPedidos',
                 path: 'compras/pedidos',

@@ -1,122 +1,93 @@
 <template>
-    <div class="vista vista-fill">
-        <div class="head">
-            <div class="head-left" style="flex-wrap: nowrap">
-                <strong style="white-space: nowrap">Pedidos de venta</strong>
-
-                <JdButtonsOverflow :buttons="headerActions" @runMethod="runMethod" />
-            </div>
-
-            <div class="head-center">
-                <JdBuscador
-                    :columns="tableColumns"
-                    :tableName="tableName"
-                    @open-filters="openConfigFiltros"
-                    @reload="loadPedidos"
-                />
-            </div>
-
-            <div class="head-right">
-                <JdPaginacion :view="vista" @reload="loadPedidos" />
-
-                <JdButton
-                    icon="fa-solid fa-sliders"
-                    tipo="2"
-                    title="Columnas"
-                    @click="openConfigCols"
-                />
-            </div>
-        </div>
-
+    <VistaLayout :vista="vista">
         <JdTable
-            :name="tableName"
-            :columns="tableColumns"
-            :datos="vista.pedidos || []"
+            :name="vista.name"
+            :columns="vista.tableColumns"
+            :datos="vista.tableData || []"
             :colAct="true"
-            :rowOptions="tableRowActions"
-            @rowOptionSelected="runMethod"
-            ref="jdtable"
+            :rowOptions="vista.tableRowActions"
+            @rowOptionSelected="vista.runMethod"
         />
-    </div>
+    </VistaLayout>
 
-    <mSocioPedido v-if="useModals.show.mSocioPedido" />
-    <mSocioPedidoPdf v-if="useModals.show.mSocioPedidoPdf" />
-    <mTransaccion v-if="useModals.show.mTransaccion" />
-    <mPedidosClientes v-if="useModals.show.mPedidosClientes" />
-
-    <mConfigCols v-if="useModals.show.mConfigCols" />
-    <mConfigFiltros v-if="useModals.show.mConfigFiltros" />
+    <!-- Modales -->
+    <mSocioPedido v-if="modals.show.mSocioPedido" />
+    <mSocioPedidoPdf v-if="modals.show.mSocioPedidoPdf" />
+    <mTransaccion v-if="modals.show.mTransaccion" />
+    <mPedidosClientes v-if="modals.show.mPedidosClientes" />
 </template>
 
 <script>
-import { JdButton, mConfigFiltros } from '@jhuler/components'
-import mConfigCols from '@/components/mConfigCols.vue'
-import JdButtonsOverflow from '@/components/JdButtonsOverflow.vue'
-import JdBuscador from '@/components/JdBuscador.vue'
-import JdPaginacion from '@/components/JdPaginacion.vue'
+// Componentes base y utilidades
+import VistaLayout from '@/components/VistaLayout/VistaLayout.vue'
 import JdTable from '@/components/JdTable/JdTable.vue'
 
-import mPedidosClientes from './mPedidosClientes.vue'
+// Modales específicos
 import mSocioPedido from '@/views/compras/pedidos/mSocioPedido.vue'
 import mSocioPedidoPdf from '@/views/compras/pedidos/mSocioPedidoPdf.vue'
 import mTransaccion from '@/views/compras/compras/mTransaccion.vue'
+import mPedidosClientes from './mPedidosClientes.vue'
 
-import { TABLE_COLUMNS, TABLE_ROW_ACTIONS, HEADER_ACTIONS } from './venta_pedidos.config.js'
+// Configuración de la vista
+import VIEW_CONFIG from './venta_pedidos.config.js'
 
+// Pinia y Utils
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
 import { useModals } from '@/pinia/modals'
-
-import { urls, get, delet, patch } from '@/utils/crud'
+import { urls, get, patch } from '@/utils/crud'
 import { jqst } from '@/utils/swal'
 import { downloadExcel } from '@/utils/mine'
-
 import dayjs from 'dayjs'
 
 export default {
     name: 'vVentaPedidos',
     components: {
-        JdButton,
-        JdButtonsOverflow,
-        JdBuscador,
+        VistaLayout,
         JdTable,
-        JdPaginacion,
-
-        mConfigCols,
-        mConfigFiltros,
-        mPedidosClientes,
-
         mSocioPedido,
         mSocioPedidoPdf,
         mTransaccion,
+        mPedidosClientes,
     },
-    data: () => ({
-        useAuth: useAuth(),
-        useVistas: useVistas(),
-        useModals: useModals(),
-
-        vista: {},
-
-        headerActions: HEADER_ACTIONS,
-        tableName: 'vVentaPedidos',
-        tableColumns: JSON.parse(JSON.stringify(TABLE_COLUMNS)),
-        tableRowActions: TABLE_ROW_ACTIONS,
-    }),
-    async created() {
-        this.vista = this.useVistas.vVentaPedidos
+    computed: {
+        auth: () => useAuth(),
+        vistas: () => useVistas(),
+        modals: () => useModals(),
+        vista() {
+            return this.vistas[VIEW_CONFIG.name]
+        },
+    },
+    created() {
+        // 1. Inicialización de la vista
+        this.vistas.initVista(VIEW_CONFIG.name, {
+            ...JSON.parse(JSON.stringify(VIEW_CONFIG)),
+            apiUrl: urls[VIEW_CONFIG.apiPath],
+            runMethod: this.runMethod,
+        })
         this.initFiltros()
-        this.useAuth.setColumns(this.tableName, this.tableColumns)
 
-        if (this.vista.loaded) return
-        this.vista.table_page = 1
-        if (this.useAuth.verifyPermiso('vVentaPedidos:listar') == true) this.loadPedidos()
+        // 2. Carga inicial
+        this.auth.setColumns(this.vista.name, this.vista.tableColumns)
+        if (!this.vista.loaded && this.auth.verifyPermiso(`${VIEW_CONFIG.name}:listar`)) {
+            this.vista.loadTableData()
+        }
+    },
+    unmounted() {
+        if (this.vista) this.vista.runMethod = null
     },
     methods: {
+        runMethod(method, item) {
+            this.vistas.runMethod(this, method, item)
+        },
         initFiltros() {
-            if (!this.tableColumns[0].val) {
-                this.tableColumns[0].op = 'Está dentro de'
-                this.tableColumns[0].val = dayjs().startOf('month').format('YYYY-MM-DD')
-                this.tableColumns[0].val1 = dayjs().format('YYYY-MM-DD')
+            if (!this.vista.tableColumns[1].val) {
+                const colFecha = this.vista.tableColumns.find((a) => a.id == 'fecha')
+                if (colFecha) {
+                    colFecha.op = 'Está dentro de'
+                    colFecha.val = dayjs().startOf('month').format('YYYY-MM-DD')
+                    colFecha.val1 = dayjs().format('YYYY-MM-DD')
+                }
             }
         },
         setQuery() {
@@ -126,25 +97,10 @@ export default {
                 ordr: [['fecha', 'DESC']],
                 page: this.vista.table_page,
             }
-
-            this.useAuth.updateQuery(this.tableColumns, this.vista.qry)
-        },
-        async loadPedidos(init_page = false) {
-            if (init_page) this.vista.table_page = 1
-            this.setQuery()
-
-            this.vista.pedidos = []
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.socio_pedidos}?qry=${JSON.stringify(this.vista.qry)}`)
-            this.useAuth.setLoading(false)
-            this.vista.loaded = true
-
-            if (res.code != 0) return
-
-            this.vista.pedidos = res.data
-            this.vista.table_meta = res.meta
+            this.auth.updateQuery(this.vista.tableColumns, this.vista.qry)
         },
 
+        // Header actions
         nuevo() {
             const send = {
                 socio_pedido: {
@@ -156,18 +112,16 @@ export default {
                     entrega_direccion_datos: {},
                 },
             }
-
-            this.useModals.setModal('mSocioPedido', 'Nuevo pedido de venta', 1, send, true)
+            this.modals.setModal('mSocioPedido', 'Nuevo pedido de venta', 1, send, true)
         },
         recuperarGuardado() {
             const send = {
-                socio_pedido: this.useAuth.avances.mVentaPedido,
+                socio_pedido: this.auth.avances.mVentaPedido,
             }
-
-            this.useModals.setModal('mSocioPedido', 'Nuevo pedido de venta', 1, send, true)
+            this.modals.setModal('mSocioPedido', 'Nuevo pedido de venta', 1, send, true)
         },
         verPedidos() {
-            this.useModals.setModal('mPedidosClientes', 'Productos pedidos')
+            this.modals.setModal('mPedidosClientes', 'Productos pedidos')
         },
         descargarPlantilla() {
             const columns = [
@@ -179,40 +133,7 @@ export default {
             downloadExcel(columns, [], 'plantilla_pedidos.xlsx')
         },
 
-        async openConfigFiltros() {
-            await this.loadDatosSistema()
-
-            const cols = this.tableColumns
-            for (const a of cols) {
-                if (a.id == 'socio1.nombres') a.reload = this.loadSocios
-                if (a.id == 'pago_condicion') a.lista = this.vista.pago_condiciones
-                if (a.id == 'moneda') a.reload = this.loadMonedas
-                if (a.id == 'estado') a.lista = this.vista.pedido_estados
-                if (a.id == 'pagado') a.lista = this.vista.estados
-                if (a.id == 'listo') a.lista = this.vista.estados
-                if (a.id == 'entregado') a.lista = this.vista.estados
-            }
-
-            const send = {
-                table: this.tableName,
-                cols,
-                reload: this.loadPedidos,
-            }
-
-            this.useModals.setModal('mConfigFiltros', 'Filtros', null, send, true)
-        },
-
-        runMethod(method, item) {
-            this[method](item)
-        },
-        openConfigCols() {
-            const send = {
-                table: this.tableName,
-                cols: this.tableColumns,
-                reload: this.loadPedidos,
-            }
-            this.useModals.setModal('mConfigCols', 'Configurar columnas', null, send, true)
-        },
+        // Table row actions
         async ver(item) {
             const qry = {
                 incl: ['socio1', 'moneda1', 'socio_pedido_items'],
@@ -227,9 +148,9 @@ export default {
                 },
             }
 
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.socio_pedidos}/uno/${item.id}?qry=${JSON.stringify(qry)}`)
-            this.useAuth.setLoading(false)
+            this.auth.setLoading(true, 'Cargando...')
+            const res = await get(`${this.vista.apiUrl}/uno/${item.id}?qry=${JSON.stringify(qry)}`)
+            this.auth.setLoading(false)
 
             if (res.code != 0) return
 
@@ -240,7 +161,7 @@ export default {
                 monedas: [{ ...res.data.moneda1 }],
             }
 
-            this.useModals.setModal('mSocioPedido', 'Ver pedido de venta', 3, send, true)
+            this.modals.setModal('mSocioPedido', 'Ver pedido de venta', 3, send, true)
         },
         async editar(item) {
             const qry = {
@@ -256,9 +177,9 @@ export default {
                 },
             }
 
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.socio_pedidos}/uno/${item.id}?qry=${JSON.stringify(qry)}`)
-            this.useAuth.setLoading(false)
+            this.auth.setLoading(true, 'Cargando...')
+            const res = await get(`${this.vista.apiUrl}/uno/${item.id}?qry=${JSON.stringify(qry)}`)
+            this.auth.setLoading(false)
 
             if (res.code != 0) return
 
@@ -269,19 +190,7 @@ export default {
                 monedas: [{ ...res.data.moneda1 }],
             }
 
-            this.useModals.setModal('mSocioPedido', 'Editar pedido de venta', 2, send, true)
-        },
-        async eliminar(item) {
-            const resQst = await jqst('¿Está seguro de eliminar?')
-            if (resQst.isConfirmed == false) return
-
-            this.useAuth.setLoading(true, 'Eliminando...')
-            const res = await delet(urls.socio_pedidos, item)
-            this.useAuth.setLoading(false)
-
-            if (res.code != 0) return
-
-            this.useVistas.removeItem('vVentaPedidos', 'pedidos', item)
+            this.modals.setModal('mSocioPedido', 'Editar pedido de venta', 2, send, true)
         },
         async generarPdf(item) {
             const qry = {
@@ -297,61 +206,61 @@ export default {
                 },
             }
 
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.socio_pedidos}/uno/${item.id}?qry=${JSON.stringify(qry)}`)
-            this.useAuth.setLoading(false)
+            this.auth.setLoading(true, 'Cargando...')
+            const res = await get(`${this.vista.apiUrl}/uno/${item.id}?qry=${JSON.stringify(qry)}`)
+            this.auth.setLoading(false)
 
             if (res.code != 0) return
 
-            this.useModals.setModal('mSocioPedidoPdf', 'Orden de compra', null, res.data)
+            this.modals.setModal('mSocioPedidoPdf', 'Orden de compra', null, res.data)
         },
         async confirmarPago(item) {
             const resQst = await jqst('¿Está seguro de confirmar el pago?')
             if (resQst.isConfirmed == false) return
 
-            this.useAuth.setLoading(true, 'Cargando...')
+            this.auth.setLoading(true, 'Cargando...')
             const res = await patch(
-                `${urls.socio_pedidos}/confirmar-pago`,
+                `${this.vista.apiUrl}/confirmar-pago`,
                 item,
                 'Pago confirmado del pedido',
             )
-            this.useAuth.setLoading(false)
+            this.auth.setLoading(false)
 
             if (res.code != 0) return
 
-            this.useVistas.updateItem('vVentaPedidos', 'pedidos', { ...item, pagado: true })
+            this.vistas.updateItem(VIEW_CONFIG.name, 'tableData', { ...item, pagado: true })
         },
         async confirmarListo(item) {
             const resQst = await jqst('¿Está seguro de marcar como listo para entrega?')
             if (resQst.isConfirmed == false) return
 
-            this.useAuth.setLoading(true, 'Cargando...')
+            this.auth.setLoading(true, 'Cargando...')
             const res = await patch(
-                `${urls.socio_pedidos}/confirmar-listo`,
+                `${this.vista.apiUrl}/confirmar-listo`,
                 item,
                 'Pedido listo para entrega',
             )
-            this.useAuth.setLoading(false)
+            this.auth.setLoading(false)
 
             if (res.code != 0) return
 
-            this.useVistas.updateItem('vVentaPedidos', 'pedidos', { ...item, listo: true })
+            this.vistas.updateItem(VIEW_CONFIG.name, 'tableData', { ...item, listo: true })
         },
         async confirmarEntrega(item) {
             const resQst = await jqst('¿Está seguro de confirmar la entrega?')
             if (resQst.isConfirmed == false) return
 
-            this.useAuth.setLoading(true, 'Cargando...')
+            this.auth.setLoading(true, 'Cargando...')
             const res = await patch(
-                `${urls.socio_pedidos}/confirmar-entrega`,
+                `${this.vista.apiUrl}/confirmar-entrega`,
                 item,
                 'Pedido entregado',
             )
-            this.useAuth.setLoading(false)
+            this.auth.setLoading(false)
 
             if (res.code != 0) return
 
-            this.useVistas.updateItem('vVentaPedidos', 'pedidos', {
+            this.vistas.updateItem(VIEW_CONFIG.name, 'tableData', {
                 ...item,
                 entregado: true,
                 estado: 2,
@@ -368,9 +277,9 @@ export default {
                 },
             }
 
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.socio_pedidos}/uno/${item.id}?qry=${JSON.stringify(qry)}`)
-            this.useAuth.setLoading(false)
+            this.auth.setLoading(true, 'Cargando...')
+            const res = await get(`${this.vista.apiUrl}/uno/${item.id}?qry=${JSON.stringify(qry)}`)
+            this.auth.setLoading(false)
 
             if (res.code != 0) return
 
@@ -388,9 +297,9 @@ export default {
                 ordr: [['orden', 'ASC']],
             }
 
-            this.useAuth.setLoading(true, 'Cargando...')
+            this.auth.setLoading(true, 'Cargando...')
             const res2 = await get(`${urls.socio_pedido_items}?qry=${JSON.stringify(qry2)}`)
-            this.useAuth.setLoading(false)
+            this.auth.setLoading(false)
 
             if (res2.code != 0) return
 
@@ -421,50 +330,8 @@ export default {
                 ],
             }
 
-            this.useModals.setModal('mTransaccion', 'Nueva venta', 1, send, true)
-        },
-
-        async loadSocios() {
-            const qry = {
-                fltr: { tipo: { op: 'Es', val: 2 }, activo: { op: 'Es', val: true } },
-                cols: ['nombres'],
-                ordr: [['nombres', 'ASC']],
-            }
-
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.socios}?qry=${JSON.stringify(qry)}`)
-            this.useAuth.setLoading(false)
-
-            if (res.code !== 0) return
-            return (this.vista.socios = res.data)
-        },
-        async loadMonedas() {
-            const qry = {
-                fltr: {},
-                cols: ['id', 'nombre', 'simbolo'],
-                ordr: [
-                    ['estandar', 'DESC'],
-                    ['nombre', 'ASC'],
-                ],
-            }
-
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.monedas}?qry=${JSON.stringify(qry)}`)
-            this.useAuth.setLoading(false)
-
-            if (res.code != 0) return
-            return (this.vista.monedas = res.data)
-        },
-        async loadDatosSistema() {
-            const qry = ['pedido_estados', 'pago_condiciones', 'estados']
-            const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
-
-            if (res.code != 0) return
-
-            Object.assign(this.vista, res.data)
+            this.modals.setModal('mTransaccion', 'Nueva venta', 1, send, true)
         },
     },
 }
 </script>
-
-<style lang="scss" scoped></style>

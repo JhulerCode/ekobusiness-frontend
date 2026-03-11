@@ -1,0 +1,101 @@
+export default {
+    name: 'vPreciosCompra',
+    title: 'Precios',
+    apiPath: 'articulo_suppliers',
+
+    headerActions: [
+        {
+            text: 'Nuevo',
+            action: 'nuevo',
+            permiso: 'vPreciosCompra:crear',
+        },
+        {
+            icon: 'fa-solid fa-download',
+            text: 'Exportar página actual',
+            action: 'vista.downloadActualTablePage',
+            tipo: '2',
+        },
+    ],
+
+    tableColumns: [
+        {
+            id: 'id',
+            title: 'id',
+            type: 'text',
+            width: '5rem',
+            show: false,
+            orden: 1,
+        },
+        {
+            id: 'articulo1.nombre',
+            title: 'Artículo',
+            prop: 'articulo1.nombre',
+            type: 'text',
+            width: '20rem',
+            show: true,
+            seek: true,
+            orden: 2,
+        },
+        {
+            id: 'socio1.nombre',
+            title: 'Proveedor',
+            prop: 'socio1.nombres',
+            type: 'text',
+            width: '20rem',
+            show: true,
+            seek: true,
+            orden: 3,
+        },
+        {
+            id: 'currency_id1.nombre',
+            title: 'Moneda',
+            prop: 'currency_id1.nombre',
+            type: 'select',
+            width: '10rem',
+            show: true,
+            seek: true,
+            orden: 4,
+        },
+        {
+            id: 'price',
+            title: 'Valor unitario',
+            type: 'decimal',
+            width: '10rem',
+            show: true,
+            orden: 5,
+        },
+    ],
+
+    tableBulkActions: [
+        {
+            icon: 'fa-solid fa-trash-can',
+            text: 'Eliminar',
+            action: 'vista.eliminarBulk',
+            permiso: 'vPreciosCompra:eliminarBulk',
+        },
+    ],
+
+    tableRowActions: [
+        {
+            id: 1,
+            label: 'Editar',
+            icon: 'fa-solid fa-pen-to-square',
+            action: 'editar',
+            permiso: 'vPreciosCompra:editar',
+        },
+        {
+            id: 2,
+            label: 'Eliminar',
+            icon: 'fa-solid fa-trash-can',
+            action: 'vista.eliminar',
+            permiso: 'vPreciosCompra:eliminar',
+        },
+        {
+            id: 3,
+            label: 'Artículos',
+            icon: 'fa-solid fa-tags',
+            action: 'verArticulos',
+            permiso: 'vPrecioListaItems:listar',
+        },
+    ],
+}

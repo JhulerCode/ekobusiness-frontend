@@ -65,6 +65,7 @@ router.beforeEach(async (to, from, next) => {
         }
 
         // Si hay token pero no hay usuario cargado (ej. al refrescar F5), cargarlo
+        // login() ahora se encarga de limpiar el estado si falla (sesión no encontrada)
         if (!auth.usuario?.id) {
             const loginOk = await auth.login()
             if (!loginOk) return next({ name: 'SignIn' })

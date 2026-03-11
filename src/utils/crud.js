@@ -174,7 +174,10 @@ async function process(response, ms) {
         if ([401, 403, 404, 426].includes(response.status)) {
             jmsg('error', res.msg)
 
-            if (response.status == 401) useModals().setModal('mLogin', 'Sesión terminada', null, null)
+            if (response.status == 401) {
+                useAuth().clearAuth()
+                useModals().setModal('mLogin', 'Sesión terminada', null, null)
+            }
 
             return { code: response.status }
         }

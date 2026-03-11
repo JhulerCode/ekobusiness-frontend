@@ -23,10 +23,14 @@ export const useAuth = defineStore('auth', {
     actions: {
         initVars() {
             this.token = null
-            this.permisos = []
             this.usuario = {}
             this.tables = {}
             this.avances = {}
+        },
+        clearAuth() {
+            this.initVars()
+            useVistas().initVars()
+            useModals().initVars()
         },
 
         // ----- LOGIN ----- //
@@ -37,7 +41,10 @@ export const useAuth = defineStore('auth', {
             const result = await get(`${urls.colaboradores}/login`)
             this.setLoading(false)
 
-            if (result.code != 0) return false
+            if (result.code != 0) {
+                this.clearAuth()
+                return false
+            }
 
             this.setSessionDatos(result)
 
@@ -56,20 +63,15 @@ export const useAuth = defineStore('auth', {
         },
         async logout(vueRouter) {
             this.setLoading(true, 'Cerrando sesion...')
-            const result = await post(
+            await post(
                 `${urls.signin}/logout`,
                 { id: this.usuario.colaborador },
                 false,
             )
             this.setLoading(false)
 
-            if (result.code != 0) return
-
+            this.clearAuth()
             if (vueRouter) vueRouter.replace({ name: 'SignIn' })
-
-            this.initVars()
-            useVistas().initVars()
-            useModals().initVars()
         },
         verifyPermiso(...permisos) {
             // return this.usuario?.permisos?.includes(permiso)

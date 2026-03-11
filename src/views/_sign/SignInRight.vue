@@ -30,6 +30,8 @@
             class="mrg-btm2"
         />
         <JdButton text="INGRESAR" @click="signin()" class="boton-ingresar" />
+
+        <small>v{{ useAuth.app_version }}</small>
     </div>
 </template>
 

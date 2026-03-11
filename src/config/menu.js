@@ -477,20 +477,13 @@ export default [
                     { id: 'vAsistencias:eliminar', label: 'Eliminar' },
                 ],
             },
-            {
-                label: 'Usuarios conectados',
-                goto: 'vSessions',
-                path: 'operaciones/sesiones',
-                view: 'operaciones/sessions/vSessions.vue',
-                permisos: [{ id: 'vSessions:listar', label: 'Listar' }],
-            },
-            {
-                label: 'Activity logs',
-                goto: 'vActivityLogs',
-                path: 'operaciones/actividad',
-                view: 'operaciones/activity_logs/vActivityLogs.vue',
-                permisos: [{ id: 'vActivityLogs:listar', label: 'Listar' }],
-            },
+            // {
+            //     label: 'Usuarios conectados',
+            //     goto: 'vSessions',
+            //     path: 'operaciones/sesiones',
+            //     view: 'operaciones/sessions/vSessions.vue',
+            //     permisos: [{ id: 'vSessions:listar', label: 'Listar' }],
+            // },
         ],
     },
 ]

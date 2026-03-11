@@ -114,8 +114,7 @@ export default {
 
             if (res.code != 0) return
 
-            this.useVistas.addItem('vAsistencias', 'asistencias', res.data)
-
+            this.useVistas.addItem('vAsistencias', 'tableData', res.data)
             this.useModals.show.mAsistencia = false
         },
         async modificar() {
@@ -127,7 +126,7 @@ export default {
 
             if (res.code != 0) return
 
-            this.useVistas.updateItem('vAsistencias', 'asistencias', res.data)
+            this.useVistas.updateItem('vAsistencias', 'tableData', res.data)
             this.useModals.show.mAsistencia = false
         },
     },

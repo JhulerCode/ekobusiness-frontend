@@ -1,82 +1,107 @@
-export const HEADER_ACTIONS = [
-    {
-        text: 'Nuevo',
-        action: 'nuevo',
-        permiso: 'vMonedas:crear',
-    },
-    {
-        icon: 'fa-solid fa-download',
-        text: 'Exportar página actual',
-        action: 'vista.downloadActualTablePage',
-        tipo: '2',
-    }
-]
+export default {
+    name: 'vMonedas',
+    title: 'Monedas',
+    apiPath: 'monedas',
 
-export const TABLE_COLUMNS = [
-    {
-        id: 'nombre',
-        title: 'Nombre',
-        type: 'text',
-        width: '10rem',
-        show: true,
-        seek: true,
-        sort: true,
-        orden: 1,
-    },
-    {
-        id: 'codigo',
-        title: 'Código',
-        type: 'text',
-        width: '8rem',
-        show: true,
-        seek: true,
-        sort: true,
-        orden: 2,
-    },
-    {
-        id: 'simbolo',
-        title: 'Símbolo',
-        type: 'text',
-        width: '5rem',
-        show: true,
-        seek: true,
-        sort: true,
-        orden: 3,
-    },
-    {
-        id: 'plural',
-        title: 'En plural',
-        type: 'text',
-        width: '10rem',
-        show: true,
-        seek: true,
-        sort: true,
-        orden: 4,
-    },
-]
+    headerActions: [
+        {
+            text: 'Nuevo',
+            action: 'nuevo',
+            permiso: 'vMonedas:crear',
+        },
+        {
+            icon: 'fa-solid fa-download',
+            text: 'Exportar página actual',
+            action: 'vista.downloadActualTablePage',
+            tipo: '2',
+        },
+    ],
 
-export const TABLE_ROW_ACTIONS = [
-    {
-        id: 1,
-        label: 'Editar',
-        icon: 'fa-solid fa-pen-to-square',
-        action: 'editar',
-        permiso: 'vMonedas:editar',
-    },
-    {
-        id: 2,
-        label: 'Eliminar',
-        icon: 'fa-solid fa-trash-can',
-        action: 'vista.eliminar',
-        permiso: 'vMonedas:eliminar',
-        ocultar: { estandar: true },
-    },
-    {
-        id: 3,
-        label: 'Tipos de cambio',
-        icon: 'fa-solid fa-dollar-sign',
-        action: 'openTiposCambio',
-        permiso: 'vTipoCambios:listar',
-        ocultar: { estandar: true },
-    },
-]
+    tableColumns: [
+        {
+            id: 'id',
+            title: 'id',
+            type: 'text',
+            width: '5rem',
+            show: false,
+            seek: false,
+            sort: false,
+            orden: 1,
+        },
+        {
+            id: 'nombre',
+            title: 'Nombre',
+            type: 'text',
+            width: '10rem',
+            show: true,
+            seek: true,
+            sort: true,
+            orden: 2,
+        },
+        {
+            id: 'codigo',
+            title: 'Código',
+            type: 'text',
+            width: '8rem',
+            show: true,
+            seek: true,
+            sort: true,
+            orden: 3,
+        },
+        {
+            id: 'simbolo',
+            title: 'Símbolo',
+            type: 'text',
+            width: '5rem',
+            show: true,
+            seek: true,
+            sort: true,
+            orden: 4,
+        },
+        {
+            id: 'plural',
+            title: 'En plural',
+            type: 'text',
+            width: '10rem',
+            show: true,
+            seek: true,
+            sort: true,
+            orden: 5,
+        },
+    ],
+
+    tableBulkActions: [
+        {
+            icon: 'fa-solid fa-trash-can',
+            text: 'Eliminar',
+            action: 'vista.eliminarBulk',
+            permiso: 'vMonedas:eliminarBulk',
+        },
+    ],
+
+    tableRowActions: [
+        {
+            id: 1,
+            label: 'Editar',
+            icon: 'fa-solid fa-pen-to-square',
+            action: 'editar',
+            permiso: 'vMonedas:editar',
+        },
+        {
+            id: 2,
+            label: 'Eliminar',
+            icon: 'fa-solid fa-trash-can',
+            action: 'vista.eliminar',
+            permiso: 'vMonedas:eliminar',
+            ocultar: { estandar: true },
+        },
+        {
+            id: 3,
+            label: 'Tipos de cambio',
+            icon: 'fa-solid fa-dollar-sign',
+            action: 'openTiposCambio',
+            permiso: 'vTipoCambios:listar',
+            ocultar: { estandar: true },
+        },
+    ],
+}

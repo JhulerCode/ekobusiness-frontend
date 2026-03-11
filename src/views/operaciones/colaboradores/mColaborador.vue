@@ -5,7 +5,7 @@
                 <JdSelect
                     label="Tipo documento"
                     :nec="true"
-                    v-model="colaborador.doc_tipo"
+                    v-model="modal.colaborador.doc_tipo"
                     :lista="modal.documentos_identidad || []"
                     :disabled="modal.mode == 3"
                 />
@@ -13,69 +13,69 @@
                 <JdInput
                     label="Nro documento"
                     :nec="true"
-                    v-model="colaborador.doc_numero"
+                    v-model="modal.colaborador.doc_numero"
                     :disabled="modal.mode == 3"
                 />
 
                 <JdInput
                     label="Nombres y apellidos"
                     :nec="true"
-                    v-model="colaborador.nombres"
+                    v-model="modal.colaborador.nombres"
                     :disabled="modal.mode == 3"
                 />
 
                 <JdInput
                     label="Fecha de nacimiento"
                     type="date"
-                    v-model="colaborador.fecha_nacimiento"
+                    v-model="modal.colaborador.fecha_nacimiento"
                     :disabled="modal.mode == 3"
                 />
                 <JdSelect
                     label="Sexo"
-                    v-model="colaborador.sexo"
+                    v-model="modal.colaborador.sexo"
                     :lista="modal.generos || []"
                     :disabled="modal.mode == 3"
                 />
 
                 <JdInput
                     label="Dirección"
-                    v-model="colaborador.direccion"
+                    v-model="modal.colaborador.direccion"
                     :disabled="modal.mode == 3"
                 />
                 <JdInput
                     label="Teléfono"
-                    v-model="colaborador.telefono"
+                    v-model="modal.colaborador.telefono"
                     :disabled="modal.mode == 3"
                 />
 
                 <JdInput
                     label="Cargo"
                     :nec="true"
-                    v-model="colaborador.cargo"
+                    v-model="modal.colaborador.cargo"
                     :disabled="modal.mode == 3"
                 />
 
                 <JdInput
                     label="Producción código"
-                    v-model="colaborador.produccion_codigo"
+                    v-model="modal.colaborador.produccion_codigo"
                     :disabled="modal.mode == 3"
                 />
 
-                <JdSwitch label="Activo" v-model="colaborador.activo" :disabled="modal.mode == 3" />
+                <JdSwitch label="Activo" v-model="modal.colaborador.activo" :disabled="modal.mode == 3" />
 
                 <JdSwitch
                     label="Tiene usuario?"
-                    v-model="colaborador.has_signin"
+                    v-model="modal.colaborador.has_signin"
                     :disabled="modal.mode == 3"
                 />
             </div>
 
-            <div class="right" v-if="colaborador.has_signin">
+            <div class="right" v-if="modal.colaborador.has_signin">
                 <div class="container-accesos">
                     <JdSelect
                         label="Vista inicial"
                         :nec="true"
-                        v-model="colaborador.vista_inicial"
+                        v-model="modal.colaborador.vista_inicial"
                         :lista="vistas"
                         mostrar="label"
                         :disabled="modal.mode == 3"
@@ -85,14 +85,14 @@
                     <JdInput
                         label="Usuario"
                         :nec="true"
-                        v-model="colaborador.usuario"
+                        v-model="modal.colaborador.usuario"
                         :disabled="modal.mode == 3"
                     />
 
                     <div>
                         <JdInput
                             label="Contraseña"
-                            v-model="colaborador.contrasena"
+                            v-model="modal.colaborador.contrasena"
                             :disabled="modal.mode == 3"
                         />
                         <small class="fa-solid fa-triangle-exclamation"></small>
@@ -100,12 +100,12 @@
                     </div>
                 </div>
 
-                <div class="grupos" v-if="colaborador.has_signin">
+                <div class="grupos" v-if="modal.colaborador.has_signin">
                     <div class="mrg-btm05">
                         <strong>--- Permisos ---</strong>
                     </div>
 
-                    <div v-for="a in useAuth.menu || []" :key="a.id">
+                    <div v-for="a in auth.menu || []" :key="a.id">
                         <div class="grupo-header" @click="toggleGrupo(a.id)">
                             {{ a.label }}
 
@@ -187,13 +187,18 @@ export default {
         JdCheckBox,
         JdButton,
     },
+    computed: {
+        auth: () => useAuth(),
+        modals: () => useModals(),
+        storeVistas: () => useVistas(),
+        vistas() {
+            return this.auth.menu
+                .map((a) => a.children.map((b) => ({ id: b.goto, label: b.label, menu: a.label })))
+                .flat()
+        },
+    },
     data: () => ({
-        useAuth: useAuth(),
-        useModals: useModals(),
-        useVistas: useVistas(),
-
         modal: {},
-        colaborador: {},
 
         buttons: [
             { text: 'Grabar', action: 'crear', permiso: 'vColaboradores:crear' },
@@ -204,16 +209,8 @@ export default {
             },
         ],
     }),
-    computed: {
-        vistas() {
-            return this.useAuth.menu
-                .map((a) => a.children.map((b) => ({ id: b.goto, label: b.label, menu: a.label })))
-                .flat()
-        },
-    },
     created() {
-        this.modal = this.useModals.mColaborador
-        this.colaborador = this.useModals.mColaborador.item
+        this.modal = this.modals.mColaborador
 
         this.showButtons()
         this.loadDatosSistema()
@@ -231,9 +228,9 @@ export default {
         checkDatos() {
             const props = ['nombres', 'doc_tipo', 'doc_numero', 'cargo', 'activo', 'has_signin']
 
-            if (this.colaborador.has_signin) props.push('vista_inicial', 'usuario', 'contrasena')
+            if (this.modal.colaborador.has_signin) props.push('vista_inicial', 'usuario', 'contrasena')
 
-            if (incompleteData(this.colaborador, props)) {
+            if (incompleteData(this.modal.colaborador, props)) {
                 jmsg('warning', 'Ingrese los datos necesarios')
                 return true
             }
@@ -241,38 +238,38 @@ export default {
             return false
         },
         shapeDatos() {
-            this.colaborador.permisos = this.recolectarPermisosSeleccionados()
+            this.modal.colaborador.permisos = this.recolectarPermisosSeleccionados()
         },
         async crear() {
             if (this.checkDatos()) return
             this.shapeDatos()
 
-            this.useAuth.setLoading(true, 'Creando...')
-            const res = await post(urls.colaboradores, this.colaborador)
-            this.useAuth.setLoading(false)
+            this.auth.setLoading(true, 'Creando...')
+            const res = await post(urls.colaboradores, this.modal.colaborador)
+            this.auth.setLoading(false)
 
             if (res.code != 0) return
 
-            this.useVistas.addItem('vColaboradores', 'colaboradores', res.data)
+            this.storeVistas.addItem('vColaboradores', 'tableData', res.data)
 
-            this.useModals.show.mColaborador = false
+            this.modals.show.mColaborador = false
         },
         async modificar() {
             if (this.checkDatos()) return
             this.shapeDatos()
 
-            this.useAuth.setLoading(true, 'Actualizando...')
-            const res = await patch(urls.colaboradores, this.colaborador)
-            this.useAuth.setLoading(false)
+            this.auth.setLoading(true, 'Actualizando...')
+            const res = await patch(urls.colaboradores, this.modal.colaborador)
+            this.auth.setLoading(false)
 
             if (res.code != 0) return
 
-            this.useVistas.updateItem('vColaboradores', 'colaboradores', res.data)
+            this.storeVistas.updateItem('vColaboradores', 'tableData', res.data)
 
-            if (this.useAuth.usuario.id == this.colaborador.id) {
-                this.useAuth.usuario.permisos = this.colaborador.permisos
+            if (this.auth.usuario.id == this.modal.colaborador.id) {
+                this.auth.usuario.permisos = this.modal.colaborador.permisos
             }
-            this.useModals.show.mColaborador = false
+            this.modals.show.mColaborador = false
         },
 
         async loadDatosSistema() {
@@ -285,9 +282,9 @@ export default {
         },
 
         sincronizarChecksConPermisos() {
-            const permisos = this.colaborador.permisos || []
+            const permisos = this.modal.colaborador.permisos || []
 
-            for (const a of this.useAuth.menu) {
+            for (const a of this.auth.menu) {
                 if (a.children) {
                     for (const b of a.children) {
                         if (b.permisos) {
@@ -302,7 +299,7 @@ export default {
         recolectarPermisosSeleccionados() {
             const permisos = []
 
-            for (const a of this.useAuth.menu) {
+            for (const a of this.auth.menu) {
                 if (a.children) {
                     for (const b of a.children) {
                         if (b.permisos) {
@@ -323,7 +320,7 @@ export default {
         },
 
         selectAll(id) {
-            for (const a of this.useAuth.menu) {
+            for (const a of this.auth.menu) {
                 if (a.children) {
                     for (const b of a.children) {
                         if (b.goto == id) {
@@ -336,7 +333,7 @@ export default {
             }
         },
         selectNone(id) {
-            for (const a of this.useAuth.menu) {
+            for (const a of this.auth.menu) {
                 if (a.children) {
                     for (const b of a.children) {
                         if (b.goto == id) {

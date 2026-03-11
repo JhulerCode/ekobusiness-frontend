@@ -5,7 +5,7 @@
                 label="Fecha"
                 :nec="true"
                 type="date"
-                v-model="inspeccion.fecha"
+                v-model="modal.inspeccion.fecha"
                 :disabled="modal.mode == 3"
             />
             <JdSelect
@@ -13,21 +13,21 @@
                 :nec="true"
                 :lista="modal.socios"
                 mostrar="nombres"
-                v-model="inspeccion.socio"
+                v-model="modal.inspeccion.socio"
                 :disabled="modal.mode == 3"
             />
             <JdInput
                 label="Puntuación"
                 :nec="true"
                 type="number"
-                v-model="inspeccion.puntuacion"
+                v-model="modal.inspeccion.puntuacion"
                 :disabled="modal.mode == 3"
             />
             <JdInput
                 label="Puntuación máxima"
                 :nec="true"
                 type="number"
-                v-model="inspeccion.puntuacion_maxima"
+                v-model="modal.inspeccion.puntuacion_maxima"
                 :disabled="modal.mode == 3"
             />
         </div>
@@ -46,7 +46,7 @@
 
             <JdTable
                 :columns="columns"
-                :datos="inspeccion.correcciones"
+                :datos="modal.inspeccion.correcciones"
                 :seeker="false"
                 :colAct="modal.mode != 3"
                 :download="false"
@@ -91,7 +91,6 @@ export default {
         useVistas: useVistas(),
 
         modal: {},
-        inspeccion: {},
 
         buttons: [
             { text: 'Grabar', action: 'crear' },
@@ -119,7 +118,6 @@ export default {
     }),
     created() {
         this.modal = this.useModals.mInspeccion
-        this.inspeccion = this.useModals.mInspeccion.item
 
         this.showButtons()
 
@@ -137,14 +135,14 @@ export default {
         },
 
         addNew() {
-            this.inspeccion.correcciones.push({
+            this.modal.inspeccion.correcciones.push({
                 id: crypto.randomUUID(),
                 correccion: '',
                 estado: false,
             })
         },
         removeItem(item) {
-            this.inspeccion.correcciones = this.inspeccion.correcciones.filter(
+            this.modal.inspeccion.correcciones = this.modal.inspeccion.correcciones.filter(
                 (a) => a.id != item.id,
             )
         },
@@ -152,7 +150,7 @@ export default {
         checkDatos() {
             const props = ['fecha', 'socio', 'puntuacion', 'puntuacion_maxima']
 
-            if (incompleteData(this.inspeccion, props)) {
+            if (incompleteData(this.modal.inspeccion, props)) {
                 jmsg('warning', 'Ingrese los datos necesarios')
                 return true
             }
@@ -163,24 +161,24 @@ export default {
             if (this.checkDatos()) return
 
             this.useAuth.setLoading(true, 'Creando...')
-            const res = await post(urls.inspecciones, this.inspeccion)
+            const res = await post(urls.inspecciones, this.modal.inspeccion)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
 
-            this.useVistas.addItem('vInspecciones', 'inspecciones', res.data)
+            this.useVistas.addItem('vInspecciones', 'tableData', res.data)
             this.useModals.show.mInspeccion = false
         },
         async modificar() {
             if (this.checkDatos()) return
 
             this.useAuth.setLoading(true, 'Actualizando...')
-            const res = await patch(urls.inspecciones, this.inspeccion)
+            const res = await patch(urls.inspecciones, this.modal.inspeccion)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
 
-            this.useVistas.updateItem('vInspecciones', 'inspecciones', res.data)
+            this.useVistas.updateItem('vInspecciones', 'tableData', res.data)
             this.useModals.show.mInspeccion = false
         },
 

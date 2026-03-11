@@ -5,14 +5,14 @@
                 label="Fecha apertura"
                 :nec="true"
                 type="date"
-                v-model="caja_apertura.fecha_apertura"
+                v-model="modal.caja_apertura.fecha_apertura"
                 :disabled="modal.mode != 1"
             />
             <JdInput
                 label="Monto apertura"
                 :nec="true"
                 type="number"
-                v-model="caja_apertura.monto_apertura"
+                v-model="modal.caja_apertura.monto_apertura"
                 :disabled="modal.mode != 1"
                 v-if="modal.mode == 1"
             />
@@ -21,7 +21,7 @@
                 label="Fecha cierre"
                 :nec="true"
                 type="date"
-                v-model="caja_apertura.fecha_cierre"
+                v-model="modal.caja_apertura.fecha_cierre"
                 :disabled="modal.mode != 2"
                 v-if="[2, 3].includes(modal.mode)"
             />
@@ -29,7 +29,7 @@
 
         <div class="container-resumen" v-if="modal.mode != 1">
             <div class="monto-resumen">
-                <p>{{ redondear(caja_apertura.monto_apertura) }}</p>
+                <p>{{ redondear(modal.caja_apertura.monto_apertura) }}</p>
                 <small>Monto inicial</small>
             </div>
 
@@ -39,7 +39,7 @@
             </div>
 
             <div class="monto-resumen">
-                <p>{{ redondear(caja_apertura.monto_apertura - egresos) }}</p>
+                <p>{{ redondear(modal.caja_apertura.monto_apertura - egresos) }}</p>
                 <small>Saldo disponible</small>
             </div>
         </div>
@@ -53,7 +53,7 @@
                 class="container-agregar"
                 v-if="
                     modal.mode == 4 &&
-                    useAuth.verifyPermiso('vCajaMovimientos:crear', 'vCajaMovimientos:editar')
+                    auth.verifyPermiso('vCajaMovimientos:crear', 'vCajaMovimientos:editar')
                 "
             >
                 <div class="container-nuevo">
@@ -86,8 +86,7 @@
                         tipo="2"
                         @click="addMovimiento"
                         v-if="
-                            useAuth.verifyPermiso('vCajaMovimientos:crear') &&
-                            modal.nuevo?.id == null
+                            auth.verifyPermiso('vCajaMovimientos:crear') && modal.nuevo?.id == null
                         "
                     />
 
@@ -97,8 +96,7 @@
                         tipo="2"
                         @click="editarMovimiento"
                         v-if="
-                            useAuth.verifyPermiso('vCajaMovimientos:editar') &&
-                            modal.nuevo?.id != null
+                            auth.verifyPermiso('vCajaMovimientos:editar') && modal.nuevo?.id != null
                         "
                     />
                 </div>
@@ -106,7 +104,7 @@
 
             <JdTable
                 :columns="columns"
-                :datos="caja_apertura?.caja_movimientos || []"
+                :datos="modal.caja_apertura?.caja_movimientos || []"
                 maxHeight="30rem"
                 :colAct="modal.mode != 3"
                 :reload="loadCajaMovimientos"
@@ -139,28 +137,23 @@ export default {
         JdSelect,
     },
     computed: {
+        auth: () => useAuth(),
+        vistas: () => useVistas(),
+        modals: () => useModals(),
         egresos() {
             // Suma todos los montos de los movimientos
-            if (!this.caja_apertura || !this.caja_apertura.caja_movimientos) return 0
-            return this.caja_apertura.caja_movimientos.reduce(
+            if (!this.modal.caja_apertura || !this.modal.caja_apertura.caja_movimientos) return 0
+            return this.modal.caja_apertura.caja_movimientos.reduce(
                 (acc, mov) => acc + (mov.monto || 0),
                 0,
             )
         },
     },
     data: () => ({
-        useAuth: useAuth(),
-        useModals: useModals(),
-        useVistas: useVistas(),
         redondear,
-
         modal: {},
-        caja_apertura: {},
 
-        buttons: [
-            { text: 'Grabar', action: 'crear', spin: false },
-            // { text: 'Actualizar', action: 'modificar', spin: false },
-        ],
+        buttons: [{ text: 'Grabar', action: 'crear', spin: false }],
 
         columns: [
             {
@@ -205,14 +198,12 @@ export default {
         ],
         tableRowActions: [
             {
-                // id: 1,
                 label: 'Editar',
                 icon: 'fa-solid fa-pen-to-square',
                 action: 'editMovimiento',
                 permiso: 'vCajaMovimientos:editar',
             },
             {
-                // id: 2,
                 label: 'Eliminar',
                 icon: 'fa-solid fa-trash-can',
                 action: 'deleteMovimiento',
@@ -222,15 +213,9 @@ export default {
         ],
     }),
     created() {
-        this.modal = this.useModals.mCajaApertura
+        this.modal = this.modals.mCajaApertura
         this.modal.nuevo = {}
-        this.caja_apertura = this.useModals.mCajaApertura.item
 
-        // if (this.modal.mode == 3) {
-        //     setTimeout(() => {
-        //         this.$refs.jdtable.sortData(this.columns[0], 'desc')
-        //     }, 100)
-        // }
         if (this.modal.mode == 4) this.loadDatosSistema()
         this.loadCajaMovimientos()
         this.showButtons()
@@ -240,22 +225,15 @@ export default {
             if (this.modal.mode == 1) {
                 this.buttons[0].show = true
             }
-            // else if (this.modal.mode == 2) {
-            //     this.buttons[1].show = true
-            // }
         },
 
         checkDatos() {
             let props = []
-
             if (this.modal.mode == 1) {
                 props = ['fecha_apertura', 'monto_apertura']
             }
-            // else if (this.modal.mode == 2) {
-            //     props = ['fecha_cierre', 'monto_cierre']
-            // }
 
-            if (incompleteData(this.caja_apertura, props)) {
+            if (incompleteData(this.modal.caja_apertura, props)) {
                 jmsg('warning', 'Ingrese los datos necesarios')
                 return true
             }
@@ -265,27 +243,15 @@ export default {
         async crear() {
             if (this.checkDatos()) return
 
-            this.useAuth.setLoading(true, 'Grabando...')
-            const res = await post(urls.caja_aperturas, this.caja_apertura)
-            this.useAuth.setLoading(false)
+            this.auth.setLoading(true, 'Grabando...')
+            const res = await post(urls.caja_aperturas, this.modal.caja_apertura)
+            this.auth.setLoading(false)
 
             if (res.code != 0) return
 
-            this.useVistas.addItem('vCajaAperturas', 'caja_aperturas', res.data)
-            this.useModals.show.mCajaApertura = false
+            this.vistas.addItem('vCajaAperturas', 'tableData', res.data)
+            this.modals.show.mCajaApertura = false
         },
-        // async modificar() {
-        //     if (this.checkDatos()) return
-
-        //     this.useAuth.setLoading(true, 'Grabando...')
-        //     const res = await patch(urls.caja_aperturas, this.caja_apertura)
-        //     this.useAuth.setLoading(false)
-
-        //     if (res.code != 0) return
-
-        //     this.useVistas.updateItem('vCajaAperturas', 'caja_aperturas', res.data)
-        //     this.useModals.show.mCajaApertura = false
-        // },
 
         initCajaMovimiento() {
             this.modal.nuevo = {}
@@ -305,30 +271,30 @@ export default {
 
             const send = {
                 tipo: 2,
-                caja_apertura: this.caja_apertura.id,
+                caja_apertura: this.modal.caja_apertura.id,
                 ...this.modal.nuevo,
             }
 
-            this.useAuth.setLoading(true, 'Grabando...')
+            this.auth.setLoading(true, 'Grabando...')
             const res = await post(urls.caja_movimientos, send)
-            this.useAuth.setLoading(false)
+            this.auth.setLoading(false)
 
             if (res.code != 0) return
 
-            this.caja_apertura.caja_movimientos.unshift(res.data)
+            this.modal.caja_apertura.caja_movimientos.unshift(res.data)
             this.$refs.jdtable.sortData(this.columns[0], 'desc')
             this.initCajaMovimiento()
         },
         async editarMovimiento() {
             if (this.checkDatos1()) return
 
-            this.useAuth.setLoading(true, 'Actualizando...')
+            this.auth.setLoading(true, 'Actualizando...')
             const res = await patch(urls.caja_movimientos, this.modal.nuevo)
-            this.useAuth.setLoading(false)
+            this.auth.setLoading(false)
 
             if (res.code != 0) return
 
-            this.caja_apertura.caja_movimientos.splice(this.modal.nuevo.i, 1, this.modal.nuevo)
+            this.modal.caja_apertura.caja_movimientos.splice(this.modal.nuevo.i, 1, this.modal.nuevo)
             this.$refs.jdtable.sortData(this.columns[0], 'desc')
             this.initCajaMovimiento()
         },
@@ -343,37 +309,37 @@ export default {
             const resQst = await jqst('¿Está seguro de eliminar?')
             if (resQst.isConfirmed == false) return
 
-            this.useAuth.setLoading(true, 'Eliminando...')
+            this.auth.setLoading(true, 'Eliminando...')
             const res = await delet(urls.caja_movimientos, item)
-            this.useAuth.setLoading(false)
+            this.auth.setLoading(false)
 
             if (res.code != 0) return
 
-            this.useVistas.removeItem('vCaja', 'articulo_categorias', item)
-            this.caja_apertura.caja_movimientos = this.caja_apertura.caja_movimientos.filter(
+            this.modal.caja_apertura.caja_movimientos = this.modal.caja_apertura.caja_movimientos.filter(
                 (a) => a.id != item.id,
             )
         },
 
         async loadCajaMovimientos() {
-            this.caja_apertura.caja_movimientos = []
+            if (!this.modal.caja_apertura?.id) return
+            this.modal.caja_apertura.caja_movimientos = []
 
             const qry = {
                 fltr: {
-                    caja_apertura: { op: 'Es', val: this.caja_apertura.id },
+                    caja_apertura: { op: 'Es', val: this.modal.caja_apertura.id },
                 },
                 ordr: [['fecha', 'DESC']],
             }
 
-            this.useAuth.updateQuery(this.columns, qry)
+            this.auth.updateQuery(this.columns, qry)
 
-            this.useAuth.setLoading(true, 'Cargando...')
+            this.auth.setLoading(true, 'Cargando...')
             const res = await get(`${urls.caja_movimientos}?qry=${JSON.stringify(qry)}`)
-            this.useAuth.setLoading(false)
+            this.auth.setLoading(false)
 
             if (res.code != 0) return
 
-            this.caja_apertura.caja_movimientos = res.data
+            this.modal.caja_apertura.caja_movimientos = res.data
         },
 
         async loadDatosSistema() {

@@ -1,33 +1,33 @@
 <template>
     <JdModal modal="mMaquina" :buttons="buttons" @button-click="(action) => this[action]()">
         <div class="container-datos">
-            <JdInput label="Código" :nec="true" v-model="maquina.codigo" v-if="maquina.tipo == 2" />
-            <JdInput label="Nombre" :nec="true" v-model="maquina.nombre" />
+            <JdInput label="Código" :nec="true" v-model="modal.maquina.codigo" v-if="modal.maquina.tipo == 2" />
+            <JdInput label="Nombre" :nec="true" v-model="modal.maquina.nombre" />
             <JdInput
                 label="Fecha de compra"
                 type="date"
                 :nec="true"
-                v-model="maquina.fecha_compra"
+                v-model="modal.maquina.fecha_compra"
             />
 
-            <template v-if="maquina.tipo == 1">
+            <template v-if="modal.maquina.tipo == 1">
                 <JdSelect
                     label="Tipo de producción"
                     :nec="true"
                     :lista="modal.articulo_lineas || []"
-                    v-model="maquina.linea"
+                    v-model="modal.maquina.linea"
                 />
                 <JdInput
                     label="Velocidad (und/min)"
                     :nec="true"
                     type="number"
-                    v-model="maquina.velocidad"
+                    v-model="modal.maquina.velocidad"
                 />
                 <JdInput
                     label="Tiempo de limpieza (min)"
                     :nec="true"
                     type="number"
-                    v-model="maquina.limpieza_tiempo"
+                    v-model="modal.maquina.limpieza_tiempo"
                 />
             </template>
         </div>
@@ -57,7 +57,6 @@ export default {
         useVistas: useVistas(),
 
         modal: {},
-        maquina: {},
 
         buttons: [
             { text: 'Grabar', action: 'crear', spin: false },
@@ -66,14 +65,13 @@ export default {
     }),
     created() {
         this.modal = this.useModals.mMaquina
-        this.maquina = this.useModals.mMaquina.item
 
         this.showButtons()
         this.loadLineas()
     },
     methods: {
         showButtons() {
-            if (this.useModals.mMaquina.mode == 1) {
+            if (this.modal.mode == 1) {
                 this.buttons[0].show = true
             } else {
                 this.buttons[1].show = true
@@ -81,13 +79,13 @@ export default {
         },
 
         checkDatos() {
-            const props = ['nombre']
+            const props = ['nombre', 'fecha_compra']
 
-            if (this.maquina.tipo == 1)
+            if (this.modal.maquina.tipo == 1)
                 props.push('linea', 'velocidad', 'limpieza_tiempo')
-            if (this.maquina.tipo == 2) props.push('codigo')
+            if (this.modal.maquina.tipo == 2) props.push('codigo')
 
-            if (incompleteData(this.maquina, props)) {
+            if (incompleteData(this.modal.maquina, props)) {
                 jmsg('warning', 'Ingrese los datos necesarios')
                 return true
             }
@@ -98,26 +96,26 @@ export default {
             if (this.checkDatos()) return
 
             this.useAuth.setLoading(true, 'Creando...')
-            const res = await post(urls.maquinas, this.maquina)
+            const res = await post(urls.maquinas, this.modal.maquina)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
 
-            const vista = this.maquina.tipo == 1 ? 'vMaquinas' : 'vEquipos'
-            this.useVistas.addItem(vista, 'maquinas', res.data)
+            const vista = this.modal.maquina.tipo == 1 ? 'vMaquinas' : 'vEquipos'
+            this.useVistas.addItem(vista, 'tableData', res.data)
             this.useModals.show.mMaquina = false
         },
         async modificar() {
             if (this.checkDatos()) return
 
             this.useAuth.setLoading(true, 'Actualizando...')
-            const res = await patch(urls.maquinas, this.maquina)
+            const res = await patch(urls.maquinas, this.modal.maquina)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
 
-            const vista = this.maquina.tipo == 1 ? 'vMaquinas' : 'vEquipos'
-            this.useVistas.updateItem(vista, 'maquinas', res.data)
+            const vista = this.modal.maquina.tipo == 1 ? 'vMaquinas' : 'vEquipos'
+            this.useVistas.updateItem(vista, 'tableData', res.data)
             this.useModals.show.mMaquina = false
         },
 

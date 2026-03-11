@@ -1,10 +1,10 @@
 <template>
     <JdModal modal="mMoneda" :buttons="buttons" @button-click="(action) => this[action]()">
         <div class="container-datos">
-            <JdInput label="Nombre" :nec="true" v-model="moneda.nombre" />
-            <JdInput label="Código" :nec="true" v-model="moneda.codigo" />
-            <JdInput label="Símbolo" :nec="true" v-model="moneda.simbolo" />
-            <JdInput label="En plural" :nec="true" v-model="moneda.plural" />
+            <JdInput label="Nombre" :nec="true" v-model="modal.moneda.nombre" />
+            <JdInput label="Código" :nec="true" v-model="modal.moneda.codigo" />
+            <JdInput label="Símbolo" :nec="true" v-model="modal.moneda.simbolo" />
+            <JdInput label="En plural" :nec="true" v-model="modal.moneda.plural" />
         </div>
     </JdModal>
 </template>
@@ -30,7 +30,7 @@ export default {
         useModals: useModals(),
         useVistas: useVistas(),
 
-        moneda: {},
+        modal: {},
 
         buttons: [
             { text: 'Grabar', action: 'crear', spin: false },
@@ -38,16 +38,15 @@ export default {
         ],
     }),
     created() {
-        this.moneda = this.useModals.mMoneda.item
+        this.modal = this.useModals.mMoneda
 
         this.showButtons()
     },
     methods: {
         showButtons() {
-            if (this.useModals.mMoneda.mode == 1) {
+            if (this.modal.mode == 1) {
                 this.buttons[0].show = true
-            }
-            else {
+            } else {
                 this.buttons[1].show = true
             }
         },
@@ -55,7 +54,7 @@ export default {
         checkDatos() {
             const props = ['nombre', 'codigo', 'simbolo', 'plural']
 
-            if (incompleteData(this.moneda, props)) {
+            if (incompleteData(this.modal.moneda, props)) {
                 jmsg('warning', 'Ingrese los datos necesarios')
                 return true
             }
@@ -66,27 +65,27 @@ export default {
             if (this.checkDatos()) return
 
             this.useAuth.setLoading(true, 'Creando...')
-            const res = await post(urls.monedas, this.moneda)
+            const res = await post(urls.monedas, this.modal.moneda)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
 
-            this.useVistas.addItem('vMonedas', 'monedas', res.data)
+            this.useVistas.addItem('vMonedas', 'tableData', res.data)
             this.useModals.show.mMoneda = false
         },
         async modificar() {
             if (this.checkDatos()) return
 
             this.useAuth.setLoading(true, 'Actualizando...')
-            const res = await patch(urls.monedas, this.moneda)
+            const res = await patch(urls.monedas, this.modal.moneda)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
 
-            this.useVistas.updateItem('vMonedas', 'monedas', res.data)
+            this.useVistas.updateItem('vMonedas', 'tableData', res.data)
             this.useModals.show.mMoneda = false
         },
-    }
+    },
 }
 </script>
 

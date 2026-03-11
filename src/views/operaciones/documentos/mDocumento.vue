@@ -1,26 +1,26 @@
 <template>
     <JdModal modal="mDocumento" :buttons="buttons" @button-click="(action) => this[action]()">
         <div class="container-datos">
-            <template v-if="documento.tipo == 1">
-                <JdInput label="Nombre" :nec="true" v-model="documento.nombre" />
-                <JdTextArea label="Descripción" v-model="documento.descripcion" />
+            <template v-if="modal.documento.tipo == 1">
+                <JdInput label="Nombre" :nec="true" v-model="modal.documento.nombre" />
+                <JdTextArea label="Descripción" v-model="modal.documento.descripcion" />
             </template>
 
-            <template v-if="documento.tipo == 2">
+            <template v-if="modal.documento.tipo == 2">
                 <JdTextArea
                     label="Denominación legal"
                     :nec="true"
-                    v-model="documento.denominacion_legal"
+                    v-model="modal.documento.denominacion_legal"
                 />
                 <JdTextArea
                     label="Denominación comercial"
                     :nec="true"
-                    v-model="documento.denominacion_comercial"
+                    v-model="modal.documento.denominacion_comercial"
                 />
                 <JdInput
                     label="Registro sanitario"
                     :nec="true"
-                    v-model="documento.registro_sanitario"
+                    v-model="modal.documento.registro_sanitario"
                 />
             </template>
 
@@ -28,27 +28,27 @@
                 label="Fecha de emisión"
                 :nec="true"
                 type="date"
-                v-model="documento.fecha_emision"
+                v-model="modal.documento.fecha_emision"
             />
             <JdInput
                 label="Fecha de vencimiento"
                 :nec="true"
                 type="date"
-                v-model="documento.fecha_vencimiento"
+                v-model="modal.documento.fecha_vencimiento"
             />
             <JdInput
                 label="Recodar días antes"
                 :nec="true"
                 type="number"
-                v-model="documento.recordar_dias"
+                v-model="modal.documento.recordar_dias"
             />
 
             <JdInputFile
                 label="Documento"
                 accept="application/pdf"
-                v-model="documento.file_name"
-                @handleFile="(file) => (documento.archivo = file)"
-                @deleteFile="documento.archivo = null"
+                v-model="modal.documento.file_name"
+                @handleFile="(file) => (modal.documento.archivo = file)"
+                @deleteFile="modal.documento.archivo = null"
             />
         </div>
     </JdModal>
@@ -77,15 +77,13 @@ export default {
         useModals: useModals(),
         useVistas: useVistas(),
 
-        documento: {},
-
         buttons: [
             { text: 'Grabar', action: 'crear', spin: false },
             { text: 'Actualizar', action: 'modificar', spin: false },
         ],
     }),
     created() {
-        this.documento = this.useModals.mDocumento.item
+        this.modal = this.useModals.mDocumento
 
         this.showButtons()
     },
@@ -101,16 +99,16 @@ export default {
         checkDatos() {
             const props = ['tipo', 'fecha_emision', 'fecha_vencimiento', 'recordar_dias']
 
-            if (this.documento.tipo == 1) props.push('nombre')
-            if (this.documento.tipo == 2)
+            if (this.modal.documento.tipo == 1) props.push('nombre')
+            if (this.modal.documento.tipo == 2)
                 props.push('denominacion_legal', 'denominacion_comercial', 'registro_sanitario')
 
-            if (incompleteData(this.documento, props)) {
+            if (incompleteData(this.modal.documento, props)) {
                 jmsg('warning', 'Ingrese los datos necesarios')
                 return true
             }
 
-            if (this.documento.fecha_emision > this.documento.fecha_vencimiento) {
+            if (this.modal.documento.fecha_emision > this.modal.documento.fecha_vencimiento) {
                 jmsg('warning', 'La fecha de vencimiento debe ser mayor a la fecha de emisión')
                 return true
             }
@@ -118,38 +116,34 @@ export default {
             return false
         },
         shapeDatos() {
-            if (this.documento.archivo) this.documento.formData = true
+            if (this.modal.documento.archivo) this.modal.documento.formData = true
         },
         async crear() {
             if (this.checkDatos()) return
             this.shapeDatos()
 
             this.useAuth.setLoading(true, 'Creando...')
-            const res = await post(urls.documentos, this.documento)
+            const res = await post(urls.documentos, this.modal.documento)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
 
-            const vista = this.documento.tipo == 1 ? 'vDocumentos' : 'vRegistrosSanitarios'
-            this.useVistas.addItem(vista, 'documentos', res.data)
+            const vista = this.modal.documento.tipo == 1 ? 'vDocumentos' : 'vRegistrosSanitarios'
+            this.useVistas.addItem(vista, 'tableData', res.data)
             this.useModals.show.mDocumento = false
         },
-        // modificar1() {
-        //     if (this.checkDatos()) return
-        //     console.log(this.documento)
-        // },
         async modificar() {
             if (this.checkDatos()) return
             this.shapeDatos()
 
             this.useAuth.setLoading(true, 'Actualizando...')
-            const res = await patch(urls.documentos, this.documento)
+            const res = await patch(urls.documentos, this.modal.documento)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
 
-            const vista = this.documento.tipo == 1 ? 'vDocumentos' : 'vRegistrosSanitarios'
-            this.useVistas.updateItem(vista, 'documentos', res.data)
+            const vista = this.modal.documento.tipo == 1 ? 'vDocumentos' : 'vRegistrosSanitarios'
+            this.useVistas.updateItem(vista, 'tableData', res.data)
             this.useModals.show.mDocumento = false
         },
     },

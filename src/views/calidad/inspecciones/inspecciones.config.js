@@ -1,71 +1,102 @@
-export const HEADER_ACTIONS = [
-    {
-        text: 'Nuevo',
-        action: 'nuevo',
-        permiso: 'vInspecciones:crear',
-    },
-]
+export default {
+    name: 'vInspecciones',
+    title: 'Inspecciones de clientes',
+    apiPath: 'inspecciones',
 
-export const TABLE_COLUMNS = [
-    {
-        id: 'fecha',
-        title: 'Fecha',
-        type: 'date',
-        format: 'date',
-        width: '10rem',
-        show: true,
-        sort: true,
-        orden: 1,
-    },
-    {
-        id: 'socio1.nombres',
-        title: 'Cliente',
-        prop: 'socio1.nombres',
-        type: 'select',
-        mostrar: 'nombres',
-        width: '20rem',
-        show: true,
-        seek: true,
-        sort: true,
-        orden: 2,
-    },
-    {
-        id: 'puntuacion',
-        title: 'Puntuación',
-        type: 'number',
-        width: '10rem',
-        show: true,
-        sort: true,
-        orden: 3,
-    },
-    {
-        id: 'puntuacion_maxima',
-        title: 'Puntuación máxima',
-        type: 'number',
-        width: '10rem',
-        show: true,
-        sort: true,
-        orden: 4,
-    },
-]
+    headerActions: [
+        {
+            text: 'Nuevo',
+            action: 'nuevo',
+            permiso: 'vInspecciones:crear',
+        },
+        {
+            icon: 'fa-solid fa-download',
+            text: 'Exportar página actual',
+            action: 'vista.downloadActualTablePage',
+            tipo: '2',
+        },
+    ],
 
-export const TABLE_ROW_ACTIONS = [
-    {
-        label: 'Ver',
-        icon: 'fa-regular fa-folder-open',
-        action: 'ver',
-        permiso: 'vInspecciones:ver',
-    },
-    {
-        label: 'Editar',
-        icon: 'fa-solid fa-pen-to-square',
-        action: 'editar',
-        permiso: 'vInspecciones:editar',
-    },
-    {
-        label: 'Eliminar',
-        icon: 'fa-solid fa-trash-can',
-        action: 'vista.eliminar',
-        permiso: 'vInspecciones:eliminar',
-    },
-]
+    tableColumns: [
+        {
+            id: 'id',
+            title: 'id',
+            type: 'text',
+            width: '5rem',
+            show: false,
+            seek: false,
+            sort: false,
+            orden: 1,
+        },
+        {
+            id: 'fecha',
+            title: 'Fecha',
+            type: 'date',
+            format: 'date',
+            width: '10rem',
+            show: true,
+            sort: true,
+            orden: 2,
+        },
+        {
+            id: 'socio1.nombres',
+            title: 'Cliente',
+            prop: 'socio1.nombres',
+            type: 'select',
+            mostrar: 'nombres',
+            width: '20rem',
+            show: true,
+            seek: true,
+            sort: true,
+            orden: 3,
+        },
+        {
+            id: 'puntuacion',
+            title: 'Puntuación',
+            type: 'number',
+            width: '10rem',
+            show: true,
+            sort: true,
+            orden: 4,
+        },
+        {
+            id: 'puntuacion_maxima',
+            title: 'Puntuación máxima',
+            type: 'number',
+            width: '10rem',
+            show: true,
+            sort: true,
+            orden: 5,
+        },
+    ],
+
+    tableBulkActions: [
+        {
+            icon: 'fa-solid fa-trash-can',
+            text: 'Eliminar',
+            action: 'vista.eliminarBulk',
+            permiso: 'vInspecciones:eliminarBulk',
+        },
+    ],
+
+    tableRowActions: [
+        {
+            label: 'Ver',
+            icon: 'fa-regular fa-folder-open',
+            action: 'ver',
+            permiso: 'vInspecciones:ver',
+        },
+        {
+            label: 'Editar',
+            icon: 'fa-solid fa-pen-to-square',
+            action: 'editar',
+            permiso: 'vInspecciones:editar',
+        },
+        {
+            label: 'Eliminar',
+            icon: 'fa-solid fa-trash-can',
+            action: 'vista.eliminar',
+            permiso: 'vInspecciones:eliminar',
+        },
+    ],
+}

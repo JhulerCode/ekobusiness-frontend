@@ -40,6 +40,7 @@
                     :loaded="typeof colsMap[item.id].reload == 'function'"
                     @reload="runMethod(item)"
                     v-model="item.val"
+                    @elegir="(a) => elegir(a, item)"
                     v-if="
                         item.type == 'select' &&
                         operaciones[item.type].find((a) => a.op == item.op)?.show
@@ -52,13 +53,14 @@
                     :spin="item.loading"
                     v-model="item.val"
                     @search="(txt) => handleRelationalSearch(txt, item)"
+                    @elegir="(a) => elegir(a, item)"
                     v-if="
                         item.type == 'related' &&
                         operaciones[item.type].find((a) => a.op == item.op)?.show
                     "
                 />
 
-                <div v-if="item.type === 'date'">
+                <div v-if="item.type === 'date'" class="tipo-date">
                     <JdInput
                         type="date"
                         v-model="item.val"
@@ -204,7 +206,7 @@ export default {
             return this.modal.cols.reduce((obj, a) => ((obj[a.id] = a), obj), {})
         },
     },
-    created() {
+    async created() {
         this.modal = this.useModals.mConfigFiltros
         this.modal.cols1 = JSON.parse(
             JSON.stringify(this.modal.cols.filter((a) => a.filtrable != false)),
@@ -214,14 +216,25 @@ export default {
             // Inicializar props reactivas
             a.loading = false
             a.fullLista = null
+            if (!a.lista) a.lista = []
 
             // Si tiene systemKey, la traemos del store de sistema
             if (a.systemKey) {
+                // Asegurarnos que esté cargado en el store
+                const currentData = this.useSystem.get(a.systemKey)
+                if (currentData.length === 0) {
+                    await this.useSystem.load([a.systemKey])
+                }
                 a.lista = this.useSystem.get(a.systemKey)
             }
 
             if (a.op) {
                 this.runMethod(a)
+            }
+
+            // Si ya tiene un valor (ej: recarga) y es relacional, cargamos ese registro específico para mostrar el texto
+            if (a.val && a.relatedUrl && (a.type === 'related' || a.type === 'select')) {
+                this.loadSpecificItem(a)
             }
         }
     },
@@ -230,6 +243,10 @@ export default {
             if (sel == null) {
                 item.val = null
                 item.val1 = null
+                item.valLabel = null
+            } else if (item.type === 'related' || item.type === 'select') {
+                // Guardar la etiqueta descriptiva para el buscador (chips)
+                item.valLabel = sel[item.mostrar || 'nombre']
             }
 
             if (this.operaciones[item.type].find((a) => a.op == item.op)?.show == false) {
@@ -242,6 +259,7 @@ export default {
                 a.op = null
                 a.val = null
                 a.val1 = null
+                a.valLabel = null
             }
         },
         checkDatos() {
@@ -282,7 +300,23 @@ export default {
             this.modal.reload(true)
             this.useModals.show.mConfigFiltros = false
         },
+        async loadSpecificItem(item) {
+            const url = urls[item.relatedUrl] || item.relatedUrl
+            if (!url) return
 
+            item.loading = true
+            const qry = {
+                fltr: { id: { op: 'Es', val: item.val } },
+                cols: [item.mostrar || 'nombre'],
+            }
+            const res = await get(`${url}?qry=${JSON.stringify(qry)}`)
+            item.loading = false
+
+            if (res.code == 0 && res.data[0]) {
+                item.lista.push(res.data[0])
+                item.valLabel = res.data[0][item.mostrar || 'nombre']
+            }
+        },
         async runMethod(item) {
             if (!this.colsMap[item.id].reload) return
             item.lista = await this.colsMap[item.id].reload()
@@ -291,46 +325,40 @@ export default {
 
         async handleRelationalSearch(txt, item) {
             const url = urls[item.relatedUrl] || item.relatedUrl
-
-            // Búsqueda local si no hay URL (Variables de sistema o precargadas)
+            // 1. Búsqueda local (para systemKey o listas ya cargadas)
             if (!url) {
-                // Re-intentar poblar si está vacía usando el store de sistema
-                if ((!item.lista || item.lista.length === 0) && item.systemKey) {
-                    await this.useSystem.load([item.systemKey])
-                    item.lista = this.useSystem.get(item.systemKey)
-                }
+                if (!item.fullLista) item.fullLista = [...(item.lista || [])]
 
-                if (!item.fullLista || item.fullLista.length === 0) {
-                    item.fullLista = [...(item.lista || [])]
-                }
-                
                 const search = (txt || '').toLowerCase()
                 item.lista = item.fullLista.filter((l) =>
-                    String(l[item.mostrar || 'nombre']).toLowerCase().includes(search),
+                    String(l[item.mostrar || 'nombre'])
+                        .toLowerCase()
+                        .includes(search),
                 )
                 return
             }
-
+            // 2. Búsqueda remota (para JdSelectQuery / related)
             item.loading = true
             const qry = {
                 cols: [item.mostrar || 'nombre'],
                 fltr: {},
                 ordr: [[item.mostrar || 'nombre', 'ASC']],
-                limit: 10,
+                limit: 25, // Subimos el límite para dar más opciones al buscador
             }
-
             if (txt) {
                 qry.fltr[item.mostrar || 'nombre'] = { op: 'Contiene', val: txt }
             }
-
-            item.loading = true
             const res = await get(`${url}?qry=${JSON.stringify(qry)}`)
+            item.lista = res.code === 0 ? res.data : []
             item.loading = false
-
-            if (res.code == 0) {
-                item.lista = res.data
-            }
         },
     },
 }
 </script>
+
+<style lang="scss" scoped>
+.tipo-date {
+    display: flex;
+    gap: 0.5rem;
+}
+</style>

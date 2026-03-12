@@ -76,9 +76,9 @@ export default {
             apiUrl: urls[VIEW_CONFIG.apiPath],
             runMethod: this.runMethod,
         })
+        this.auth.setColumns(this.vista.name, this.vista.tableColumns)
 
         // 2. Carga inicial
-        this.auth.setColumns(this.vista.name, this.vista.tableColumns)
         if (!this.vista.loaded && this.auth.verifyPermiso(`${VIEW_CONFIG.name}:listar`)) {
             this.vista.loadTableData()
         }
@@ -93,7 +93,7 @@ export default {
         setQuery() {
             this.vista.qry = {
                 fltr: {},
-                incl: ['categoria1'],
+                incl: ['linea1', 'categoria1'],
                 sqls: [],
                 ordr: [['nombre', 'ASC']],
                 page: this.vista.table_page,

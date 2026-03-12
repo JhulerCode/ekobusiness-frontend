@@ -1,10 +1,6 @@
 <template>
     <VistaLayout :vista="vista">
-        <JdTable
-            :name="vista.name"
-            :columns="vista.tableColumns"
-            :datos="vista.tableData || []"
-        />
+        <JdTable :name="vista.name" :columns="vista.tableColumns" :datos="vista.tableData || []" />
     </VistaLayout>
 
     <!-- Modales -->
@@ -52,9 +48,9 @@ export default {
             runMethod: this.runMethod,
         })
         this.initFiltros()
+        this.auth.setColumns(this.vista.name, this.vista.tableColumns)
 
         // 2. Carga inicial
-        this.auth.setColumns(this.vista.name, this.vista.tableColumns)
         if (!this.vista.loaded && this.auth.verifyPermiso(`${VIEW_CONFIG.name}:listar`)) {
             this.vista.loadTableData()
         }
@@ -67,10 +63,12 @@ export default {
             this.vistas.runMethod(this, method, item)
         },
         initFiltros() {
-            if (!this.vista.tableColumns[0].val) {
-                this.vista.tableColumns[0].op = 'Está dentro de'
-                this.vista.tableColumns[0].val = dayjs().startOf('month').format('YYYY-MM-DD')
-                this.vista.tableColumns[0].val1 = dayjs().format('YYYY-MM-DD')
+            const i = this.vista.tableColumns.findIndex((a) => a.id == 'transaccion1.fecha')
+
+            if (!this.vista.tableColumns[i].val) {
+                this.vista.tableColumns[i].op = 'Está dentro de'
+                this.vista.tableColumns[i].val = dayjs().startOf('month').format('YYYY-MM-DD')
+                this.vista.tableColumns[i].val1 = dayjs().format('YYYY-MM-DD')
             }
         },
         setQuery() {

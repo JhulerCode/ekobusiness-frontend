@@ -83,7 +83,9 @@ export const useAuth = defineStore('auth', {
             columns
                 .filter((a) => a.op)
                 .forEach((b) => {
-                    qry.fltr[b.id] = { op: b.op, val: b.val, val1: b.val1 }
+                    // Si es una búsqueda de texto (Contiene) y tiene prop (relación), usamos el prop
+                    const field = b.op === 'Contiene' && b.prop ? b.prop : b.id
+                    qry.fltr[field] = { op: b.op, val: b.val, val1: b.val1 }
                 })
 
             qry.cols = columns.filter((a) => a.show).map((b) => b.id)
@@ -96,11 +98,10 @@ export const useAuth = defineStore('auth', {
                     id: col.id,
                     width: col.width,
                     show: col.show,
-                    seek: col.seek,
-                    sort: col.sort,
                     op: col.op,
                     val: col.val,
                     val1: col.val1,
+                    valLabel: col.valLabel,
                     orden: col.orden,
                     sortDirection: col.sortDirection,
                 }

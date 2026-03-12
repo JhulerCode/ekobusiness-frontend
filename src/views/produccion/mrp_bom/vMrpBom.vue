@@ -81,11 +81,14 @@ export default {
 
         // --- Acciones de Registro ---
         nuevo() {
-            const send = { mrp_bom: { mrp_bom_lines: [] } }
+            const send = { mrp_bom: { mrp_bom_lines: [], mrp_bom_socios: [] } }
             this.modals.setModal('mMrpBom', 'Nueva receta de producción', 1, send, true)
         },
         async ver(item) {
-            const qry = { incl: [{ model: 'mrp_bom_lines', incl: ['articulo1'] }, 'articulo1'] }
+            const qry = {
+                incl: ['articulo1'],
+            }
+
             this.auth.setLoading(true, 'Cargando...')
             const res = await get(`${this.vista.apiUrl}/uno/${item.id}?qry=${JSON.stringify(qry)}`)
             this.auth.setLoading(false)
@@ -93,12 +96,15 @@ export default {
 
             const send = {
                 mrp_bom: res.data,
-                articulos: [{ ...res.data.articulo1 }],
+                articulos_fabricables: [{ ...res.data.articulo1 }],
             }
             this.modals.setModal('mMrpBom', 'Ver receta de producción', 3, send, true)
         },
         async editar(item) {
-            const qry = { incl: [{ model: 'mrp_bom_lines', incl: ['articulo1'] }, 'articulo1'] }
+            const qry = {
+                incl: ['articulo1'],
+            }
+
             this.auth.setLoading(true, 'Cargando...')
             const res = await get(`${this.vista.apiUrl}/uno/${item.id}?qry=${JSON.stringify(qry)}`)
             this.auth.setLoading(false)
@@ -106,7 +112,7 @@ export default {
 
             const send = {
                 mrp_bom: res.data,
-                articulos: [{ ...res.data.articulo1 }],
+                articulos_fabricables: [{ ...res.data.articulo1 }],
             }
             this.modals.setModal('mMrpBom', 'Editar receta de producción', 2, send, true)
         },

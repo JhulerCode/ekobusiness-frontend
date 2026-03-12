@@ -14,7 +14,7 @@
                 <transition-group name="chip">
                     <div v-for="col in activeFilters" :key="col.id" class="filter-chip">
                         <span class="chip-label">{{ col.title }}:</span>
-                        <span class="chip-value">{{ col.val }}</span>
+                        <span class="chip-value">{{ col.valLabel || col.val }}</span>
                         <i class="fa-solid fa-xmark chip-close" @click.stop="removeFilter(col)"></i>
                     </div>
                 </transition-group>
@@ -188,6 +188,7 @@ const selectOption = (col) => {
     if (targetCol) {
         targetCol.op = 'Contiene'
         targetCol.val = query.value
+        targetCol.valLabel = null
     }
 
     auth.saveTableColumns(props.tableName, props.columns)
@@ -203,6 +204,7 @@ const removeFilter = (col) => {
     if (targetCol) {
         targetCol.op = null
         targetCol.val = null
+        targetCol.valLabel = null
     }
 
     auth.saveTableColumns(props.tableName, props.columns)

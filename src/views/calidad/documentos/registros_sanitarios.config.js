@@ -24,8 +24,6 @@ export default {
             type: 'text',
             width: '5rem',
             show: false,
-            seek: false,
-            sort: false,
             orden: 1,
         },
         {
@@ -35,7 +33,6 @@ export default {
             width: '20rem',
             show: true,
             seek: true,
-            sort: true,
             orden: 2,
         },
         {
@@ -45,7 +42,6 @@ export default {
             width: '20rem',
             show: true,
             seek: true,
-            sort: true,
             orden: 3,
         },
         {
@@ -55,7 +51,6 @@ export default {
             width: '12rem',
             show: true,
             seek: true,
-            sort: true,
             orden: 4,
         },
         {
@@ -65,7 +60,6 @@ export default {
             format: 'date',
             width: '12rem',
             show: true,
-            sort: true,
             orden: 5,
         },
         {
@@ -75,7 +69,6 @@ export default {
             format: 'date',
             width: '12rem',
             show: true,
-            sort: true,
             orden: 6,
         },
         {
@@ -84,7 +77,6 @@ export default {
             type: 'number',
             width: '8rem',
             show: true,
-            sort: true,
             orden: 7,
         },
         {
@@ -95,7 +87,6 @@ export default {
             format: 'estado',
             width: '10rem',
             show: true,
-            sort: true,
             orden: 8,
         },
     ],

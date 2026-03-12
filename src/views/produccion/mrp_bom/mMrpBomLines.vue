@@ -49,6 +49,10 @@ export default {
     created() {
         this.modal = this.useModals.mMrpBom
         this.setMrpBomLinesColumns()
+
+        if (this.modal.mode != 1 && !this.modal.mrp_bom_lines_loaded) {
+            this.loadMrpBomLines()
+        }
     },
     methods: {
         setMrpBomLinesColumns() {

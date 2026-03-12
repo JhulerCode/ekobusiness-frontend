@@ -24,8 +24,6 @@ export default {
             type: 'text',
             width: '5rem',
             show: false,
-            seek: false,
-            sort: false,
             orden: 1,
         },
         {
@@ -35,7 +33,6 @@ export default {
             width: '10rem',
             show: true,
             seek: true,
-            sort: true,
             orden: 2,
         },
         {
@@ -45,7 +42,6 @@ export default {
             width: '8rem',
             show: true,
             seek: true,
-            sort: true,
             orden: 3,
         },
         {
@@ -55,7 +51,6 @@ export default {
             width: '5rem',
             show: true,
             seek: true,
-            sort: true,
             orden: 4,
         },
         {
@@ -65,7 +60,6 @@ export default {
             width: '10rem',
             show: true,
             seek: true,
-            sort: true,
             orden: 5,
         },
     ],

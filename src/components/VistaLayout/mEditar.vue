@@ -98,8 +98,6 @@ export default {
                 }
                 a.lista = this.useSystem.get(a.systemKey)
             }
-
-
         }
     },
     methods: {
@@ -141,8 +139,6 @@ export default {
             this.$emit('updated', this.modal.nuevo)
             this.useModals.show.mEditar = false
         },
-
-
 
         async handleRelationalSearch(txt, item) {
             const url = urls[item.relatedUrl] || item.relatedUrl

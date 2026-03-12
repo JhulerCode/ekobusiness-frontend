@@ -24,8 +24,6 @@ export default {
             type: 'text',
             width: '5rem',
             show: false,
-            seek: false,
-            sort: false,
             orden: 1,
         },
         {
@@ -35,7 +33,6 @@ export default {
             width: '10rem',
             show: true,
             seek: true,
-            sort: true,
             orden: 2,
         },
         {
@@ -43,10 +40,9 @@ export default {
             title: 'Tipo de documento',
             prop: 'doc_tipo1.nombre',
             type: 'select',
+            systemKey: 'documentos_identidad',
             width: '10rem',
             show: true,
-            seek: true,
-            sort: true,
             orden: 3,
         },
         {
@@ -56,7 +52,6 @@ export default {
             width: '10rem',
             show: true,
             seek: true,
-            sort: true,
             orden: 4,
         },
         {
@@ -65,8 +60,6 @@ export default {
             type: 'date',
             width: '8rem',
             show: true,
-            seek: true,
-            sort: true,
             orden: 5,
         },
         {
@@ -74,10 +67,9 @@ export default {
             title: 'Sexo',
             prop: 'sexo1.nombre',
             type: 'select',
+            systemKey: 'generos',
             width: '8rem',
             show: true,
-            seek: true,
-            sort: true,
             orden: 6,
         },
         {
@@ -86,8 +78,6 @@ export default {
             type: 'text',
             width: '10rem',
             show: true,
-            seek: true,
-            sort: true,
             orden: 7,
         },
         {
@@ -97,7 +87,6 @@ export default {
             width: '10rem',
             show: true,
             seek: true,
-            sort: true,
             orden: 8,
         },
         {
@@ -107,7 +96,6 @@ export default {
             width: '10rem',
             show: true,
             seek: true,
-            sort: true,
             orden: 9,
         },
         {
@@ -117,7 +105,6 @@ export default {
             width: '10rem',
             show: true,
             seek: true,
-            sort: true,
             orden: 10,
         },
         {
@@ -125,11 +112,10 @@ export default {
             title: 'Activo?',
             prop: 'activo1.nombre',
             type: 'select',
+            systemKey: 'estados',
             format: 'yesno',
             width: '5rem',
             show: true,
-            seek: true,
-            sort: true,
             orden: 11,
         },
         {
@@ -137,11 +123,10 @@ export default {
             title: 'Tiene usuario?',
             prop: 'has_signin1.nombre',
             type: 'select',
+            systemKey: 'estados',
             format: 'yesno',
             width: '5rem',
             show: true,
-            seek: true,
-            sort: true,
             orden: 12,
         },
     ],

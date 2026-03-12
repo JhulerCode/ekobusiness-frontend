@@ -122,10 +122,19 @@ export const useAuth = defineStore('auth', {
             // ----- RECUPERA LAS COLUMNAS GUARDADAS ----- //
             if (this.tables[tableName]) {
                 for (const a of columns) {
-                    Object.assign(
-                        a,
-                        this.tables[tableName].find((b) => b.id === a.id),
-                    )
+                    const saved = this.tables[tableName].find((b) => b.id === a.id)
+                    if (saved) {
+                        Object.assign(a, {
+                            width: saved.width,
+                            show: saved.show,
+                            op: saved.op,
+                            val: saved.val,
+                            val1: saved.val1,
+                            valLabel: saved.valLabel,
+                            orden: saved.orden,
+                            sortDirection: saved.sortDirection,
+                        })
+                    }
                 }
                 columns.sort((a, b) => (a.orden || 0) - (b.orden || 0))
             }

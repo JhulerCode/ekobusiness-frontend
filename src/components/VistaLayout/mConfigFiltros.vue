@@ -211,14 +211,8 @@ export default {
         )
 
         for (const a of this.modal.cols1) {
-            // Inicializar props reactivas
-            a.loading = false
-            a.fullLista = null
-            if (!a.lista) a.lista = []
-
-            // Si tiene systemKey, la traemos del store de sistema
             if (a.systemKey) {
-                // Asegurarnos que esté cargado en el store
+                if (!a.lista) a.lista = []
                 const currentData = this.useSystem.get(a.systemKey)
                 if (currentData.length === 0) {
                     await this.useSystem.load([a.systemKey])
@@ -226,11 +220,14 @@ export default {
                 a.lista = this.useSystem.get(a.systemKey)
             }
 
+            if (a.type === 'related') {
+                a.loading = false
+                a.fullLista = null
+                if (!a.lista) a.lista = []
 
-
-            // Si ya tiene un valor (ej: recarga) y es relacional, cargamos ese registro específico para mostrar el texto
-            if (a.val && a.relatedUrl && (a.type === 'related' || a.type === 'select')) {
-                this.loadSpecificItem(a)
+                if (a.val && a.relatedUrl && a.type === 'related') {
+                    this.loadSpecificItem(a)
+                }
             }
         }
     },
@@ -309,7 +306,7 @@ export default {
             item.loading = false
 
             if (res.code == 0 && res.data[0]) {
-                item.lista.push(res.data[0])
+                item.lista = res.data
                 item.valLabel = res.data[0][item.mostrar || 'nombre']
             }
         },

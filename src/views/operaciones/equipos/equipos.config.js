@@ -1,7 +1,7 @@
 export default {
     name: 'vEquipos',
     title: 'Equipos',
-    apiPath: 'maquinas', // Utiliza el endpoint de maquinas con tipo=2
+    apiPath: 'maquinas',
 
     headerActions: [
         {
@@ -24,8 +24,6 @@ export default {
             type: 'text',
             width: '5rem',
             show: false,
-            seek: false,
-            sort: false,
             orden: 1,
         },
         {
@@ -35,7 +33,6 @@ export default {
             width: '8rem',
             show: true,
             seek: true,
-            sort: true,
             orden: 2,
         },
         {
@@ -45,7 +42,6 @@ export default {
             width: '20rem',
             show: true,
             seek: true,
-            sort: true,
             orden: 3,
         },
         {
@@ -55,8 +51,6 @@ export default {
             format: 'date',
             width: '8rem',
             show: true,
-            seek: true,
-            sort: true,
             orden: 4,
         },
     ],

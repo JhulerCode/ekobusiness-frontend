@@ -1,11 +1,6 @@
 <template>
     <VistaLayout :vista="vista">
-        <JdTable
-            :name="vista.name"
-            :columns="vista.tableColumns"
-            :datos="vista.tableData || []"
-            :colAct="false"
-        />
+        <JdTable :name="vista.name" :columns="vista.tableColumns" :datos="vista.tableData || []" />
     </VistaLayout>
 </template>
 
@@ -46,17 +41,12 @@ export default {
             apiUrl: urls[VIEW_CONFIG.apiPath],
             runMethod: this.runMethod,
         })
-
-        // 2. Override de métodos de carga
-        this.vista.loadTableData = this.loadTableData
-        this.vista.openConfigFiltros = this.openConfigFiltros
-
-        // 3. Carga inicial
         this.initFiltros()
-        this.auth.setColumns(this.vista.name, this.vista.tableColumns)
+        this.vista.loadTableData = this.loadTableData
 
-        if (!this.vista.loaded) {
-            this.loadTableData()
+        // 2. Carga inicial
+        if (!this.vista.loaded && this.auth.verifyPermiso(`${VIEW_CONFIG.name}:listar`)) {
+            this.vista.loadTableData()
         }
     },
     unmounted() {
@@ -67,7 +57,7 @@ export default {
             this.vistas.runMethod(this, method, item)
         },
         initFiltros() {
-            if (this.vista.tableColumns && this.vista.tableColumns.length > 0) {
+            if (!this.vista.tableColumns[0].val) {
                 this.vista.tableColumns[0].op = 'Es igual o anterior a'
                 this.vista.tableColumns[0].val = dayjs().format('YYYY-MM-DD')
             }
@@ -91,7 +81,7 @@ export default {
                 fltr: {},
                 grop: ['id'],
                 ordr: [['nombre', 'ASC']],
-                page: this.vista.table_page,
+                // page: this.vista.table_page,
             }
 
             this.auth.updateQuery(this.vista.tableColumns, this.vista.qry)
@@ -112,54 +102,6 @@ export default {
                 this.vista.tableData = res.data
                 this.vista.table_meta = res.meta
             }
-        },
-
-        async openConfigFiltros() {
-            await this.loadDatosSistema()
-
-            const cols = this.vista.tableColumns
-            for (const a of cols) {
-                if (a.id == 'categoria') a.reload = this.loadCategorias
-                if (a.id == 'purchase_ok') a.lista = this.vista.estados
-                if (a.id == 'sale_ok') a.lista = this.vista.estados
-                if (a.id == 'produce_ok') a.lista = this.vista.estados
-            }
-
-            const send = {
-                table: this.vista.name,
-                cols,
-                reload: this.loadTableData,
-            }
-
-            this.modals.setModal('mConfigFiltros', 'Filtros', null, send, true)
-        },
-        async loadDatosSistema() {
-            const qry = ['igv_afectaciones', 'unidades', 'estados', 'articulo_tipos']
-            const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
-
-            if (res.code != 0) return
-
-            Object.assign(this.vista, res.data)
-        },
-        async loadCategorias() {
-            const qry = {
-                cols: ['nombre'],
-                fltr: {
-                    tipo: { op: 'Es', val: 1 },
-                    activo: { op: 'Es', val: true },
-                },
-                ordr: [['nombre', 'ASC']],
-            }
-
-            this.vista.articulo_categorias = []
-            this.auth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.articulo_categorias}?qry=${JSON.stringify(qry)}`)
-            this.auth.setLoading(false)
-
-            if (res.code != 0) return
-
-            this.vista.articulo_categorias = res.data
-            return res.data
         },
     },
 }

@@ -175,7 +175,6 @@ async function process(response, ms) {
             jmsg('error', res.msg)
 
             if (response.status == 401) {
-                useAuth().clearAuth()
                 useModals().setModal('mLogin', 'Sesión terminada', null, null)
             }
 

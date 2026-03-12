@@ -19,7 +19,7 @@ export default {
 
     tableColumns: [
         {
-            id: 'articulo1.nombre',
+            id: 'articulo',
             title: 'Producto',
             prop: 'articulo1.nombre',
             type: 'related',
@@ -33,10 +33,10 @@ export default {
             id: 'tipo',
             title: 'Tipo',
             prop: 'tipo1.nombre',
-            type: 'text',
+            type: 'select',
+            systemKey: 'mrp_bom_tipos',
             width: '10rem',
             show: true,
-            seek: true,
             orden: 2,
         },
     ],

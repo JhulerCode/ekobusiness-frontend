@@ -61,12 +61,14 @@ export default {
         mAjusteStock,
         mUploadFiles,
     },
-    data: () => ({
-        auth: useAuth(),
-        vistas: useVistas(),
-        modals: useModals(),
-        vista: useVistas()[VIEW_CONFIG.name],
-    }),
+    computed: {
+        auth: () => useAuth(),
+        vistas: () => useVistas(),
+        modals: () => useModals(),
+        vista() {
+            return this.vistas[VIEW_CONFIG.name]
+        },
+    },
     created() {
         // 1. Inicialización de la vista
         this.vistas.initVista(VIEW_CONFIG.name, {

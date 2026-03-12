@@ -333,7 +333,7 @@ export default {
                 cols: [item.mostrar || 'nombre'],
                 fltr: {},
                 ordr: [[item.mostrar || 'nombre', 'ASC']],
-                limit: 25,
+                limt: 25,
             }
 
             if (txt) {

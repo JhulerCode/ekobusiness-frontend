@@ -61,7 +61,7 @@ export default {
             id: 'estado',
             title: 'Estado',
             prop: 'estado1.nombre',
-            type: 'related',
+            type: 'select',
             systemKey: 'produccion_orden_estados',
             format: 'estado',
             width: '8rem',

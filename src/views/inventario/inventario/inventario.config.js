@@ -27,7 +27,6 @@ export default {
             width: '30rem',
             show: true,
             seek: true,
-            sort: true,
             orden: 2,
         },
         {
@@ -39,13 +38,13 @@ export default {
             width: '12rem',
             show: true,
             seek: true,
-            sort: true,
             orden: 3,
         },
         {
             id: 'unidad',
             title: 'Unidad',
-            filtrable: false,
+            type: 'select',
+            systemKey: 'unidades',
             width: '7rem',
             show: true,
             orden: 4,

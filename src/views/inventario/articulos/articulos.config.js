@@ -55,8 +55,8 @@ export default {
         {
             id: 'stock',
             title: 'Stock',
-            format: 'decimal',
             filtrable: false,
+            format: 'decimal',
             toRight: true,
             width: '7rem',
             show: true,
@@ -148,7 +148,7 @@ export default {
         },
         {
             id: 'is_ecommerce',
-            title: 'Ecommerce',
+            title: 'Ecommerce?',
             prop: 'is_ecommerce1.nombre',
             type: 'select',
             format: 'yesno',

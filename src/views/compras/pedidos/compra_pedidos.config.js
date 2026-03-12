@@ -91,7 +91,7 @@ export default {
             id: 'estado',
             title: 'Estado',
             prop: 'estado1.nombre',
-            type: 'related',
+            type: 'select',
             systemKey: 'pedido_estados',
             format: 'estado',
             width: '10rem',

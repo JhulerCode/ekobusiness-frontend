@@ -61,7 +61,7 @@ export default {
             id: 'pago_condicion',
             title: 'Condición de pago',
             prop: 'pago_condicion1.nombre',
-            type: 'related',
+            type: 'select',
             systemKey: 'pago_condiciones',
             width: '12rem',
             show: true,
@@ -93,7 +93,7 @@ export default {
         {
             id: 'estado',
             title: 'Estado',
-            type: 'related',
+            type: 'select',
             systemKey: 'transaccion_estados',
             prop: 'estado1.nombre',
             format: 'estado',

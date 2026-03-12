@@ -25,8 +25,6 @@
                 <JdSelect
                     :lista="modal.elegido.lista || []"
                     :mostrar="modal.elegido.mostrar || 'nombre'"
-                    :loaded="typeof colsMap[modal.elegido.id].reload == 'function'"
-                    @reload="runMethod(modal.elegido)"
                     v-model="modal.nuevo.val"
                     v-if="modal.elegido.type == 'select'"
                 />
@@ -79,25 +77,29 @@ export default {
             return this.modal.cols.reduce((obj, a) => ((obj[a.id] = a), obj), {})
         },
     },
-    created() {
+    async created() {
         this.modal = this.useModals.mEditar
-
         this.modal.cols1 = JSON.parse(
             JSON.stringify(this.modal.cols.filter((a) => a.editable == true)),
         )
 
         for (const a of this.modal.cols1) {
+            // Inicializar props reactivas
             a.loading = false
             a.fullLista = null
+            if (!a.lista) a.lista = []
 
             // Si tiene systemKey, la traemos del store de sistema
             if (a.systemKey) {
+                // Asegurarnos que esté cargado en el store
+                const currentData = this.useSystem.get(a.systemKey)
+                if (currentData.length === 0) {
+                    await this.useSystem.load([a.systemKey])
+                }
                 a.lista = this.useSystem.get(a.systemKey)
             }
 
-            if (a.op) {
-                this.runMethod(a)
-            }
+
         }
     },
     methods: {
@@ -140,39 +142,31 @@ export default {
             this.useModals.show.mEditar = false
         },
 
-        async runMethod(item) {
-            item.lista = await this.colsMap[item.id].reload()
-            this.colsMap[item.id].lista = item.lista
-        },
+
 
         async handleRelationalSearch(txt, item) {
             const url = urls[item.relatedUrl] || item.relatedUrl
 
-            // Búsqueda local si no hay URL (Variables de sistema o precargadas)
+            // 1. Búsqueda local (para systemKey o listas ya cargadas)
             if (!url) {
-                // Re-intentar poblar si está vacía usando el store de sistema
-                if ((!item.lista || item.lista.length === 0) && item.systemKey) {
-                    await this.useSystem.load([item.systemKey])
-                    item.lista = this.useSystem.get(item.systemKey)
-                }
-
-                if (!item.fullLista || item.fullLista.length === 0) {
-                    item.fullLista = [...(item.lista || [])]
-                }
+                if (!item.fullLista) item.fullLista = [...(item.lista || [])]
 
                 const search = (txt || '').toLowerCase()
                 item.lista = item.fullLista.filter((l) =>
-                    String(l[item.mostrar || 'nombre']).toLowerCase().includes(search),
+                    String(l[item.mostrar || 'nombre'])
+                        .toLowerCase()
+                        .includes(search),
                 )
                 return
             }
 
+            // 2. Búsqueda remota (para JdSelectQuery / related)
             item.loading = true
             const qry = {
                 cols: [item.mostrar || 'nombre'],
                 fltr: {},
                 ordr: [[item.mostrar || 'nombre', 'ASC']],
-                limit: 10,
+                limit: 25,
             }
 
             if (txt) {

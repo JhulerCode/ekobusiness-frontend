@@ -37,8 +37,6 @@
                 <JdSelect
                     :lista="item.lista || []"
                     :mostrar="item.mostrar || 'nombre'"
-                    :loaded="typeof colsMap[item.id].reload == 'function'"
-                    @reload="runMethod(item)"
                     v-model="item.val"
                     @elegir="(a) => elegir(a, item)"
                     v-if="
@@ -139,12 +137,6 @@ export default {
                 { op: 'Está vacío', show: false },
                 { op: 'No está vacío', show: false },
             ],
-            select: [
-                { op: 'Es', show: true },
-                { op: 'No es', show: true },
-                { op: 'Está vacío', show: false },
-                { op: 'No está vacío', show: false },
-            ],
             date: [
                 { op: 'Es', show: true },
                 { op: 'Es anterior a', show: true },
@@ -162,6 +154,12 @@ export default {
                 { op: 'Es igual o anterior a', show: true },
                 { op: 'Es igual o posterior a', show: true },
                 { op: 'Está dentro de', show: true, show1: true },
+                { op: 'Está vacío', show: false },
+                { op: 'No está vacío', show: false },
+            ],
+            select: [
+                { op: 'Es', show: true },
+                { op: 'No es', show: true },
                 { op: 'Está vacío', show: false },
                 { op: 'No está vacío', show: false },
             ],
@@ -228,9 +226,7 @@ export default {
                 a.lista = this.useSystem.get(a.systemKey)
             }
 
-            if (a.op) {
-                this.runMethod(a)
-            }
+
 
             // Si ya tiene un valor (ej: recarga) y es relacional, cargamos ese registro específico para mostrar el texto
             if (a.val && a.relatedUrl && (a.type === 'related' || a.type === 'select')) {
@@ -317,14 +313,10 @@ export default {
                 item.valLabel = res.data[0][item.mostrar || 'nombre']
             }
         },
-        async runMethod(item) {
-            if (!this.colsMap[item.id].reload) return
-            item.lista = await this.colsMap[item.id].reload()
-            this.colsMap[item.id].lista = item.lista
-        },
 
         async handleRelationalSearch(txt, item) {
             const url = urls[item.relatedUrl] || item.relatedUrl
+
             // 1. Búsqueda local (para systemKey o listas ya cargadas)
             if (!url) {
                 if (!item.fullLista) item.fullLista = [...(item.lista || [])]
@@ -337,20 +329,26 @@ export default {
                 )
                 return
             }
+
             // 2. Búsqueda remota (para JdSelectQuery / related)
             item.loading = true
             const qry = {
                 cols: [item.mostrar || 'nombre'],
                 fltr: {},
                 ordr: [[item.mostrar || 'nombre', 'ASC']],
-                limit: 25, // Subimos el límite para dar más opciones al buscador
+                limit: 25,
             }
+
             if (txt) {
                 qry.fltr[item.mostrar || 'nombre'] = { op: 'Contiene', val: txt }
             }
+
             const res = await get(`${url}?qry=${JSON.stringify(qry)}`)
-            item.lista = res.code === 0 ? res.data : []
             item.loading = false
+
+            if (res.code == 0) {
+                item.lista = res.data
+            }
         },
     },
 }

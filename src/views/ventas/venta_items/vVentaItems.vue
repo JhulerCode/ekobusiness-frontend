@@ -1,10 +1,6 @@
 <template>
     <VistaLayout :vista="vista">
-        <JdTable
-            :name="vista.name"
-            :columns="vista.tableColumns"
-            :datos="vista.tableData || []"
-        />
+        <JdTable :name="vista.name" :columns="vista.tableColumns" :datos="vista.tableData || []" />
     </VistaLayout>
 
     <!-- Modales -->
@@ -78,7 +74,7 @@ export default {
                 fltr: { 'transaccion1.tipo': { op: 'Es', val: 5 } },
                 incl: ['transaccion1', 'articulo1'],
                 iccl: {
-                    transaccion1: { incl: ['socio1'] },
+                    transaccion1: { incl: ['socio1', 'socio_pedido1'] },
                 },
                 page: this.vista.table_page,
             }

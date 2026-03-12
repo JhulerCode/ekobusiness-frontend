@@ -27,8 +27,6 @@ export default {
             editable: true,
             width: '10rem',
             show: true,
-            seek: true,
-            sort: true,
             orden: 1,
         },
         {
@@ -38,7 +36,6 @@ export default {
             width: '10rem',
             show: true,
             seek: true,
-            sort: true,
             orden: 2,
         },
         {
@@ -48,7 +45,6 @@ export default {
             width: '20rem',
             show: true,
             seek: true,
-            sort: true,
             orden: 3,
         },
         {
@@ -58,7 +54,6 @@ export default {
             width: '10rem',
             show: true,
             seek: true,
-            sort: false,
             orden: 4,
         },
         {
@@ -68,7 +63,6 @@ export default {
             width: '10rem',
             show: true,
             seek: true,
-            sort: false,
             orden: 5,
         },
         {
@@ -81,8 +75,6 @@ export default {
             editable: true,
             width: '10rem',
             show: true,
-            seek: false,
-            sort: false,
             orden: 6,
         },
     ],

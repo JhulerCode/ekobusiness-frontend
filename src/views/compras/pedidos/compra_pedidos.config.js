@@ -28,7 +28,7 @@ export default {
         {
             id: 'fecha',
             title: 'Fecha',
-            format: 'date',
+            prop: 'fecha_format',
             type: 'date',
             width: '10rem',
             show: true,

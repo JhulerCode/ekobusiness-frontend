@@ -61,7 +61,7 @@
                 :class="{ 'user-info-active': showUserFlyout }"
             >
                 <div class="user-foto">
-                    {{ useAuth.usuario.nombres[0] }}
+                    {{ useAuth.usuario.nombres ? useAuth.usuario.nombres[0] : '' }}
                 </div>
 
                 <transition name="to-width-cero">
@@ -94,7 +94,7 @@
         >
             <div class="user-header">
                 <div class="user-avatar-large">
-                    {{ useAuth.usuario.nombres[0] }}
+                    {{ useAuth.usuario.nombres ? useAuth.usuario.nombres[0] : '' }}
                 </div>
                 <div class="user-details">
                     <p class="user-name max-1line" :title="``">

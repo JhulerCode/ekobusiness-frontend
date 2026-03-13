@@ -56,8 +56,8 @@ export default {
         {
             id: 'fecha_emision',
             title: 'Fecha de emisión',
+            prop: 'fecha_emision1',
             type: 'date',
-            format: 'date',
             width: '12rem',
             show: true,
             orden: 5,
@@ -65,8 +65,8 @@ export default {
         {
             id: 'fecha_vencimiento',
             title: 'Fecha de vencimiento',
+            prop: 'fecha_vencimiento1',
             type: 'date',
-            format: 'date',
             width: '12rem',
             show: true,
             orden: 6,

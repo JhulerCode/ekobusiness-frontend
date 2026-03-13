@@ -21,8 +21,8 @@ export default {
         {
             id: 'fecha',
             title: 'Fecha',
+            prop: 'fecha1',
             type: 'date',
-            format: 'date',
             width: '8rem',
             show: true,
             orden: 1,
@@ -72,8 +72,8 @@ export default {
         {
             id: 'fv',
             title: 'F. vencimiento',
+            prop: 'fv1',
             type: 'date',
-            format: 'date',
             width: '8rem',
             show: true,
             orden: 6,

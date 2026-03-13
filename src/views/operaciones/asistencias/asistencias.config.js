@@ -43,7 +43,7 @@ export default {
         {
             id: 'fecha_entrada',
             title: 'Fecha de entrada',
-            format: 'date',
+            prop: 'fecha_entrada1',
             type: 'date',
             width: '8rem',
             show: true,
@@ -60,7 +60,7 @@ export default {
         {
             id: 'fecha_salida',
             title: 'Fecha de salida',
-            format: 'date',
+            prop: 'fecha_salida1',
             type: 'date',
             width: '8rem',
             show: true,

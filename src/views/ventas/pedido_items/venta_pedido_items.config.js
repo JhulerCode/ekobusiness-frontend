@@ -16,9 +16,8 @@ export default {
         {
             id: 'socio_pedido1.fecha',
             title: 'Fecha',
-            prop: 'socio_pedido1.fecha',
+            prop: 'socio_pedido1.fecha1',
             type: 'date',
-            format: 'date',
             width: '8rem',
             show: true,
             orden: 1,

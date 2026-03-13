@@ -16,9 +16,8 @@ export default {
         {
             id: 'transaccion1.fecha',
             title: 'Fecha',
+            prop: 'transaccion1.fecha1',
             type: 'date',
-            prop: 'transaccion1.fecha',
-            format: 'date',
             width: '8rem',
             show: true,
             orden: 1,
@@ -97,8 +96,8 @@ export default {
         {
             id: 'fv',
             title: 'Fecha de vencimiento',
+            prop: 'fv1',
             type: 'date',
-            format: 'date',
             width: '8rem',
             show: true,
             orden: 9,

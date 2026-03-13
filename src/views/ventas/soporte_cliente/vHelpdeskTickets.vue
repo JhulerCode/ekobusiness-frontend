@@ -75,7 +75,6 @@ export default {
             }
 
             this.auth.updateQuery(this.vista.tableColumns, this.vista.qry)
-            this.vista.qry.cols.push('estandar')
         },
 
         // --- Acciones de Registro ---

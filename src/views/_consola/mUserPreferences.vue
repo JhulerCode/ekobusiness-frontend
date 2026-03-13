@@ -10,13 +10,13 @@
                 v-model="modal.usuario.color"
             />
 
-            <JdSelect
+            <!-- <JdSelect
                 label="Formato fecha"
                 :nec="true"
                 v-model="modal.usuario.format_date"
                 :lista="fecha_formatos"
                 mostrar="id"
-            />
+            /> -->
 
             <JdSelect
                 label="Menú visible"

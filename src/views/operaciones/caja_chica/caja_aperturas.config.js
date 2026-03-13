@@ -29,8 +29,8 @@ export default {
         {
             id: 'fecha_apertura',
             title: 'Fecha apertura',
+            prop: 'fecha_apertura1',
             type: 'date',
-            format: 'date',
             width: '12rem',
             show: true,
             orden: 2,
@@ -47,8 +47,8 @@ export default {
         {
             id: 'fecha_cierre',
             title: 'Fecha cierre',
+            prop: 'fecha_cierre1',
             type: 'date',
-            format: 'date',
             width: '12rem',
             show: true,
             orden: 4,

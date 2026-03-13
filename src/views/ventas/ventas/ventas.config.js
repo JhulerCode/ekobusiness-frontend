@@ -29,7 +29,7 @@ export default {
             id: 'fecha',
             title: 'Fecha',
             type: 'date',
-            format: 'date',
+            prop: 'fecha1',
             width: '8rem',
             show: true,
             orden: 1,

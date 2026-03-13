@@ -62,7 +62,7 @@ export default {
         {
             id: 'reclamo_fecha',
             title: 'Fecha de reclamo',
-            format: 'date',
+            prop: 'reclamo_fecha1',
             type: 'date',
             width: '10rem',
             show: true,

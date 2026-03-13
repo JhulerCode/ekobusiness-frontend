@@ -47,8 +47,8 @@ export default {
         {
             id: 'fecha_compra',
             title: 'Fecha de compra',
+            prop: 'fecha_compra1',
             type: 'date',
-            format: 'date',
             width: '8rem',
             show: true,
             orden: 4,

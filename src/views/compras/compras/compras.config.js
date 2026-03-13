@@ -102,9 +102,9 @@ export default {
             type: 'select',
             systemKey: 'transaccion_estados',
             format: 'estado',
+            color: 'estado1.color',
             width: '7rem',
             show: true,
-
             orden: 8,
         },
         {

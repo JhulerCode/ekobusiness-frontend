@@ -68,6 +68,7 @@ export default {
             type: 'select',
             systemKey: 'documentos_estados',
             format: 'estado',
+            color: 'estado1.color',
             width: '10rem',
             show: true,
             orden: 6,

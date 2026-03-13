@@ -82,8 +82,7 @@ export default {
             {
                 id: 'fecha',
                 title: 'Fecha',
-                prop: 'fecha',
-                format: 'date',
+                // prop: 'fecha1',
                 width: '8rem',
                 show: true,
                 seek: true,

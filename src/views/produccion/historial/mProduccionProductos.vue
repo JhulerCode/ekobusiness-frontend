@@ -114,6 +114,7 @@ export default {
                 title: 'Estado',
                 prop: 'producto_estado1.nombre',
                 format: 'estado',
+                color: 'producto_estado1.color',
                 width: '8rem',
                 show: true,
             },

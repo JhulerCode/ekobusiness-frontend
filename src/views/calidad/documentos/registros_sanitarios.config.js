@@ -85,6 +85,7 @@ export default {
             prop: 'estado1.nombre',
             type: 'select',
             format: 'estado',
+            color: 'estado1.color',
             width: '10rem',
             show: true,
             orden: 8,

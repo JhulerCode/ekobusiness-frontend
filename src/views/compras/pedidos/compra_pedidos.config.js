@@ -94,6 +94,7 @@ export default {
             type: 'select',
             systemKey: 'pedido_estados',
             format: 'estado',
+            color: 'estado1.color',
             width: '10rem',
             show: true,
             orden: 7,

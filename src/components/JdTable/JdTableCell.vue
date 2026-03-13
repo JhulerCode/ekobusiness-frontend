@@ -59,13 +59,13 @@
 
     <!-- Format Mode -->
     <template v-else-if="column.format">
-        <div v-if="['yesno', 'estado'].includes(column.format)" class="estado" :class="formatClass">
+        <div
+            v-if="['yesno', 'estado'].includes(column.format)"
+            class="estado"
+            :class="`chip-${valueColor}`"
+        >
             {{ value }}
         </div>
-
-        <template v-else-if="['date', 'datetime'].includes(column.format)">
-            {{ formatDate(value, column.format) }}
-        </template>
 
         <template v-else-if="['number', 'decimal'].includes(column.format)">
             {{ redondear(value, column.format === 'number' ? 0 : 2) }}
@@ -87,7 +87,7 @@
         </div>
     </template>
 
-    <!-- Plain View -->
+    <!-- Plain Mode -->
     <template v-else>
         {{ value }}
     </template>
@@ -97,12 +97,9 @@
 import { computed } from 'vue'
 import { JdInput, JdCheckBox, JdSelect, JdTextArea, JdSelectQuery } from '@jhuler/components'
 import { redondear } from '@/utils/mine'
-import { useAuth } from '@/pinia/auth'
-import dayjs from 'dayjs'
 
 const props = defineProps(['column', 'item', 'disabled'])
 const emit = defineEmits(['onChange', 'onInput'])
-const auth = useAuth()
 
 const value = computed(() => {
     const prop = props.column.prop || props.column.id
@@ -110,21 +107,11 @@ const value = computed(() => {
     return prop.split('.').reduce((acc, part) => acc?.[part], props.item) || ''
 })
 
-const formatClass = computed(() => {
-    if (props.column.format === 'yesno') return value.value ? 'si' : 'no'
-    if (props.column.format === 'estado') {
-        const v = value.value
-        return v < 1 ? 'anulado' : v < 2 ? 'abierto' : 'cerrado'
-    }
-    return ''
+const valueColor = computed(() => {
+    const prop = props.column.color
+    if (!prop) return ''
+    return prop.split('.').reduce((acc, part) => acc?.[part], props.item) || ''
 })
-
-const formatDate = (val, format) => {
-    if (!val) return ''
-    const baseFormat = auth.usuario?.format_date || 'YYYY-MM-DD'
-    const finalFormat = format === 'datetime' ? `${baseFormat} HH:mm:ss` : baseFormat
-    return dayjs(val).format(finalFormat)
-}
 </script>
 
 <style lang="scss" scoped>
@@ -134,21 +121,16 @@ const formatDate = (val, format) => {
     border-radius: 0.3rem;
     font-size: 0.8rem;
 }
-.si {
+.chip-rojo {
+    border: solid 1px var(--rojo);
+}
+.chip-verde {
     border: solid 1px var(--verde);
 }
-.no {
-    border: solid 1px var(--rojo);
-}
-.anulado {
-    border: solid 1px var(--rojo);
-}
-.abierto {
+.chip-amarillo {
     border: solid 1px var(--amarillo);
 }
-.cerrado {
-    border: solid 1px var(--verde);
-}
+
 .color-box {
     width: 2rem;
     height: 1rem;

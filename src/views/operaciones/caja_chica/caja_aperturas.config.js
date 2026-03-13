@@ -60,6 +60,7 @@ export default {
             type: 'select',
             systemKey: 'caja_apertura_estados',
             format: 'estado',
+            color: 'estado1.color',
             width: '10rem',
             show: true,
             orden: 5,

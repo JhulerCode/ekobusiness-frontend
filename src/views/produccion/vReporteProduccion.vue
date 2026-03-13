@@ -77,7 +77,7 @@
 </template>
 
 <script>
-import { JdTable, JdSelect, JdInput, JdButton } from '@jhuler/components'
+import { JdSelect, JdInput, JdButton } from '@jhuler/components'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
@@ -91,7 +91,6 @@ import { jmsg } from '@/utils/swal'
 
 export default {
     components: {
-        JdTable,
         JdSelect,
         JdInput,
         JdButton,

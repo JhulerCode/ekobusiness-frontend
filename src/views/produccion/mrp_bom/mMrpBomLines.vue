@@ -2,30 +2,17 @@
     <JdTable
         :columns="modal.mrp_bom_lines_columns"
         :datos="modal.mrp_bom.mrp_bom_lines || []"
-        :seeker="false"
-        :download="false"
-        :colAct="true"
+        :rowOptions="rowActions"
+        rowOptionsMode="buttons"
         class="jd-table"
         :inputsDisabled="!this.useAuth.verifyPermiso('vMrpBom:editar')"
         :agregarFila="addLine"
         :rowReorderable="this.useAuth.verifyPermiso('vMrpBom:editar')"
-    >
-        <template v-slot:cAction="{ item }">
-            <JdButton
-                :small="true"
-                tipo="2"
-                icon="fa-solid fa-trash-can"
-                title="Eliminar"
-                @click="removeLine(item)"
-                v-if="this.useAuth.verifyPermiso('vMrpBom:editar')"
-            />
-        </template>
-    </JdTable>
+        @rowOptionSelected="runMethod"
+    />
 </template>
 
 <script>
-import { JdButton } from '@jhuler/components'
-import JdTable from '@/components/JdTable/JdTable.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
@@ -36,8 +23,6 @@ import { genCorrelativo } from '@/utils/mine'
 
 export default {
     components: {
-        JdButton,
-        JdTable,
     },
     data: () => ({
         useAuth: useAuth(),
@@ -46,6 +31,18 @@ export default {
 
         modal: {},
     }),
+    computed: {
+        rowActions() {
+            return [
+                {
+                    icon: 'fa-solid fa-trash-can',
+                    title: 'Eliminar',
+                    action: 'removeLine',
+                    permiso: 'vMrpBom:editar',
+                },
+            ]
+        },
+    },
     created() {
         this.modal = this.useModals.mMrpBom
         this.setMrpBomLinesColumns()
@@ -55,6 +52,9 @@ export default {
         }
     },
     methods: {
+        runMethod(method, item) {
+            this[method](item)
+        },
         setMrpBomLinesColumns() {
             this.modal.mrp_bom_lines_columns = [
                 {

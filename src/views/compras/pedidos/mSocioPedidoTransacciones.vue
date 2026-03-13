@@ -3,8 +3,6 @@
         <JdTable
             :columns="columns"
             :datos="modal.socio_pedido.transacciones || []"
-            :download="false"
-            :seeker="false"
             :reload="loadTransacciones"
             :maxHeight="modal.mode == 3 ? '18rem' : '14.5rem'"
         />
@@ -14,17 +12,13 @@
 </template>
 
 <script>
-import { JdTable } from '@jhuler/components'
-
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
 
 import { urls, get } from '@/utils/crud'
 
 export default {
-    components: {
-        JdTable,
-    },
+    components: {},
     data: () => ({
         useAuth: useAuth(),
         useModals: useModals(),

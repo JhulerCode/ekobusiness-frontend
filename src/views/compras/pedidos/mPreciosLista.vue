@@ -10,14 +10,14 @@
             :rowSelectable="true"
             maxHeight="30rem"
             :reload="loadPrecioListaItems"
-            :download="false"
+            
         >
         </JdTable>
     </JdModal>
 </template>
 
 <script>
-import { JdModal, JdTable } from '@jhuler/components'
+import { JdModal } from '@jhuler/components'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
@@ -29,7 +29,6 @@ import { jmsg } from '@/utils/swal'
 export default {
     components: {
         JdModal,
-        JdTable,
     },
     data: () => ({
         useAuth: useAuth(),

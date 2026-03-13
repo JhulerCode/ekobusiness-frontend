@@ -4,7 +4,6 @@
             :name="vista.name"
             :columns="vista.tableColumns"
             :datos="vista.tableData"
-            :colAct="true"
             :rowOptions="vista.tableRowActions"
             @rowOptionSelected="vista.runMethod"
         />
@@ -16,10 +15,6 @@
 </template>
 
 <script>
-// Componentes base y utilidades
-import VistaLayout from '@/components/VistaLayout/VistaLayout.vue'
-import JdTable from '@/components/JdTable/JdTable.vue'
-
 // Modales específicos
 import mTransaccion from '@/views/compras/compras/mTransaccion.vue'
 import mFormato from '@/views/calidad/formatos/mFormato.vue'
@@ -37,8 +32,6 @@ import dayjs from 'dayjs'
 export default {
     name: 'vVentas',
     components: {
-        VistaLayout,
-        JdTable,
         mTransaccion,
         mFormato,
     },

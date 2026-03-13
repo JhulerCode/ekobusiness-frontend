@@ -28,7 +28,7 @@
 </template>
 
 <script>
-import { JdModal, JdInput, JdTable } from '@jhuler/components'
+import { JdModal, JdInput } from '@jhuler/components'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
@@ -43,7 +43,6 @@ import dayjs from 'dayjs'
 export default {
     components: {
         JdModal,
-        JdTable,
         JdInput,
     },
     data: () => ({
@@ -60,7 +59,7 @@ export default {
                 id: 'fecha',
                 title: 'Fecha',
                 type: 'date',
-                format: 'date',
+                prop: 'fecha1',
                 width: '8rem',
                 show: true,
                 seek: true,

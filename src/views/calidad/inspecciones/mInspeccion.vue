@@ -47,27 +47,17 @@
             <JdTable
                 :columns="columns"
                 :datos="modal.inspeccion.correcciones"
-                :seeker="false"
-                :colAct="modal.mode != 3"
-                :download="false"
+                :rowOptions="rowActions"
+                rowOptionsMode="buttons"
                 :inputsDisabled="modal.mode == 3"
-            >
-                <template v-slot:cAction="{ item }">
-                    <JdButton
-                        icon="fa-solid fa-trash"
-                        title="Eliminar"
-                        tipo="2"
-                        :small="true"
-                        @click="removeItem(item)"
-                    />
-                </template>
-            </JdTable>
+                @rowOptionSelected="runMethod"
+            />
         </div>
     </JdModal>
 </template>
 
 <script>
-import { JdModal, JdInput, JdSelect, JdButton, JdTable } from '@jhuler/components'
+import { JdModal, JdInput, JdSelect, JdButton } from '@jhuler/components'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
@@ -83,7 +73,6 @@ export default {
         JdInput,
         JdSelect,
         JdButton,
-        JdTable,
     },
     data: () => ({
         useAuth: useAuth(),
@@ -116,6 +105,20 @@ export default {
             },
         ],
     }),
+    computed: {
+        rowActions() {
+            if (this.modal.mode != 3) {
+                return [
+                    {
+                        icon: 'fa-solid fa-trash',
+                        title: 'Eliminar',
+                        action: 'removeItem',
+                    },
+                ]
+            }
+            return []
+        },
+    },
     created() {
         this.modal = this.useModals.mInspeccion
 
@@ -126,6 +129,9 @@ export default {
         }
     },
     methods: {
+        runMethod(method, item) {
+            this[method](item)
+        },
         showButtons() {
             if (this.modal.mode == 1) {
                 this.buttons[0].show = true

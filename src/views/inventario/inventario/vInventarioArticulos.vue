@@ -5,10 +5,6 @@
 </template>
 
 <script>
-// Componentes base y utilidades
-import VistaLayout from '@/components/VistaLayout/VistaLayout.vue'
-import JdTable from '@/components/JdTable/JdTable.vue'
-
 // Configuración de la vista
 import VIEW_CONFIG from './inventario.config.js'
 
@@ -22,10 +18,7 @@ import { jmsg } from '@/utils/swal'
 
 export default {
     name: 'vInventarioArticulos',
-    components: {
-        VistaLayout,
-        JdTable,
-    },
+    components: {},
     computed: {
         auth: () => useAuth(),
         vistas: () => useVistas(),

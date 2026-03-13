@@ -142,8 +142,6 @@
             <JdTable
                 :columns="columns"
                 :datos="modal.socio_pedido.socio_pedido_items || []"
-                :seeker="false"
-                :download="false"
                 :showResumen="false"
                 class="mrg-btm1"
             >
@@ -219,7 +217,7 @@
 </template>
 
 <script>
-import { JdModal, JdTable } from '@jhuler/components'
+import { JdModal } from '@jhuler/components'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
@@ -231,7 +229,6 @@ import html2pdf from 'html2pdf.js'
 export default {
     components: {
         JdModal,
-        JdTable,
     },
     data: () => ({
         useAuth: useAuth(),

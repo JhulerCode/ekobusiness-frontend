@@ -61,22 +61,13 @@
         <JdTable
             :columns="columns"
             :datos="modal.transaccion.transaccion_items || []"
-            :colAct="modal.mode == 1 || (modal.mode == 2 && modal.transaccion.tipo != 5)"
-            :download="false"
-            :seeker="false"
+            :rowOptions="rowActions"
+            rowOptionsMode="buttons"
             minHeight="10rem"
             :inputsDisabled="modal.mode == 3 || (modal.mode == 2 && modal.transaccion.tipo == 5)"
             @onInput="runMethod"
+            @rowOptionSelected="runMethod"
         >
-            <template v-slot:cAction="{ item }">
-                <JdButton
-                    :small="true"
-                    tipo="2"
-                    icon="fa-solid fa-trash-can"
-                    title="Eliminar"
-                    @click="quitar(item)"
-                />
-            </template>
 
             <template v-slot:cFv="{ item }">
                 <div class="container-compra-fv">
@@ -120,7 +111,7 @@
 </template>
 
 <script>
-import { JdInput, JdSelectQuery, JdButton, JdTable } from '@jhuler/components'
+import { JdInput, JdSelectQuery, JdButton } from '@jhuler/components'
 
 import mPedidoItems from '@/views/compras/compras/mPedidoItems.vue'
 import mPedidoMrpBomLines from './mPedidoMrpBomLines.vue'
@@ -139,7 +130,6 @@ export default {
         JdInput,
         JdSelectQuery,
         JdButton,
-        JdTable,
 
         mPedidoItems,
         mPedidoMrpBomLines,
@@ -189,6 +179,20 @@ export default {
             },
         ],
     }),
+    computed: {
+        rowActions() {
+            if (this.modal.mode == 1 || (this.modal.mode == 2 && this.modal.transaccion.tipo != 5)) {
+                return [
+                    {
+                        icon: 'fa-solid fa-trash-can',
+                        title: 'Eliminar',
+                        action: 'quitar',
+                    },
+                ]
+            }
+            return []
+        },
+    },
     created() {
         this.modal = this.useModals.mStockPicking
         this.loadEmpresa()

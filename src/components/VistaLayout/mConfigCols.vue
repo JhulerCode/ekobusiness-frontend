@@ -3,8 +3,6 @@
         <JdTable
             :columns="columns"
             :datos="modal.cols1 || []"
-            :seeker="false"
-            :download="false"
             :rowReorderable="true"
         >
             <template v-slot:cShow="{ item }">
@@ -24,7 +22,6 @@
 
 <script>
 import { JdModal, JdCheckBox } from '@jhuler/components'
-import JdTable from '@/components/JdTable/JdTable.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
@@ -34,7 +31,6 @@ import { jmsg } from '@/utils/swal'
 export default {
     components: {
         JdModal,
-        JdTable,
         JdCheckBox,
     },
     data: () => ({

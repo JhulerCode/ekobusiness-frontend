@@ -2,27 +2,15 @@
     <JdTable
         :columns="modal.mrp_bom_socios_columns"
         :datos="modal.mrp_bom.mrp_bom_socios || []"
-        :seeker="false"
-        :download="false"
-        :colAct="true"
+        :rowOptions="rowActions"
+        rowOptionsMode="buttons"
         :inputsDisabled="!this.useAuth.verifyPermiso('vMrpBom:editar')"
         :agregarFila="addLineSocio"
-    >
-        <template v-slot:cAction="{ item }">
-            <JdButton
-                :small="true"
-                tipo="2"
-                icon="fa-solid fa-trash-can"
-                title="Eliminar"
-                @click="removeLineSocio(item)"
-                v-if="this.useAuth.verifyPermiso('vMrpBom:editar')"
-            />
-        </template>
-    </JdTable>
+        @rowOptionSelected="runMethod"
+    />
 </template>
 
 <script>
-import { JdTable, JdButton } from '@jhuler/components'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
@@ -32,8 +20,6 @@ import { urls, get } from '@/utils/crud'
 
 export default {
     components: {
-        JdButton,
-        JdTable,
     },
     data: () => ({
         useAuth: useAuth(),
@@ -42,6 +28,18 @@ export default {
 
         modal: {},
     }),
+    computed: {
+        rowActions() {
+            return [
+                {
+                    icon: 'fa-solid fa-trash-can',
+                    title: 'Eliminar',
+                    action: 'removeLineSocio',
+                    permiso: 'vMrpBom:editar',
+                },
+            ]
+        },
+    },
     created() {
         this.modal = this.useModals.mMrpBom
         this.setMrpBomLinesColumns()
@@ -51,6 +49,9 @@ export default {
         }
     },
     methods: {
+        runMethod(method, item) {
+            this[method](item)
+        },
         setMrpBomLinesColumns() {
             this.modal.mrp_bom_socios_columns = [
                 {

@@ -65,9 +65,7 @@
                 :columns="columns"
                 :datos="socio.bancos || []"
                 height="13rem"
-                :seeker="false"
                 :rowSelectable="true"
-                :download="false"
                 :rsUno="true"
                 @rowSelected="setExistente"
             >
@@ -81,7 +79,7 @@
 </template>
 
 <script>
-import { JdInput, JdSelect, JdSwitch, JdTable, JdButton } from '@jhuler/components'
+import { JdInput, JdSelect, JdSwitch, JdButton } from '@jhuler/components'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
@@ -96,7 +94,6 @@ export default {
         JdInput,
         JdSelect,
         JdSwitch,
-        JdTable,
         JdButton,
     },
     data: () => ({

@@ -3,8 +3,6 @@
         <JdTable
             :columns="columns"
             :datos="modal.cols1.sort((a, b) => a.orden - b.orden) || []"
-            :seeker="false"
-            :download="false"
         >
             <template v-slot:cOperacion="{ item }">
                 <JdSelect
@@ -91,7 +89,7 @@
 </template>
 
 <script>
-import { JdModal, JdTable, JdInput, JdSelect } from '@jhuler/components'
+import { JdModal, JdInput, JdSelect } from '@jhuler/components'
 import JdSelectQuery from '@/components/inputs/JdSelectQuery.vue'
 
 import { useAuth } from '@/pinia/auth'
@@ -106,7 +104,6 @@ export default {
         JdModal,
         JdInput,
         JdSelect,
-        JdTable,
         JdSelectQuery,
     },
     data: () => ({

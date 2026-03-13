@@ -39,9 +39,7 @@
             :columns="columns"
             :datos="socio.contactos || []"
             height="15rem"
-            :seeker="false"
             :rowSelectable="true"
-            :download="false"
             :rsUno="true"
             @rowSelected="setExistente"
         >
@@ -54,7 +52,7 @@
 </template>
 
 <script>
-import { JdInput, JdSwitch, JdTable, JdButton } from '@jhuler/components'
+import { JdInput, JdSwitch, JdButton } from '@jhuler/components'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
@@ -67,7 +65,6 @@ export default {
     components: {
         JdInput,
         JdSwitch,
-        JdTable,
         JdButton,
     },
     data: () => ({

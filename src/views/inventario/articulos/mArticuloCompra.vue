@@ -3,27 +3,16 @@
         <JdTable
             :columns="modal.columns_suppliers"
             :datos="modal.articulo.articulo_suppliers || []"
-            :colAct="true"
-            :seeker="false"
-            :download="false"
+            :rowOptions="rowActions"
+            rowOptionsMode="buttons"
             :agregarFila="addSupplier"
             style="grid-column: 1/3"
-        >
-            <template v-slot:cAction="{ item }">
-                <JdButton
-                    tipo="2"
-                    :small="true"
-                    icon="fa-solid fa-trash-can"
-                    title="Eliminar"
-                    @click="removeSupplier(item)"
-                />
-            </template>
-        </JdTable>
+            @rowOptionSelected="runMethod"
+        />
     </div>
 </template>
 
 <script>
-import { JdButton, JdTable } from '@jhuler/components'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
@@ -33,8 +22,6 @@ import { urls, get } from '@/utils/crud'
 
 export default {
     components: {
-        JdTable,
-        JdButton,
     },
     data: () => ({
         useAuth: useAuth(),
@@ -43,6 +30,17 @@ export default {
 
         modal: {},
     }),
+    computed: {
+        rowActions() {
+            return [
+                {
+                    icon: 'fa-solid fa-trash-can',
+                    title: 'Eliminar',
+                    action: 'removeSupplier',
+                },
+            ]
+        },
+    },
     created() {
         this.modal = this.useModals.mArticulo
         this.setColumnsSuppliers()
@@ -52,6 +50,9 @@ export default {
         }
     },
     methods: {
+        runMethod(method, item) {
+            this[method](item)
+        },
         setColumnsSuppliers() {
             this.modal.columns_suppliers = [
                 {

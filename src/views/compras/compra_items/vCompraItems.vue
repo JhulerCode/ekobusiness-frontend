@@ -8,10 +8,6 @@
 </template>
 
 <script>
-// Componentes base y utilidades
-import VistaLayout from '@/components/VistaLayout/VistaLayout.vue'
-import JdTable from '@/components/JdTable/JdTable.vue'
-
 // Configuración de la vista
 import VIEW_CONFIG from './compra_items.config.js'
 
@@ -28,8 +24,6 @@ import dayjs from 'dayjs'
 export default {
     name: 'vCompraItems',
     components: {
-        VistaLayout,
-        JdTable,
         mFormato,
     },
     computed: {

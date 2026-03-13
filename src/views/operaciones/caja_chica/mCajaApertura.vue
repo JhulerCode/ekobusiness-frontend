@@ -107,7 +107,6 @@
                 :datos="modal.caja_apertura?.caja_movimientos || []"
                 maxHeight="30rem"
                 :colAct="modal.mode != 3"
-                :reload="loadCajaMovimientos"
                 :rowOptions="tableRowActions"
                 @rowOptionSelected="runMethod"
                 ref="jdtable"
@@ -118,7 +117,7 @@
 </template>
 
 <script>
-import { JdModal, JdInput, JdSelect, JdTable, JdButton } from '@jhuler/components'
+import { JdModal, JdInput, JdSelect, JdButton } from '@jhuler/components'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
@@ -133,7 +132,6 @@ export default {
         JdModal,
         JdInput,
         JdButton,
-        JdTable,
         JdSelect,
     },
     computed: {
@@ -159,7 +157,7 @@ export default {
             {
                 id: 'fecha',
                 title: 'Fecha',
-                format: 'date',
+                prop: 'fecha1',
                 width: '8rem',
                 show: true,
                 seek: true,

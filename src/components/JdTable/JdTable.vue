@@ -1,20 +1,12 @@
 <template>
-    <article class="jd-table" :style="{ height, maxHeight, width }">
-        <JdInput
-            icon="fa-solid fa-magnifying-glass"
-            type="search"
-            placeholder="Buscar artículos..."
-            v-model="buscador"
-            v-if="seeker"
-        />
-
+    <div class="jd-table" :style="{ height, maxHeight, width }">
         <div class="container-table" :style="{ minHeight }">
             <table ref="jdtable" :class="{ 'table-cols-resizable': columnsResizable }">
                 <colgroup>
                     <col v-if="rowReorderable" style="width: 2rem" />
                     <col v-if="colNro" style="width: 2rem" />
                     <col v-if="rowSelectable" style="width: 2.5rem" />
-                    <col v-if="colAct" :style="`width: ${colActWidth}`" />
+                    <col v-if="computedColAct" :style="`width: ${colActWidth}`" />
                     <col
                         v-for="col in columns"
                         :key="col.id"
@@ -30,7 +22,7 @@
                         headless,
                         rowReorderable,
                         colNro,
-                        colAct,
+                        colAct: computedColAct,
                         rowSelectable: rowSelectable,
                         resizable: columnsResizable,
                         allSelected,
@@ -53,22 +45,21 @@
                             rowSelectable: rowSelectable,
                             reorderable: rowReorderable,
                             colNro,
-                            colAct,
+                            colAct: computedColAct,
                             rowOptions,
+                            rowOptionsMode,
                             resizable: columnsResizable,
                             inputsDisabled,
                         }"
                         @select="selectRow"
                         @toggleOptions="toogleRowOptions"
+                        @action="selectOptionRaw"
                         @dragStart="draggedRowIndex = $event"
                         @drop="handleDrop"
                         @dragEnd="draggedRowIndex = null"
                         @onChange="(...args) => $emit('onChange', ...args)"
                         @onInput="(...args) => $emit('onInput', ...args)"
                     >
-                        <template #cAction="slotProps">
-                            <slot name="cAction" v-bind="slotProps"></slot>
-                        </template>
                         <!-- Dynamic slots forwarding -->
                         <template v-for="slot in dynamicSlots" v-slot:[slot]="slotProps">
                             <slot :name="slot" v-bind="slotProps"></slot>
@@ -104,12 +95,12 @@
                 </template>
             </ul>
         </transition>
-    </article>
+    </div>
 </template>
 
 <script setup>
 import { computed, nextTick } from 'vue'
-import { JdButton, JdInput } from '@jhuler/components'
+import { JdButton } from '@jhuler/components'
 import { useAuth } from '@/pinia/auth'
 import { useTable } from './useTable'
 import TableHead from './JdTableHead.vue'
@@ -124,10 +115,9 @@ const props = defineProps({
     maxHeight: { type: String, default: '100%' },
     minHeight: { type: String, default: 'auto' },
     width: { type: String, default: '100%' },
-    seeker: { type: Boolean, default: false },
     colNro: { type: Boolean, default: true },
-    colAct: { type: Boolean, default: false },
     colActWidth: { type: String, default: '2.5rem' },
+    rowOptionsMode: { type: String, default: 'menu' },
     columnsResizable: { type: Boolean, default: true },
     rowSelectable: { type: Boolean, default: false },
     rsUno: { type: Boolean, default: false },
@@ -139,25 +129,14 @@ const props = defineProps({
     agregarFila: Function,
 })
 
-const emit = defineEmits([
-    'rowSelected',
-    'rowOptionSelected',
-    'onReorder',
-    'onChange',
-    'onInput',
-])
+const emit = defineEmits(['rowSelected', 'rowOptionSelected', 'onReorder', 'onChange', 'onInput'])
 
 const auth = useAuth()
 
-const {
-    draggedRowIndex,
-    optionsCaseItem,
-    datosFiltrados,
-    allSelected,
-    sortData,
-    selectRow,
-} = useTable(props, emit)
+const { draggedRowIndex, optionsCaseItem, datosFiltrados, allSelected, sortData, selectRow } =
+    useTable(props, emit)
 
+const computedColAct = computed(() => props.rowOptions && props.rowOptions.length > 0)
 const dynamicSlots = computed(() => props.columns.filter((c) => c.slot).map((c) => c.slot))
 
 const onColumnResize = ({ column, width }) => {
@@ -235,6 +214,10 @@ const selectOption = (a) => {
     hide()
 }
 
+const selectOptionRaw = (action, item) => {
+    emit('rowOptionSelected', action, item)
+}
+
 const verifyRowOptionPermiso = (item, option) => {
     if (option.ocultar) {
         for (const prop in option.ocultar) {
@@ -304,7 +287,7 @@ defineExpose({})
 
 .row-options-case {
     position: absolute;
-    z-index: 2;
+    z-index: 3;
     user-select: none;
     max-height: 15rem;
     overflow-y: auto;

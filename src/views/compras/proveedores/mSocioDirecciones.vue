@@ -31,9 +31,7 @@
             :columns="columns"
             :datos="socio.direcciones || []"
             height="15rem"
-            :seeker="false"
             :rowSelectable="true"
-            :download="false"
             :rsUno="true"
             @rowSelected="setExistente"
         >
@@ -46,7 +44,7 @@
 </template>
 
 <script>
-import { JdInput, JdSwitch, JdTable, JdButton, JdTextArea } from '@jhuler/components'
+import { JdInput, JdSwitch, JdButton, JdTextArea } from '@jhuler/components'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
@@ -60,7 +58,6 @@ export default {
         JdInput,
         JdTextArea,
         JdSwitch,
-        JdTable,
         JdButton,
     },
     data: () => ({

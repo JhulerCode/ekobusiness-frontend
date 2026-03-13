@@ -33,7 +33,6 @@
         <JdTable
             :columns="columns"
             :datos="modal.kardex || []"
-            :colAct="true"
             :rowOptions="tableRowActions"
             maxHeight="70vh"
             @rowOptionSelected="runMethod"
@@ -46,7 +45,6 @@
 
 <script>
 import { JdModal, JdButton } from '@jhuler/components'
-import JdTable from '@/components/JdTable/JdTable.vue'
 import mTransaccion from '@/views/compras/compras/mTransaccion.vue'
 import JdPaginacion from '@/components/VistaLayout/JdPaginacion.vue'
 
@@ -64,7 +62,6 @@ export default {
     components: {
         JdModal,
         JdButton,
-        JdTable,
         mTransaccion,
         JdPaginacion,
     },
@@ -82,7 +79,7 @@ export default {
             {
                 id: 'fecha',
                 title: 'Fecha',
-                // prop: 'fecha1',
+                prop: 'fecha1',
                 width: '8rem',
                 show: true,
                 seek: true,
@@ -109,7 +106,7 @@ export default {
             {
                 id: 'fv',
                 title: 'Fecha vencimiento',
-                format: 'date',
+                prop: 'fv1',
                 width: '8rem',
                 show: true,
                 seek: true,

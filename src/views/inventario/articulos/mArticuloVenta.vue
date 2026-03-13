@@ -53,52 +53,32 @@
             <JdTable
                 :columns="columns_ingredientes"
                 :datos="modal.articulo.ingredientes"
-                :seeker="false"
-                :download="false"
-                :colAct="true"
+                :rowOptions="rowActionsIngredientes"
+                rowOptionsMode="buttons"
                 :showResumen="false"
                 :agregarFila="addIngrediente"
                 style="grid-column: 1/3"
                 class="mrg-top1"
-            >
-                <template v-slot:cAction="{ item }">
-                    <JdButton
-                        icon="fa-solid fa-trash"
-                        title="Eliminar"
-                        tipo="2"
-                        :small="true"
-                        @click="removeIngrediente(item)"
-                    />
-                </template>
-            </JdTable>
+                @rowOptionSelected="runMethod"
+            />
 
             <JdTable
                 :columns="columns_beneficios"
                 :datos="modal.articulo.beneficios"
-                :seeker="false"
-                :download="false"
-                :colAct="true"
+                :rowOptions="rowActionsBeneficios"
+                rowOptionsMode="buttons"
                 :showResumen="false"
                 :agregarFila="addBeneficio"
                 style="grid-column: 1/3"
                 class="mrg-top1"
-            >
-                <template v-slot:cAction="{ item }">
-                    <JdButton
-                        icon="fa-solid fa-trash"
-                        title="Eliminar"
-                        tipo="2"
-                        :small="true"
-                        @click="removeBeneficio(item)"
-                    />
-                </template>
-            </JdTable>
+                @rowOptionSelected="runMethod"
+            />
         </template>
     </div>
 </template>
 
 <script>
-import { JdButton,JdTable, JdInput, JdTextArea, JdCheckBox } from '@jhuler/components'
+import { JdInput, JdTextArea, JdCheckBox } from '@jhuler/components'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
@@ -106,8 +86,6 @@ import { useVistas } from '@/pinia/vistas'
 
 export default {
     components: {
-        JdTable,
-        JdButton,
         JdInput,
         JdTextArea,
         JdCheckBox,
@@ -141,10 +119,33 @@ export default {
             },
         ],
     }),
+    computed: {
+        rowActionsIngredientes() {
+            return [
+                {
+                    icon: 'fa-solid fa-trash',
+                    title: 'Eliminar',
+                    action: 'removeIngrediente',
+                },
+            ]
+        },
+        rowActionsBeneficios() {
+            return [
+                {
+                    icon: 'fa-solid fa-trash',
+                    title: 'Eliminar',
+                    action: 'removeBeneficio',
+                },
+            ]
+        },
+    },
     created() {
         this.modal = this.useModals.mArticulo
     },
     methods: {
+        runMethod(method, item) {
+            this[method](item)
+        },
         addIngrediente() {
             this.modal.articulo.ingredientes.push({
                 id: crypto.randomUUID(),

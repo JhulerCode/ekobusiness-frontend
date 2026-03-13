@@ -118,8 +118,6 @@
         <JdTable
             :columns="columns1"
             :datos="insumos_necesitados"
-            :seeker="false"
-            :download="false"
             class="jd-table"
         >
             <template v-slot:colStock="{ item }">
@@ -136,16 +134,7 @@
 </template>
 
 <script>
-import {
-    JdModal,
-    JdInput,
-    JdSelect,
-    JdSelectQuery,
-    JdTextArea,
-    JdTable,
-    JdButton,
-} from '@jhuler/components'
-
+import { JdModal, JdInput, JdSelect, JdSelectQuery, JdTextArea, JdButton } from '@jhuler/components'
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
 import { useVistas } from '@/pinia/vistas'
@@ -163,7 +152,6 @@ export default {
         JdSelect,
         JdSelectQuery,
         JdTextArea,
-        JdTable,
         JdButton,
     },
     data: () => ({

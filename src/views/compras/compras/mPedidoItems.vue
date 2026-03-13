@@ -4,7 +4,7 @@
             :columns="columns"
             :datos="modal.articulos || []"
             :rowSelectable="true"
-            :download="false"
+            
             :reload="loadPedidoItems"
             maxHeight="30rem"
         />
@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import { JdModal, JdTable } from '@jhuler/components'
+import { JdModal } from '@jhuler/components'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
@@ -24,7 +24,6 @@ import { jmsg } from '@/utils/swal'
 export default {
     components: {
         JdModal,
-        JdTable,
     },
     data: () => ({
         useAuth: useAuth(),

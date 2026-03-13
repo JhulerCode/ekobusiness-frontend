@@ -55,26 +55,16 @@
             :columns="columns"
             :datos="modal.kardexes || []"
             :colNro="false"
-            :seeker="false"
-            :colAct="true"
-            :download="false"
+            :rowOptions="rowActions"
+            rowOptionsMode="buttons"
             maxHeight="30rem"
-        >
-            <template v-slot:cAction="{ item }">
-                <JdButton
-                    :small="true"
-                    tipo="2"
-                    icon="fa-solid fa-trash-can"
-                    title="Eliminar"
-                    @click="quitar(item)"
-                />
-            </template>
-        </JdTable>
+            @rowOptionSelected="runMethod"
+        />
     </JdModal>
 </template>
 
 <script>
-import { JdModal, JdTable, JdButton, JdInput, JdSelect } from '@jhuler/components'
+import { JdModal, JdInput, JdSelect } from '@jhuler/components'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
@@ -86,9 +76,7 @@ import { jmsg } from '@/utils/swal'
 export default {
     components: {
         JdModal,
-        JdTable,
         JdSelect,
-        JdButton,
         JdInput,
     },
     data: () => ({
@@ -141,6 +129,15 @@ export default {
         totalCantidad() {
             return this.modal.kardexes.reduce((sum, a) => sum + (a.cantidad ?? 0), 0)
         },
+        rowActions() {
+            return [
+                {
+                    icon: 'fa-solid fa-trash-can',
+                    title: 'Eliminar',
+                    action: 'quitar',
+                },
+            ]
+        },
     },
     async created() {
         this.modal = this.useModals.mTransaccionItemLotes
@@ -149,6 +146,9 @@ export default {
         this.loadLotes()
     },
     methods: {
+        runMethod(method, item) {
+            this[method](item)
+        },
         async setColumns() {
             if (this.modal.articulo1.type == 'combo') {
                 this.columns[0].show = true
@@ -233,7 +233,8 @@ export default {
             this.nuevo.lote_padre = null
         },
         quitar(item) {
-            this.modal.kardexes.splice(item.i, 1)
+            const i = this.modal.kardexes.findIndex((a) => a.lote_padre == item.lote_padre)
+            this.modal.kardexes.splice(i, 1)
         },
 
         sendItems() {

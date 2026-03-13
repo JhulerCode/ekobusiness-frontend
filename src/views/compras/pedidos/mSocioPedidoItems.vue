@@ -32,30 +32,19 @@
         <JdTable
             :columns="columns"
             :datos="modal.socio_pedido.socio_pedido_items || []"
-            :colAct="modal.mode != 3"
-            :download="false"
-            :seeker="false"
+            :rowOptions="rowActions"
+            rowOptionsMode="buttons"
             :maxHeight="modal.mode == 3 ? '18rem' : '14.5rem'"
             :inputsDisabled="modal.mode == 3"
             @onInput="runMethod"
             @onChange="runMethod"
-        >
-            <template v-slot:cAction="{ item }">
-                <JdButton
-                    :small="true"
-                    tipo="2"
-                    icon="fa-solid fa-trash-can"
-                    title="Eliminar"
-                    @click="quitar(item)"
-                />
-            </template>
-        </JdTable>
+            @rowOptionSelected="runMethod"
+        />
     </div>
 </template>
 
 <script>
 import { JdSelectQuery, JdButton } from '@jhuler/components'
-import JdTable from '@/components/JdTable/JdTable.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
@@ -69,7 +58,6 @@ export default {
     components: {
         JdSelectQuery,
         JdButton,
-        JdTable,
     },
     data: () => ({
         useAuth: useAuth(),
@@ -148,6 +136,20 @@ export default {
             },
         ],
     }),
+    computed: {
+        rowActions() {
+            if (this.modal.mode != 3) {
+                return [
+                    {
+                        icon: 'fa-solid fa-trash-can',
+                        title: 'Eliminar',
+                        action: 'quitar',
+                    },
+                ]
+            }
+            return []
+        },
+    },
     created() {
         this.modal = this.useModals.mSocioPedido
 
@@ -377,7 +379,8 @@ export default {
                 if (res.code != 0) return
             }
 
-            this.modal.socio_pedido.socio_pedido_items.splice(item.i, 1)
+            const i = this.modal.socio_pedido.socio_pedido_items.findIndex((a) => a.id == item.id)
+            this.modal.socio_pedido.socio_pedido_items.splice(i, 1)
 
             this.calcularTotales()
         },

@@ -50,8 +50,6 @@
             :columns="columns"
             :datos="modal.produccion_productos || []"
             :colAct="modal.tableColAct"
-            :seeker="false"
-            :download="false"
             :reload="loadProduccionProductos"
             :rowOptions="tableRowActions"
             @rowOptionSelected="runMethod"
@@ -61,7 +59,7 @@
 </template>
 
 <script>
-import { JdModal, JdInput, JdButton, JdTable } from '@jhuler/components'
+import { JdModal, JdInput, JdButton } from '@jhuler/components'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
@@ -78,7 +76,6 @@ export default {
         JdModal,
         JdButton,
         JdInput,
-        JdTable,
     },
     data: () => ({
         useAuth: useAuth(),
@@ -98,7 +95,7 @@ export default {
             {
                 id: 'fv',
                 title: 'F. vencim.',
-                format: 'date',
+                prop: 'fv1',
                 width: '10rem',
                 show: true,
             },

@@ -5,21 +5,40 @@
             <strong v-else>{{ vista.formato_id }} {{ vista.formato_nombre }}</strong>
 
             <div class="buttons" v-if="vista.formato_id != null">
-                <JdButton icon="fa-solid fa-arrow-left-long" text="Regresar" tipo="2"
-                    @click="vista.formato_id = null" />
+                <JdButton
+                    icon="fa-solid fa-arrow-left-long"
+                    text="Regresar"
+                    tipo="2"
+                    @click="vista.formato_id = null"
+                />
 
-                <JdButton text="Nuevo" @click="nuevoFormatoValue()"
-                    v-if="useAuth.verifyPermiso('vFormatosHaccp:crear')" />
+                <JdButton
+                    text="Nuevo"
+                    @click="nuevoFormatoValue()"
+                    v-if="useAuth.verifyPermiso('vFormatosHaccp:crear')"
+                />
             </div>
         </div>
 
-        <JdTable :name="tableName" :columns="tableColumns" :datos="vista.formatos || []" :colAct="true"
-            :reload="loadFormatos" :rowOptions="tableRowActions" @rowOptionSelected="runMethod"
-            v-if="vista.formato_id == null">
+        <JdTable
+            :name="tableName"
+            :columns="tableColumns"
+            :datos="vista.formatos || []"
+            :reload="loadFormatos"
+            :rowOptions="tableRowActions"
+            @rowOptionSelected="runMethod"
+            v-if="vista.formato_id == null"
+        >
         </JdTable>
 
-        <JdTable :columns="columns1" :datos="vista.formato_values || []" :colAct="true" :reload="ver"
-            :rowOptions="tableRowOptions1" @rowOptionSelected="runMethod" v-else>
+        <JdTable
+            :columns="columns1"
+            :datos="vista.formato_values || []"
+            :reload="ver"
+            :rowOptions="tableRowOptions1"
+            @rowOptionSelected="runMethod"
+            v-else
+        >
         </JdTable>
     </div>
 
@@ -60,7 +79,7 @@ export default {
                 width: '10rem',
                 show: true,
                 seek: true,
-                sort: true
+                sort: true,
             },
             {
                 id: 'nombre',
@@ -68,18 +87,42 @@ export default {
                 width: '30rem',
                 show: true,
                 seek: true,
-                sort: true
+                sort: true,
             },
         ],
         tableRowActions: [
-            { id: 1, label: 'Ver', icon: 'fa-regular fa-folder-open', action: 'ver', permiso: 'vFormatosHaccp:listar' },
+            {
+                id: 1,
+                label: 'Ver',
+                icon: 'fa-regular fa-folder-open',
+                action: 'ver',
+                permiso: 'vFormatosHaccp:listar',
+            },
         ],
 
         columns1: [],
         tableRowOptions1: [
-            { id: 1, label: 'Ver', icon: 'fa-regular fa-folder-open', action: 'verFormatoValue', permiso: 'vFormatosHaccp:ver' },
-            { id: 1, label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editarFormatoValue', permiso: 'vFormatosHaccp:editar' },
-            { id: 2, label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminarFormatoValue', permiso: 'vFormatosHaccp:eliminar' },
+            {
+                id: 1,
+                label: 'Ver',
+                icon: 'fa-regular fa-folder-open',
+                action: 'verFormatoValue',
+                permiso: 'vFormatosHaccp:ver',
+            },
+            {
+                id: 1,
+                label: 'Editar',
+                icon: 'fa-solid fa-pen-to-square',
+                action: 'editarFormatoValue',
+                permiso: 'vFormatosHaccp:editar',
+            },
+            {
+                id: 2,
+                label: 'Eliminar',
+                icon: 'fa-solid fa-trash-can',
+                action: 'eliminarFormatoValue',
+                permiso: 'vFormatosHaccp:eliminar',
+            },
         ],
     }),
     created() {
@@ -133,8 +176,6 @@ export default {
             this.vista.formato_values = res1.data
         },
 
-
-
         ///// ----- FORMATO VALUES ----- /////
         async loadFormatoValues() {
             const qry = {
@@ -142,22 +183,26 @@ export default {
                 cols: [],
             }
 
-            const hasTransaccionItem = this.tableColumns1.some(a => a.relacion == 'transaccion_items')
+            const hasTransaccionItem = this.tableColumns1.some(
+                (a) => a.relacion == 'transaccion_items',
+            )
             if (hasTransaccionItem) qry.cols.push('transaccion_item')
 
-            const hasProduccionOrden = this.tableColumns1.some(a => a.relacion == 'produccion_ordenes')
+            const hasProduccionOrden = this.tableColumns1.some(
+                (a) => a.relacion == 'produccion_ordenes',
+            )
             if (hasProduccionOrden) qry.cols.push('produccion_orden')
 
-            const hasMaquina = this.tableColumns1.some(a => a.relacion == 'maquinas')
+            const hasMaquina = this.tableColumns1.some((a) => a.relacion == 'maquinas')
             if (hasMaquina) qry.cols.push('maquina')
 
-            const hasTransaccion = this.tableColumns1.some(a => a.relacion == 'transacciones')
+            const hasTransaccion = this.tableColumns1.some((a) => a.relacion == 'transacciones')
             if (hasTransaccion) qry.cols.push('transaccion')
 
-            const hasArticulo = this.tableColumns1.some(a => a.relacion == 'articulos')
+            const hasArticulo = this.tableColumns1.some((a) => a.relacion == 'articulos')
             if (hasArticulo) qry.cols.push('articulo')
 
-            const hasColaborador = this.tableColumns1.some(a => a.relacion == 'colaboradores')
+            const hasColaborador = this.tableColumns1.some((a) => a.relacion == 'colaboradores')
             if (hasColaborador) qry.cols.push('colaborador')
 
             this.useAuth.setLoading(true, 'Cargando...')
@@ -178,23 +223,23 @@ export default {
                     codigo: res.data.id,
                     tipo: res.data.tipo,
                     columns: res.data.columns,
-                    instructivo: res.data.instructivo
-                }
+                    instructivo: res.data.instructivo,
+                },
             }
 
-            const hasMaquina = res.data.columns.find(a => a.relacion == 'maquinas')
+            const hasMaquina = res.data.columns.find((a) => a.relacion == 'maquinas')
             if (hasMaquina) {
                 await this.loadMaquinas(hasMaquina.relacion_tipo)
                 hasMaquina.lista = this.vista.maquinas
             }
 
-            const hasArticulo = res.data.columns.find(a => a.relacion == 'articulos')
+            const hasArticulo = res.data.columns.find((a) => a.relacion == 'articulos')
             if (hasArticulo) {
                 await this.loadArticulos(hasArticulo.relacion_tipo)
                 hasArticulo.lista = this.vista.articulos
             }
 
-            const hasColaborador = res.data.columns.find(a => a.relacion == 'colaboradores')
+            const hasColaborador = res.data.columns.find((a) => a.relacion == 'colaboradores')
             if (hasColaborador) {
                 await this.loadColaboradores()
                 hasColaborador.lista = this.vista.colaboradores
@@ -236,23 +281,23 @@ export default {
                     id: item.id,
                     codigo: res.data.id,
                     columns: res.data.columns,
-                    instructivo: res.data.instructivo
-                }
+                    instructivo: res.data.instructivo,
+                },
             }
 
-            const hasMaquina = res.data.columns.find(a => a.relacion == 'maquinas')
+            const hasMaquina = res.data.columns.find((a) => a.relacion == 'maquinas')
             if (hasMaquina) {
                 await this.loadMaquinas(hasMaquina.relacion_tipo)
                 hasMaquina.lista = this.vista.maquinas
             }
 
-            const hasArticulo = res.data.columns.find(a => a.relacion == 'articulos')
+            const hasArticulo = res.data.columns.find((a) => a.relacion == 'articulos')
             if (hasArticulo) {
                 await this.loadArticulos(hasArticulo.relacion_tipo)
                 hasArticulo.lista = this.vista.articulos
             }
 
-            const hasColaborador = res.data.columns.find(a => a.relacion == 'colaboradores')
+            const hasColaborador = res.data.columns.find((a) => a.relacion == 'colaboradores')
             if (hasColaborador) {
                 await this.loadColaboradores()
                 hasColaborador.lista = this.vista.colaboradores
@@ -337,7 +382,7 @@ export default {
             if (res.code != 0) return
 
             this.vista.colaboradores = res.data
-        }
+        },
     },
 }
 </script>

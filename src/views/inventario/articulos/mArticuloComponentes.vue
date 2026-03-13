@@ -3,28 +3,17 @@
         <JdTable
             :columns="modal.columns_componentes"
             :datos="modal.articulo.combo_componentes || []"
-            :colAct="true"
-            :seeker="false"
-            :download="false"
+            :rowOptions="rowActions"
+            rowOptionsMode="buttons"
             :showResumen="false"
             :agregarFila="addComponente"
             style="grid-column: 1/3"
-        >
-            <template v-slot:cAction="{ item }">
-                <JdButton
-                    tipo="2"
-                    :small="true"
-                    icon="fa-solid fa-trash-can"
-                    title="Eliminar"
-                    @click="removeComponente(item)"
-                />
-            </template>
-        </JdTable>
+            @rowOptionSelected="runMethod"
+        />
     </div>
 </template>
 
 <script>
-import { JdButton, JdTable } from '@jhuler/components'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
@@ -35,8 +24,6 @@ import { genCorrelativo } from '@/utils/mine'
 
 export default {
     components: {
-        JdTable,
-        JdButton,
     },
     data: () => ({
         useAuth: useAuth(),
@@ -45,6 +32,17 @@ export default {
 
         modal: {},
     }),
+    computed: {
+        rowActions() {
+            return [
+                {
+                    icon: 'fa-solid fa-trash-can',
+                    title: 'Eliminar',
+                    action: 'removeComponente',
+                },
+            ]
+        },
+    },
     created() {
         this.modal = this.useModals.mArticulo
         this.setColums()
@@ -54,6 +52,9 @@ export default {
         }
     },
     methods: {
+        runMethod(method, item) {
+            this[method](item)
+        },
         setColums() {
             this.modal.columns_componentes = [
                 {

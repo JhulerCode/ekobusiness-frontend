@@ -34,7 +34,6 @@
             :datos="modal.tipo_cambios || []"
             maxHeight="30rem"
             :reload="loadTipoCambios"
-            :colAct="true"
             :rowOptions="tableRowActions"
             @rowOptionSelected="runMethod"
         >
@@ -43,7 +42,7 @@
 </template>
 
 <script>
-import { JdModal, JdInput, JdTable, JdButton } from '@jhuler/components'
+import { JdModal, JdInput, JdButton } from '@jhuler/components'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
@@ -58,7 +57,6 @@ export default {
     components: {
         JdModal,
         JdInput,
-        JdTable,
         JdButton,
     },
     data: () => ({
@@ -69,16 +67,11 @@ export default {
         modal: {},
         tipo_cambio: {},
 
-        // buttons: [
-        //     { text: 'Grabar', action: 'crear', spin: false },
-        //     { text: 'Actualizar', action: 'modificar', spin: false },
-        // ],
-
         columns: [
             {
                 id: 'fecha',
                 title: 'Fecha',
-                format: 'date',
+                prop: 'fecha1',
                 width: '8rem',
                 show: true,
                 seek: true,

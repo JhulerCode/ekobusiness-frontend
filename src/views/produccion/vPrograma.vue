@@ -68,11 +68,8 @@
                 <JdTable
                     :columns="columns"
                     :datos="produccion_ordenes_hoy"
-                    :seeker="false"
-                    :colAct="true"
                     :colNro="false"
                     :showResumen="false"
-                    :download="false"
                     :rowOptions="tableRowActions"
                     @rowOptionSelected="runMethod"
                 >
@@ -135,11 +132,8 @@
                     <JdTable
                         :columns="columns"
                         :datos="a.produccion_ordenes || []"
-                        :seeker="false"
-                        :colAct="true"
                         :colNro="false"
                         :showResumen="false"
-                        :download="false"
                         :rowOptions="tableRowActions"
                         @rowOptionSelected="runMethod"
                     >
@@ -199,8 +193,7 @@
 
                 <JdTable
                     :columns="columns_insumos"
-                    :colAct="false"
-                    :download="false"
+                    
                     :datos="insumos_necesitados"
                     class="jd-table"
                 >
@@ -230,7 +223,7 @@
 </template>
 
 <script>
-import { JdTable, JdButton, JdSelect, JdInput } from '@jhuler/components'
+import { JdButton, JdSelect, JdInput } from '@jhuler/components'
 
 import mProduccionOrden from '@/views/produccion/historial/mProduccionOrden.vue'
 import mProduccionInsumos from '@/views/produccion/historial/mProduccionInsumos.vue'
@@ -252,7 +245,6 @@ import { saveAs } from 'file-saver'
 
 export default {
     components: {
-        JdTable,
         JdButton,
         JdSelect,
         JdInput,
@@ -277,7 +269,6 @@ export default {
             {
                 id: 'fecha',
                 title: 'Fecha',
-                format: 'date',
                 width: '10rem',
                 show: false,
             },

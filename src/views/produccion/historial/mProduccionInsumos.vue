@@ -80,33 +80,14 @@
             :columns="columns"
             :datos="modal.produccion_insumos || []"
             width="61rem"
-            :colAct="modal.tableColAct"
-            :seeker="false"
-            :download="false"
+            :rowOptions="rowActions"
+            rowOptionsMode="buttons"
             :reload="loadProduccionInsumos"
             colActWidth="4.5rem"
+            @rowOptionSelected="runMethod"
         >
             <template v-slot:cPu="{ item }">
                 {{ item.lote_padre1?.pu }}
-            </template>
-
-            <template v-slot:cAction="{ item }">
-                <JdButton
-                    tipo="2"
-                    :small="true"
-                    icon="fa-solid fa-trash"
-                    title="Eliminar"
-                    @click="eliminar(item)"
-                />
-
-                <JdButton
-                    tipo="2"
-                    :small="true"
-                    icon="fa-solid fa-rotate-left"
-                    title="Devolución"
-                    v-if="item.tipo == 2"
-                    @click="devolucion(item)"
-                />
             </template>
         </JdTable>
         <!-- </div> -->
@@ -119,15 +100,7 @@
 </template>
 
 <script>
-import {
-    JdModal,
-    JdInput,
-    JdCheckBox,
-    JdSelect,
-    JdSelectQuery,
-    JdButton,
-    JdTable,
-} from '@jhuler/components'
+import { JdModal, JdInput, JdCheckBox, JdSelect, JdSelectQuery, JdButton } from '@jhuler/components'
 import mProduccionInsumosDevolucion from '@/views/produccion/historial/mProduccionInsumosDevolucion.vue'
 
 import { useAuth } from '@/pinia/auth'
@@ -148,7 +121,6 @@ export default {
         JdSelect,
         JdSelectQuery,
         JdButton,
-        JdTable,
         mProduccionInsumosDevolucion,
     },
     data: () => ({
@@ -164,7 +136,7 @@ export default {
             {
                 id: 'fecha',
                 title: 'Fecha',
-                format: 'date',
+                prop: 'fecha1',
                 width: '7rem',
                 show: true,
                 seek: true,
@@ -208,22 +180,42 @@ export default {
                 id: 'fv',
                 title: 'Fecha vencimiento',
                 prop: 'lote_padre1.fv',
-                format: 'date',
                 width: '7rem',
                 show: true,
                 seek: true,
             },
         ],
     }),
+    computed: {
+        rowActions() {
+            if (this.modal.produccion_orden.estado == 1 ? true : false) {
+                return [
+                    {
+                        icon: 'fa-solid fa-trash',
+                        title: 'Eliminar',
+                        action: 'eliminar',
+                    },
+                    {
+                        icon: 'fa-solid fa-rotate-left',
+                        title: 'Devolución',
+                        action: 'devolucion',
+                        ocultar: { prop: 'tipo', op: 'Distinto de', val: 2 },
+                    },
+                ]
+            }
+            return []
+        },
+    },
     created() {
         this.modal = this.useModals.mProduccionInsumos
-
-        this.modal.tableColAct = this.modal.produccion_orden.estado == 1 ? true : false
 
         this.initTransaccion()
         this.loadProduccionInsumos()
     },
     methods: {
+        runMethod(method, item) {
+            this[method](item)
+        },
         initTransaccion() {
             this.modal.transaccion = {
                 tipo: 2,

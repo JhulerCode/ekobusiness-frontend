@@ -49,23 +49,13 @@
         <JdTable
             :columns="columns"
             :datos="modal.transaccion.transaccion_items || []"
-            :colAct="modal.mode == 1 || (modal.mode == 2 && modal.transaccion.tipo != 5)"
-            :download="false"
-            :seeker="modal.transaccion.socio_pedido != null"
+            :rowOptions="rowActions"
+            rowOptionsMode="buttons"
             minHeight="10rem"
             :inputsDisabled="modal.mode == 3 || (modal.mode == 2 && modal.transaccion.tipo == 5)"
             @onInput="runMethod"
+            @rowOptionSelected="runMethod"
         >
-            <template v-slot:cAction="{ item }">
-                <JdButton
-                    :small="true"
-                    tipo="2"
-                    icon="fa-solid fa-trash-can"
-                    title="Eliminar"
-                    @click="quitar(item)"
-                />
-            </template>
-
             <template v-slot:cFv="{ item }">
                 <div class="container-compra-fv">
                     <p class="lote">{{ item.lote }}</p>
@@ -107,7 +97,7 @@
 </template>
 
 <script>
-import { JdInput, JdButton, JdTable, JdSelectQuery } from '@jhuler/components'
+import { JdInput, JdButton, JdSelectQuery } from '@jhuler/components'
 
 import mPedidoItems from '@/views/compras/compras/mPedidoItems.vue'
 import mTransaccionItemLotes from '@/views/compras/compras/mTransaccionItemLotes.vue'
@@ -125,7 +115,6 @@ export default {
         JdInput,
         JdSelectQuery,
         JdButton,
-        JdTable,
 
         mPedidoItems,
         mTransaccionItemLotes,
@@ -213,20 +202,24 @@ export default {
                 toRight: true,
             },
         ],
-        // tableRowActions: [
-        //     {
-        //         label: 'Duplicar',
-        //         icon: 'fa-solid fa-copy',
-        //         action: 'duplicar',
-        //     },
-        //     {
-        //         label: 'Quitar',
-        //         icon: 'fa-solid fa-trash-can',
-        //         action: 'quitar',
-        //         permiso: 'vVentas:crear',
-        //     },
-        // ],
     }),
+    computed: {
+        rowActions() {
+            if (
+                this.modal.mode == 1 ||
+                (this.modal.mode == 2 && this.modal.transaccion.tipo != 5)
+            ) {
+                return [
+                    {
+                        icon: 'fa-solid fa-trash-can',
+                        title: 'Eliminar',
+                        action: 'quitar',
+                    },
+                ]
+            }
+            return []
+        },
+    },
     created() {
         this.modal = this.useModals.mTransaccion
 

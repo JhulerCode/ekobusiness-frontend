@@ -4,7 +4,6 @@
             :name="vista.name"
             :columns="vista.tableColumns"
             :datos="vista.tableData || []"
-            :colAct="true"
             :rowOptions="vista.tableRowActions"
             @rowOptionSelected="vista.runMethod"
         />
@@ -15,10 +14,6 @@
 </template>
 
 <script>
-// Componentes base y utilidades
-import VistaLayout from '@/components/VistaLayout/VistaLayout.vue'
-import JdTable from '@/components/JdTable/JdTable.vue'
-
 // Modales específicos
 import mCajaApertura from './mCajaApertura.vue'
 
@@ -36,8 +31,6 @@ import dayjs from 'dayjs'
 export default {
     name: 'vCajaAperturas',
     components: {
-        VistaLayout,
-        JdTable,
         mCajaApertura,
     },
     computed: {

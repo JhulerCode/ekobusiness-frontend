@@ -1,6 +1,6 @@
 export default {
     name: 'vPtsIngresos',
-    title: 'Ingreso de productos terminados',
+    title: 'Ingreso de productos',
     apiPath: 'kardex',
 
     headerActions: [

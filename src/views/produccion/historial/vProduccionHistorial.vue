@@ -4,7 +4,6 @@
             :name="vista.name"
             :columns="vista.tableColumns"
             :datos="vista.tableData || []"
-            :colAct="true"
             :rowOptions="vista.tableRowActions"
             @rowOptionSelected="vista.runMethod"
         />
@@ -24,10 +23,6 @@
 </template>
 
 <script>
-// Componentes base y utilidades
-import VistaLayout from '@/components/VistaLayout/VistaLayout.vue'
-import JdTable from '@/components/JdTable/JdTable.vue'
-
 // Modales específicos
 import mProduccionOrden from '@/views/produccion/historial/mProduccionOrden.vue'
 import mProduccionInsumos from '@/views/produccion/historial/mProduccionInsumos.vue'
@@ -51,8 +46,6 @@ import { jmsg, jqst } from '@/utils/swal'
 export default {
     name: 'vProduccionHistorial',
     components: {
-        VistaLayout,
-        JdTable,
         mProduccionOrden,
         mProduccionInsumos,
         mProduccionProductos,

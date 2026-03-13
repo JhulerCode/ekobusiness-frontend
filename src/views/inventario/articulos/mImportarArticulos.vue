@@ -4,12 +4,12 @@
         :buttons="buttons"
         @button-click="(action) => this[action]()"
     >
-        <JdTable :columns="columns" :datos="modal.articulos" :seeker="false" :download="false" />
+        <JdTable :columns="columns" :datos="modal.articulos" />
     </JdModal>
 </template>
 
 <script>
-import { JdModal, JdTable } from '@jhuler/components'
+import { JdModal } from '@jhuler/components'
 
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
@@ -20,7 +20,6 @@ import { urls, post } from '@/utils/crud'
 export default {
     components: {
         JdModal,
-        JdTable,
     },
     data: () => ({
         useAuth: useAuth(),

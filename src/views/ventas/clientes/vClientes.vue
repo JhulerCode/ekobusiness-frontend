@@ -6,7 +6,6 @@
             :datos="vista.tableData"
             :bulkActions="vista.tableBulkActions"
             @bulkActionSelected="runMethod"
-            :colAct="true"
             :rowOptions="vista.tableRowActions"
             @rowOptionSelected="runMethod"
         />
@@ -16,10 +15,6 @@
 </template>
 
 <script>
-// Componentes base y utilidades
-import VistaLayout from '@/components/VistaLayout/VistaLayout.vue'
-import JdTable from '@/components/JdTable/JdTable.vue'
-
 // Modales específicos
 import mSocio from '@/views/compras/proveedores/mSocio.vue'
 
@@ -35,8 +30,6 @@ import { urls, get } from '@/utils/crud'
 export default {
     name: 'vClientes',
     components: {
-        VistaLayout,
-        JdTable,
         mSocio,
     },
     computed: {

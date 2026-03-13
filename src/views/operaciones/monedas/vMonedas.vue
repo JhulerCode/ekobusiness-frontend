@@ -4,7 +4,6 @@
             :name="vista.name"
             :columns="vista.tableColumns"
             :datos="vista.tableData || []"
-            :colAct="true"
             :rowOptions="vista.tableRowActions"
             @rowOptionSelected="vista.runMethod"
         />
@@ -16,10 +15,6 @@
 </template>
 
 <script>
-// Componentes base y utilidades
-import VistaLayout from '@/components/VistaLayout/VistaLayout.vue'
-import JdTable from '@/components/JdTable/JdTable.vue'
-
 // Modales específicos
 import mMoneda from './mMoneda.vue'
 import mTipoCambios from './mTipoCambios.vue'
@@ -36,8 +31,6 @@ import { urls, get } from '@/utils/crud'
 export default {
     name: 'vMonedas',
     components: {
-        VistaLayout,
-        JdTable,
         mMoneda,
         mTipoCambios,
     },

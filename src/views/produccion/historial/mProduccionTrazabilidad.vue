@@ -57,37 +57,21 @@
                 <p class="mrg-btm05">
                     <strong>--- Insumos ---</strong>
                 </p>
-                <JdTable
-                    :columns="columns1"
-                    :datos="modal.insumos || []"
-                    :seeker="false"
-                    :download="false"
-                >
-                    <!-- <template v-slot:cAction="{ item }">
-                    <JdButton tipo="2" :small="true" icon="fa-regular fa-folder-open" :disabled="true"
-                        @click="verCompra(item)" />
-                </template> -->
-                </JdTable>
+                <JdTable :columns="columns1" :datos="modal.insumos || []" />
             </div>
 
             <div>
                 <p class="mrg-btm05">
                     <strong>--- Productos terminados ---</strong>
                 </p>
-                <JdTable
-                    :columns="columns2"
-                    :datos="modal.productos_terminados || []"
-                    :seeker="false"
-                    :download="false"
-                >
-                </JdTable>
+                <JdTable :columns="columns2" :datos="modal.productos_terminados || []" />
             </div>
         </div>
     </JdModal>
 </template>
 
 <script>
-import { JdModal, JdInput, JdSelect, JdSelectQuery, JdTable, JdButton } from '@jhuler/components'
+import { JdModal, JdInput, JdSelect, JdSelectQuery, JdButton } from '@jhuler/components'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
@@ -102,7 +86,6 @@ export default {
         JdInput,
         JdSelectQuery,
         JdSelect,
-        JdTable,
         JdButton,
     },
     data: () => ({

@@ -129,7 +129,6 @@ export default {
                         label: 'Eliminar',
                         icon: 'fa-solid fa-trash-can',
                         action: 'eliminar',
-                        ocultar: { producto_estado: 2 },
                     },
                 ]
             }
@@ -214,8 +213,15 @@ export default {
 
             return false
         },
+        shapeDatos() {
+            if (this.modal.direct_approve) {
+                this.modal.transaccion_item.is_lote_padre = true
+                this.modal.transaccion_item.stock = this.modal.transaccion_item.cantidad
+            }
+        },
         async grabar() {
             if (this.checkDatos()) return
+            this.shapeDatos()
 
             this.useAuth.setLoading(true, 'Grabando...')
             const res = await post(urls.kardex, this.modal.transaccion_item)
@@ -230,21 +236,25 @@ export default {
         async modificar() {
             if (this.checkDatos()) return
 
-            const send = {
-                id: this.modal.transaccion_item.id,
-                articulo: this.modal.produccion_orden.articulo,
-                lote: this.modal.transaccion_item.lote,
-                fv: this.modal.transaccion_item.fv,
-                cantidad: this.modal.transaccion_item.cantidad,
-            }
+            // const send = {
+            //     id: this.modal.transaccion_item.id,
+            //     articulo: this.modal.produccion_orden.articulo,
+            //     lote: this.modal.transaccion_item.lote,
+            //     fv: this.modal.transaccion_item.fv,
+            //     cantidad: this.modal.transaccion_item.cantidad,
+            // }
+
+            this.shapeDatos()
 
             this.useAuth.setLoading(true, 'Actualizando...')
-            const res = await patch(urls.kardex, send)
+            const res = await patch(urls.kardex, this.modal.transaccion_item)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
 
-            const i = this.modal.produccion_productos.findIndex((a) => a.id == send.id)
+            const i = this.modal.produccion_productos.findIndex(
+                (a) => a.id == this.modal.transaccion_item.id,
+            )
             this.modal.produccion_productos.splice(i, 1, this.modal.transaccion_item)
             this.initTransaccion()
             this.$emit('productosCargados', this.sumarProductos())

@@ -213,7 +213,7 @@ export default {
             this.modals.setModal('mProduccionInsumos', `Salida de insumos`, 1, send, true)
         },
         productosTerminados(item) {
-            const send = { produccion_orden: { ...item }, lote_manual: false }
+            const send = { produccion_orden: { ...item }, lote_manual: false, direct_approve: true }
             this.modals.setModal('mProduccionProductos', `Productos terminados`, null, send, true)
         },
         setProduccionProductos(item) {
@@ -306,6 +306,3 @@ export default {
     },
 }
 </script>
-
-
-<style lang="scss" scoped></style>

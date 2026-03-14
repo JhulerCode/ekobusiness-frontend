@@ -14,7 +14,7 @@
                 <transition-group name="chip">
                     <div v-for="col in activeFilters" :key="col.id" class="filter-chip">
                         <span class="chip-label">{{ col.title }}:</span>
-                        <span class="chip-value">{{ col.valLabel || col.val }}</span>
+                        <span class="chip-value">{{ formatVal(col) }}</span>
                         <i class="fa-solid fa-xmark chip-close" @click.stop="removeFilter(col)"></i>
                     </div>
                 </transition-group>
@@ -82,6 +82,7 @@
 <script setup>
 import { ref, computed, watch, nextTick, onMounted, onUnmounted } from 'vue'
 import { useAuth } from '@/pinia/auth'
+import dayjs from 'dayjs'
 
 const props = defineProps({
     tableName: { type: String, required: true },
@@ -106,6 +107,28 @@ const inputRef = ref(null)
 const activeFilters = computed(() => {
     return props.columns.filter((c) => c.op && c.val !== undefined && c.val !== '')
 })
+
+const formatVal = (col) => {
+    if (col.valLabel) return col.valLabel
+
+    const formatDate = (v) => {
+        if (typeof v !== 'string') return v
+        const dateRegex = /^\d{4}-\d{2}-\d{2}$/
+        if (dateRegex.test(v)) {
+            return dayjs(v).format('DD-MM-YYYY')
+        }
+        return v
+    }
+
+    const v = formatDate(col.val)
+    const v1 = formatDate(col.val1)
+
+    if (v && v1 && col.op === 'Está dentro de') {
+        return `${v} → ${v1}`
+    }
+
+    return v
+}
 
 const isValidSearch = computed(() => {
     const val = (query.value ?? '').toString().trim()

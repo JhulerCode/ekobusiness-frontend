@@ -106,8 +106,7 @@
                 :columns="columns"
                 :datos="modal.caja_apertura?.caja_movimientos || []"
                 maxHeight="30rem"
-                :colAct="modal.mode != 3"
-                :rowOptions="tableRowActions"
+                :rowOptions="rowActions"
                 @rowOptionSelected="runMethod"
                 ref="jdtable"
             >
@@ -145,6 +144,26 @@ export default {
                 (acc, mov) => acc + (mov.monto || 0),
                 0,
             )
+        },
+        rowActions() {
+            if (this.modal.mode != 3) {
+                return [
+                    {
+                        label: 'Editar',
+                        icon: 'fa-solid fa-pen-to-square',
+                        action: 'editMovimiento',
+                        permiso: 'vCajaMovimientos:editar',
+                    },
+                    {
+                        label: 'Eliminar',
+                        icon: 'fa-solid fa-trash-can',
+                        action: 'deleteMovimiento',
+                        permiso: 'vCajaMovimientos:eliminar',
+                        ocultar: { estado: 2 },
+                    },
+                ]
+            }
+            return []
         },
     },
     data: () => ({
@@ -192,21 +211,6 @@ export default {
                 width: '10rem',
                 show: true,
                 seek: true,
-            },
-        ],
-        tableRowActions: [
-            {
-                label: 'Editar',
-                icon: 'fa-solid fa-pen-to-square',
-                action: 'editMovimiento',
-                permiso: 'vCajaMovimientos:editar',
-            },
-            {
-                label: 'Eliminar',
-                icon: 'fa-solid fa-trash-can',
-                action: 'deleteMovimiento',
-                permiso: 'vCajaMovimientos:eliminar',
-                ocultar: { estado: 2 },
             },
         ],
     }),
@@ -292,7 +296,11 @@ export default {
 
             if (res.code != 0) return
 
-            this.modal.caja_apertura.caja_movimientos.splice(this.modal.nuevo.i, 1, this.modal.nuevo)
+            this.modal.caja_apertura.caja_movimientos.splice(
+                this.modal.nuevo.i,
+                1,
+                this.modal.nuevo,
+            )
             this.$refs.jdtable.sortData(this.columns[0], 'desc')
             this.initCajaMovimiento()
         },
@@ -313,9 +321,8 @@ export default {
 
             if (res.code != 0) return
 
-            this.modal.caja_apertura.caja_movimientos = this.modal.caja_apertura.caja_movimientos.filter(
-                (a) => a.id != item.id,
-            )
+            this.modal.caja_apertura.caja_movimientos =
+                this.modal.caja_apertura.caja_movimientos.filter((a) => a.id != item.id)
         },
 
         async loadCajaMovimientos() {

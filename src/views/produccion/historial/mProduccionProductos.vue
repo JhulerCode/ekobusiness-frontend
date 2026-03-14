@@ -49,12 +49,10 @@
         <JdTable
             :columns="columns"
             :datos="modal.produccion_productos || []"
-            :colAct="modal.tableColAct"
             :reload="loadProduccionProductos"
-            :rowOptions="tableRowActions"
+            :rowOptions="rowActions"
             @rowOptionSelected="runMethod"
-        >
-        </JdTable>
+        />
     </JdModal>
 </template>
 
@@ -116,25 +114,30 @@ export default {
                 show: true,
             },
         ],
-        tableRowActions: [
-            {
-                label: 'Editar',
-                icon: 'fa-solid fa-pen-to-square',
-                action: 'edit',
-                ocultar: { producto_estado: 2 },
-            },
-            {
-                label: 'Eliminar',
-                icon: 'fa-solid fa-trash-can',
-                action: 'eliminar',
-                ocultar: { producto_estado: 2 },
-            },
-        ],
     }),
+    computed: {
+        rowActions() {
+            if (this.modal.produccion_orden.estado == 1) {
+                return [
+                    {
+                        label: 'Editar',
+                        icon: 'fa-solid fa-pen-to-square',
+                        action: 'edit',
+                        ocultar: { producto_estado: 2 },
+                    },
+                    {
+                        label: 'Eliminar',
+                        icon: 'fa-solid fa-trash-can',
+                        action: 'eliminar',
+                        ocultar: { producto_estado: 2 },
+                    },
+                ]
+            }
+            return []
+        },
+    },
     created() {
         this.modal = this.useModals.mProduccionProductos
-
-        this.modal.tableColAct = this.modal.produccion_orden.estado == 1 ? true : false
 
         this.initTransaccion()
         this.loadProduccionProductos()

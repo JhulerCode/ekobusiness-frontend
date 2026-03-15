@@ -14,9 +14,9 @@ menuConfig.forEach((section) => {
             path: item.path,
             name: item.goto,
             meta: {
-                title: `${item.label} - Eko Business`,
+                title: item.label,
                 vistaName: item.goto,
-                permission: item.goto,
+                permission: item.permission || item.goto,
             },
             component: viewsModules[`../views/${item.view}`],
         })
@@ -65,7 +65,6 @@ router.beforeEach(async (to, from, next) => {
         }
 
         // Si hay token pero no hay usuario cargado (ej. al refrescar F5), cargarlo
-        // login() ahora se encarga de limpiar el estado si falla (sesión no encontrada)
         if (!auth.usuario?.id) {
             const loginOk = await auth.login()
             if (!loginOk) return next({ name: 'SignIn' })
@@ -74,6 +73,8 @@ router.beforeEach(async (to, from, next) => {
         // Verificar permisos de la vista
         if (to.meta.permission) {
             const permisos = auth.usuario?.permisos || []
+            // Cambiado para que si el permiso es 'vArticulos:listar' y la ruta pide 'vArticuloDetalle', 
+            // se pueda manejar de forma más flexible o específica.
             const hasPermission = permisos.some((p) => p.startsWith(to.meta.permission + ':'))
 
             if (!hasPermission) {

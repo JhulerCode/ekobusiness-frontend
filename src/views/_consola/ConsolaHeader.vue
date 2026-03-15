@@ -51,6 +51,7 @@
 <script>
 import { useAuth } from '@/pinia/auth.js'
 import { useModals } from '@/pinia/modals'
+import { useVistas } from '@/pinia/vistas'
 
 import { urls, patch } from '@/utils/crud'
 
@@ -59,20 +60,71 @@ export default {
     data: () => ({
         useAuth: useAuth(),
         useModals: useModals(),
+        useVistas: useVistas(),
     }),
     computed: {
         breadcrumbs() {
             const crumbs = []
-            const routeName = this.$route.name
+            const currentPath = this.$route.path
 
-            if (!routeName) return crumbs
+            if (currentPath === '/consola' || currentPath === '/consola/') return crumbs
 
-            // Buscar en el menú
+            // Buscar en el menú basándonos en el path para soportar sub-rutas
             for (const section of this.useAuth.menu) {
-                const activeChild = section.children.find((child) => child.goto === routeName)
+                const matches = section.children
+                    .filter((child) => {
+                        const childPath = `/consola/${child.path}`.replace(/\/+$/, '')
+                        const normalizedCurrent = currentPath.replace(/\/+$/, '')
+                        return (
+                            normalizedCurrent === childPath ||
+                            normalizedCurrent.startsWith(childPath + '/')
+                        )
+                    })
+                    .sort((a, b) => b.path.length - a.path.length)
+
+                const activeChild = matches[0]
+
                 if (activeChild) {
                     crumbs.push({ label: section.label, icon: section.icon })
                     crumbs.push({ label: activeChild.label, name: activeChild.goto })
+
+                    // Intento de obtener nombre dinámico (ej: Nombre del artículo)
+                    const childFullPath = `/consola/${activeChild.path}`.replace(/\/+$/, '')
+                    const normalizedCurrent = currentPath.replace(/\/+$/, '')
+
+                    if (normalizedCurrent.length > childFullPath.length) {
+                        // 1. Prioridad: Meta de la ruta si se definió algo específico
+                        let dynamicName = this.$route.meta.breadcrumbName
+
+                        // 2. Si no hay meta, intentamos obtenerlo desde el store de vistas o el título
+                        if (!dynamicName || dynamicName === 'Detalle') {
+                            const vistaDetalle = this.useVistas['vArticuloDetalle']
+                            if (vistaDetalle?.articulo?.nombre) {
+                                dynamicName = vistaDetalle.articulo.nombre
+                            } else {
+                                const title = document.title.split('-')[0].trim()
+                                const forbiddenNames = [
+                                    section.label,
+                                    activeChild.label,
+                                    'Consola',
+                                    'Artículos',
+                                    'Detalle Artículo',
+                                ]
+                                if (title && !forbiddenNames.includes(title)) {
+                                    dynamicName = title
+                                } else {
+                                    dynamicName = 'Detalle'
+                                }
+                            }
+                        }
+
+                        // Truncar si es muy largo
+                        if (dynamicName && dynamicName.length > 30) {
+                            dynamicName = dynamicName.substring(0, 27) + '...'
+                        }
+
+                        crumbs.push({ label: dynamicName })
+                    }
                     break
                 }
             }

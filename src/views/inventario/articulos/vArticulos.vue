@@ -121,6 +121,9 @@ export default {
         },
 
         // Table row actions
+        ver(item) {
+            this.$router.push(`/consola/inventario/articulos/${item.id}`)
+        },
         async editar(item) {
             const qry = {
                 incl: ['categoria1', 'linea1', 'articulo_suppliers', 'combo_componentes'],

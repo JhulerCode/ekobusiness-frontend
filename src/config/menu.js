@@ -37,6 +37,7 @@ export default [
                 view: 'inventario/articulos/vArticulos.vue',
                 permisos: [
                     { id: 'vArticulos:listar', label: 'Listar' },
+                    { id: 'vArticulos:ver', label: 'Ver' },
                     { id: 'vArticulos:crear', label: 'Crear' },
                     { id: 'vArticulos:editar', label: 'Editar' },
                     { id: 'vArticulos:eliminar', label: 'Eliminar' },
@@ -64,7 +65,8 @@ export default [
                 path: 'inventario/articulos/:id',
                 view: 'inventario/articulos/vArticuloDetalle.vue',
                 showInMenu: false, // Esta no aparecerá en el menú lateral
-                permisos: [{ id: 'vArticuloDetalle:ver', label: 'Ver detalle' }],
+                permission: 'vArticulos', // Usar el prefijo de permisos de artículos
+                permisos: [{ id: 'vArticulos:listar', label: 'Ver detalle' }],
             },
         ],
     },

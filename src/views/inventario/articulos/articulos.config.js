@@ -224,6 +224,12 @@ export default {
 
     tableRowActions: [
         {
+            label: 'Ver',
+            icon: 'fa-solid fa-eye',
+            action: 'ver',
+            permiso: 'vArticulos:ver',
+        },
+        {
             label: 'Editar',
             icon: 'fa-solid fa-pen-to-square',
             action: 'editar',

@@ -164,6 +164,21 @@ export default {
         },
     ],
 
+    tableBulkActions: [
+        {
+            text: 'Abrir',
+            icon: 'fa-solid fa-check-double',
+            action: 'abrirMasivo',
+            permiso: 'vProduccionHistorial:terminar',
+        },
+        {
+            text: 'Terminar',
+            icon: 'fa-solid fa-check-double',
+            action: 'terminarMasivo',
+            permiso: 'vProduccionHistorial:terminar',
+        },
+    ],
+
     tableRowActions: [
         {
             label: 'Ver',

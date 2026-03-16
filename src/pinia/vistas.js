@@ -41,7 +41,7 @@ export const useVistas = defineStore('vistas', {
 
             this[name].addItem = (item, where) => this.addItem(name, 'tableData', item, where)
             this[name].removeItem = (item) => this.removeItem(name, 'tableData', item)
-            this[name].updateItem = (item) => this.updateItem(name, 'tableData', item)
+            this[name].updateItem = (item, partial = false) => this.updateItem(name, 'tableData', item, partial)
         },
         runMethod(context, method, item) {
             const parts = method.split('.')
@@ -178,11 +178,17 @@ export const useVistas = defineStore('vistas', {
             const i = tableData.findIndex((a) => a.id == item.id)
             if (i !== -1) tableData.splice(i, 1)
         },
-        updateItem(goto, array, item) {
+        updateItem(goto, array, item, partial = false) {
             const tableData = this[goto]?.[array] || this[goto]?.tableData
             if (!tableData) return
             const i = tableData.findIndex((a) => a.id == item.id)
-            if (i !== -1) tableData.splice(i, 1, item)
+            if (i !== -1) {
+                if (partial) {
+                    Object.assign(tableData[i], item)
+                } else {
+                    tableData.splice(i, 1, item)
+                }
+            }
         },
     },
 })

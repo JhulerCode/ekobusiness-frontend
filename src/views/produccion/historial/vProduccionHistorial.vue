@@ -4,6 +4,7 @@
             :name="vista.name"
             :columns="vista.tableColumns"
             :datos="vista.tableData || []"
+            :rowSelectable="true"
             :rowOptions="vista.tableRowActions"
             @rowOptionSelected="vista.runMethod"
         />
@@ -107,7 +108,67 @@ export default {
             this.vista.qry.cols.push('articulo', 'mrp_bom')
         },
 
-        // --- Acciones de Registro ---
+        // --- Table bulk actions ---
+        async abrirMasivo() {
+            const selected = this.vista.tableData.filter((a) => a.selected)
+            if (selected.length == 0) return jmsg('warning', 'Seleccione al menos una orden')
+
+            const resQst = await jqst(
+                `¿Está seguro de abrir ${selected.length} órdenes de producción?`,
+            )
+            if (resQst.isConfirmed == false) return
+
+            const send = { id: selected.map((b) => b.id) }
+            this.auth.setLoading(true, 'Cargando...')
+            const res = await patch(
+                `${this.vista.apiUrl}/abrir`,
+                send,
+                'Órdenes abiertas correctamente',
+            )
+            this.auth.setLoading(false)
+
+            if (res.code == 0) {
+                for (const a of selected) {
+                    this.vistas.updateItem(
+                        'vProduccionHistorial',
+                        'tableData',
+                        { id: a.id, estado: 1, estado1: res.data.estado1, selected: false },
+                        true,
+                    )
+                }
+            }
+        },
+        async terminarMasivo() {
+            const selected = this.vista.tableData.filter((a) => a.selected)
+            if (selected.length == 0) return jmsg('warning', 'Seleccione al menos una orden')
+
+            const resQst = await jqst(
+                `¿Está seguro de terminar ${selected.length} órdenes de producción?`,
+            )
+            if (resQst.isConfirmed == false) return
+
+            const send = { id: selected.map((b) => b.id) }
+            this.auth.setLoading(true, 'Cargando...')
+            const res = await patch(
+                `${this.vista.apiUrl}/terminar`,
+                send,
+                'Órdenes terminadas correctamente',
+            )
+            this.auth.setLoading(false)
+
+            if (res.code == 0) {
+                for (const a of selected) {
+                    this.vistas.updateItem(
+                        'vProduccionHistorial',
+                        'tableData',
+                        { id: a.id, estado: 2, estado1: res.data.estado1, selected: false },
+                        true,
+                    )
+                }
+            }
+        },
+
+        // --- Table row actions ---
         nuevo() {
             const send = {
                 produccion_orden: {
@@ -163,21 +224,6 @@ export default {
             }
             this.modals.setModal('mProduccionOrden', 'Editar órden de producción', 2, send, true)
         },
-        async terminar(item) {
-            const resQst = await jqst('¿Está seguro de terminar la orden de producción?')
-            if (resQst.isConfirmed == false) return
-
-            this.auth.setLoading(true, 'Cargando...')
-            const res = await patch(
-                `${this.vista.apiUrl}/terminar`,
-                item,
-                'Orden de producción terminada',
-            )
-            this.auth.setLoading(false)
-            if (res.code != 0) return
-
-            this.vistas.updateItem('vProduccionHistorial', 'tableData', { ...item, estado: 2 })
-        },
         async abrir(item) {
             const resQst = await jqst('¿Está seguro de abrir la orden de producción?')
             if (resQst.isConfirmed == false) return
@@ -191,7 +237,32 @@ export default {
             this.auth.setLoading(false)
             if (res.code != 0) return
 
-            this.vistas.updateItem('vProduccionHistorial', 'tableData', { ...item, estado: 1 })
+            this.vistas.updateItem(
+                'vProduccionHistorial',
+                'tableData',
+                { id: res.data.id, estado: 1, estado1: res.data.estado1 },
+                true,
+            )
+        },
+        async terminar(item) {
+            const resQst = await jqst('¿Está seguro de terminar la orden de producción?')
+            if (resQst.isConfirmed == false) return
+
+            this.auth.setLoading(true, 'Cargando...')
+            const res = await patch(
+                `${this.vista.apiUrl}/terminar`,
+                item,
+                'Orden de producción terminada',
+            )
+            this.auth.setLoading(false)
+            if (res.code != 0) return
+
+            this.vistas.updateItem(
+                'vProduccionHistorial',
+                'tableData',
+                { id: res.data.id, estado: 2, estado1: res.data.estado1 },
+                true,
+            )
         },
         async salidaInsumos(item) {
             const qry1 = {

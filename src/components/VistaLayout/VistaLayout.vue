@@ -81,7 +81,6 @@ const modals = useModals()
 
 const props = defineProps({
     vista: { type: Object, required: true },
-    title: { type: String, default: '' },
     showConfigCols: { type: Boolean, default: true },
 })
 

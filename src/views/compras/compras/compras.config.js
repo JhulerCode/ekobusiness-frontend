@@ -133,5 +133,12 @@ export default {
             permiso: 'vCompras:editar',
             ocultar: { estado: 2 },
         },
+        {
+            label: 'Eliminar',
+            icon: 'fa-solid fa-trash',
+            action: 'vista.eliminar',
+            permiso: 'vCompras:editar',
+            ocultar: { estado: 2 },
+        },
     ],
 }

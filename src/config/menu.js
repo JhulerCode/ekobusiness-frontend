@@ -63,10 +63,10 @@ export default [
                 label: 'Detalle Artículo',
                 goto: 'vArticuloDetalle',
                 path: 'inventario/articulos/:id',
-                view: 'inventario/articulos/vArticuloDetalle.vue',
+                view: 'inventario/articulos/vArticuloDetalle/vArticuloDetalle.vue',
                 showInMenu: false, // Esta no aparecerá en el menú lateral
                 permission: 'vArticulos', // Usar el prefijo de permisos de artículos
-                permisos: [{ id: 'vArticulos:listar', label: 'Ver detalle' }],
+                viewType: 'detail'
             },
         ],
     },

@@ -16,6 +16,7 @@ menuConfig.forEach((section) => {
             meta: {
                 title: item.label,
                 vistaName: item.goto,
+                viewType: item.viewType || 'list',
                 permission: item.permission || item.goto,
             },
             component: viewsModules[`../views/${item.view}`],
@@ -86,7 +87,7 @@ router.beforeEach(async (to, from, next) => {
         // Inicializar datos de la vista
         if (to.meta.vistaName) {
             const vistas = useVistas()
-            vistas.initVista(to.meta.vistaName)
+            vistas.initVista(to.meta.vistaName, {}, to.meta.viewType)
         }
 
         // Si navega a /consola sin vista específica, redirigir a vista inicial

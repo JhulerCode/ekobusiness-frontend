@@ -1,5 +1,5 @@
 <template>
-    <div class="jd-buttons-overflow" ref="container">
+    <div class="jd-buttons-overflow" :class="{ 'align-right': align === 'right' }" ref="container">
         <div
             class="visible-buttons"
             :class="{ 'is-calculating': calculating }"
@@ -25,7 +25,11 @@
                 />
 
                 <transition name="options-fade">
-                    <div class="menu-dropdown" v-if="menuOpen">
+                    <div
+                        class="menu-dropdown"
+                        v-bind:class="{ 'align-right': align === 'right' }"
+                        v-if="menuOpen"
+                    >
                         <ul>
                             <li
                                 v-for="(btn, i) in hiddenButtons"
@@ -58,6 +62,10 @@ export default {
             type: Array,
             required: true,
             // Example items: { text: 'Nuevo', icon: 'fa-solid fa-plus', tipo: '1', action: fn, show: true }
+        },
+        align: {
+            type: String,
+            default: 'left', // 'left' or 'right'
         },
     },
     data: () => ({
@@ -188,11 +196,14 @@ export default {
 .jd-buttons-overflow {
     flex: 1;
     min-width: 0;
-    width: 100%;
-    position: relative;
-    min-height: 2.5rem; // Para no perder el alto durante el cálculo
     display: flex;
     align-items: center;
+    position: relative;
+    min-height: 2.5rem; 
+
+    &.align-right {
+        justify-content: flex-end;
+    }
 
     .visible-buttons {
         display: flex;
@@ -220,6 +231,11 @@ export default {
             position: absolute;
             top: calc(100% + 6px);
             left: 0;
+
+            &.align-right {
+                left: auto;
+                right: 0;
+            }
             background: var(--bg-color);
             border: var(--border);
             border-radius: 0.5rem;

@@ -14,14 +14,24 @@ export const useVistas = defineStore('vistas', {
         },
 
         // --- Inicializa o "hidrata" una vista con su configuración ---
-        initVista(name, config = {}) {
+        initVista(name, config = {}, type = 'list') {
             if (this[name] === undefined) {
-                this[name] = {
-                    tableData: [],
-                    table_meta: { total: 0 },
-                    table_page: 1,
-                    loaded: false,
-                    qry: {},
+                if (type === 'list') {
+                    this[name] = {
+                        tableData: [],
+                        table_meta: { total: 0 },
+                        table_page: 1,
+                        loaded: false,
+                        qry: {},
+                        type,
+                    }
+                } else if (type === 'detail') {
+                    this[name] = {
+                        data: {},
+                        loaded: false,
+                        mode: 'view',
+                        type,
+                    }
                 }
             }
 

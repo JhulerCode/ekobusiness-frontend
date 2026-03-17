@@ -7,6 +7,7 @@ import router from './router'
 import { createPinia } from 'pinia'
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 import VistaLayout from '@/components/VistaLayout/VistaLayout.vue'
+import VistaDetalleLayout from '@/components/VistaDetalleLayout.vue'
 // import { JdModal } from '@jhuler/components'
 
 // --- Components --- //
@@ -17,5 +18,6 @@ createApp(App)
     .use(createPinia().use(piniaPluginPersistedstate))
     .component('JdTable', JdTable)
     .component('VistaLayout', VistaLayout)
+    .component('VistaDetalleLayout', VistaDetalleLayout)
     // .component('JdModal', JdModal)
     .mount('#app')

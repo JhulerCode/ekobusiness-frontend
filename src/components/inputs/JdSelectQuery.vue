@@ -23,6 +23,7 @@
                     v-model="txtBuscar"
                     @input="handleInput()"
                     :placeholder="placeholder"
+                    :disabled="disabled"
                     v-if="!hasValue || isVisible"
                 />
 
@@ -287,7 +288,7 @@ export default {
 
             input {
                 width: 100%;
-                background-color: var(--bg-color);
+                background-color: transparent;
             }
 
             .actions {

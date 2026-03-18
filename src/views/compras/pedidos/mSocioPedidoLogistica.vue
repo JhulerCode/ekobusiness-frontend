@@ -75,8 +75,6 @@
 </template>
 
 <script>
-import { JdSelect, JdInput, JdTextArea } from '@jhuler/components'
-
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
 import { useVistas } from '@/pinia/vistas'
@@ -84,12 +82,6 @@ import { useVistas } from '@/pinia/vistas'
 import { urls, get } from '@/utils/crud'
 
 export default {
-    components: {
-        JdSelect,
-        JdInput,
-        // JdSelectQuery,
-        JdTextArea,
-    },
     data: () => ({
         useAuth: useAuth(),
         useModals: useModals(),

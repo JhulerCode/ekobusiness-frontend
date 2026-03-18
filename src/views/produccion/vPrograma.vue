@@ -193,7 +193,7 @@
 
                 <JdTable
                     :columns="columns_insumos"
-                    
+
                     :datos="insumos_necesitados"
                     class="jd-table"
                 >
@@ -223,8 +223,6 @@
 </template>
 
 <script>
-import { JdButton, JdSelect, JdInput } from '@jhuler/components'
-
 import mProduccionOrden from '@/views/produccion/historial/mProduccionOrden.vue'
 import mProduccionInsumos from '@/views/produccion/historial/mProduccionInsumos.vue'
 import mProduccionProductos from '@/views/produccion/historial/mProduccionProductos.vue'
@@ -245,10 +243,6 @@ import { saveAs } from 'file-saver'
 
 export default {
     components: {
-        JdButton,
-        JdSelect,
-        JdInput,
-
         mProduccionOrden,
         mProduccionInsumos,
         mProduccionProductos,

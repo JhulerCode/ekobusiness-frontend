@@ -1,8 +1,17 @@
 <template>
     <div class="container-datos">
-        <JdInput label="Precio de venta/lista" type="number" v-model="vista.data.list_price" :disabled="vista.mode !== 'edit'" />
+        <JdInput
+            label="Precio de venta/lista"
+            type="number"
+            v-model="vista.data.list_price"
+            :disabled="vista.mode !== 'edit'"
+        />
 
-        <JdCheckBox label="Mostrar en ecommerce" v-model="vista.data.is_ecommerce" :disabled="vista.mode !== 'edit'" />
+        <JdCheckBox
+            label="Mostrar en ecommerce"
+            v-model="vista.data.is_ecommerce"
+            :disabled="vista.mode !== 'edit'"
+        />
 
         <template v-if="vista.data.is_ecommerce == true">
             <div class="mrg-top1" style="grid-column: 1/3">
@@ -53,42 +62,41 @@
                 :disabled="vista.mode !== 'edit'"
             />
 
-            <JdCheckBox label="Destacado" v-model="vista.data.is_destacado" :disabled="vista.mode !== 'edit'" />
+            <JdCheckBox
+                label="Destacado"
+                v-model="vista.data.is_destacado"
+                :disabled="vista.mode !== 'edit'"
+            />
 
             <JdTable
                 :columns="columns_ingredientes"
-                :datos="vista.data.ingredientes || []"
-                :showResumen="false"
+                :datos="vista.data.ingredientes"
+                :rowOptions="rowActionsIngredientes"
+                rowOptionsMode="buttons"
+                @rowOptionSelected="runMethod"
+                :inputsDisabled="vista.mode == 'view'"
+                :agregarFila="vista.mode == 'view' ? null : addIngrediente"
                 style="grid-column: 1/3"
-                class="mrg-top1"
             />
 
             <JdTable
                 :columns="columns_beneficios"
-                :datos="vista.data.beneficios || []"
-                :showResumen="false"
-                style="grid-column: 1/3"
-                class="mrg-top1"
+                :datos="vista.data.beneficios"
+                :rowOptions="rowActionsBeneficios"
+                rowOptionsMode="buttons"
+                @rowOptionSelected="runMethod"
+                :inputsDisabled="vista.mode == 'view'"
+                :agregarFila="vista.mode == 'view' ? null : addBeneficio"
+                style="grid-column: 3/5"
             />
         </template>
     </div>
 </template>
 
 <script>
-import { JdInput, JdTextArea, JdCheckBox, JdTable } from '@jhuler/components'
-
 import { useVistas } from '@/pinia/vistas'
 
 export default {
-    components: {
-        JdInput,
-        JdTextArea,
-        JdCheckBox,
-        JdTable,
-    },
-    computed: {
-        vistas: () => useVistas(),
-    },
     data: () => ({
         vista: {},
         columns_ingredientes: [
@@ -96,6 +104,7 @@ export default {
                 id: 'nombre',
                 title: 'Ingredientes',
                 width: '25rem',
+                input: true,
                 type: 'longtext',
                 show: true,
             },
@@ -105,16 +114,64 @@ export default {
                 id: 'nombre',
                 title: 'Beneficios',
                 width: '25rem',
+                input: true,
                 type: 'longtext',
                 show: true,
             },
         ],
     }),
+    computed: {
+        vistas: () => useVistas(),
+        rowActionsIngredientes() {
+            if (this.vista.mode == 'view') return []
+
+            return [
+                {
+                    icon: 'fa-solid fa-trash',
+                    title: 'Eliminar',
+                    action: 'removeIngrediente',
+                },
+            ]
+        },
+        rowActionsBeneficios() {
+            if (this.vista.mode == 'view') return []
+
+            return [
+                {
+                    icon: 'fa-solid fa-trash',
+                    title: 'Eliminar',
+                    action: 'removeBeneficio',
+                },
+            ]
+        },
+    },
     created() {
         this.vista = this.vistas.vArticuloDetalle
+    },
+    methods: {
+        runMethod(method, item) {
+            this[method](item)
+        },
+        addIngrediente() {
+            this.vista.data.ingredientes.push({
+                id: crypto.randomUUID(),
+            })
+        },
+        removeIngrediente(item) {
+            this.vista.data.ingredientes = this.vista.data.ingredientes.filter(
+                (a) => a.id != item.id,
+            )
+        },
+        addBeneficio() {
+            this.vista.data.beneficios.push({
+                id: crypto.randomUUID(),
+            })
+        },
+        removeBeneficio(item) {
+            this.vista.data.beneficios = this.vista.data.beneficios.filter((a) => a.id != item.id)
+        },
     },
 }
 </script>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

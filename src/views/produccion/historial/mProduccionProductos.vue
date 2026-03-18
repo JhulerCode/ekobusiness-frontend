@@ -57,8 +57,6 @@
 </template>
 
 <script>
-import { JdModal, JdInput, JdButton } from '@jhuler/components'
-
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
 import { useVistas } from '@/pinia/vistas'
@@ -70,11 +68,6 @@ import { jmsg, jqst } from '@/utils/swal'
 import dayjs from 'dayjs'
 
 export default {
-    components: {
-        JdModal,
-        JdButton,
-        JdInput,
-    },
     data: () => ({
         useAuth: useAuth(),
         useModals: useModals(),

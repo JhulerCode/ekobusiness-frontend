@@ -1,6 +1,14 @@
 <template>
     <div class="jd-table" :style="{ height, maxHeight, width }">
-        <div class="container-table" :style="{ minHeight }">
+        <div
+            ref="container"
+            class="container-table"
+            :style="{ minHeight }"
+            tabindex="0"
+            @keydown.up.prevent="focusUp"
+            @keydown.down.prevent="focusDown"
+            @keydown.enter.prevent="selectFocusedRow"
+        >
             <table ref="jdtable" :class="{ 'table-cols-resizable': columnsResizable }">
                 <colgroup>
                     <col v-if="rowReorderable" style="width: 2rem" />
@@ -51,7 +59,7 @@
                             resizable: columnsResizable,
                             inputsDisabled,
                         }"
-                        @select="selectRow"
+                        @select="(item, index) => { selectRow(item, index); focusContainer() }"
                         @toggleOptions="toogleRowOptions"
                         @action="selectOptionRaw"
                         @dragStart="draggedRowIndex = $event"
@@ -59,6 +67,7 @@
                         @dragEnd="draggedRowIndex = null"
                         @onChange="(...args) => $emit('onChange', ...args)"
                         @onInput="(...args) => $emit('onInput', ...args)"
+                        @rowDblclick="(...args) => $emit('rowDblclick', ...args)"
                     >
                         <!-- Dynamic slots forwarding -->
                         <template v-for="slot in dynamicSlots" v-slot:[slot]="slotProps">
@@ -99,7 +108,7 @@
 </template>
 
 <script setup>
-import { computed, nextTick } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 import { useAuth } from '@/pinia/auth'
 import { useTable } from './useTable'
 import TableHead from './JdTableHead.vue'
@@ -128,15 +137,37 @@ const props = defineProps({
     agregarFila: Function,
 })
 
-const emit = defineEmits(['rowSelected', 'rowOptionSelected', 'onReorder', 'onChange', 'onInput'])
+const emit = defineEmits(['rowSelected', 'rowOptionSelected', 'onReorder', 'onChange', 'onInput', 'rowDblclick'])
 
 const auth = useAuth()
+const container = ref(null)
 
-const { draggedRowIndex, optionsCaseItem, datosFiltrados, allSelected, sortData, selectRow } =
-    useTable(props, emit)
+const {
+    draggedRowIndex,
+    optionsCaseItem,
+    datosFiltrados,
+    allSelected,
+    focusedIndex,
+    sortData,
+    selectRow,
+    focusUp,
+    focusDown,
+    selectFocusedRow,
+} = useTable(props, emit)
 
 const computedColAct = computed(() => props.rowOptions && props.rowOptions.length > 0)
 const dynamicSlots = computed(() => props.columns.filter((c) => c.slot).map((c) => c.slot))
+
+watch(focusedIndex, (val) => {
+    if (val === -1) return
+    nextTick(() => {
+        const row = container.value.querySelector('.row-focused')
+        if (!row) return
+        row.scrollIntoView({ block: 'nearest', behavior: 'auto' })
+    })
+})
+
+const focusContainer = () => container.value?.focus()
 
 const onColumnResize = ({ column, width }) => {
     column.width = `${width}px`
@@ -271,6 +302,10 @@ defineExpose({})
     height: 100%;
     overflow: auto;
     border-bottom: var(--border);
+
+    &:focus {
+        outline: none;
+    }
 
     .table-cols-resizable {
         table-layout: fixed;

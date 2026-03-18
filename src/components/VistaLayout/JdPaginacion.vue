@@ -20,7 +20,6 @@
 
 <script setup>
 import { computed } from 'vue'
-import { JdButton } from '@jhuler/components'
 
 const props = defineProps({
     view: { type: Object, default: () => ({}) },

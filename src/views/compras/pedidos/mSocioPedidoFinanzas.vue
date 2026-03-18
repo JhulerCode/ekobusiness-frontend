@@ -52,17 +52,11 @@
 </template>
 
 <script>
-import { JdSelect, JdInput } from '@jhuler/components'
-
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
 import { useVistas } from '@/pinia/vistas'
 
 export default {
-    components: {
-        JdSelect,
-        JdInput,
-    },
     data: () => ({
         useAuth: useAuth(),
         useModals: useModals(),

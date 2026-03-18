@@ -36,19 +36,12 @@
 </template>
 
 <script>
-import { JdInput, JdInputPassword, JdButton } from '@jhuler/components'
-
 import { useAuth } from '@/pinia/auth'
 
 import { urls, post } from '@/utils/crud'
 import { jmsg } from '@/utils/swal'
 
 export default {
-    components: {
-        JdInput,
-        JdInputPassword,
-        JdButton,
-    },
     data: () => ({
         useAuth: useAuth(),
 

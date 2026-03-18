@@ -27,7 +27,6 @@
 </template>
 
 <script>
-import { JdModal, JdSelect, JdSelectQuery } from '@jhuler/components'
 import mMrpBomSocios from './mMrpBomSocios.vue'
 import mMrpBomLines from './mMrpBomLines.vue'
 
@@ -41,9 +40,6 @@ import { incompleteData } from '@/utils/mine'
 
 export default {
     components: {
-        JdModal,
-        JdSelect,
-        JdSelectQuery,
         mMrpBomSocios,
         mMrpBomLines,
     },

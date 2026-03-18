@@ -46,16 +46,9 @@
 <script>
 import { useSystem } from '@/pinia/system'
 import { useVistas } from '@/pinia/vistas'
-import { JdInput, JdSelect } from '@jhuler/components'
-import JdSelectQuery from '@/components/inputs/JdSelectQuery.vue'
 import { get, urls } from '@/utils/crud'
 
 export default {
-    components: {
-        JdInput,
-        JdSelect,
-        JdSelectQuery,
-    },
     computed: {
         useSystem: () => useSystem(),
         vistas: () => useVistas(),

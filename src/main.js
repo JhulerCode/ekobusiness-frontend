@@ -20,6 +20,12 @@ import {
     JdSelect,
     JdSwitch,
     JdTextArea,
+    // Modals
+    JdModal,
+    mAnular,
+    mLogin,
+    mPdfViewer,
+    LoadingSpin,
 } from '@jhuler/components'
 import JdSelectQuery from '@/components/inputs/JdSelectQuery.vue'
 
@@ -38,4 +44,9 @@ createApp(App)
     .component('JdSelectQuery', JdSelectQuery)
     .component('JdSwitch', JdSwitch)
     .component('JdTextArea', JdTextArea)
+    .component('JdModal', JdModal)
+    .component('mAnular', mAnular)
+    .component('mLogin', mLogin)
+    .component('mPdfViewer', mPdfViewer)
+    .component('LoadingSpin', LoadingSpin)
     .mount('#app')

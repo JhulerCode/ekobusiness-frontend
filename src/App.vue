@@ -10,16 +10,11 @@
 </template>
 
 <script>
-import { LoadingSpin } from '@jhuler/components'
-
 import { useAuth } from '@/pinia/auth.js'
 import { useVistas } from '@/pinia/vistas.js'
 import { useModals } from '@/pinia/modals.js'
 
 export default {
-    components: {
-        LoadingSpin,
-    },
     data: () => ({
         useAuth: useAuth(),
         useVistas: useVistas(),

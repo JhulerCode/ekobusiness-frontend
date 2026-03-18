@@ -17,7 +17,6 @@
 
 <script setup>
 import { computed } from 'vue'
-import { JdInput } from '@jhuler/components'
 
 const props = defineProps(['modelValue', 'seeker', 'seekString', 'datosFiltradosLength'])
 

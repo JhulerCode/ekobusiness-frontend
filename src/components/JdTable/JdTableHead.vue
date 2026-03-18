@@ -41,8 +41,6 @@
 </template>
 
 <script setup>
-import { JdCheckBox } from '@jhuler/components'
-
 defineProps([
     'columns',
     'headless',

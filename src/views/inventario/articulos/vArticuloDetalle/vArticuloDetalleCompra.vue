@@ -7,7 +7,7 @@
             rowOptionsMode="buttons"
             @rowOptionSelected="runMethod"
             :inputsDisabled="vista.mode == 'view'"
-            :agregarFila="addSupplier"
+            :agregarFila="vista.mode == 'view' ? null : addSupplier"
             style="grid-column: 1/5"
         />
     </div>
@@ -19,6 +19,9 @@ import { useVistas } from '@/pinia/vistas'
 import { urls, get } from '@/utils/crud'
 
 export default {
+    data: () => ({
+        vista: {},
+    }),
     computed: {
         auth: () => useAuth(),
         vistas: () => useVistas(),
@@ -113,6 +116,7 @@ export default {
             ]
         },
         rowActions() {
+            if (this.vista.mode == 'view') return []
             return [
                 {
                     icon: 'fa-solid fa-trash-can',
@@ -122,9 +126,6 @@ export default {
             ]
         },
     },
-    data: () => ({
-        vista: {},
-    }),
     created() {
         this.vista = this.vistas.vArticuloDetalle
 

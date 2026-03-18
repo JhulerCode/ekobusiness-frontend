@@ -12,13 +12,9 @@
 </template>
 
 <script>
-import { JdInput } from '@jhuler/components'
 import { useVistas } from '@/pinia/vistas'
 
 export default {
-    components: {
-        JdInput,
-    },
     computed: {
         vistas: () => useVistas(),
         lineaNombre() {

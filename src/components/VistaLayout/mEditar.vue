@@ -45,10 +45,6 @@
 </template>
 
 <script>
-import { JdModal, JdInput, JdSelect, JdSwitch } from '@jhuler/components'
-
-import JdSelectQuery from '@/components/inputs/JdSelectQuery.vue'
-
 import { useModals } from '@/pinia/modals'
 import { useAuth } from '@/pinia/auth'
 import { useSystem } from '@/pinia/system'
@@ -58,13 +54,6 @@ import { incompleteData } from '@/utils/mine'
 import { jmsg } from '@/utils/swal'
 
 export default {
-    components: {
-        JdModal,
-        JdInput,
-        JdSelect,
-        JdSwitch,
-        JdSelectQuery,
-    },
     data: () => ({
         useAuth: useAuth(),
         useSystem: useSystem(),

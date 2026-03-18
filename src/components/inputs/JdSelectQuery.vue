@@ -70,12 +70,7 @@
 </template>
 
 <script>
-import { LoadingSpin } from '@jhuler/components'
-
 export default {
-    components: {
-        LoadingSpin,
-    },
     props: {
         modelValue: [String, Number],
 

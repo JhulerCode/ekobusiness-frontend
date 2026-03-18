@@ -44,8 +44,6 @@
 </template>
 
 <script>
-import { JdInput, JdSwitch, JdButton, JdTextArea } from '@jhuler/components'
-
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
 import { useVistas } from '@/pinia/vistas'
@@ -54,12 +52,6 @@ import { incompleteData } from '@/utils/mine'
 import { jmsg } from '@/utils/swal'
 
 export default {
-    components: {
-        JdInput,
-        JdTextArea,
-        JdSwitch,
-        JdButton,
-    },
     data: () => ({
         useAuth: useAuth(),
         useModals: useModals(),

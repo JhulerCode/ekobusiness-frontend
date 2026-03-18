@@ -79,8 +79,6 @@
 </template>
 
 <script>
-import { JdModal, JdInput, JdSelect, JdTextArea } from '@jhuler/components'
-
 import mStockPickingLine from './mStockPickingLine.vue'
 
 import { useAuth } from '@/pinia/auth'
@@ -95,11 +93,6 @@ import dayjs from 'dayjs'
 
 export default {
     components: {
-        JdModal,
-        JdInput,
-        JdSelect,
-        JdTextArea,
-
         mStockPickingLine,
     },
     data: () => ({

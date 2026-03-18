@@ -160,8 +160,6 @@
 </template>
 
 <script>
-import { JdModal, JdInput, JdSwitch, JdCheckBox, JdSelectQuery, JdSelect } from '@jhuler/components'
-
 import mArticuloCompra from './mArticuloCompra.vue'
 import mArticiloVenta from './mArticuloVenta.vue'
 import mArticuloComponentes from './mArticuloComponentes.vue'
@@ -176,13 +174,6 @@ import { jmsg } from '@/utils/swal'
 
 export default {
     components: {
-        JdModal,
-        JdInput,
-        JdSelect,
-        JdSwitch,
-        JdCheckBox,
-        JdSelectQuery,
-
         mArticiloVenta,
         mArticuloCompra,
         mArticuloComponentes,

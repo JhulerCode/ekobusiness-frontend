@@ -9,13 +9,9 @@
 </template>
 
 <script>
-import { JdSwitch } from '@jhuler/components'
 import { useVistas } from '@/pinia/vistas'
 
 export default {
-    components: {
-        JdSwitch,
-    },
     computed: {
         vistas: () => useVistas(),
     },

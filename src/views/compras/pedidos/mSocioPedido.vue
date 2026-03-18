@@ -127,8 +127,6 @@
 </template>
 
 <script>
-import { JdModal, JdInput, JdSelect, JdTextArea } from '@jhuler/components'
-
 import mSocioPedidoItems from './mSocioPedidoItems.vue'
 import mSocioPedidoLogistica from './mSocioPedidoLogistica.vue'
 import mSocioPedidoFinanzas from './mSocioPedidoFinanzas.vue'
@@ -146,11 +144,6 @@ import dayjs from 'dayjs'
 
 export default {
     components: {
-        JdModal,
-        JdInput,
-        JdSelect,
-        JdTextArea,
-
         mSocioPedidoItems,
         mSocioPedidoLogistica,
         mSocioPedidoFinanzas,

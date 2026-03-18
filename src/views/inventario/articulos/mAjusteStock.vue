@@ -104,15 +104,6 @@
 </template>
 
 <script>
-import {
-    JdModal,
-    JdInput,
-    JdSelect,
-    JdSelectQuery,
-    JdCheckBox,
-    JdTextArea,
-} from '@jhuler/components'
-
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
 import { useVistas } from '@/pinia/vistas'
@@ -124,14 +115,6 @@ import { jmsg } from '@/utils/swal'
 import dayjs from 'dayjs'
 
 export default {
-    components: {
-        JdModal,
-        JdInput,
-        JdSelect,
-        JdSelectQuery,
-        JdCheckBox,
-        JdTextArea,
-    },
     data: () => ({
         useAuth: useAuth(),
         useModals: useModals(),

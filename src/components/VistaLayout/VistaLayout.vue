@@ -63,7 +63,6 @@
 
 <script setup>
 import { computed } from 'vue'
-import { JdButton } from '@jhuler/components'
 
 // Componentes base
 import JdButtonsOverflow from './JdButtonsOverflow.vue'

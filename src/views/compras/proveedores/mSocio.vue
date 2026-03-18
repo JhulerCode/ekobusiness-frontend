@@ -65,8 +65,6 @@
 </template>
 
 <script>
-import { JdModal, JdInput, JdSelect, JdSwitch } from '@jhuler/components'
-
 import mSocioDirecciones from './mSocioDirecciones.vue'
 import mSocioContactos from './mSocioContactos.vue'
 import mSocioFinanzas from './mSocioFinanzas.vue'
@@ -82,10 +80,6 @@ import { jmsg } from '@/utils/swal'
 
 export default {
     components: {
-        JdModal,
-        JdSelect,
-        JdInput,
-        JdSwitch,
         mSocioDirecciones,
         mSocioContactos,
         mSocioFinanzas,

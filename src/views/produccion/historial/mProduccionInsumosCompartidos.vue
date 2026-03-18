@@ -100,7 +100,6 @@
 </template>
 
 <script>
-import { JdModal, JdInput, JdSelect, JdSelectQuery, JdTextArea, JdButton } from '@jhuler/components'
 import mProduccionInsumosDevolucion from '@/views/produccion/historial/mProduccionInsumosDevolucion.vue'
 
 import { useAuth } from '@/pinia/auth'
@@ -115,12 +114,6 @@ import dayjs from 'dayjs'
 
 export default {
     components: {
-        JdModal,
-        JdInput,
-        JdSelect,
-        JdSelectQuery,
-        JdTextArea,
-        JdButton,
         mProduccionInsumosDevolucion,
     },
     data: () => ({

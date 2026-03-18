@@ -46,8 +46,6 @@
 </template>
 
 <script>
-import { JdButton, JdTable } from '@jhuler/components'
-
 import mFormato from '@/views/calidad/formatos/mFormato.vue'
 
 import { useAuth } from '@/pinia/auth'
@@ -59,9 +57,6 @@ import { jmsg, jqst } from '@/utils/swal'
 
 export default {
     components: {
-        JdButton,
-        JdTable,
-
         mFormato,
     },
     data: () => ({

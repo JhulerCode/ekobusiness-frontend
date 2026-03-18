@@ -49,14 +49,10 @@
 </template>
 
 <script>
-import { JdButton } from '@jhuler/components'
 import { useAuth } from '@/pinia/auth'
 
 export default {
     name: 'JdButtonsOverflow',
-    components: {
-        JdButton,
-    },
     props: {
         actions: {
             type: Array,
@@ -199,7 +195,7 @@ export default {
     display: flex;
     align-items: center;
     position: relative;
-    min-height: 2.5rem; 
+    min-height: 2.5rem;
 
     &.align-right {
         justify-content: flex-end;

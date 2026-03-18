@@ -12,8 +12,6 @@
 </template>
 
 <script>
-import { mLogin } from '@jhuler/components'
-
 import ConsolaHeader from '@/views/_consola/ConsolaHeader.vue'
 import ConsolaSideBar from '@/views/_consola/ConsolaSideBar.vue'
 import ConsolaCenter from '@/views/_consola/ConsolaCenter.vue'
@@ -30,8 +28,6 @@ export default {
         ConsolaCenter,
 
         mUserPreferences,
-
-        mLogin,
     },
     data: () => ({
         useAuth: useAuth(),

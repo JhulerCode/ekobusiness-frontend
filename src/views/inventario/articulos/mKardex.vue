@@ -44,7 +44,6 @@
 </template>
 
 <script>
-import { JdModal, JdButton } from '@jhuler/components'
 import mTransaccion from '@/views/compras/compras/mTransaccion.vue'
 import JdPaginacion from '@/components/VistaLayout/JdPaginacion.vue'
 
@@ -60,8 +59,6 @@ import dayjs from 'dayjs'
 
 export default {
     components: {
-        JdModal,
-        JdButton,
         mTransaccion,
         JdPaginacion,
     },

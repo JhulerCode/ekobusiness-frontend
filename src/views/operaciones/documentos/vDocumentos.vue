@@ -15,8 +15,6 @@
 </template>
 
 <script>
-import { mPdfViewer } from '@jhuler/components'
-
 // Modales específicos
 import mDocumento from './mDocumento.vue'
 
@@ -33,7 +31,6 @@ export default {
     name: 'vDocumentos',
     components: {
         mDocumento,
-        mPdfViewer,
     },
     computed: {
         auth: () => useAuth(),

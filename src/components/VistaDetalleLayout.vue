@@ -123,7 +123,7 @@ const handleTabClick = (tabId) => {
         .principal-datos {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 0.5rem 2rem;
+            gap: 0.75rem 2rem;
             margin-bottom: 2rem;
         }
 
@@ -152,12 +152,12 @@ const handleTabClick = (tabId) => {
         }
 
         .pestanas-body {
-            padding: 1rem 0;
+            padding: 1rem 0 0;
 
             :deep(.container-datos) {
                 display: grid;
                 grid-template-columns: repeat(4, 1fr);
-                gap: 0.5rem 2rem;
+                gap: 0.75rem 2rem;
             }
         }
     }

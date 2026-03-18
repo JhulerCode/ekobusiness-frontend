@@ -35,7 +35,6 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { JdButton } from '@jhuler/components'
 import { useAuth } from '@/pinia/auth'
 
 const props = defineProps({

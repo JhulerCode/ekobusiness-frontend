@@ -18,10 +18,11 @@
             <JdSelect
                 label="Tipo"
                 :nec="true"
-                :lista="articulo_tipos || []"
+                :lista="vista.articulo_tipos || []"
                 v-model="vista.data.type"
                 style="grid-column: 1/2"
                 :disabled="vista.mode != 'edit'"
+                @elegir="setArticuloType"
             />
 
             <div class="flags">
@@ -70,16 +71,8 @@
 </template>
 
 <script>
-import { JdInput, JdSwitch, JdCheckBox, JdSelect } from '@jhuler/components'
-import { get, urls } from '@/utils/crud'
-import { useAuth } from '@/pinia/auth'
-import { useVistas } from '@/pinia/vistas'
-import { useSystem } from '@/pinia/system'
-
-// Configuración de la vista
 import VIEW_CONFIG from './articulos.config.js'
 
-// Subcomponentes
 import vArticuloDetalleGeneral from './vArticuloDetalleGeneral.vue'
 import vArticuloDetalleCompra from './vArticuloDetalleCompra.vue'
 import vArticuloDetalleVenta from './vArticuloDetalleVenta.vue'
@@ -87,13 +80,15 @@ import vArticuloDetalleInventario from './vArticuloDetalleInventario.vue'
 import vArticuloDetalleProduccion from './vArticuloDetalleProduccion.vue'
 import vArticuloDetalleComponentes from './vArticuloDetalleComponentes.vue'
 
+import { useAuth } from '@/pinia/auth'
+import { useVistas } from '@/pinia/vistas'
+import { useSystem } from '@/pinia/system'
+import { urls, get, patch } from '@/utils/crud'
+import { incompleteData } from '@/utils/mine.js'
+import { jmsg } from '@/utils/swal.js'
+
 export default {
     components: {
-        JdInput,
-        JdSelect,
-        JdSwitch,
-        JdCheckBox,
-
         vArticuloDetalleGeneral,
         vArticuloDetalleCompra,
         vArticuloDetalleVenta,
@@ -103,9 +98,6 @@ export default {
     },
     data: () => ({
         pestana: 1,
-
-        // Datos del sistema
-        articulo_tipos: [],
     }),
     computed: {
         auth: () => useAuth(),
@@ -168,17 +160,36 @@ export default {
 
         // --- Header actions ---
         editar() {
+            this.vista.original_data = JSON.parse(JSON.stringify(this.vista.data))
             this.updateHeaderActions('edit')
         },
         cancelar() {
-            // Opcional: recargar el artículo para deshacer cambios
-            // this.loadArticulo()
+            this.vista.data = JSON.parse(JSON.stringify(this.vista.original_data))
             this.updateHeaderActions('view')
         },
-        guardar() {
-            // Lógica final para de guardar aquí (ej: PUT/POST)
-            // ...
+        async guardar() {
+            if (this.checkDatos()) return
+            this.shapeDatos()
+
+            this.auth.setLoading(true)
+            const res = await patch(urls.articulos, this.vista.data)
+            this.auth.setLoading(false)
+
+            if (res.code != 0) return
+
             this.updateHeaderActions('view')
+        },
+
+        // -- Methods auxiliares ---
+        setArticuloType() {
+            if (this.vista.data.type == 'combo') {
+                this.vista.data.purchase_ok = false
+                this.vista.data.produce_ok = false
+            }
+
+            if (this.vista.data.type == 'service') {
+                this.vista.data.produce_ok = false
+            }
         },
         updateHeaderActions(mode) {
             this.vista.mode = mode
@@ -191,11 +202,50 @@ export default {
                 })
             }
         },
+        checkDatos() {
+            const props = ['nombre', 'type', 'igv_afectacion', 'unidad']
+
+            if (this.vista.data.type == 'combo') {
+                if (this.vista.data.combo_componentes.length == 0) {
+                    jmsg('warning', 'Agregue al menos un componente')
+                    return true
+                }
+
+                for (const a of this.vista.data.combo_componentes) {
+                    if (incompleteData(a, ['articulo', 'cantidad'])) {
+                        jmsg('warning', 'Ingrese los datos necesarios')
+                        return true
+                    }
+                }
+            }
+
+            if (this.vista.data.sale_ok == true) {
+                if (this.vista.data.is_ecommerce == true) {
+                    props.push('descripcion', 'precio')
+                }
+            }
+
+            if (incompleteData(this.vista.data, props)) {
+                jmsg('warning', 'Ingrese los datos necesarios')
+                return true
+            }
+
+            return false
+        },
+        shapeDatos() {
+            if (this.vista.data.type == 'combo') {
+                this.vista.data.purchase_ok = false
+            }
+
+            if (this.vista.data.precio_anterior == '') {
+                this.vista.data.precio_anterior = null
+            }
+        },
 
         // --- Data auxiliar ---
         async loadArticuloTipos() {
             await this.useSystem.load(['articulo_tipos'])
-            this.articulo_tipos = this.useSystem.get('articulo_tipos')
+            this.vista.articulo_tipos = this.useSystem.get('articulo_tipos')
         },
     },
 }

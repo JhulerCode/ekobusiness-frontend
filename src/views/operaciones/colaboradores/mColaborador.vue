@@ -168,8 +168,6 @@
 </template>
 
 <script>
-import { JdModal, JdInput, JdSelect, JdCheckBox, JdSwitch, JdButton } from '@jhuler/components'
-
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
 import { useVistas } from '@/pinia/vistas'
@@ -179,14 +177,6 @@ import { incompleteData } from '@/utils/mine'
 import { jmsg } from '@/utils/swal'
 
 export default {
-    components: {
-        JdModal,
-        JdInput,
-        JdSwitch,
-        JdSelect,
-        JdCheckBox,
-        JdButton,
-    },
     computed: {
         auth: () => useAuth(),
         modals: () => useModals(),

@@ -9,8 +9,6 @@
 </template>
 
 <script>
-import { JdModal } from '@jhuler/components'
-
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
 import { useModals } from '@/pinia/modals'
@@ -18,9 +16,6 @@ import { useModals } from '@/pinia/modals'
 import { urls, post } from '@/utils/crud'
 
 export default {
-    components: {
-        JdModal,
-    },
     data: () => ({
         useAuth: useAuth(),
         useVistas: useVistas(),

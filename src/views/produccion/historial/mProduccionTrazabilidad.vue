@@ -71,8 +71,6 @@
 </template>
 
 <script>
-import { JdModal, JdInput, JdSelect, JdSelectQuery, JdButton } from '@jhuler/components'
-
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
 
@@ -81,13 +79,6 @@ import { urls, get } from '@/utils/crud'
 import html2pdf from 'html2pdf.js'
 
 export default {
-    components: {
-        JdModal,
-        JdInput,
-        JdSelectQuery,
-        JdSelect,
-        JdButton,
-    },
     data: () => ({
         useAuth: useAuth(),
         useModals: useModals(),

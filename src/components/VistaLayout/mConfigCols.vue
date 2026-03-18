@@ -21,18 +21,12 @@
 </template>
 
 <script>
-import { JdModal, JdCheckBox } from '@jhuler/components'
-
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
 
 import { jmsg } from '@/utils/swal'
 
 export default {
-    components: {
-        JdModal,
-        JdCheckBox,
-    },
     data: () => ({
         useAuth: useAuth(),
         useModals: useModals(),

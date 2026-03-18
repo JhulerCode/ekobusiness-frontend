@@ -78,18 +78,11 @@
 </template>
 
 <script>
-import { JdInput, JdTextArea, JdCheckBox } from '@jhuler/components'
-
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
 import { useVistas } from '@/pinia/vistas'
 
 export default {
-    components: {
-        JdInput,
-        JdTextArea,
-        JdCheckBox,
-    },
     data: () => ({
         useAuth: useAuth(),
         useModals: useModals(),

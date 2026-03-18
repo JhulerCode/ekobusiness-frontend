@@ -111,8 +111,6 @@
 </template>
 
 <script>
-import { JdInput, JdSelectQuery, JdButton } from '@jhuler/components'
-
 import mPedidoItems from '@/views/compras/compras/mPedidoItems.vue'
 import mPedidoMrpBomLines from './mPedidoMrpBomLines.vue'
 import mTransaccionItemLotes from '@/views/compras/compras/mTransaccionItemLotes.vue'
@@ -127,10 +125,6 @@ import { obtenerNumeroJuliano, genCorrelativo } from '@/utils/mine'
 
 export default {
     components: {
-        JdInput,
-        JdSelectQuery,
-        JdButton,
-
         mPedidoItems,
         mPedidoMrpBomLines,
         mTransaccionItemLotes,

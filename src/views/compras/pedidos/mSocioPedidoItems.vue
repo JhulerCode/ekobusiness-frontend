@@ -44,8 +44,6 @@
 </template>
 
 <script>
-import { JdSelectQuery, JdButton } from '@jhuler/components'
-
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
 import { useVistas } from '@/pinia/vistas'
@@ -55,10 +53,6 @@ import { jmsg, jqst } from '@/utils/swal'
 import { tryOficialExcel, genCorrelativo } from '@/utils/mine'
 
 export default {
-    components: {
-        JdSelectQuery,
-        JdButton,
-    },
     data: () => ({
         useAuth: useAuth(),
         useModals: useModals(),

@@ -5,13 +5,16 @@
             'row-selected': item.selected,
             'row-reorderable': reorderable,
             'row-dragging': isDragging,
+            'row-focused': item.focused,
         }"
         :draggable="reorderable"
+        @click="$emit('select', item, index)"
         @dragstart="onDragStart"
         @dragover.prevent="onDragOver"
         @dragleave="onDragLeave"
         @drop="onDrop"
         @dragend="onDragEnd"
+        @dblclick="$emit('rowDblclick', item)"
     >
         <td v-if="reorderable" class="td-reorder">
             <i class="fa-solid fa-grip-vertical"></i>
@@ -79,7 +82,6 @@
 
 <script setup>
 import { ref } from 'vue'
-import { JdButton, JdCheckBox } from '@jhuler/components'
 import { useAuth } from '@/pinia/auth'
 import TableCell from './JdTableCell.vue'
 
@@ -106,6 +108,7 @@ const emit = defineEmits([
     'dragStart',
     'drop',
     'dragEnd',
+    'rowDblclick',
 ])
 
 const auth = useAuth()
@@ -187,6 +190,8 @@ const onDragEnd = () => {
 <style lang="scss" scoped>
 tr {
     border-bottom: var(--border);
+    scroll-margin-top: 2.3rem;
+
     &:hover {
         background-color: var(--bg-color-hover);
         .td-numero {
@@ -205,6 +210,13 @@ tr {
     &.row-dragging {
         opacity: 0.5;
         background-color: var(--bg-color-hover);
+    }
+    &.row-focused {
+        outline: 1px solid var(--primary-color);
+        outline-offset: -1px;
+        &:not(.row-selected) {
+            background-color: var(--bg-color-hover);
+        }
     }
     &.row-drag-over-top {
         border-top: 2px solid var(--primary-color) !important;

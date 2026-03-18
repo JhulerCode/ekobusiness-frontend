@@ -89,9 +89,6 @@
 </template>
 
 <script>
-import { JdModal, JdInput, JdSelect } from '@jhuler/components'
-import JdSelectQuery from '@/components/inputs/JdSelectQuery.vue'
-
 import { useAuth } from '@/pinia/auth'
 import { useSystem } from '@/pinia/system'
 import { useModals } from '@/pinia/modals'
@@ -100,12 +97,6 @@ import { urls, get } from '@/utils/crud'
 import { jmsg } from '@/utils/swal'
 
 export default {
-    components: {
-        JdModal,
-        JdInput,
-        JdSelect,
-        JdSelectQuery,
-    },
     data: () => ({
         useAuth: useAuth(),
         useSystem: useSystem(),

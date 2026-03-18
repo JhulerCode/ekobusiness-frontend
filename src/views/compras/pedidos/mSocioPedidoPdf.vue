@@ -217,8 +217,6 @@
 </template>
 
 <script>
-import { JdModal } from '@jhuler/components'
-
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
 
@@ -227,9 +225,6 @@ import { numeroATexto, redondear } from '@/utils/mine'
 import html2pdf from 'html2pdf.js'
 
 export default {
-    components: {
-        JdModal,
-    },
     data: () => ({
         useAuth: useAuth(),
         useModals: useModals(),

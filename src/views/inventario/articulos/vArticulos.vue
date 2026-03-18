@@ -11,6 +11,7 @@
             :rowSelectable="true"
             :rowOptions="vista.tableRowActions"
             @rowOptionSelected="vista.runMethod"
+            @rowDblclick="ver"
         />
     </VistaLayout>
 
@@ -122,6 +123,7 @@ export default {
 
         // Table row actions
         ver(item) {
+            if (!this.auth.verifyPermiso(`${VIEW_CONFIG.name}:ver`)) return
             this.$router.push(`/consola/inventario/articulos/${item.id}`)
         },
         async editar(item) {

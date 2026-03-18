@@ -132,8 +132,6 @@
 </template>
 
 <script>
-import { JdModal, JdInput, JdSelect, JdTextArea } from '@jhuler/components'
-
 import mTransaccionItems from './mTransaccionItems.vue'
 import mTransaccionFinanzas from './mTransaccionFinanzas.vue'
 
@@ -149,11 +147,6 @@ import dayjs from 'dayjs'
 
 export default {
     components: {
-        JdModal,
-        JdInput,
-        JdSelect,
-        JdTextArea,
-
         mTransaccionItems,
         mTransaccionFinanzas,
     },

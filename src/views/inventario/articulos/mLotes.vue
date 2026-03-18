@@ -28,7 +28,6 @@
 </template>
 
 <script>
-import { JdModal } from '@jhuler/components'
 import mTransaccion from '@/views/compras/compras/mTransaccion.vue'
 
 import { useAuth } from '@/pinia/auth'
@@ -42,7 +41,6 @@ import dayjs from 'dayjs'
 
 export default {
     components: {
-        JdModal,
         mTransaccion,
     },
     data: () => ({

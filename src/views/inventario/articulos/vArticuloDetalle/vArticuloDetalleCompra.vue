@@ -2,98 +2,144 @@
     <div class="container-datos">
         <JdTable
             :columns="columns_suppliers"
-            :datos="articulo_suppliers || []"
-            :showResumen="false"
-            style="grid-column: 1/3"
+            :datos="vista.data.articulo_suppliers || []"
+            :rowOptions="rowActions"
+            rowOptionsMode="buttons"
+            @rowOptionSelected="runMethod"
+            :inputsDisabled="vista.mode == 'view'"
+            :agregarFila="addSupplier"
+            style="grid-column: 1/5"
         />
     </div>
 </template>
 
 <script>
-import { JdTable } from '@jhuler/components'
-import { urls, get } from '@/utils/crud'
+import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
+import { urls, get } from '@/utils/crud'
 
 export default {
-    components: {
-        JdTable,
-    },
     computed: {
+        auth: () => useAuth(),
         vistas: () => useVistas(),
+        columns_suppliers() {
+            return [
+                {
+                    id: 'socio',
+                    title: 'Proveedor',
+                    width: '20rem',
+                    input: true,
+                    select_query: {
+                        mostrar: 'nombres',
+                        search: this.loadProveedores,
+                    },
+                    show: true,
+                    sort: true,
+                },
+                {
+                    id: 'min_qty',
+                    title: 'Cantidad mínima',
+                    type: 'number',
+                    input: true,
+                    width: '6rem',
+                    show: true,
+                    sort: true,
+                },
+                {
+                    id: 'price',
+                    title: 'Precio',
+                    type: 'number',
+                    input: true,
+                    width: '6rem',
+                    show: true,
+                    sort: true,
+                },
+                {
+                    id: 'currency_id',
+                    title: 'Moneda',
+                    width: '10rem',
+                    input: true,
+                    select_query: {
+                        search: this.loadMonedas,
+                    },
+                    show: true,
+                    sort: true,
+                },
+                {
+                    id: 'delay',
+                    title: 'Lead time (días)',
+                    type: 'number',
+                    input: true,
+                    width: '6rem',
+                    show: true,
+                    sort: true,
+                },
+                {
+                    id: 'date_start',
+                    title: 'Fecha inicio',
+                    type: 'date',
+                    input: true,
+                    width: '10rem',
+                    show: true,
+                    sort: true,
+                },
+                {
+                    id: 'date_end',
+                    title: 'Fecha fin',
+                    type: 'date',
+                    input: true,
+                    width: '10rem',
+                    show: true,
+                    sort: true,
+                },
+                {
+                    id: 'product_code',
+                    title: 'Código de producto del proveedor',
+                    type: 'text',
+                    input: true,
+                    width: '8rem',
+                    show: true,
+                    sort: true,
+                },
+                {
+                    id: 'product_name',
+                    title: 'Nombre de producto del proveedor',
+                    type: 'text',
+                    input: true,
+                    width: '20rem',
+                    show: true,
+                    sort: true,
+                },
+            ]
+        },
+        rowActions() {
+            return [
+                {
+                    icon: 'fa-solid fa-trash-can',
+                    title: 'Eliminar',
+                    action: 'removeSupplier',
+                },
+            ]
+        },
     },
     data: () => ({
         vista: {},
-        articulo_suppliers: [],
-        columns_suppliers: [
-            {
-                id: 'socio',
-                title: 'Proveedor',
-                width: '20rem',
-                show: true,
-            },
-            {
-                id: 'min_qty',
-                title: 'Cantidad mínima',
-                type: 'number',
-                width: '6rem',
-                show: true,
-            },
-            {
-                id: 'price',
-                title: 'Precio',
-                type: 'number',
-                width: '6rem',
-                show: true,
-            },
-            {
-                id: 'currency_id',
-                title: 'Moneda',
-                width: '10rem',
-                show: true,
-            },
-            {
-                id: 'delay',
-                title: 'Lead time (días)',
-                type: 'number',
-                width: '6rem',
-                show: true,
-            },
-            {
-                id: 'date_start',
-                title: 'Fecha inicio',
-                type: 'date',
-                width: '10rem',
-                show: true,
-            },
-            {
-                id: 'date_end',
-                title: 'Fecha fin',
-                type: 'date',
-                width: '10rem',
-                show: true,
-            },
-            {
-                id: 'product_code',
-                title: 'Código de producto del proveedor',
-                type: 'text',
-                width: '8rem',
-                show: true,
-            },
-            {
-                id: 'product_name',
-                title: 'Nombre de producto del proveedor',
-                type: 'text',
-                width: '20rem',
-                show: true,
-            },
-        ],
     }),
     created() {
         this.vista = this.vistas.vArticuloDetalle
-        this.loadArticuloSuppliers()
+
+        if (this.vista.mode != 1 && !this.vista.articulo_suppliers_loaded) {
+            this.loadArticuloSuppliers()
+        }
     },
     methods: {
+        runMethod(method, item) {
+            this[method](item)
+        },
         async loadArticuloSuppliers() {
+            this.vista.articulo_suppliers_loaded = true
+            this.vista.data.articulo_suppliers = []
+
             const qry = {
                 fltr: {
                     articulo: { op: 'Es', val: this.vista.data.id },
@@ -102,20 +148,61 @@ export default {
                 incl: ['socio1', 'currency_id1'],
             }
 
+            this.auth.setLoading(true, 'Cargando...')
             const res = await get(`${urls.articulo_suppliers}?qry=${JSON.stringify(qry)}`)
-            if (res.code !== 0) return
+            this.auth.setLoading(false)
 
-            for (const a of res.data) {
-                // Populate strings for JdTable reading
-                a.socio = a.socio1?.nombres || ''
-                a.currency_id = a.currency_id1?.nombre || ''
+            if (res.code != 0) return
+            this.vista.data.articulo_suppliers = res.data
+        },
+        addSupplier() {
+            this.vista.data.articulo_suppliers.push({
+                table_columns: {},
+                id: crypto.randomUUID(),
+            })
+        },
+        async removeSupplier(item) {
+            const i = this.vista.data.articulo_suppliers.findIndex((a) => a.id == item.id)
+            this.vista.data.articulo_suppliers.splice(i, 1)
+        },
+
+        // --- Datos auxiliares ---
+        async loadProveedores(txtBuscar) {
+            const qry = {
+                fltr: { activo: { op: 'Es', val: true } },
+                cols: ['nombres'],
+                ordr: [['nombres', 'ASC']],
+                limt: 25,
             }
 
-            this.articulo_suppliers = res.data
+            if (txtBuscar) {
+                qry.fltr.nombres = { op: 'Contiene', val: txtBuscar }
+            }
+
+            const res = await get(`${urls.socios}?qry=${JSON.stringify(qry)}`)
+
+            if (res.code !== 0) return []
+
+            return res.data
+        },
+        async loadMonedas(txtBuscar) {
+            const qry = {
+                fltr: { activo: { op: 'Es', val: true } },
+                cols: ['nombre'],
+                ordr: [['nombre', 'ASC']],
+                limt: 25,
+            }
+
+            if (txtBuscar) {
+                qry.fltr.nombre = { op: 'Contiene', val: txtBuscar }
+            }
+
+            const res = await get(`${urls.monedas}?qry=${JSON.stringify(qry)}`)
+
+            if (res.code != 0) return []
+
+            return res.data
         },
     },
 }
 </script>
-
-<style lang="scss" scoped>
-</style>

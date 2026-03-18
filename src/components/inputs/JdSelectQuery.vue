@@ -50,16 +50,16 @@
                     borderRadius="0.2rem"
                     :shadowBack="false"
                     :rellenar="false"
-                    v-if="spin"
+                    v-if="computedSpin"
                 />
 
                 <template v-else>
-                    <div v-if="txtBuscar !== '' && lista.length == 0" class="notes">
+                    <div v-if="txtBuscar !== '' && computedLista.length == 0" class="notes">
                         <small>Sin resultados</small>
                     </div>
 
-                    <ul v-if="lista.length > 0">
-                        <li v-for="(a, i) in lista" :key="i" @click="elegir(a[id])">
+                    <ul v-if="computedLista.length > 0">
+                        <li v-for="(a, i) in computedLista" :key="i" @click="elegir(a[id])">
                             {{ getNestedProp(a, mostrar) }}
                         </li>
                     </ul>
@@ -88,8 +88,16 @@ export default {
         id: { type: String, default: 'id' },
         mostrar: { type: String, default: 'nombre' },
 
-        spin: { type: Boolean, default: false },
-        lista: { type: Array, default: () => [] },
+        // Props opcionales (para mantener compatibilidad o manejo externo)
+        spin: { type: Boolean, default: null },
+        lista: { type: Array, default: null },
+
+        // Prop para búsqueda (función que devuelve la lista o URL/Recurso)
+        // Si se pasa una función, el componente gestionará su propio estado interno
+        search: { type: Function, default: null },
+
+        // Nuevo: Objeto seleccionado inicial (evita depender de la lista para mostrar el valor)
+        selectedObject: { type: Object, default: null },
     },
     computed: {
         inputModel: {
@@ -105,17 +113,28 @@ export default {
                 this.inputModel !== null && this.inputModel !== undefined && this.inputModel !== ''
             )
         },
+        // Gestión cruzada entre lista interna (auto-gestionada) y externa (prop)
+        computedLista() {
+            return this.lista !== null ? this.lista : this.internalLista
+        },
+        computedSpin() {
+            return this.spin !== null ? this.spin : this.internalSpin
+        },
         mostrarValor() {
-            if (
-                this.inputModel !== null &&
-                this.inputModel !== undefined &&
-                this.inputModel !== ''
-            ) {
-                const send = this.lista.find((a) => a[this.id] == this.inputModel)
+            if (!this.hasValue) return ''
 
-                if (send) {
-                    return this.getNestedProp(send, this.mostrar)
-                }
+            // 1. Prioridad: Buscar en la lista actual (resultados de búsqueda)
+            const matchInList = this.computedLista.find((a) => a[this.id] == this.inputModel)
+            if (matchInList) {
+                return this.getNestedProp(matchInList, this.mostrar)
+            }
+
+            // 2. Fallback: Usar el objeto inicial si coincide con el id
+            if (
+                this.selectedObject &&
+                this.getNestedProp(this.selectedObject, this.id) == this.inputModel
+            ) {
+                return this.getNestedProp(this.selectedObject, this.mostrar)
             }
 
             return ''
@@ -125,10 +144,11 @@ export default {
         isVisible: false,
         txtBuscar: '',
         searchTimeOut: null,
+
+        // Estado interno para cuando el componente es autónomo
+        internalLista: [],
+        internalSpin: false,
     }),
-    mounted() {
-        this.init(this.inputModel)
-    },
     methods: {
         handleClickOutside(event) {
             const el = this.$refs['lista-box']
@@ -170,27 +190,12 @@ export default {
             document.removeEventListener('click', this.handleClickOutside)
             window.removeEventListener('keydown', this.handleEscapeKey)
         },
-        init(id) {
-            if (id !== null && id !== undefined) {
-                if (this.lista.length > 0) {
-                    this.inputModel = id
-                } else {
-                    const inter = setInterval(() => {
-                        if (this.lista.length > 0) {
-                            this.inputModel = id
-
-                            clearInterval(inter)
-                        }
-                    }, 100)
-                }
-            }
-        },
         elegir(id) {
             this.inputModel = id
 
             this.$emit(
                 'elegir',
-                this.lista.find((a) => a[this.id] == id),
+                this.computedLista.find((a) => a[this.id] == id),
             )
 
             this.ocultar()
@@ -217,8 +222,8 @@ export default {
             })
 
             // Solo buscamos si la lista está vacía y no estamos cargando
-            if (this.lista.length === 0 && !this.spin) {
-                this.$emit('search', '')
+            if (this.computedLista.length === 0 && !this.computedSpin) {
+                this.execSearch('')
             }
         },
         handleInput() {
@@ -227,11 +232,24 @@ export default {
             this.toogleList()
 
             this.searchTimeOut = setTimeout(() => {
-                this.$emit('search', this.txtBuscar)
+                this.execSearch(this.txtBuscar)
             }, 500)
         },
-        async search() {
-            this.$emit('search', this.txtBuscar)
+        async execSearch(txt) {
+            // Si hay un handler de búsqueda (función), lo usamos de forma autónoma
+            if (this.search) {
+                this.internalSpin = true
+                const res = await this.search(txt)
+                this.internalSpin = false
+
+                // Si la función devuelve la lista, la guardamos internamente
+                if (Array.isArray(res)) {
+                    this.internalLista = res
+                }
+            } else {
+                // Si no hay handler, emitimos para que el padre la maneje externamente (retrocompatibilidad)
+                this.$emit('search', txt)
+            }
         },
     },
 }

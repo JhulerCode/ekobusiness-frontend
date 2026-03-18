@@ -100,7 +100,6 @@
 
 <script setup>
 import { computed, nextTick } from 'vue'
-import { JdButton } from '@jhuler/components'
 import { useAuth } from '@/pinia/auth'
 import { useTable } from './useTable'
 import TableHead from './JdTableHead.vue'

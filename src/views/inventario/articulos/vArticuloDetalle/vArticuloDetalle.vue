@@ -142,6 +142,9 @@ export default {
         await this.loadArticuloTipos()
         await this.loadArticulo()
     },
+    unmounted() {
+        delete this.vistas[VIEW_CONFIG.name]
+    },
     methods: {
         runMethod(method, item) {
             this[method](item)
@@ -160,31 +163,26 @@ export default {
             if (res.code === 0) {
                 this.vista.data = res.data
                 document.title = `${this.vista.data.nombre}`
-
-                this.vista.articulo_categorias = [{ ...res.data.categoria1 }]
-                this.vista.articulo_linea = [{ ...res.data.linea1 }]
             }
         },
 
         // --- Header actions ---
         editar() {
-            this.vista.mode = 'edit'
-            this.updateHeaderActions()
+            this.updateHeaderActions('edit')
         },
         cancelar() {
-            this.vista.mode = 'view'
             // Opcional: recargar el artículo para deshacer cambios
             // this.loadArticulo()
-            this.updateHeaderActions()
+            this.updateHeaderActions('view')
         },
         guardar() {
             // Lógica final para de guardar aquí (ej: PUT/POST)
             // ...
-            this.vista.mode = 'view'
-            this.updateHeaderActions()
+            this.updateHeaderActions('view')
         },
-        updateHeaderActions() {
-            const isEdit = this.vista.mode === 'edit'
+        updateHeaderActions(mode) {
+            this.vista.mode = mode
+            const isEdit = mode === 'edit'
             if (this.vista.headerActions) {
                 this.vista.headerActions.forEach((action) => {
                     if (action.action === 'editar') action.show = !isEdit

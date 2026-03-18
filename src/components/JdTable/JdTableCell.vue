@@ -37,10 +37,9 @@
             v-else-if="column.select_query"
             v-model="item[column.id]"
             v-bind="column.select_query"
-            :spin="item.table_columns?.[`${column.id}_spin`]"
-            :lista="item.table_columns?.[`${column.id}_lista`]"
+            :search="(txt) => column.select_query.search(txt, item, column)"
+            :selectedObject="item[column.select_query.selectedObjectProp || (column.id + '1')]"
             :disabled="item.table_columns?.[`${column.id}_disabled`] || disabled"
-            @search="(txt) => column.select_query.search(txt, item, column)"
         />
 
         <JdCheckBox
@@ -95,11 +94,10 @@
 
 <script setup>
 import { computed } from 'vue'
-import { JdInput, JdCheckBox, JdSelect, JdTextArea, JdSelectQuery } from '@jhuler/components'
 import { redondear } from '@/utils/mine'
 
 const props = defineProps(['column', 'item', 'disabled'])
-const emit = defineEmits(['onChange', 'onInput'])
+defineEmits(['onChange', 'onInput'])
 
 const value = computed(() => {
     const prop = props.column.prop || props.column.id

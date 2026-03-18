@@ -25,10 +25,9 @@
 
         <JdSelectQuery
             label="Categoría"
-            :spin="vista.spin_articulo_categorias"
-            :lista="vista.articulo_categorias"
-            @search="loadCategorias"
+            :search="loadCategorias"
             v-model="vista.data.categoria"
+            :selectedObject="vista.data.categoria1"
             :disabled="vista.mode != 'edit'"
         />
 
@@ -89,28 +88,22 @@ export default {
             this.mp_tipos = this.useSystem.get('mp_tipos')
         },
         async loadCategorias(txtBuscar) {
-            if (!txtBuscar) {
-                this.vista.articulo_categorias.length = 0
-                return
-            }
-
             const qry = {
-                fltr: {
-                    activo: { op: 'Es', val: true },
-                    nombre: { op: 'Contiene', val: txtBuscar },
-                },
+                fltr: { activo: { op: 'Es', val: true } },
                 cols: ['nombre'],
                 ordr: [['nombre', 'ASC']],
+                limt: 25,
             }
 
-            this.vista.articulo_categorias = []
-            this.vista.spin_articulo_categorias = true
+            if (txtBuscar) {
+                qry.fltr.nombre = { op: 'Contiene', val: txtBuscar }
+            }
+
             const res = await get(`${urls.articulo_categorias}?qry=${JSON.stringify(qry)}`)
-            this.vista.spin_articulo_categorias = false
 
-            if (res.code != 0) return
+            if (res.code != 0) return []
 
-            this.vista.articulo_categorias = res.data
+            return res.data
         },
     },
 }

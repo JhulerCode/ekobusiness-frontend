@@ -1,19 +1,17 @@
 <template>
     <JdTable
-        :columns="modal.mrp_bom_lines_columns"
+        :columns="mrpBomLinesColumns"
         :datos="modal.mrp_bom.mrp_bom_lines || []"
         :rowOptions="rowActions"
         rowOptionsMode="buttons"
-        class="jd-table"
+        @rowOptionSelected="runMethod"
         :inputsDisabled="!this.useAuth.verifyPermiso('vMrpBom:editar')"
         :agregarFila="addLine"
         :rowReorderable="this.useAuth.verifyPermiso('vMrpBom:editar')"
-        @rowOptionSelected="runMethod"
     />
 </template>
 
 <script>
-
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
 import { useVistas } from '@/pinia/vistas'
@@ -22,8 +20,7 @@ import { urls, get } from '@/utils/crud'
 import { genCorrelativo } from '@/utils/mine'
 
 export default {
-    components: {
-    },
+    components: {},
     data: () => ({
         useAuth: useAuth(),
         useModals: useModals(),
@@ -32,31 +29,8 @@ export default {
         modal: {},
     }),
     computed: {
-        rowActions() {
+        mrpBomLinesColumns() {
             return [
-                {
-                    icon: 'fa-solid fa-trash-can',
-                    title: 'Eliminar',
-                    action: 'removeLine',
-                    permiso: 'vMrpBom:editar',
-                },
-            ]
-        },
-    },
-    created() {
-        this.modal = this.useModals.mMrpBom
-        this.setMrpBomLinesColumns()
-
-        if (this.modal.mode != 1 && !this.modal.mrp_bom_lines_loaded) {
-            this.loadMrpBomLines()
-        }
-    },
-    methods: {
-        runMethod(method, item) {
-            this[method](item)
-        },
-        setMrpBomLinesColumns() {
-            this.modal.mrp_bom_lines_columns = [
                 {
                     id: 'articulo',
                     title: 'Artículo',
@@ -87,7 +61,29 @@ export default {
                 },
             ]
         },
+        rowActions() {
+            return [
+                {
+                    icon: 'fa-solid fa-trash-can',
+                    title: 'Eliminar',
+                    action: 'removeLine',
+                    permiso: 'vMrpBom:editar',
+                },
+            ]
+        },
+    },
+    created() {
+        this.modal = this.useModals.mMrpBom
+        this.setMrpBomLinesColumns()
 
+        if (this.modal.mode != 1 && !this.modal.mrp_bom_lines_loaded) {
+            this.loadMrpBomLines()
+        }
+    },
+    methods: {
+        runMethod(method, item) {
+            this[method](item)
+        },
         async loadMrpBomLines() {
             this.modal.mrp_bom_lines_loaded = true
             this.modal.mrp_bom.mrp_bom_lines = []
@@ -117,7 +113,7 @@ export default {
         },
         async loadArticulosConsumables(txtBuscar, fila, column) {
             if (!txtBuscar) {
-                fila.table_columns[column.id + '_lista'].length = 0
+                fila.table_columns[column.id + '_lista'] = []
                 return
             }
 

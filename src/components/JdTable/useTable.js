@@ -67,6 +67,7 @@ export function useTable(props, emit) {
     }
 
     function setFocus(newIndex) {
+        if (!props.rowFocusable) return
         if (focusedIndex.value >= 0 && focusedIndex.value < datosFiltrados.value.length) {
             datosFiltrados.value[focusedIndex.value].focused = false
         }

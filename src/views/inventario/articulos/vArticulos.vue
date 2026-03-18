@@ -12,6 +12,7 @@
             :rowOptions="vista.tableRowActions"
             @rowOptionSelected="vista.runMethod"
             @rowDblclick="ver"
+            :rowFocusable="true"
         />
     </VistaLayout>
 

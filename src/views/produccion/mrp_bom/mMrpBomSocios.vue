@@ -1,17 +1,16 @@
 <template>
     <JdTable
-        :columns="modal.mrp_bom_socios_columns"
+        :columns="mrpBomSociosColumns"
         :datos="modal.mrp_bom.mrp_bom_socios || []"
         :rowOptions="rowActions"
         rowOptionsMode="buttons"
+        @rowOptionSelected="runMethod"
         :inputsDisabled="!this.useAuth.verifyPermiso('vMrpBom:editar')"
         :agregarFila="addLineSocio"
-        @rowOptionSelected="runMethod"
     />
 </template>
 
 <script>
-
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
 import { useVistas } from '@/pinia/vistas'
@@ -19,8 +18,7 @@ import { useVistas } from '@/pinia/vistas'
 import { urls, get } from '@/utils/crud'
 
 export default {
-    components: {
-    },
+    components: {},
     data: () => ({
         useAuth: useAuth(),
         useModals: useModals(),
@@ -29,31 +27,8 @@ export default {
         modal: {},
     }),
     computed: {
-        rowActions() {
+        mrpBomSociosColumns() {
             return [
-                {
-                    icon: 'fa-solid fa-trash-can',
-                    title: 'Eliminar',
-                    action: 'removeLineSocio',
-                    permiso: 'vMrpBom:editar',
-                },
-            ]
-        },
-    },
-    created() {
-        this.modal = this.useModals.mMrpBom
-        this.setMrpBomLinesColumns()
-
-        if (this.modal.mode != 1 && !this.modal.mrp_bom_socios_loaded) {
-            this.loadMrpBomSocios()
-        }
-    },
-    methods: {
-        runMethod(method, item) {
-            this[method](item)
-        },
-        setMrpBomLinesColumns() {
-            this.modal.mrp_bom_socios_columns = [
                 {
                     id: 'socio',
                     title: 'Subcontratistas',
@@ -67,7 +42,28 @@ export default {
                 },
             ]
         },
+        rowActions() {
+            return [
+                {
+                    icon: 'fa-solid fa-trash-can',
+                    title: 'Eliminar',
+                    action: 'removeLineSocio',
+                    permiso: 'vMrpBom:editar',
+                },
+            ]
+        },
+    },
+    created() {
+        this.modal = this.useModals.mMrpBom
 
+        if (this.modal.mode != 1 && !this.modal.mrp_bom_socios_loaded) {
+            this.loadMrpBomSocios()
+        }
+    },
+    methods: {
+        runMethod(method, item) {
+            this[method](item)
+        },
         async loadMrpBomSocios() {
             this.modal.mrp_bom_socios_loaded = true
             this.modal.mrp_bom.mrp_bom_socios = []
@@ -86,39 +82,14 @@ export default {
 
             if (res.code != 0) return
 
-            for (const a of res.data) {
-                a.table_columns = {
-                    socio_lista: [{ ...a.socio1 }],
-                }
-            }
+            // for (const a of res.data) {
+            //     a.table_columns = {
+            //         socio_lista: [{ ...a.socio1 }],
+            //     }
+            // }
 
             this.modal.mrp_bom.mrp_bom_socios = res.data
         },
-        async loadSocios(txtBuscar, fila, column) {
-            if (!txtBuscar) {
-                fila.table_columns[column.id + '_lista'].length = 0
-                return
-            }
-
-            const qry = {
-                fltr: {
-                    tipo: { op: 'Es', val: 1 },
-                    activo: { op: 'Es', val: true },
-                    nombres: { op: 'Contiene', val: txtBuscar },
-                },
-                cols: ['nombres'],
-                ordr: [['nombres', 'ASC']],
-            }
-
-            fila.table_columns[column.id + '_spin'] = true
-            const res = await get(`${urls.socios}?qry=${JSON.stringify(qry)}`)
-            fila.table_columns[column.id + '_spin'] = false
-
-            if (res.code !== 0) return
-
-            fila.table_columns[column.id + '_lista'] = res.data
-        },
-
         addLineSocio() {
             this.modal.mrp_bom.mrp_bom_socios.push({
                 table_columns: {},
@@ -128,6 +99,29 @@ export default {
         async removeLineSocio(item) {
             const i = this.modal.mrp_bom.mrp_bom_socios.findIndex((a) => a.id == item.id)
             this.modal.mrp_bom.mrp_bom_socios.splice(i, 1)
+        },
+
+        // --- Datos auxiliares ---
+        async loadSocios(txtBuscar) {
+            const qry = {
+                fltr: {
+                    tipo: { op: 'Es', val: 1 },
+                    activo: { op: 'Es', val: true },
+                },
+                cols: ['nombres'],
+                ordr: [['nombres', 'ASC']],
+                limt: 25,
+            }
+
+            if (txtBuscar) {
+                qry.fltr.nombres = { op: 'Contiene', val: txtBuscar }
+            }
+
+            const res = await get(`${urls.socios}?qry=${JSON.stringify(qry)}`)
+
+            if (res.code !== 0) return
+
+            return res.data
         },
     },
 }

@@ -8,7 +8,7 @@
             'row-focused': item.focused,
         }"
         :draggable="reorderable"
-        @click="$emit('select', item, index)"
+        @click="onRowClick"
         @dragstart="onDragStart"
         @dragover.prevent="onDragOver"
         @dragleave="onDragLeave"
@@ -184,6 +184,16 @@ const onDrop = (e) => {
 const onDragEnd = () => {
     isDragging.value = false
     emit('dragEnd')
+}
+
+const onRowClick = (e) => {
+    const isInput = ['INPUT', 'SELECT', 'TEXTAREA'].includes(e.target.tagName)
+    const isInsideInput = e.target.closest('input, select, textarea')
+    const isInsideActs = e.target.closest('.acts')
+
+    if (isInput || isInsideInput || isInsideActs) return
+
+    emit('select', props.item, props.index)
 }
 </script>
 

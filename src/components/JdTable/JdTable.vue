@@ -4,10 +4,10 @@
             ref="container"
             class="container-table"
             :style="{ minHeight }"
-            tabindex="0"
-            @keydown.up.prevent="focusUp"
-            @keydown.down.prevent="focusDown"
-            @keydown.enter.prevent="selectFocusedRow"
+            :tabindex="rowFocusable ? 0 : -1"
+            @keydown.up.prevent="rowFocusable && handleKeyDown($event, focusUp)"
+            @keydown.down.prevent="rowFocusable && handleKeyDown($event, focusDown)"
+            @keydown.enter.prevent="rowFocusable && handleKeyDown($event, selectFocusedRow)"
         >
             <table ref="jdtable" :class="{ 'table-cols-resizable': columnsResizable }">
                 <colgroup>
@@ -59,7 +59,7 @@
                             resizable: columnsResizable,
                             inputsDisabled,
                         }"
-                        @select="(item, index) => { selectRow(item, index); focusContainer() }"
+                        @select="(item, index) => { selectRow(item, index); rowFocusable && focusContainer() }"
                         @toggleOptions="toogleRowOptions"
                         @action="selectOptionRaw"
                         @dragStart="draggedRowIndex = $event"
@@ -135,6 +135,7 @@ const props = defineProps({
     rowReorderProp: { type: String, default: 'orden' },
     bulkActions: { type: Array, default: () => [] },
     agregarFila: Function,
+    rowFocusable: { type: Boolean, default: false },
 })
 
 const emit = defineEmits(['rowSelected', 'rowOptionSelected', 'onReorder', 'onChange', 'onInput', 'rowDblclick'])
@@ -168,6 +169,12 @@ watch(focusedIndex, (val) => {
 })
 
 const focusContainer = () => container.value?.focus()
+
+const handleKeyDown = (e, callback) => {
+    const isInput = ['INPUT', 'SELECT', 'TEXTAREA'].includes(document.activeElement.tagName)
+    if (isInput) return
+    callback()
+}
 
 const onColumnResize = ({ column, width }) => {
     column.width = `${width}px`

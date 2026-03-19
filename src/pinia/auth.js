@@ -9,6 +9,7 @@ export const useAuth = defineStore('auth', {
     state: () => ({
         token: null,
         usuario: {},
+        empresa: {},
         app_version: '2.0.0',
 
         menu: menuConfig,
@@ -24,6 +25,7 @@ export const useAuth = defineStore('auth', {
         initVars() {
             this.token = null
             this.usuario = {}
+            this.empresa = {}
             this.tables = {}
             this.avances = {}
         },
@@ -60,14 +62,14 @@ export const useAuth = defineStore('auth', {
             this.setInicialAvances(this.usuario.avances)
             // Formato de fecha
             this.showNavbar = this.usuario.menu_visible
+
+            if (result.empresa) {
+                this.empresa = deepCopy(result.empresa)
+            }
         },
         async logout(vueRouter) {
             this.setLoading(true, 'Cerrando sesion...')
-            await post(
-                `${urls.signin}/logout`,
-                { id: this.usuario.colaborador },
-                false,
-            )
+            await post(`${urls.signin}/logout`, { id: this.usuario.colaborador }, false)
             this.setLoading(false)
 
             this.clearAuth()

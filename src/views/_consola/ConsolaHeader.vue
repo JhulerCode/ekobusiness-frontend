@@ -40,9 +40,8 @@
                 </div>
             </div>
 
-            <div class="tenant-logo" v-if="useAuth.usuario?.empresa">
-                <img src="@/assets/img/logo-sunka-black.webp" v-if="!useAuth.isDarkMode" />
-                <img src="@/assets/img/logo-sunka-white.webp" v-else />
+            <div class="tenant-logo" v-if="useAuth.empresa">
+                <img :src="useAuth.empresa.logo.url" />
             </div>
         </div>
     </header>
@@ -71,10 +70,10 @@ export default {
 
             // Buscar en el menú basándonos en la ruta activa
             for (const section of this.useAuth.menu) {
-                const matches = section.children.filter(child => {
+                const matches = section.children.filter((child) => {
                     const childPath = `/consola/${child.path}`.replace(/\/+$/, '')
                     const normalizedCurrent = currentPath.replace(/\/+$/, '')
-                    
+
                     return (
                         child.goto === this.$route.name ||
                         normalizedCurrent === childPath ||
@@ -94,7 +93,7 @@ export default {
                     const isDetail =
                         activeChild.viewType === 'detail' ||
                         Object.keys(this.$route.params).length > 0
-                    
+
                     // Si es detalle, intentamos buscar el "Padre" (listado) para que no diga "Detalle Artículo"
                     let breadcrumbLabel = activeChild.label
                     let breadcrumbGoto = activeChild.goto
@@ -122,12 +121,15 @@ export default {
                             // Buscar nombre en el store de la vista
                             if (vista?.data?.nombre) {
                                 dynamicName = vista.data.nombre
-                            } else if (vista?.data?.razon_social) {
-                                dynamicName = vista.data.razon_social
                             } else {
                                 // Fallback: Limpiar el título
                                 const title = document.title.split(' - ')[0].trim()
-                                const forbidden = [section.label, activeChild.label, breadcrumbLabel, 'Consola']
+                                const forbidden = [
+                                    section.label,
+                                    activeChild.label,
+                                    breadcrumbLabel,
+                                    'Consola',
+                                ]
 
                                 if (title && !forbidden.includes(title)) {
                                     dynamicName = title

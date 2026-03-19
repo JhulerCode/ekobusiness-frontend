@@ -66,7 +66,7 @@ export default [
                 view: 'inventario/articulos/vArticuloDetalle/vArticuloDetalle.vue',
                 showInMenu: false, // Esta no aparecerá en el menú lateral
                 permission: 'vArticulos', // Usar el prefijo de permisos de artículos
-                viewType: 'detail'
+                viewType: 'detail',
             },
         ],
     },
@@ -498,6 +498,23 @@ export default [
             //     view: 'operaciones/sessions/vSessions.vue',
             //     permisos: [{ id: 'vSessions:listar', label: 'Listar' }],
             // },
+        ],
+    },
+    {
+        id: 'configuracion',
+        label: 'Configuración',
+        icon: 'fa-solid fa-screwdriver-wrench',
+        children: [
+            {
+                label: 'Mi Empresa',
+                goto: 'vEmpresa',
+                path: 'configuracion/empresa',
+                view: 'configuracion/empresa/vEmpresa.vue',
+                permisos: [
+                    { id: 'vEmpresa:ver', label: 'Ver' },
+                    { id: 'vEmpresa:editar', label: 'Editar' },
+                ],
+            },
         ],
     },
 ]

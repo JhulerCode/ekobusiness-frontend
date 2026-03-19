@@ -14,7 +14,6 @@ import VistaDetalleLayout from '@/components/VistaDetalleLayout.vue'
 import {
     JdButton,
     JdCheckBox,
-    JdInput,
     JdInputFile,
     JdInputPassword,
     JdSelect,
@@ -27,6 +26,7 @@ import {
     mPdfViewer,
     LoadingSpin,
 } from '@jhuler/components'
+import JdInput from '@/components/inputs/JdInput.vue'
 import JdSelectQuery from '@/components/inputs/JdSelectQuery.vue'
 
 createApp(App)

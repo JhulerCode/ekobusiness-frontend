@@ -5,7 +5,7 @@ export default {
 
     headerActions: [
         {
-            text: 'Asignar Suscripción',
+            text: 'Nuevo',
             action: 'nuevo',
             permiso: 'vAdminSuscripciones:crear',
         },

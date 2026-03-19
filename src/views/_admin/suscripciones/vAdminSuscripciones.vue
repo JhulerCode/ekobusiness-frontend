@@ -66,26 +66,29 @@ export default {
         async nuevo() {
             const send = {
                 suscripcion: {
-                    plan_nombre: 'PLAN ESTÁNDAR',
+                    plan_nombre: 'ESTÁNDAR',
                     periodo: 'mensual',
-                    limite_usuarios: 5,
-                    precio: 0,
-                    moneda: 'PEN',
                     fecha_inicio: dayjs().format('YYYY-MM-DD'),
                     fecha_vencimiento: dayjs().add(1, 'month').format('YYYY-MM-DD'),
-                    estado: 'ACTIVO',
                 },
             }
             this.modals.setModal('mAdminSuscripcion', 'Nueva Suscripción Global', 1, send, true)
         },
         async editar(item) {
+            const qry = {
+                incl: ['empresa1', 'moneda1'],
+            }
+
             this.auth.setLoading(true, 'Cargando...')
-            const res = await get(`${this.vista.apiUrl}/uno/${item.id}`)
+            const res = await get(`${this.vista.apiUrl}/uno/${item.id}?qry=${JSON.stringify(qry)}`)
             this.auth.setLoading(false)
+
             if (res.code != 0) return
+
             const send = {
                 suscripcion: { ...res.data },
             }
+
             this.modals.setModal('mAdminSuscripcion', 'Editar Suscripción Global', 2, send, true)
         },
     },

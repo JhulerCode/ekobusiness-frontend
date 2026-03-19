@@ -56,7 +56,7 @@ export default {
                 prop: 'fecha1',
                 width: '8rem',
                 show: true,
-                seek: true,
+
                 sort: true,
             },
             {
@@ -66,7 +66,7 @@ export default {
                 prop: 'produccion_orden1.linea1.nombre',
                 width: '10rem',
                 show: true,
-                seek: true,
+
                 sort: true,
             },
             {
@@ -76,7 +76,7 @@ export default {
                 prop: 'maquina1.nombre',
                 width: '8rem',
                 show: true,
-                seek: true,
+
                 sort: true,
             },
             {
@@ -86,7 +86,7 @@ export default {
                 prop: 'articulo1.nombre',
                 width: '25rem',
                 show: true,
-                seek: true,
+
                 sort: true,
             },
             {
@@ -95,7 +95,7 @@ export default {
                 type: 'text',
                 width: '7rem',
                 show: true,
-                seek: true,
+
                 sort: true,
             },
             {
@@ -105,7 +105,7 @@ export default {
                 type: 'date',
                 width: '8rem',
                 show: true,
-                seek: true,
+
                 sort: true,
             },
             {
@@ -115,7 +115,7 @@ export default {
                 toRight: true,
                 width: '8rem',
                 show: true,
-                seek: true,
+
                 sort: true,
             },
         ],

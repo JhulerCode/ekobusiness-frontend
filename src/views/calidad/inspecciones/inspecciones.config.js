@@ -43,7 +43,7 @@ export default {
             mostrar: 'nombres',
             width: '20rem',
             show: true,
-            seek: true,
+
             orden: 3,
         },
         {

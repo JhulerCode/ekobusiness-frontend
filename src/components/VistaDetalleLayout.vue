@@ -2,7 +2,7 @@
     <div class="vista-detalle" v-if="vista">
         <header class="header">
             <div class="header-left" style="flex-wrap: nowrap">
-                <strong style="white-space: nowrap">{{ title }}</strong>
+                <strong style="white-space: nowrap">{{ resolvedTitle }}</strong>
 
                 <slot name="header-left"></slot>
             </div>
@@ -10,9 +10,9 @@
             <div class="header-right">
                 <JdButtonsOverflow
                     v-if="vista.headerActions"
-                    :actions="vista.headerActions"
+                    :actions="[...basicActions, ...(vista.headerActions || [])]"
                     align="right"
-                    @actionSelected="(action) => $emit('runMethod', action)"
+                    @actionSelected="handleAction"
                 />
 
                 <slot name="header-right"></slot>
@@ -47,22 +47,79 @@
 
 <script setup>
 import { computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useVistas } from '@/pinia/vistas'
 import JdButtonsOverflow from './VistaLayout/JdButtonsOverflow.vue'
 
 const props = defineProps({
     vistaName: { type: String, required: true },
-    title: { type: String, required: false },
     pestanas: { type: Array, default: () => [] },
 })
 
+const route = useRoute()
 const vistas = useVistas()
 const vista = computed(() => vistas[props.vistaName])
 
-defineEmits(['runMethod'])
+const emit = defineEmits(['runMethod'])
+
+const resolvedTitle = computed(() => {
+    const id = route?.params?.id
+    if (id === 'nuevo') return 'Nuevo'
+    if (id) return vista.value?.data?.[vista.value?.titleKey ?? 'nombre']
+    return vista.value?.title
+})
+
+const basicActions = computed(() => {
+    const isEdit = vista.value?.mode === 'edit'
+    return [
+        {
+            text: 'Editar',
+            action: 'editar',
+            icon: 'fa-solid fa-pen-to-square',
+            permiso: ['vEmpresa:editar', 'vAdminSuscripciones:editar'],
+            show: !isEdit,
+        },
+        {
+            text: 'Cancelar',
+            action: 'cancelar',
+            icon: 'fa-solid fa-xmark',
+            tipo: '2',
+            show: isEdit,
+        },
+        {
+            text: 'Guardar',
+            action: 'guardar',
+            icon: 'fa-solid fa-floppy-disk',
+            show: isEdit,
+        },
+    ]
+})
 
 const handleTabClick = (tabId) => {
     vista.value.pestana = tabId
+}
+
+const router = useRouter()
+
+const handleAction = (action) => {
+    if (action === 'editar') {
+        const v = vista.value
+        v.original_data = JSON.parse(JSON.stringify(v.data))
+        v.mode = 'edit'
+        return
+    }
+    if (action === 'cancelar') {
+        if (route?.params?.id === 'nuevo') {
+            router.back()
+            return
+        }
+        const v = vista.value
+        v.data = JSON.parse(JSON.stringify(v.original_data))
+        v.mode = 'view'
+        return
+    }
+    // Cualquier otra acción (guardar, etc.) se delega al parent
+    emit('runMethod', action)
 }
 </script>
 

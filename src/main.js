@@ -14,7 +14,6 @@ import VistaDetalleLayout from '@/components/VistaDetalleLayout.vue'
 import {
     JdButton,
     JdCheckBox,
-    JdInputFile,
     JdInputPassword,
     JdSelect,
     JdSwitch,
@@ -28,6 +27,8 @@ import {
 } from '@jhuler/components'
 import JdInput from '@/components/inputs/JdInput.vue'
 import JdSelectQuery from '@/components/inputs/JdSelectQuery.vue'
+import JdInputFile from '@/components/inputs/JdInputFile.vue'
+import JdInputImage from '@/components/inputs/JdInputImage.vue'
 
 createApp(App)
     .use(router)
@@ -39,6 +40,7 @@ createApp(App)
     .component('JdCheckBox', JdCheckBox)
     .component('JdInput', JdInput)
     .component('JdInputFile', JdInputFile)
+    .component('JdInputImage', JdInputImage)
     .component('JdInputPassword', JdInputPassword)
     .component('JdSelect', JdSelect)
     .component('JdSelectQuery', JdSelectQuery)

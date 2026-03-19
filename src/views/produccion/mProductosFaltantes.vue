@@ -37,7 +37,7 @@ export default {
                 title: 'Producto',
                 width: '25rem',
                 show: true,
-                seek: true,
+
                 sort: true,
             },
             {

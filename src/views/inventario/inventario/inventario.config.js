@@ -26,7 +26,7 @@ export default {
             type: 'text',
             width: '30rem',
             show: true,
-            seek: true,
+
             orden: 2,
         },
         {
@@ -37,7 +37,7 @@ export default {
             relatedUrl: 'articulo_categorias',
             width: '12rem',
             show: true,
-            seek: true,
+
             orden: 3,
         },
         {

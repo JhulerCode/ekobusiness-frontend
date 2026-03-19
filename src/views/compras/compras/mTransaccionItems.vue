@@ -130,7 +130,7 @@ export default {
                 width: '23rem',
                 show: true,
                 sort: true,
-                seek: true,
+
             },
             {
                 id: 'unidad',

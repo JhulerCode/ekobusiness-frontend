@@ -171,7 +171,7 @@ export default {
                 prop: 'fecha1',
                 width: '8rem',
                 show: true,
-                seek: true,
+
                 sort: true,
             },
             {
@@ -180,21 +180,21 @@ export default {
                 title: 'Tipo compr.',
                 width: '10rem',
                 show: true,
-                seek: true,
+
             },
             {
                 id: 'comprobante_numero',
                 title: 'Nro compr.',
                 width: '10rem',
                 show: true,
-                seek: true,
+
             },
             {
                 id: 'detalle',
                 title: 'Detalle',
                 width: '20rem',
                 show: true,
-                seek: true,
+
             },
             {
                 id: 'monto',
@@ -202,7 +202,7 @@ export default {
                 format: 'decimal',
                 width: '10rem',
                 show: true,
-                seek: true,
+
             },
         ],
     }),

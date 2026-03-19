@@ -1,20 +1,24 @@
 <template>
     <VistaDetalleLayout
         v-if="vista && vista.data"
-        :vistaName="VIEW_CONFIG_NAME"
-        :title="VIEW_CONFIG_TITLE"
+        vistaName="vEmpresa"
         :pestanas="availableTabs"
         @runMethod="runMethod"
     >
         <template #principal-datos>
-            <JdInput label="RUC" :nec="true" v-model="vista.data.ruc" :disabled="true" />
+            <JdInput
+                label="RUC"
+                :nec="true"
+                v-model="vista.data.ruc"
+                :disabled="!is_nuevo ? true : vista.mode == 'view'"
+            />
 
             <JdInput
                 label="Razón Social"
                 :nec="true"
                 v-model="vista.data.razon_social"
                 style="grid-column: 1/3"
-                :disabled="true"
+                :disabled="!is_nuevo ? true : vista.mode == 'view'"
             />
 
             <JdInput
@@ -24,28 +28,13 @@
                 :disabled="vista.mode != 'edit'"
             />
 
-            <JdInputFile
-                label="Logo"
-                :nec="true"
-                accept="image/*"
+            <JdInputImage
                 v-model="vista.data.logo"
-                @handleFile="(file, blob) => ((vista.data.archivo = file), (vista.blob = blob))"
-                @deleteFile="((vista.data.archivo = null), (vista.blob = null))"
+                @handleFile="(file) => (vista.data.archivo = file)"
+                @deleteFile="vista.data.archivo = null"
                 :disabled="vista.mode != 'edit'"
+                style="grid-column: 4/5; grid-row: 1/4"
             />
-
-            <div class="empresa-logo" style="grid-column: 4/5; grid-row: 1/4">
-                <img
-                    :src="vista.blob"
-                    :alt="'logo-' + vista.data.razon_social"
-                    v-if="vista.data.archivo"
-                />
-                <img
-                    :src="vista.data.logo.url"
-                    :alt="'logo-' + vista.data.razon_social"
-                    v-if="vista.data.logo?.url"
-                />
-            </div>
         </template>
 
         <template #pestanas-body>
@@ -68,7 +57,7 @@ import vEmpresaDetalleBancos from './vEmpresaDetalleBancos.vue'
 import VIEW_CONFIG from './empresa.config.js'
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
-import { urls, get, patch } from '@/utils/crud'
+import { urls, get, post, patch } from '@/utils/crud'
 import { incompleteData } from '@/utils/mine.js'
 
 export default {
@@ -88,9 +77,6 @@ export default {
         VIEW_CONFIG_NAME() {
             return VIEW_CONFIG.name
         },
-        VIEW_CONFIG_TITLE() {
-            return VIEW_CONFIG.title
-        },
         availableTabs() {
             return [
                 { id: 1, label: 'General', show: true },
@@ -98,6 +84,9 @@ export default {
                 { id: 4, label: 'Bancos', show: true },
                 { id: 2, label: 'Redes y links', show: true },
             ]
+        },
+        is_nuevo() {
+            return this.$route.params.id === 'nuevo'
         },
     },
     async created() {
@@ -120,8 +109,20 @@ export default {
             this[method](item)
         },
         async loadEmpresa() {
+            const id = this.$route.params.id || 'mi-empresa'
+
+            if (id === 'nuevo') {
+                this.vista.data = {
+                    igv_porcentaje: 18,
+                    direcciones: [],
+                    bancos: [],
+                }
+                this.vista.mode = 'edit'
+                return
+            }
+
             this.auth.setLoading(true, 'Cargando datos de empresa...')
-            const res = await get(`${urls.empresas}/uno/mi-empresa`)
+            const res = await get(`${urls.empresas}/uno/${id}`)
             this.auth.setLoading(false)
 
             if (res.code === 0) {
@@ -131,41 +132,30 @@ export default {
         },
 
         // --- Header actions ---
-        editar() {
-            this.vista.original_data = JSON.parse(JSON.stringify(this.vista.data))
-            this.updateHeaderActions('edit')
-        },
-        cancelar() {
-            this.vista.data = JSON.parse(JSON.stringify(this.vista.original_data))
-            this.updateHeaderActions('view')
-        },
         async guardar() {
             if (this.checkDatos()) return
             this.shapeDatos()
 
-            this.auth.setLoading(true, 'Actualizando...')
-            const res = await patch(urls.empresas, this.vista.data)
+            this.auth.setLoading(true, 'Guardando...')
+            let res
+            if (this.is_nuevo) {
+                res = await post(urls.empresas, this.vista.data)
+            } else {
+                res = await patch(urls.empresas, this.vista.data)
+            }
             this.auth.setLoading(false)
 
             if (res.code != 0) return
 
-            this.updateHeaderActions('view')
+            if (this.is_nuevo) {
+                this.$router.push({ name: 'vAdminEmpresaDetalle', params: { id: res.data.id } })
+            }
+
+            this.vista.mode = 'view'
         },
 
-        // -- Methods auxiliares ---
-        updateHeaderActions(mode) {
-            this.vista.mode = mode
-            const isEdit = mode === 'edit'
-            if (this.vista.headerActions) {
-                this.vista.headerActions.forEach((action) => {
-                    if (action.action === 'editar') action.show = !isEdit
-                    if (action.action === 'cancelar') action.show = isEdit
-                    if (action.action === 'guardar') action.show = isEdit
-                })
-            }
-        },
         checkDatos() {
-            const props = ['razon_social', 'ruc']
+            const props = ['razon_social', 'ruc', 'subdominio', 'igv_porcentaje']
             if (incompleteData(this.vista.data, props)) {
                 return true
             }
@@ -177,18 +167,3 @@ export default {
     },
 }
 </script>
-
-<style lang="scss" scoped>
-.empresa-logo {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0.5rem;
-    border: var(--border);
-
-    img {
-        max-width: calc(100% - 1rem);
-        border-radius: 0.5rem;
-    }
-}
-</style>

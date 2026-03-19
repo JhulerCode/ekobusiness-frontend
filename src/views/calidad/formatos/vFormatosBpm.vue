@@ -73,7 +73,7 @@ export default {
                 title: 'Código',
                 width: '10rem',
                 show: true,
-                seek: true,
+
                 sort: true,
             },
             {
@@ -81,7 +81,7 @@ export default {
                 title: 'Nombre',
                 width: '30rem',
                 show: true,
-                seek: true,
+
                 sort: true,
             },
         ],

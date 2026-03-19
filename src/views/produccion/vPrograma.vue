@@ -385,7 +385,7 @@ export default {
                 prop: 'articulo1.nombre',
                 width: '30rem',
                 show: true,
-                seek: true,
+
             },
             {
                 id: 'cantidad_necesitada',

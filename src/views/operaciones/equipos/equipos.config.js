@@ -32,7 +32,7 @@ export default {
             type: 'text',
             width: '8rem',
             show: true,
-            seek: true,
+
             orden: 2,
         },
         {
@@ -41,7 +41,7 @@ export default {
             type: 'text',
             width: '20rem',
             show: true,
-            seek: true,
+
             orden: 3,
         },
         {

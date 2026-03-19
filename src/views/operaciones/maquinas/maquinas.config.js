@@ -32,7 +32,7 @@ export default {
             type: 'text',
             width: '15rem',
             show: true,
-            seek: true,
+
             orden: 2,
         },
         {
@@ -43,7 +43,7 @@ export default {
             relatedUrl: 'articulo_lineas',
             width: '15rem',
             show: true,
-            seek: true,
+
             orden: 3,
         },
         {

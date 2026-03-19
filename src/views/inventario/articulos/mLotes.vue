@@ -59,7 +59,7 @@ export default {
                 title: 'Lote',
                 width: '8rem',
                 show: true,
-                seek: true,
+
                 sort: true,
             },
             {
@@ -68,7 +68,7 @@ export default {
                 prop: 'fv1',
                 width: '8rem',
                 show: true,
-                seek: true,
+
                 sort: true,
             },
             {
@@ -77,7 +77,7 @@ export default {
                 width: '8rem',
                 format: 'decimal',
                 show: true,
-                seek: true,
+
                 sort: true,
             },
         ],

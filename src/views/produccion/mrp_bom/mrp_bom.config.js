@@ -26,7 +26,7 @@ export default {
             relatedUrl: 'articulos',
             width: '25rem',
             show: true,
-            seek: true,
+
             orden: 1,
         },
         {

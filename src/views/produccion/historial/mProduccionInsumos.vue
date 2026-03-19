@@ -132,7 +132,7 @@ export default {
                 prop: 'fecha1',
                 width: '7rem',
                 show: true,
-                seek: true,
+
                 sort: true,
             },
             {
@@ -141,7 +141,7 @@ export default {
                 prop: 'articulo1.nombre',
                 width: '20rem',
                 show: true,
-                seek: true,
+
                 sort: true,
             },
             {
@@ -150,7 +150,7 @@ export default {
                 prop: 'articulo1.unidad',
                 width: '5rem',
                 show: true,
-                seek: true,
+
             },
             {
                 id: 'cantidad',
@@ -159,7 +159,7 @@ export default {
                 toRight: true,
                 width: '8rem',
                 show: true,
-                seek: true,
+
             },
             {
                 id: 'lote',
@@ -167,7 +167,7 @@ export default {
                 prop: 'lote_padre1.lote',
                 width: '7rem',
                 show: true,
-                seek: true,
+
             },
             {
                 id: 'fv',
@@ -175,7 +175,7 @@ export default {
                 prop: 'lote_padre1.fv',
                 width: '7rem',
                 show: true,
-                seek: true,
+
             },
         ],
     }),

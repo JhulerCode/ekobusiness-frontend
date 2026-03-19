@@ -4,6 +4,7 @@
         <JdInput label="Correo" v-model="vista.data.correo" :disabled="vista.mode != 'edit'" />
         <JdInput
             label="IGV %"
+            :nec="true"
             type="number"
             v-model="vista.data.igv_porcentaje"
             :disabled="vista.mode != 'edit'"
@@ -13,7 +14,12 @@
             v-model="vista.data.yape_number"
             :disabled="vista.mode != 'edit'"
         />
-        <JdInput label="Subdominio" v-model="vista.data.subdominio" :disabled="true" />
+        <JdInput
+            label="Subdominio"
+            :nec="true"
+            v-model="vista.data.subdominio"
+            :disabled="!is_nuevo"
+        />
     </div>
 </template>
 
@@ -26,6 +32,9 @@ export default {
         vistas: () => useVistas(),
         vista() {
             return this.vistas.vEmpresa
+        },
+        is_nuevo() {
+            return this.$route.params.id === 'nuevo'
         },
     },
 }

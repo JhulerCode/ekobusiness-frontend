@@ -3,12 +3,29 @@ import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
 
 import menuConfig from '@/config/menu.js'
+import menuAdmin from '@/config/menuAdmin.js'
 const viewsModules = import.meta.glob('../views/**/*.vue')
 
 // ----- RUTAS HIJAS DE LA CONSOLA (DINÁMICAS) ----- //
 const consolaChildren = []
 
 menuConfig.forEach((section) => {
+    section.children.forEach((item) => {
+        consolaChildren.push({
+            path: item.path,
+            name: item.goto,
+            meta: {
+                title: item.label,
+                vistaName: item.goto,
+                viewType: item.viewType || 'list',
+                permission: item.permission || item.goto,
+            },
+            component: viewsModules[`../views/${item.view}`],
+        })
+    })
+})
+
+menuAdmin.forEach((section) => {
     section.children.forEach((item) => {
         consolaChildren.push({
             path: item.path,
@@ -73,10 +90,14 @@ router.beforeEach(async (to, from, next) => {
 
         // Verificar permisos de la vista
         if (to.meta.permission) {
-            const permisos = auth.usuario?.permisos || []
-            // Cambiado para que si el permiso es 'vArticulos:listar' y la ruta pide 'vArticuloDetalle', 
-            // se pueda manejar de forma más flexible o específica.
-            const hasPermission = permisos.some((p) => p.startsWith(to.meta.permission + ':'))
+            const permissions = Array.isArray(to.meta.permission)
+                ? to.meta.permission
+                : [to.meta.permission]
+            const hasPermission = permissions.some(
+                (perm) =>
+                    auth.verifyPermiso(perm) ||
+                    (auth.usuario?.permisos || []).some((p) => p.startsWith(perm + ':')),
+            )
 
             if (!hasPermission) {
                 if (from.name && from.name !== 'SignIn') return next(false)

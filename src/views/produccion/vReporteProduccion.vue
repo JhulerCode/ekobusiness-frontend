@@ -103,7 +103,7 @@ export default {
                 title: 'Nombre',
                 width: '25rem',
                 show: true,
-                seek: true,
+
                 sort: true,
             },
             {
@@ -113,7 +113,7 @@ export default {
                 toRight: true,
                 width: '7rem',
                 show: true,
-                seek: true,
+
                 sort: true,
             },
         ],
@@ -124,7 +124,7 @@ export default {
                 title: 'Nombre',
                 width: '15rem',
                 show: true,
-                seek: true,
+
                 sort: true,
             },
             {
@@ -134,7 +134,7 @@ export default {
                 toRight: true,
                 width: '7rem',
                 show: true,
-                seek: true,
+
                 sort: true,
             },
             {
@@ -144,7 +144,7 @@ export default {
                 toRight: true,
                 width: '7rem',
                 show: true,
-                seek: true,
+
                 sort: true,
             },
             {
@@ -154,7 +154,7 @@ export default {
                 toRight: true,
                 width: '7rem',
                 show: true,
-                seek: true,
+
                 sort: true,
             },
         ],
@@ -165,7 +165,7 @@ export default {
                 title: 'Nombre',
                 width: '12rem',
                 show: true,
-                seek: true,
+
                 sort: true,
             },
             {
@@ -175,7 +175,7 @@ export default {
                 toRight: true,
                 width: '7rem',
                 show: true,
-                seek: true,
+
                 sort: true,
             },
             {
@@ -185,7 +185,7 @@ export default {
                 toRight: true,
                 width: '7rem',
                 show: true,
-                seek: true,
+
                 sort: true,
             },
             {
@@ -195,7 +195,7 @@ export default {
                 toRight: true,
                 width: '7rem',
                 show: true,
-                seek: true,
+
                 sort: true,
             },
         ],
@@ -207,7 +207,7 @@ export default {
                 prop: 'responsable1.nombres',
                 width: '12rem',
                 show: true,
-                seek: true,
+
                 sort: true,
             },
             {
@@ -217,7 +217,7 @@ export default {
                 toRight: true,
                 width: '7rem',
                 show: true,
-                seek: true,
+
                 sort: true,
             },
             {
@@ -227,7 +227,7 @@ export default {
                 toRight: true,
                 width: '7rem',
                 show: true,
-                seek: true,
+
                 sort: true,
             },
             {
@@ -237,7 +237,7 @@ export default {
                 toRight: true,
                 width: '7rem',
                 show: true,
-                seek: true,
+
                 sort: true,
             },
         ],

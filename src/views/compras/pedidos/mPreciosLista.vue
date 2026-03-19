@@ -41,7 +41,7 @@ export default {
                 prop: 'articulo1.nombre',
                 width: '25rem',
                 show: true,
-                seek: true,
+
                 sort: true,
             },
             {

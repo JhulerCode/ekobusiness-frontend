@@ -67,7 +67,7 @@ export default {
                 prop: 'fecha1',
                 width: '8rem',
                 show: true,
-                seek: true,
+
                 sort: true,
             },
             {
@@ -75,14 +75,14 @@ export default {
                 title: 'Compra',
                 width: '8rem',
                 show: true,
-                seek: true,
+
             },
             {
                 id: 'venta',
                 title: 'Venta',
                 width: '8rem',
                 show: true,
-                seek: true,
+
             },
         ],
         tableRowActions: [

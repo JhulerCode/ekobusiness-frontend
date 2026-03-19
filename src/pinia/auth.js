@@ -4,6 +4,7 @@ import { deepCopy } from '@/utils/mine'
 import { useVistas } from '@/pinia/vistas.js'
 import { useModals } from '@/pinia/modals.js'
 import menuConfig from '@/config/menu.js'
+import menuAdmin from '@/config/menuAdmin.js'
 
 export const useAuth = defineStore('auth', {
     state: () => ({
@@ -65,6 +66,13 @@ export const useAuth = defineStore('auth', {
 
             if (result.empresa) {
                 this.empresa = deepCopy(result.empresa)
+
+                // Cargar menú administrativo si el subdominio es 'admin'
+                if (this.empresa.subdominio === 'admin') {
+                    this.menu = menuAdmin
+                } else {
+                    this.menu = menuConfig
+                }
             }
         },
         async logout(vueRouter) {
@@ -76,8 +84,7 @@ export const useAuth = defineStore('auth', {
             if (vueRouter) vueRouter.replace({ name: 'SignIn' })
         },
         verifyPermiso(...permisos) {
-            // return this.usuario?.permisos?.includes(permiso)
-            return permisos.some((p) => this.usuario?.permisos?.includes(p))
+            return permisos.flat().some((p) => this.usuario?.permisos?.includes(p))
         },
 
         // ----- TABLES ----- //

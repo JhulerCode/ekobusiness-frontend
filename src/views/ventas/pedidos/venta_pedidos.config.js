@@ -51,7 +51,7 @@ export default {
             type: 'text',
             width: '12rem',
             show: true,
-            seek: true,
+
             orden: 2,
         },
         {
@@ -63,7 +63,7 @@ export default {
             mostrar: 'nombres',
             width: '20rem',
             show: true,
-            seek: true,
+
             orden: 3,
         },
         {
@@ -74,7 +74,7 @@ export default {
             systemKey: 'pago_condiciones',
             width: '12rem',
             show: true,
-            seek: true,
+
             orden: 4,
         },
         {
@@ -85,7 +85,7 @@ export default {
             relatedUrl: 'monedas',
             width: '8rem',
             show: true,
-            seek: true,
+
             orden: 5,
         },
         {
@@ -163,7 +163,7 @@ export default {
             mostrar: 'nombres',
             width: '10rem',
             show: true,
-            seek: true,
+
             orden: 8,
         },
     ],

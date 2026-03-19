@@ -79,7 +79,7 @@ export default {
                 prop: 'fecha1',
                 width: '8rem',
                 show: true,
-                seek: true,
+
                 sort: true,
             },
             {
@@ -89,7 +89,7 @@ export default {
                 // slot: 'cTipo',
                 width: '15rem',
                 show: true,
-                seek: true,
+
                 sort: true,
             },
             {
@@ -97,7 +97,7 @@ export default {
                 title: 'Lote',
                 width: '8rem',
                 show: true,
-                seek: true,
+
                 sort: true,
             },
             {
@@ -106,7 +106,7 @@ export default {
                 prop: 'fv1',
                 width: '8rem',
                 show: true,
-                seek: true,
+
                 sort: true,
             },
             {

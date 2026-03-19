@@ -1,30 +1,10 @@
 export default {
     name: 'vEmpresa',
-    title: 'Mi Empresa',
+    title: 'Mi empresa',
+    titleKey: 'razon_social',
     apiPath: 'empresas',
 
-    headerActions: [
-        {
-            text: 'Editar',
-            action: 'editar',
-            icon: 'fa-solid fa-pen-to-square',
-            permiso: 'vEmpresa:editar',
-            show: true,
-        },
-        {
-            text: 'Cancelar',
-            action: 'cancelar',
-            icon: 'fa-solid fa-xmark',
-            tipo: '2',
-            show: false,
-        },
-        {
-            text: 'Guardar',
-            action: 'guardar',
-            icon: 'fa-solid fa-floppy-disk',
-            show: false,
-        },
-    ],
+    headerActions: [],
 
     tableColumns: [
         {

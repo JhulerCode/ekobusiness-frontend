@@ -82,7 +82,14 @@ export const useAuth = defineStore('auth', {
                 if (this.empresa.subdominio === 'admin') {
                     this.menu = menuAdmin
                 } else {
-                    this.menu = menuConfig
+                    // Filtrar menú según módulos contratados
+                    if (this.empresa.modulos && this.empresa.modulos.length > 0) {
+                        this.menu = menuConfig.filter(
+                            (m) => !m.id || this.empresa.modulos.includes(m.id),
+                        )
+                    } else {
+                        this.menu = menuConfig
+                    }
                 }
             }
         },

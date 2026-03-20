@@ -42,6 +42,7 @@
             <vEmpresaDetalleSocial v-show="vista.pestana == 2" />
             <vEmpresaDetalleDirecciones v-show="vista.pestana == 3" />
             <vEmpresaDetalleBancos v-show="vista.pestana == 4" />
+            <vEmpresaDetalleModulos v-show="vista.pestana == 5" />
         </template>
     </VistaDetalleLayout>
 </template>
@@ -52,6 +53,8 @@ import vEmpresaDetalleGeneral from './vEmpresaDetalleGeneral.vue'
 import vEmpresaDetalleSocial from './vEmpresaDetalleSocial.vue'
 import vEmpresaDetalleDirecciones from './vEmpresaDetalleDirecciones.vue'
 import vEmpresaDetalleBancos from './vEmpresaDetalleBancos.vue'
+import vEmpresaDetalleModulos from './vEmpresaDetalleModulos.vue'
+
 
 // Configuración y Stores
 import VIEW_CONFIG from './empresa.config.js'
@@ -67,6 +70,7 @@ export default {
         vEmpresaDetalleSocial,
         vEmpresaDetalleDirecciones,
         vEmpresaDetalleBancos,
+        vEmpresaDetalleModulos,
     },
     computed: {
         auth: () => useAuth(),
@@ -78,12 +82,18 @@ export default {
             return VIEW_CONFIG.name
         },
         availableTabs() {
-            return [
+            const tabs = [
                 { id: 1, label: 'General', show: true },
                 { id: 3, label: 'Direcciones', show: true },
                 { id: 4, label: 'Bancos', show: true },
                 { id: 2, label: 'Redes y links', show: true },
             ]
+
+            if (this.auth.empresa.subdominio === 'admin') {
+                tabs.push({ id: 5, label: 'Módulos', show: true })
+            }
+
+            return tabs
         },
         is_nuevo() {
             return this.$route.params.id === 'nuevo'

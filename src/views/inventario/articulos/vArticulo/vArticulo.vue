@@ -58,14 +58,14 @@
         </template>
 
         <template #pestanas-body>
-            <vArticuloDetalleGeneral v-if="vista.pestana == 1" />
-            <vArticuloDetalleCompra v-if="vista.pestana == 2" />
-            <vArticuloDetalleVenta v-if="vista.pestana == 3" />
+            <vArticuloGeneral v-if="vista.pestana == 1" />
+            <vArticuloCompra v-if="vista.pestana == 2" />
+            <vArticuloVenta v-if="vista.pestana == 3" />
 
-            <vArticuloDetalleInventario v-if="vista.pestana == 4" />
-            <vArticuloDetalleProduccion v-if="vista.pestana == 5" />
+            <vArticuloInventario v-if="vista.pestana == 4" />
+            <vArticuloProduccion v-if="vista.pestana == 5" />
 
-            <vArticuloDetalleComponentes v-if="vista.pestana == 6" />
+            <vArticuloComponentes v-if="vista.pestana == 6" />
         </template>
     </VistaDetalleLayout>
 </template>
@@ -73,12 +73,12 @@
 <script>
 import VIEW_CONFIG from './articulos.config.js'
 
-import vArticuloDetalleGeneral from './vArticuloDetalleGeneral.vue'
-import vArticuloDetalleCompra from './vArticuloDetalleCompra.vue'
-import vArticuloDetalleVenta from './vArticuloDetalleVenta.vue'
-import vArticuloDetalleInventario from './vArticuloDetalleInventario.vue'
-import vArticuloDetalleProduccion from './vArticuloDetalleProduccion.vue'
-import vArticuloDetalleComponentes from './vArticuloDetalleComponentes.vue'
+import vArticuloGeneral from './vArticuloGeneral.vue'
+import vArticuloCompra from './vArticuloCompra.vue'
+import vArticuloVenta from './vArticuloVenta.vue'
+import vArticuloInventario from './vArticuloInventario.vue'
+import vArticuloProduccion from './vArticuloProduccion.vue'
+import vArticuloComponentes from './vArticuloComponentes.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
@@ -89,12 +89,12 @@ import { jmsg } from '@/utils/swal.js'
 
 export default {
     components: {
-        vArticuloDetalleGeneral,
-        vArticuloDetalleCompra,
-        vArticuloDetalleVenta,
-        vArticuloDetalleInventario,
-        vArticuloDetalleProduccion,
-        vArticuloDetalleComponentes,
+        vArticuloGeneral,
+        vArticuloCompra,
+        vArticuloVenta,
+        vArticuloInventario,
+        vArticuloProduccion,
+        vArticuloComponentes,
     },
     data: () => ({
         pestana: 1,

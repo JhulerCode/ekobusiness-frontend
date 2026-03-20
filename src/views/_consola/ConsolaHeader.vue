@@ -64,91 +64,66 @@ export default {
     computed: {
         breadcrumbs() {
             const crumbs = []
-            const currentPath = this.$route.path
+            const currentRouteName = this.$route.name
+            if (!currentRouteName) return crumbs
 
-            if (currentPath === '/consola' || currentPath === '/consola/') return crumbs
+            // 1. Encontrar la sección y el elemento activo
+            let activeChild = null
+            let activeSection = null
 
-            // Buscar en el menú basándonos en la ruta activa
             for (const section of this.useAuth.menu) {
-                const matches = section.children.filter((child) => {
-                    const childPath = `/consola/${child.path}`.replace(/\/+$/, '')
-                    const normalizedCurrent = currentPath.replace(/\/+$/, '')
-
-                    return (
-                        child.goto === this.$route.name ||
-                        normalizedCurrent === childPath ||
-                        normalizedCurrent.startsWith(childPath + '/')
-                    )
-                })
-
-                if (matches.length) {
-                    // 1. Obtener el hijo más específico
-                    const activeChild =
-                        matches.find((c) => c.goto === this.$route.name) ||
-                        matches.sort((a, b) => b.path.length - a.path.length)[0]
-
-                    crumbs.push({ label: section.label, icon: section.icon })
-
-                    // 2. Determinar si es una vista de detalle para mejorar el sello (Breadcrumb)
-                    const isDetail =
-                        activeChild.viewType === 'detail' ||
-                        Object.keys(this.$route.params).length > 0
-
-                    // Si es detalle, intentamos buscar el "Padre" (listado) para que no diga "Detalle Artículo"
-                    let breadcrumbLabel = activeChild.label
-                    let breadcrumbGoto = activeChild.goto
-
-                    if (isDetail) {
-                        const parentPath = activeChild.path.split('/:')[0]
-                        const parentChild = section.children.find(
-                            (c) => c.path === parentPath && c.goto !== activeChild.goto,
-                        )
-                        if (parentChild) {
-                            breadcrumbLabel = parentChild.label
-                            breadcrumbGoto = parentChild.goto
-                        }
-                    }
-
-                    crumbs.push({ label: breadcrumbLabel, name: breadcrumbGoto })
-
-                    // 3. Agregar el nombre dinámico del registro si aplica
-                    if (isDetail) {
-                        let dynamicName = this.$route.meta.breadcrumbName
-
-                        if (!dynamicName || dynamicName === 'Detalle') {
-                            const vista = this.useVistas[activeChild.goto]
-
-                            // Buscar nombre en el store de la vista
-                            if (vista?.data?.nombre) {
-                                dynamicName = vista.data.nombre
-                            } else {
-                                // Fallback: Limpiar el título
-                                const title = document.title.split(' - ')[0].trim()
-                                const forbidden = [
-                                    section.label,
-                                    activeChild.label,
-                                    breadcrumbLabel,
-                                    'Consola',
-                                ]
-
-                                if (title && !forbidden.includes(title)) {
-                                    dynamicName = title
-                                } else {
-                                    dynamicName = 'Detalle'
-                                }
-                            }
-                        }
-
-                        // Truncar si es muy largo
-                        if (dynamicName && dynamicName.length > 30) {
-                            dynamicName = dynamicName.substring(0, 27) + '...'
-                        }
-
-                        crumbs.push({ label: dynamicName })
-                    }
+                activeChild = section.children.find((c) => c.goto === currentRouteName)
+                if (activeChild) {
+                    activeSection = section
                     break
                 }
             }
+
+            if (!activeSection || !activeChild) return crumbs
+
+            // 2. Construir la cadena de padres basándose en el path
+            // Ejemplo: inventario/articulos/:id/kardex -> [inventario/articulos, inventario/articulos/:id, inventario/articulos/:id/kardex]
+            const pathParts = activeChild.path.split('/')
+            const breadcrumbChain = []
+
+            for (let i = 1; i <= pathParts.length; i++) {
+                const subPath = pathParts.slice(0, i).join('/')
+                const parent = activeSection.children.find(
+                    (c) => c.path === subPath && c.showInMenu !== false,
+                )
+                if (parent) {
+                    breadcrumbChain.push(parent)
+                }
+            }
+
+            // 3. Construir el array final de crumbs
+            crumbs.push({ label: activeSection.label, icon: activeSection.icon })
+
+            breadcrumbChain.forEach((item, index) => {
+                const isLast = index === breadcrumbChain.length - 1
+                let label = item.label
+
+                // Si es un nivel que contiene parámetros (:id), intentar obtener el nombre dinámico
+                if (item.path.includes(':') && isLast) {
+                    let dynamicName = this.$route.meta.breadcrumbName
+                    if (!dynamicName || dynamicName === 'Detalle') {
+                        const vista = this.useVistas[item.goto]
+                        if (vista?.data?.nombre) {
+                            dynamicName = vista.data.nombre
+                        } else {
+                            const title = document.title.split(' - ')[0].trim()
+                            dynamicName = title && title !== item.label ? title : 'Detalle'
+                        }
+                    }
+                    label = dynamicName
+                }
+
+                if (label.length > 30) {
+                    label = label.substring(0, 27) + '...'
+                }
+
+                crumbs.push({ label, name: isLast ? null : item.goto })
+            })
 
             return crumbs
         },

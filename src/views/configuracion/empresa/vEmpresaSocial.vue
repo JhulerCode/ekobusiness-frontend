@@ -37,7 +37,7 @@
 import { useVistas } from '@/pinia/vistas'
 
 export default {
-    name: 'vEmpresaDetalleSocial',
+    name: 'vEmpresaSocial',
     computed: {
         vistas: () => useVistas(),
         vista() {

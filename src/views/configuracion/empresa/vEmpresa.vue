@@ -38,22 +38,22 @@
         </template>
 
         <template #pestanas-body>
-            <vEmpresaDetalleGeneral v-show="vista.pestana == 1" />
-            <vEmpresaDetalleSocial v-show="vista.pestana == 2" />
-            <vEmpresaDetalleDirecciones v-show="vista.pestana == 3" />
-            <vEmpresaDetalleBancos v-show="vista.pestana == 4" />
-            <vEmpresaDetalleModulos v-show="vista.pestana == 5" />
+            <vEmpresaGeneral v-show="vista.pestana == 1" />
+            <vEmpresaSocial v-show="vista.pestana == 2" />
+            <vEmpresaDirecciones v-show="vista.pestana == 3" />
+            <vEmpresaBancos v-show="vista.pestana == 4" />
+            <vEmpresaModulos v-show="vista.pestana == 5" />
         </template>
     </VistaDetalleLayout>
 </template>
 
 <script>
 // Componentes locales
-import vEmpresaDetalleGeneral from './vEmpresaDetalleGeneral.vue'
-import vEmpresaDetalleSocial from './vEmpresaDetalleSocial.vue'
-import vEmpresaDetalleDirecciones from './vEmpresaDetalleDirecciones.vue'
-import vEmpresaDetalleBancos from './vEmpresaDetalleBancos.vue'
-import vEmpresaDetalleModulos from './vEmpresaDetalleModulos.vue'
+import vEmpresaGeneral from './vEmpresaGeneral.vue'
+import vEmpresaSocial from './vEmpresaSocial.vue'
+import vEmpresaDirecciones from './vEmpresaDirecciones.vue'
+import vEmpresaBancos from './vEmpresaBancos.vue'
+import vEmpresaModulos from './vEmpresaModulos.vue'
 
 // Configuración y Stores
 import VIEW_CONFIG from './empresa.config.js'
@@ -65,11 +65,11 @@ import { incompleteData } from '@/utils/mine.js'
 export default {
     name: 'vEmpresa',
     components: {
-        vEmpresaDetalleGeneral,
-        vEmpresaDetalleSocial,
-        vEmpresaDetalleDirecciones,
-        vEmpresaDetalleBancos,
-        vEmpresaDetalleModulos,
+        vEmpresaGeneral,
+        vEmpresaSocial,
+        vEmpresaDirecciones,
+        vEmpresaBancos,
+        vEmpresaModulos,
     },
     computed: {
         auth: () => useAuth(),

@@ -40,7 +40,7 @@ import menuConfig from '@/config/menu.js'
 import JdCheckBox from '@/components/inputs/JdCheckBox.vue'
 
 export default {
-    name: 'vEmpresaDetalleModulos',
+    name: 'vEmpresaModulos',
     components: {
         JdCheckBox,
     },

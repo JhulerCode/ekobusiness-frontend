@@ -18,7 +18,7 @@ import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
 
 export default {
-    name: 'vEmpresaDetalleDirecciones',
+    name: 'vEmpresaDirecciones',
     computed: {
         auth: () => useAuth(),
         vistas: () => useVistas(),

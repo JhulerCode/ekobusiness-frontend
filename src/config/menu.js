@@ -63,10 +63,19 @@ export default [
                 label: 'Detalle Artículo',
                 goto: 'vArticuloDetalle',
                 path: 'inventario/articulos/:id',
-                view: 'inventario/articulos/vArticuloDetalle/vArticuloDetalle.vue',
+                view: 'inventario/articulos/vArticulo/vArticulo.vue',
                 showInMenu: false, // Esta no aparecerá en el menú lateral
-                permission: 'vArticulos', // Usar el prefijo de permisos de artículos
+                permission: 'vArticulo:ver', // Usar el prefijo de permisos de artículos
                 viewType: 'detail',
+            },
+            {
+                label: 'Kardex Artículo',
+                goto: 'vKardex',
+                path: 'inventario/articulos/:id/kardex',
+                view: 'inventario/kardex/vKardex.vue',
+                showInMenu: false,
+                permission: 'vArticulos:kardex',
+                viewType: 'list',
             },
         ],
     },

@@ -46,13 +46,13 @@ const routes = [
     {
         path: '/signin',
         name: 'SignIn',
-        meta: { title: 'Sign In - Eko Business' },
+        meta: { title: 'Sign In' },
         component: () => import('@/views/_sign/SignIn.vue'),
     },
     {
         path: '/consola',
         name: 'ConsolaView',
-        meta: { title: 'Consola - Eko Business', requiresAuth: true },
+        meta: { title: 'Consola', requiresAuth: true },
         component: () => import('@/views/_consola/ConsolaView.vue'),
         children: consolaChildren,
     },

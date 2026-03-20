@@ -12,14 +12,12 @@
             :rowOptions="vista.tableRowActions"
             @rowOptionSelected="vista.runMethod"
             @rowDblclick="ver"
-            :rowFocusable="true"
         />
     </VistaLayout>
 
     <!-- Modales -->
     <mImportarArticulos v-if="modals.show.mImportarArticulos" />
     <mArticulo v-if="modals.show.mArticulo" />
-    <mKardex v-if="modals.show.mKardex" />
     <mLotes v-if="modals.show.mLotes" />
     <mAjusteStock v-if="modals.show.mAjusteStock" />
     <mUploadFiles v-if="modals.show.mUploadFiles" />
@@ -29,7 +27,6 @@
 // Modales específicos
 import mImportarArticulos from '@/views/inventario/articulos/mImportarArticulos.vue'
 import mArticulo from '@/views/inventario/articulos/mArticulo.vue'
-import mKardex from '@/views/inventario/articulos/mKardex.vue'
 import mLotes from '@/views/inventario/articulos/mLotes.vue'
 import mAjusteStock from '@/views/inventario/articulos/mAjusteStock.vue'
 import mUploadFiles from '@/components/mUploadFiles.vue'
@@ -52,7 +49,6 @@ export default {
     components: {
         mImportarArticulos,
         mArticulo,
-        mKardex,
         mLotes,
         mAjusteStock,
         mUploadFiles,
@@ -126,6 +122,7 @@ export default {
 
         // Table row actions
         ver(item) {
+            console.log('ASD')
             if (!this.auth.verifyPermiso(`${VIEW_CONFIG.name}:ver`)) return
             this.$router.push(`/consola/inventario/articulos/${item.id}`)
         },
@@ -163,8 +160,7 @@ export default {
             this.modals.setModal('mArticulo', 'Nuevo artículo', 1, send, true)
         },
         verKardex(item) {
-            const send = { articulo: { id: item.id, nombre: item.nombre, unidad: item.unidad } }
-            this.modals.setModal('mKardex', 'Kardex de artículo', null, send, true)
+            this.$router.push(`/consola/inventario/articulos/${item.id}/kardex`)
         },
         verLotes(item) {
             const send = { articulo: { id: item.id, nombre: item.nombre, unidad: item.unidad } }

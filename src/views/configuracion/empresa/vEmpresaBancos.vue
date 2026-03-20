@@ -19,7 +19,7 @@ import { useVistas } from '@/pinia/vistas'
 import { urls, get } from '@/utils/crud'
 
 export default {
-    name: 'vEmpresaDetalleBancos',
+    name: 'vEmpresaBancos',
     computed: {
         auth: () => useAuth(),
         vistas: () => useVistas(),

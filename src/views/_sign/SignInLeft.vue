@@ -1,7 +1,8 @@
 <template>
     <div class="left">
-        <img src="@/assets/img/logo-sunka-black.webp" v-if="!useAuth.isDarkMode" />
-        <img src="@/assets/img/logo-sunka-white.webp" v-else />
+        <template v-if="useAuth.empresa_publica?.logo">
+            <img :src="useAuth.empresa_publica.logo.url" class="logo-empresa" />
+        </template>
     </div>
 </template>
 
@@ -22,14 +23,11 @@ export default {
     align-items: center;
     justify-content: center;
     flex-direction: column;
-    // background: linear-gradient(135deg, var(--primary-color), #6acbe0);
-    // backdrop-filter: blur(3px);
-    // -webkit-backdrop-filter: blur(3px);
     padding: 5rem 5rem;
+    width: 30rem;
 
     img {
-        // max-height: 20rem;
-        max-width: 20rem;
+        max-width: 100%;
     }
 }
 </style>

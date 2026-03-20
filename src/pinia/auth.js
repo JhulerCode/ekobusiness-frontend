@@ -11,6 +11,7 @@ export const useAuth = defineStore('auth', {
         token: null,
         usuario: {},
         empresa: {},
+        empresa_publica: null,
         app_version: '2.0.0',
 
         menu: menuConfig,
@@ -37,6 +38,16 @@ export const useAuth = defineStore('auth', {
         },
 
         // ----- LOGIN ----- //
+        async fetchInfoEmpresaPublica() {
+            this.setLoading(true, 'Cargando información...')
+            const res = await get(`${urls.public}/info-empresa`)
+            this.setLoading(false)
+
+            if (res.code == 0) {
+                this.empresa_publica = res.data
+            }
+        },
+
         async login() {
             if (this.token == null) return false
 

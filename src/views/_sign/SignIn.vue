@@ -6,6 +6,10 @@
             <SignInLeft />
             <SignInRight />
         </div>
+
+        <div class="credits">
+            <small>Powered by ITD Systems</small>
+        </div>
     </main>
 </template>
 
@@ -25,10 +29,12 @@ export default {
     data: () => ({
         useAuth: useAuth(),
     }),
-    created() {
+    async created() {
         if (this.useAuth.isDarkMode) {
             document.body.classList.add('dark-mode')
         }
+
+        await this.useAuth.fetchInfoEmpresaPublica()
     },
 }
 </script>
@@ -52,6 +58,13 @@ export default {
     max-width: 90%;
     backdrop-filter: blur(3px);
     -webkit-backdrop-filter: blur(3px);
+}
+
+.credits {
+    position: absolute;
+    bottom: 1rem;
+    right: 1rem;
+    color: var(--text-color);
 }
 
 @media (max-width: 900px) {

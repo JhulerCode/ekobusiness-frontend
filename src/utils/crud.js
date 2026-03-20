@@ -6,6 +6,8 @@ const host = import.meta.env.VITE_API_HOST
 const subdominio_local = import.meta.env.VITE_SUBDOMINIO_LOCAL
 
 const urls = {
+    public: `${host}/api/public`,
+
     signin: `${host}/api/auth`,
 
     sistema: `${host}/api/sistema`,
@@ -161,15 +163,15 @@ function setBody(item) {
     }
 
     // Agregar el resto de datos como JSON
-    formData.append("datos", JSON.stringify(resto))
+    formData.append('datos', JSON.stringify(resto))
 
     return formData
 }
 
 async function process(response, ms) {
-    const contentType = response.headers.get("Content-Type")
+    const contentType = response.headers.get('Content-Type')
 
-    if (contentType && contentType.includes("application/json")) {
+    if (contentType && contentType.includes('application/json')) {
         const res = await response.json()
 
         if ([401, 403, 404, 426].includes(response.status)) {
@@ -189,8 +191,7 @@ async function process(response, ms) {
         if (res.code == 0 && ms != false) jmsg('success', ms)
 
         return res
-    }
-    else {
+    } else {
         const blob = await response.blob()
         return blob
     }
@@ -199,18 +200,11 @@ async function process(response, ms) {
 function getSubdominio() {
     const hostname = window.location.hostname
 
-    const parts = hostname.split(".")
+    const parts = hostname.split('.')
 
     if (parts.length > 2) return parts[0]
 
     return subdominio_local
 }
 
-export {
-    host,
-    urls,
-    get,
-    post,
-    patch,
-    delet,
-}
+export { host, urls, get, post, patch, delet }

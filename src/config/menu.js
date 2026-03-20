@@ -516,12 +516,7 @@ export default [
                 goto: 'vSuscripciones',
                 path: 'configuracion/suscripciones',
                 view: 'configuracion/suscripciones/vSuscripciones.vue',
-                permisos: [
-                    { id: 'vSuscripciones:listar', label: 'Listar' },
-                    { id: 'vSuscripciones:crear', label: 'Crear' },
-                    { id: 'vSuscripciones:editar', label: 'Editar' },
-                    { id: 'vSuscripciones:eliminar', label: 'Eliminar' },
-                ],
+                permisos: [{ id: 'vSuscripciones:listar', label: 'Listar' }],
             },
         ],
     },

@@ -61,7 +61,7 @@
 
                     <JdSelect
                         label="Tipo compr."
-                        :lista="modal.comprobante_tipos"
+                        :lista="useSystem.data.comprobante_tipos"
                         v-model="modal.nuevo.comprobante_tipo"
                     />
 
@@ -119,6 +119,7 @@
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
 import { useVistas } from '@/pinia/vistas'
+import { useSystem } from '@/pinia/system'
 
 import { urls, post, patch, delet, get } from '@/utils/crud'
 import { incompleteData, redondear } from '@/utils/mine'
@@ -129,6 +130,7 @@ export default {
         auth: () => useAuth(),
         vistas: () => useVistas(),
         modals: () => useModals(),
+        useSystem: () => useSystem(),
         egresos() {
             // Suma todos los montos de los movimientos
             if (!this.modal.caja_apertura || !this.modal.caja_apertura.caja_movimientos) return 0
@@ -180,21 +182,18 @@ export default {
                 title: 'Tipo compr.',
                 width: '10rem',
                 show: true,
-
             },
             {
                 id: 'comprobante_numero',
                 title: 'Nro compr.',
                 width: '10rem',
                 show: true,
-
             },
             {
                 id: 'detalle',
                 title: 'Detalle',
                 width: '20rem',
                 show: true,
-
             },
             {
                 id: 'monto',
@@ -202,7 +201,6 @@ export default {
                 format: 'decimal',
                 width: '10rem',
                 show: true,
-
             },
         ],
     }),
@@ -210,7 +208,7 @@ export default {
         this.modal = this.modals.mCajaApertura
         this.modal.nuevo = {}
 
-        if (this.modal.mode == 4) this.loadDatosSistema()
+        if (this.modal.mode == 4) this.useSystem.load(['comprobante_tipos'])
         this.loadCajaMovimientos()
         this.showButtons()
     },
@@ -337,15 +335,6 @@ export default {
             if (res.code != 0) return
 
             this.modal.caja_apertura.caja_movimientos = res.data
-        },
-
-        async loadDatosSistema() {
-            const qry = ['comprobante_tipos']
-            const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
-
-            if (res.code != 0) return
-
-            Object.assign(this.modal, res.data)
         },
     },
 }

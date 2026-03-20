@@ -10,7 +10,7 @@
             label="Tributo"
             :nec="true"
             v-model="vista.data.igv_afectacion"
-            :lista="igv_afectaciones || []"
+            :lista="useSystem.data.igv_afectaciones || []"
             :disabled="vista.mode != 'edit'"
         />
 
@@ -18,7 +18,7 @@
             label="Unidad"
             :nec="true"
             v-model="vista.data.unidad"
-            :lista="unidades"
+            :lista="useSystem.data.unidades"
             mostrar="nombre_completo"
             :disabled="vista.mode != 'edit'"
         />
@@ -33,7 +33,7 @@
 
         <JdSelect
             label="Tipo de materia prima"
-            :lista="mp_tipos || []"
+            :lista="useSystem.data.mp_tipos || []"
             v-model="vista.data.mp_tipo"
             v-if="vista.data.categoria == materiaprima_id"
             :disabled="vista.mode != 'edit'"
@@ -56,30 +56,14 @@ export default {
     data: () => ({
         vista: {},
 
-        // Datos del sistema
-        igv_afectaciones: [],
-        unidades: [],
-        mp_tipos: [],
-
         materiaprima_id: 'f000be66-e4b1-4334-b57a-0e356eb8c7a6',
     }),
     async created() {
         this.vista = this.vistas.vArticuloDetalle
 
-        this.loadDatosSistema()
+        await this.useSystem.load(['igv_afectaciones', 'unidades', 'mp_tipos'])
     },
     methods: {
-        async loadDatosSistema() {
-            const keys = ['igv_afectaciones', 'unidades', 'mp_tipos']
-            const toLoad = keys.filter((key) => this.useSystem.get(key).length === 0)
-            if (toLoad.length > 0) {
-                await this.useSystem.load(toLoad)
-            }
-
-            this.igv_afectaciones = this.useSystem.get('igv_afectaciones')
-            this.unidades = this.useSystem.get('unidades')
-            this.mp_tipos = this.useSystem.get('mp_tipos')
-        },
         async loadCategorias(txtBuscar) {
             const qry = {
                 fltr: { activo: { op: 'Es', val: true } },

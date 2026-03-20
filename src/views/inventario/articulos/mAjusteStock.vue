@@ -14,7 +14,9 @@
                 label="Tipo"
                 :nec="true"
                 v-model="modal.transaccion.tipo"
-                :lista="modal.kardex_operaciones?.filter((a) => a.id == 6 || a.id == 7) || []"
+                :lista="
+                    useSystem.data.kardex_operaciones?.filter((a) => a.id == 6 || a.id == 7) || []
+                "
                 style="grid-column: 1/3"
                 @elegir="modal.is_nuevo_lote = false"
             />
@@ -106,6 +108,7 @@
 <script>
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
+import { useSystem } from '@/pinia/system'
 import { useVistas } from '@/pinia/vistas'
 
 import { urls, get, post } from '@/utils/crud'
@@ -119,6 +122,7 @@ export default {
         useAuth: useAuth(),
         useModals: useModals(),
         useVistas: useVistas(),
+        useSystem: useSystem(),
         redondear,
 
         modal: {},
@@ -129,7 +133,7 @@ export default {
     created() {
         this.modal = this.useModals.mAjusteStock
 
-        this.loadDatosSistema()
+        this.useSystem.load(['kardex_operaciones'])
         this.loadMonedas()
         this.loadLotes()
     },
@@ -276,14 +280,6 @@ export default {
             this.useModals.show.mAjusteStock = false
         },
 
-        async loadDatosSistema() {
-            const qry = ['kardex_operaciones', 'empresa']
-            const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
-
-            if (res.code != 0) return
-
-            Object.assign(this.modal, res.data)
-        },
         async loadMonedas() {
             const qry = {
                 fltr: {},

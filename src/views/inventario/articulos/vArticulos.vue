@@ -41,6 +41,7 @@ import VIEW_CONFIG from './articulos.config.js'
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
 import { useModals } from '@/pinia/modals'
+import { useSystem } from '@/pinia/system'
 import { urls, get } from '@/utils/crud'
 import { tryOficialExcel } from '@/utils/mine'
 import { jmsg } from '@/utils/swal'
@@ -60,6 +61,7 @@ export default {
         auth: () => useAuth(),
         vistas: () => useVistas(),
         modals: () => useModals(),
+        useSystem: () => useSystem(),
         vista() {
             return this.vistas[VIEW_CONFIG.name]
         },
@@ -214,12 +216,14 @@ export default {
                     this.auth.setLoading(false)
                     return jmsg('error', res.msg)
                 }
-                await this.loadDatosSistema()
-                const articulo_tiposMap = this.vista.articulo_tipos.reduce(
+
+                await this.useSystem.load(['articulo_tipos', 'igv_afectaciones'])
+
+                const articulo_tiposMap = this.useSystem.data.articulo_tipos.reduce(
                     (obj, a) => ((obj[a.nombre] = a), obj),
                     {},
                 )
-                const igv_afectacionesMap = this.vista.igv_afectaciones.reduce(
+                const igv_afectacionesMap = this.useSystem.data.igv_afectaciones.reduce(
                     (obj, a) => ((obj[a.id] = a), obj),
                     {},
                 )

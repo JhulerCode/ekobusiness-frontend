@@ -4,7 +4,7 @@
             <JdSelect
                 label="Condición de pago"
                 :nec="true"
-                :lista="modal.pago_condiciones || []"
+                :lista="useSystem.data.pago_condiciones || []"
                 v-model="modal.transaccion.pago_condicion"
                 :disabled="modal.mode == 3"
             />
@@ -25,12 +25,14 @@
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
 import { useVistas } from '@/pinia/vistas'
+import { useSystem } from '@/pinia/system'
 
 export default {
     data: () => ({
         useAuth: useAuth(),
         useModals: useModals(),
         useVistas: useVistas(),
+        useSystem: useSystem(),
 
         modal: {},
     }),

@@ -129,6 +129,7 @@ export default {
                 },
                 cols: ['nombre', 'unidad'],
                 ordr: [['nombre', 'ASC']],
+                limt: 25,
             }
 
             if (txtBuscar) {

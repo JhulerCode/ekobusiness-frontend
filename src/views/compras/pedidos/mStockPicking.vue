@@ -116,22 +116,6 @@ export default {
         this.modal = this.useModals.mStockPicking
 
         this.showButtons()
-
-        // this.loadDatosSistema()
-
-        // if (this.modal.mode == 1) {
-        //     if (this.modal.transaccion.tipo == 1 || this.modal.transaccion.tipo == 5) {
-        //         if (this.modal.transaccion.socio_pedido) {
-        //             setTimeout(() => {
-        //                 this.$refs.mStockPickingLine.agregarPedidoItems(
-        //                     this.modal.socio_pedido_items,
-        //                 )
-        //             }, 300)
-        //         }
-
-        //         this.loadSocios()
-        //     }
-        // }
     },
     methods: {
         showButtons() {
@@ -146,57 +130,6 @@ export default {
                 this.buttons[1].show = true
             }
         },
-
-        // async loadSocios() {
-        //     const qry = {
-        //         fltr: {
-        //             tipo: { op: 'Es', val: this.modal.transaccion.tipo == 1 ? 1 : 2 },
-        //             activo: { op: 'Es', val: true },
-        //         },
-        //         cols: [
-        //             'nombres',
-        //             //             'nombres',
-        //             'contactos',
-        //             'direcciones',
-        //             'precio_lista',
-        //         ],
-        //         incl: ['precio_lista1'],
-        //         ordr: [
-        //             ['nombres', 'ASC'],
-        //             ['ASC'],
-        //         ],
-        //     }
-
-        //     this.modal.socios = []
-        //     this.modal.sociosLoaded = false
-        //     this.useAuth.setLoading(true, 'Cargando...')
-        //     const res = await get(`${urls.socios}?qry=${JSON.stringify(qry)}`)
-        //     this.useAuth.setLoading(false)
-        //     this.modal.sociosLoaded = true
-
-        //     if (res.code !== 0) return
-
-        //     this.modal.socios = res.data
-
-        //     if (this.modal.transaccion.socio) {
-        //         this.modal.socio = this.modal.socios.find(
-        //             (a) => a.id == this.modal.transaccion.socio,
-        //         )
-        //     }
-        // },
-        // async loadDatosSistema() {
-        //     const qry = ['transaccion_estados']
-
-        //     this.useAuth.setLoading(true, 'Cargando...')
-        //     this.modal.datosSistemaLoaded = false
-        //     const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
-        //     this.useAuth.setLoading(false)
-        //     this.modal.datosSistemaLoaded = true
-
-        //     if (res.code != 0) return
-
-        //     Object.assign(this.modal, res.data)
-        // },
 
         initStockPicking() {
             this.modal.transaccion = {

@@ -4,7 +4,7 @@
             <JdSelect
                 label="Tipo de entrega"
                 :nec="true"
-                :lista="modal.entrega_tipos || []"
+                :lista="useSystem.data.entrega_tipos || []"
                 v-model="modal.socio_pedido.entrega_tipo"
                 :disabled="modal.mode == 3"
                 style="grid-column: 1/3"
@@ -78,6 +78,7 @@
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
 import { useVistas } from '@/pinia/vistas'
+import { useSystem } from '@/pinia/system'
 
 import { urls, get } from '@/utils/crud'
 
@@ -86,6 +87,7 @@ export default {
         useAuth: useAuth(),
         useModals: useModals(),
         useVistas: useVistas(),
+        useSystem: useSystem(),
 
         modal: {},
     }),

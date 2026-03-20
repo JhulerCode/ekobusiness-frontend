@@ -15,7 +15,7 @@
                 label="Tipo"
                 :nec="true"
                 v-model="modal.mrp_bom.tipo"
-                :lista="modal.mrp_bom_tipos"
+                :lista="useSystem.data.mrp_bom_tipos"
                 style="grid-column: 1/3"
             />
         </div>
@@ -33,6 +33,7 @@ import mMrpBomLines from './mMrpBomLines.vue'
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
 import { useVistas } from '@/pinia/vistas'
+import { useSystem } from '@/pinia/system'
 
 import { urls, get, post, patch } from '@/utils/crud'
 import { jmsg } from '@/utils/swal'
@@ -47,6 +48,7 @@ export default {
         useAuth: useAuth(),
         useModals: useModals(),
         useVistas: useVistas(),
+        useSystem: useSystem(),
 
         modal: {},
 
@@ -58,7 +60,7 @@ export default {
     created() {
         this.modal = this.useModals.mMrpBom
         this.showButtons()
-        this.loadDatosSistema()
+        this.useSystem.load(['mrp_bom_tipos'])
     },
     methods: {
         showButtons() {
@@ -69,20 +71,7 @@ export default {
             }
         },
 
-        async loadDatosSistema() {
-            const qry = ['mrp_bom_tipos']
-            const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
-
-            if (res.code != 0) return
-
-            Object.assign(this.modal, res.data)
-        },
         async loadArticulosFabricables(txtBuscar) {
-            if (!txtBuscar) {
-                this.modal.articulos_fabricables.length = 0
-                return
-            }
-
             const qry = {
                 fltr: {
                     activo: { op: 'Es', val: true },
@@ -92,6 +81,11 @@ export default {
                 },
                 cols: ['nombre', 'unidad'],
                 ordr: [['nombre', 'ASC']],
+                limt: 25,
+            }
+
+            if (txtBuscar) {
+                qry.fltr.nombre = { op: 'Contiene', val: txtBuscar }
             }
 
             this.modal.spin_articulos_fabricables = true

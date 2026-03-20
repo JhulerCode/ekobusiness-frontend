@@ -68,7 +68,7 @@
                 <JdSelect
                     label="Estado"
                     v-model="modal.transaccion.estado"
-                    :lista="modal.transaccion_estados || []"
+                    :lista="useSystem.data.transaccion_estados || []"
                     :disabled="true"
                     style="grid-column: 1/3"
                 />
@@ -138,6 +138,7 @@ import mTransaccionFinanzas from './mTransaccionFinanzas.vue'
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
 import { useVistas } from '@/pinia/vistas'
+import { useSystem } from '@/pinia/system'
 
 import { urls, get, post, patch } from '@/utils/crud'
 import { getItemFromArray, redondear, incompleteData, obtenerNumeroJuliano } from '@/utils/mine'
@@ -154,6 +155,7 @@ export default {
         useAuth: useAuth(),
         useModals: useModals(),
         useVistas: useVistas(),
+        useSystem: useSystem(),
         getItemFromArray,
         redondear,
 
@@ -171,7 +173,7 @@ export default {
         this.modal = this.useModals.mTransaccion
 
         this.showButtons()
-        this.loadDatosSistema()
+        this.useSystem.load(['transaccion_estados', 'pago_condiciones'])
 
         if (this.modal.mode == 1) {
             if (this.modal.transaccion.tipo == 1 || this.modal.transaccion.tipo == 5) {
@@ -434,19 +436,6 @@ export default {
             if (res.code != 0) return
 
             this.modal.monedas = res.data
-        },
-        async loadDatosSistema() {
-            const qry = ['transaccion_estados', 'pago_condiciones']
-
-            this.useAuth.setLoading(true, 'Cargando...')
-            this.modal.datosSistemaLoaded = false
-            const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
-            this.useAuth.setLoading(false)
-            this.modal.datosSistemaLoaded = true
-
-            if (res.code != 0) return
-
-            Object.assign(this.modal, res.data)
         },
     },
 }

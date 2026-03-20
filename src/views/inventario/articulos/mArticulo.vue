@@ -17,7 +17,7 @@
             <JdSelect
                 label="Tipo"
                 :nec="true"
-                :lista="modal.articulo_tipos || []"
+                :lista="useSystem.data.articulo_tipos || []"
                 v-model="modal.articulo.type"
                 style="grid-column: 1/3"
                 @elegir="setArticuloType"
@@ -100,14 +100,14 @@
                         label="Tributo"
                         :nec="true"
                         v-model="modal.articulo.igv_afectacion"
-                        :lista="modal.igv_afectaciones || []"
+                        :lista="useSystem.data.igv_afectaciones || []"
                     />
 
                     <JdSelect
                         label="Unidad"
                         :nec="true"
                         v-model="modal.articulo.unidad"
-                        :lista="modal.unidades"
+                        :lista="useSystem.data.unidades"
                         mostrar="nombre_completo"
                     />
 
@@ -121,7 +121,7 @@
 
                     <JdSelect
                         label="Tipo de materia prima"
-                        :lista="modal.mp_tipos || []"
+                        :lista="useSystem.data.mp_tipos || []"
                         v-model="modal.articulo.mp_tipo"
                         v-if="modal.articulo.categoria == materiaprima_id"
                     />
@@ -167,6 +167,7 @@ import mArticuloComponentes from './mArticuloComponentes.vue'
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
 import { useVistas } from '@/pinia/vistas'
+import { useSystem } from '@/pinia/system'
 
 import { urls, post, patch, get } from '@/utils/crud'
 import { incompleteData } from '@/utils/mine'
@@ -182,6 +183,7 @@ export default {
         useAuth: useAuth(),
         useModals: useModals(),
         useVistas: useVistas(),
+        useSystem: useSystem(),
 
         modal: {},
         nuevo_componente: {},
@@ -196,7 +198,7 @@ export default {
         this.modal = this.useModals.mArticulo
         this.showButtons()
 
-        this.loadDatosSistema()
+        this.useSystem.load(['igv_afectaciones', 'unidades', 'mp_tipos', 'articulo_tipos'])
     },
     methods: {
         showButtons() {
@@ -207,14 +209,6 @@ export default {
             }
         },
 
-        async loadDatosSistema() {
-            const qry = ['igv_afectaciones', 'unidades', 'mp_tipos', 'articulo_tipos']
-            const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
-
-            if (res.code != 0) return
-
-            Object.assign(this.modal, res.data)
-        },
         async loadLineas(txtBuscar) {
             if (!txtBuscar) {
                 this.modal.articulo_lineas.length = 0

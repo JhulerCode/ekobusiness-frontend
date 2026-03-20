@@ -4,14 +4,14 @@
             <JdSelect
                 label="Condición de pago"
                 :nec="true"
-                :lista="modal.pago_condiciones || []"
+                :lista="useSystem.data.pago_condiciones || []"
                 v-model="modal.socio_pedido.pago_condicion"
                 :disabled="modal.mode == 3"
             />
 
             <JdSelect
                 label="Método de pago"
-                :lista="modal.pago_metodos || []"
+                :lista="useSystem.data.pago_metodos || []"
                 v-model="modal.socio_pedido.pago_metodo"
                 :disabled="modal.mode == 3"
             />
@@ -26,7 +26,7 @@
         <div class="container-datos">
             <JdSelect
                 label="Comprobante solicitado"
-                :lista="modal.comprobante_tipos"
+                :lista="useSystem.data.comprobante_tipos"
                 v-model="modal.socio_pedido.comprobante_tipo"
                 :disabled="modal.mode == 3"
             />
@@ -55,12 +55,14 @@
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
 import { useVistas } from '@/pinia/vistas'
+import { useSystem } from '@/pinia/system'
 
 export default {
     data: () => ({
         useAuth: useAuth(),
         useModals: useModals(),
         useVistas: useVistas(),
+        useSystem: useSystem(),
 
         modal: {},
     }),

@@ -5,7 +5,7 @@
                 label="Tipo doc"
                 :nec="true"
                 v-model="socio.doc_tipo"
-                :lista="modal.documentos_identidad || []"
+                :lista="useSystem.data.documentos_identidad || []"
                 mostrar="nombre"
                 :disabled="modal.mode == 3"
                 style="grid-column: 1/3"
@@ -73,6 +73,7 @@ import mSocioDocumentos from './mSocioDocumentos.vue'
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
 import { useVistas } from '@/pinia/vistas'
+import { useSystem } from '@/pinia/system'
 
 import { urls, get, post, patch } from '@/utils/crud'
 import { incompleteData } from '@/utils/mine'
@@ -89,6 +90,7 @@ export default {
         useAuth: useAuth(),
         useModals: useModals(),
         useVistas: useVistas(),
+        useSystem: useSystem(),
 
         modal: {},
         socio: {},
@@ -104,8 +106,8 @@ export default {
         this.socio = this.useModals.mSocio.item
 
         this.showButtons()
-        this.loadDatosSistema()
-        // if (this.modal.mode != 3) this.loadMonedas()
+
+        this.useSystem.load(['documentos_identidad', 'pago_condiciones'])
         this.loadMonedas()
     },
     methods: {
@@ -175,14 +177,6 @@ export default {
             this.useModals.show.mSocio = false
         },
 
-        async loadDatosSistema() {
-            const qry = ['documentos_identidad', 'pago_condiciones']
-            const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
-
-            if (res.code != 0) return
-
-            Object.assign(this.modal, res.data)
-        },
         async loadMonedas() {
             const qry = {
                 fltr: {},

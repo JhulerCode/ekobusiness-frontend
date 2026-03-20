@@ -6,7 +6,7 @@
                     label="Tipo documento"
                     :nec="true"
                     v-model="modal.colaborador.doc_tipo"
-                    :lista="modal.documentos_identidad || []"
+                    :lista="system.data.documentos_identidad || []"
                     :disabled="modal.mode == 3"
                 />
 
@@ -33,7 +33,7 @@
                 <JdSelect
                     label="Sexo"
                     v-model="modal.colaborador.sexo"
-                    :lista="modal.generos || []"
+                    :lista="system.data.generos || []"
                     :disabled="modal.mode == 3"
                 />
 
@@ -61,7 +61,11 @@
                     :disabled="modal.mode == 3"
                 />
 
-                <JdSwitch label="Activo" v-model="modal.colaborador.activo" :disabled="modal.mode == 3" />
+                <JdSwitch
+                    label="Activo"
+                    v-model="modal.colaborador.activo"
+                    :disabled="modal.mode == 3"
+                />
 
                 <JdSwitch
                     label="Tiene usuario?"
@@ -76,7 +80,7 @@
                         label="Vista inicial"
                         :nec="true"
                         v-model="modal.colaborador.vista_inicial"
-                        :lista="vistas"
+                        :lista="consola_menu"
                         mostrar="label"
                         :disabled="modal.mode == 3"
                         groupBy="menu"
@@ -171,8 +175,9 @@
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
 import { useVistas } from '@/pinia/vistas'
+import { useSystem } from '@/pinia/system'
 
-import { urls, get, post, patch } from '@/utils/crud'
+import { urls, post, patch } from '@/utils/crud'
 import { incompleteData } from '@/utils/mine'
 import { jmsg } from '@/utils/swal'
 
@@ -180,8 +185,9 @@ export default {
     computed: {
         auth: () => useAuth(),
         modals: () => useModals(),
-        storeVistas: () => useVistas(),
-        vistas() {
+        vistas: () => useVistas(),
+        system: () => useSystem(),
+        consola_menu() {
             return this.auth.menu
                 .map((a) => a.children.map((b) => ({ id: b.goto, label: b.label, menu: a.label })))
                 .flat()
@@ -203,7 +209,7 @@ export default {
         this.modal = this.modals.mColaborador
 
         this.showButtons()
-        this.loadDatosSistema()
+        this.system.load(['generos', 'documentos_identidad'])
         this.sincronizarChecksConPermisos()
     },
     methods: {
@@ -218,7 +224,8 @@ export default {
         checkDatos() {
             const props = ['nombres', 'doc_tipo', 'doc_numero', 'cargo', 'activo', 'has_signin']
 
-            if (this.modal.colaborador.has_signin) props.push('vista_inicial', 'usuario', 'contrasena')
+            if (this.modal.colaborador.has_signin)
+                props.push('vista_inicial', 'usuario', 'contrasena')
 
             if (incompleteData(this.modal.colaborador, props)) {
                 jmsg('warning', 'Ingrese los datos necesarios')
@@ -240,7 +247,7 @@ export default {
 
             if (res.code != 0) return
 
-            this.storeVistas.addItem('vColaboradores', 'tableData', res.data)
+            this.vistas.addItem('vColaboradores', 'tableData', res.data)
 
             this.modals.show.mColaborador = false
         },
@@ -254,21 +261,12 @@ export default {
 
             if (res.code != 0) return
 
-            this.storeVistas.updateItem('vColaboradores', 'tableData', res.data)
+            this.vistas.updateItem('vColaboradores', 'tableData', res.data)
 
             if (this.auth.usuario.id == this.modal.colaborador.id) {
                 this.auth.usuario.permisos = this.modal.colaborador.permisos
             }
             this.modals.show.mColaborador = false
-        },
-
-        async loadDatosSistema() {
-            const qry = ['generos', 'documentos_identidad']
-            const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
-
-            if (res.code != 0) return
-
-            Object.assign(this.modal, res.data)
         },
 
         sincronizarChecksConPermisos() {

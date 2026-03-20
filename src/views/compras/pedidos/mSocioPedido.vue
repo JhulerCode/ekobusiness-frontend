@@ -64,7 +64,7 @@
                 <JdSelect
                     label="Estado"
                     v-model="modal.socio_pedido.estado"
-                    :lista="modal.pedido_estados || []"
+                    :lista="useSystem.data.pedido_estados || []"
                     :disabled="true"
                     style="grid-column: 1/3"
                 />
@@ -135,6 +135,7 @@ import mSocioPedidoTransacciones from './mSocioPedidoTransacciones.vue'
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
 import { useVistas } from '@/pinia/vistas'
+import { useSystem } from '@/pinia/system'
 
 import { urls, get, post, patch } from '@/utils/crud'
 import { getItemFromArray, redondear, incompleteData, genId } from '@/utils/mine'
@@ -153,6 +154,7 @@ export default {
         useAuth: useAuth(),
         useModals: useModals(),
         useVistas: useVistas(),
+        useSystem: useSystem(),
         getItemFromArray,
         redondear,
 
@@ -170,8 +172,13 @@ export default {
         this.modal = this.useModals.mSocioPedido
 
         this.showButtons()
-
-        this.loadDatosSistema()
+        this.useSystem.load([
+            'pedido_estados',
+            'entrega_tipos',
+            'pago_condiciones',
+            'pago_metodos',
+            'comprobante_tipos',
+        ])
 
         if (this.modal.mode == 1) {
             this.setTotalesCero()
@@ -392,25 +399,6 @@ export default {
             if (res.code != 0) return
 
             this.modal.monedas = res.data
-        },
-        async loadDatosSistema() {
-            const qry = [
-                'pedido_estados',
-                'entrega_tipos',
-                'pago_condiciones',
-                'pago_metodos',
-                'comprobante_tipos',
-            ]
-
-            this.useAuth.setLoading(true, 'Cargando...')
-            this.modal.datosSistemaLoaded = false
-            const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
-            this.useAuth.setLoading(false)
-            this.modal.datosSistemaLoaded = true
-
-            if (res.code != 0) return
-
-            Object.assign(this.modal, res.data)
         },
     },
 }

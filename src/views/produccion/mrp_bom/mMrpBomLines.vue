@@ -39,7 +39,6 @@ export default {
                     select_query: {
                         mostrar: 'nombre',
                         search: this.loadArticulosConsumables,
-                        elegir: this.elegirArticuloConsumible,
                     },
                     show: true,
                 },
@@ -74,7 +73,6 @@ export default {
     },
     created() {
         this.modal = this.useModals.mMrpBom
-        this.setMrpBomLinesColumns()
 
         if (this.modal.mode != 1 && !this.modal.mrp_bom_lines_loaded) {
             this.loadMrpBomLines()
@@ -103,44 +101,8 @@ export default {
 
             if (res.code != 0) return
 
-            for (const a of res.data) {
-                a.table_columns = {
-                    articulo_lista: [{ ...a.articulo1 }],
-                }
-            }
-
             this.modal.mrp_bom.mrp_bom_lines = res.data
         },
-        async loadArticulosConsumables(txtBuscar, fila, column) {
-            if (!txtBuscar) {
-                fila.table_columns[column.id + '_lista'] = []
-                return
-            }
-
-            const qry = {
-                fltr: {
-                    type: { op: 'Es', val: 'consumable' },
-                    activo: { op: 'Es', val: true },
-                    nombre: { op: 'Contiene', val: txtBuscar },
-                },
-                cols: ['nombre', 'unidad'],
-                ordr: [['nombre', 'ASC']],
-            }
-
-            fila.table_columns[column.id + '_spin'] = true
-            const res = await get(`${urls.articulos}?qry=${JSON.stringify(qry)}`)
-            fila.table_columns[column.id + '_spin'] = false
-
-            if (res.code !== 0) return
-
-            fila.table_columns[column.id + '_lista'] = res.data
-        },
-        elegirArticuloConsumible(elegido, fila, column) {
-            console.log('asd')
-            console.log(elegido, fila, column)
-            fila.articulo1 = { ...elegido }
-        },
-
         addLine() {
             this.modal.mrp_bom.mrp_bom_lines.push({
                 table_columns: {},
@@ -157,8 +119,28 @@ export default {
                 a.orden = j + 1
             }
         },
+
+        // --- Datos auxiliares ---
+        async loadArticulosConsumables(txtBuscar) {
+            const qry = {
+                fltr: {
+                    type: { op: 'Es', val: 'consumable' },
+                    activo: { op: 'Es', val: true },
+                },
+                cols: ['nombre', 'unidad'],
+                ordr: [['nombre', 'ASC']],
+            }
+
+            if (txtBuscar) {
+                qry.fltr.nombre = { op: 'Contiene', val: txtBuscar }
+            }
+
+            const res = await get(`${urls.articulos}?qry=${JSON.stringify(qry)}`)
+
+            if (res.code !== 0) return
+
+            return res.data
+        },
     },
 }
 </script>
-
-<style lang="scss" scoped></style>

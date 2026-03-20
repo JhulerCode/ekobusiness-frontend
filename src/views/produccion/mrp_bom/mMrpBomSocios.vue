@@ -82,12 +82,6 @@ export default {
 
             if (res.code != 0) return
 
-            // for (const a of res.data) {
-            //     a.table_columns = {
-            //         socio_lista: [{ ...a.socio1 }],
-            //     }
-            // }
-
             this.modal.mrp_bom.mrp_bom_socios = res.data
         },
         addLineSocio() {

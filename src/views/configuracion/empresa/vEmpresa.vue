@@ -55,7 +55,6 @@ import vEmpresaDetalleDirecciones from './vEmpresaDetalleDirecciones.vue'
 import vEmpresaDetalleBancos from './vEmpresaDetalleBancos.vue'
 import vEmpresaDetalleModulos from './vEmpresaDetalleModulos.vue'
 
-
 // Configuración y Stores
 import VIEW_CONFIG from './empresa.config.js'
 import { useAuth } from '@/pinia/auth'
@@ -119,9 +118,9 @@ export default {
             this[method](item)
         },
         async loadEmpresa() {
-            const id = this.$route.params.id || 'mi-empresa'
+            const param_id = this.$route.params.id
 
-            if (id === 'nuevo') {
+            if (param_id === 'nuevo') {
                 this.vista.data = {
                     igv_porcentaje: 18,
                     direcciones: [],
@@ -130,6 +129,8 @@ export default {
                 this.vista.mode = 'edit'
                 return
             }
+
+            const id = this.$route.name == 'vEmpresa' ? this.auth.empresa.id : param_id
 
             this.auth.setLoading(true, 'Cargando datos de empresa...')
             const res = await get(`${urls.empresas}/uno/${id}`)

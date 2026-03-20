@@ -27,7 +27,7 @@ export default {
             type: 'text',
             width: '8rem',
             show: true,
-
+            seek: true,
             orden: 2,
         },
         {

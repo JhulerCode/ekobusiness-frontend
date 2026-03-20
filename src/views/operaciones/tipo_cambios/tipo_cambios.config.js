@@ -1,13 +1,13 @@
 export default {
-    name: 'vInspecciones',
-    title: 'Inspecciones de clientes',
-    apiPath: 'inspecciones',
+    name: 'vTipoCambios',
+    title: 'Tipos de cambio',
+    apiPath: 'tipo_cambios',
 
     headerActions: [
         {
             text: 'Nuevo',
             action: 'nuevo',
-            permiso: 'vInspecciones:crear',
+            permiso: 'vTipoCambios:crear',
         },
         {
             icon: 'fa-solid fa-download',
@@ -29,68 +29,46 @@ export default {
         {
             id: 'fecha',
             title: 'Fecha',
-            prop: 'fecha1',
             type: 'date',
             width: '10rem',
             show: true,
+            seek: true,
             orden: 2,
         },
         {
-            id: 'socio',
-            title: 'Cliente',
-            prop: 'socio1.nombres',
-            type: 'related',
-            mostrar: 'nombres',
-            width: '20rem',
+            id: 'compra',
+            title: 'Compra',
+            type: 'number',
+            width: '8rem',
             show: true,
             seek: true,
             orden: 3,
         },
         {
-            id: 'puntuacion',
-            title: 'Puntuación',
+            id: 'venta',
+            title: 'Venta',
             type: 'number',
-            width: '10rem',
+            width: '8rem',
             show: true,
+            seek: true,
             orden: 4,
-        },
-        {
-            id: 'puntuacion_maxima',
-            title: 'Puntuación máxima',
-            type: 'number',
-            width: '10rem',
-            show: true,
-            orden: 5,
-        },
-    ],
-
-    tableBulkActions: [
-        {
-            icon: 'fa-solid fa-trash-can',
-            text: 'Eliminar',
-            action: 'vista.eliminarBulk',
-            permiso: 'vInspecciones:eliminarBulk',
         },
     ],
 
     tableRowActions: [
         {
-            label: 'Ver',
-            icon: 'fa-regular fa-folder-open',
-            action: 'ver',
-            permiso: 'vInspecciones:ver',
-        },
-        {
+            id: 1,
             label: 'Editar',
             icon: 'fa-solid fa-pen-to-square',
             action: 'editar',
-            permiso: 'vInspecciones:editar',
+            permiso: 'vTipoCambios:editar',
         },
         {
+            id: 2,
             label: 'Eliminar',
             icon: 'fa-solid fa-trash-can',
             action: 'vista.eliminar',
-            permiso: 'vInspecciones:eliminar',
+            permiso: 'vTipoCambios:eliminar',
         },
     ],
 }

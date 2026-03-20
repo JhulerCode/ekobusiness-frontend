@@ -35,7 +35,7 @@ export default {
             relatedUrl: 'articulo_lineas',
             width: '10rem',
             show: true,
-
+            seek: true,
             orden: 2,
         },
         {
@@ -46,7 +46,7 @@ export default {
             relatedUrl: 'maquinas',
             width: '8rem',
             show: true,
-
+            seek: true,
             orden: 3,
         },
         {
@@ -57,7 +57,7 @@ export default {
             relatedUrl: 'articulos',
             width: '25rem',
             show: true,
-
+            seek: true,
             orden: 4,
         },
         {
@@ -66,7 +66,7 @@ export default {
             type: 'text',
             width: '7rem',
             show: true,
-
+            seek: true,
             orden: 5,
         },
         {
@@ -99,4 +99,3 @@ export default {
         },
     ],
 }
-

@@ -24,7 +24,7 @@ export default {
             type: 'text',
             width: '10rem',
             show: true,
-
+            seek: true,
             orden: 1,
         },
         {
@@ -33,7 +33,7 @@ export default {
             type: 'text',
             width: '15rem',
             show: true,
-
+            seek: true,
             orden: 2,
         },
         {
@@ -45,7 +45,7 @@ export default {
             mostrar: 'nombres',
             width: '15rem',
             show: true,
-
+            seek: true,
             orden: 3,
         },
         {
@@ -56,7 +56,7 @@ export default {
             relatedUrl: 'articulos',
             width: '15rem',
             show: true,
-
+            seek: true,
             orden: 4,
         },
         {
@@ -74,7 +74,7 @@ export default {
             type: 'text',
             width: '10rem',
             show: true,
-
+            seek: true,
             orden: 6,
         },
         {
@@ -95,7 +95,7 @@ export default {
             mostrar: 'nombres',
             width: '10rem',
             show: true,
-
+            seek: true,
             orden: 8,
         },
     ],

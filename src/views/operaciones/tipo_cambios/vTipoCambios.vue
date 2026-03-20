@@ -10,29 +10,24 @@
     </VistaLayout>
 
     <!-- Modales -->
-    <mMoneda v-if="modals.show.mMoneda" />
-    <mTipoCambios v-if="modals.show.mTipoCambios" />
+    <mTipoCambio v-if="modals.show.mTipoCambio" />
 </template>
 
 <script>
-// Modales específicos
-import mMoneda from './mMoneda.vue'
-import mTipoCambios from './mTipoCambios.vue'
+import VIEW_CONFIG from './tipo_cambios.config.js'
 
-// Configuración de la vista
-import VIEW_CONFIG from './monedas.config.js'
+import mTipoCambio from './mTipoCambio.vue'
 
-// Pinia y Utils
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
 import { useModals } from '@/pinia/modals'
 import { urls, get } from '@/utils/crud'
+import dayjs from 'dayjs'
 
 export default {
-    name: 'vMonedas',
+    name: 'vTipoCambios',
     components: {
-        mMoneda,
-        mTipoCambios,
+        mTipoCambio,
     },
     computed: {
         auth: () => useAuth(),
@@ -66,39 +61,33 @@ export default {
         setQuery() {
             this.vista.qry = {
                 fltr: {},
-                ordr: [['nombre', 'ASC']],
+                ordr: [['fecha', 'DESC']],
                 page: this.vista.table_page,
             }
             this.auth.updateQuery(this.vista.tableColumns, this.vista.qry)
-            this.vista.qry.cols.push('estandar')
         },
 
         // Header actions
         nuevo() {
-            const send = { moneda: { estandar: false } }
-            this.modals.setModal('mMoneda', 'Nueva moneda', 1, send, true)
+            const send = { tipo_cambio: { fecha: dayjs().format('YYYY-MM-DD') } }
+            this.modals.setModal('mTipoCambio', 'Nuevo tipo de cambio', 1, send, true)
         },
 
         // Table row actions
         async editar(item) {
+            const qry = {
+                incl: ['moneda1'],
+            }
+
             this.auth.setLoading(true, 'Cargando...')
-            const res = await get(`${this.vista.apiUrl}/uno/${item.id}`)
+            const res = await get(`${this.vista.apiUrl}/uno/${item.id}?qry=${JSON.stringify(qry)}`)
             this.auth.setLoading(false)
             if (res.code != 0) return
 
             const send = {
-                moneda: res.data,
+                tipo_cambio: res.data,
             }
-            this.modals.setModal('mMoneda', 'Editar moneda', 2, send, true)
-        },
-        async openTiposCambio(item) {
-            const send = {
-                moneda: {
-                    id: item.id,
-                    nombre: item.nombre,
-                },
-            }
-            this.modals.setModal('mTipoCambios', 'Tipos de cambio', null, send, true)
+            this.modals.setModal('mTipoCambio', 'Editar tipo de cambio', 2, send, true)
         },
     },
 }

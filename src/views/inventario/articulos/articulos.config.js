@@ -39,7 +39,7 @@ export default {
             type: 'text',
             width: '25rem',
             show: true,
-
+            seek: true,
             orden: 2,
         },
         {
@@ -81,7 +81,7 @@ export default {
             type: 'text',
             width: '10rem',
             show: true,
-
+            seek: true,
             orden: 6,
         },
         {
@@ -93,7 +93,7 @@ export default {
             editable: true,
             width: '10rem',
             show: true,
-
+            seek: true,
             orden: 7,
         },
         {
@@ -105,7 +105,7 @@ export default {
             editable: true,
             width: '10rem',
             show: true,
-
+            seek: true,
             orden: 8,
         },
         {

@@ -40,7 +40,7 @@ export default {
             type: 'text',
             width: '8rem',
             show: true,
-
+            seek: true,
             orden: 2,
         },
         {
@@ -49,7 +49,7 @@ export default {
             type: 'text',
             width: '8rem',
             show: true,
-
+            seek: true,
             orden: 3,
         },
         {
@@ -61,7 +61,7 @@ export default {
             mostrar: 'nombres',
             width: '15rem',
             show: true,
-
+            seek: true,
             orden: 4,
         },
         {
@@ -82,7 +82,7 @@ export default {
             relatedUrl: 'monedas',
             width: '8rem',
             show: true,
-
+            seek: true,
             orden: 6,
         },
         {
@@ -105,7 +105,7 @@ export default {
             color: 'estado1.color',
             width: '7rem',
             show: true,
-
+            seek: true,
             orden: 8,
         },
         {
@@ -115,7 +115,7 @@ export default {
             type: 'text',
             width: '10rem',
             show: true,
-
+            seek: true,
             orden: 9,
         },
     ],
@@ -142,4 +142,3 @@ export default {
         },
     ],
 }
-

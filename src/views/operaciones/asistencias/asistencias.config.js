@@ -37,7 +37,7 @@ export default {
             mostrar: 'nombres',
             width: '15rem',
             show: true,
-
+            seek: true,
             orden: 2,
         },
         {

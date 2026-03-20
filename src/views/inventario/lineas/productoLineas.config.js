@@ -24,7 +24,7 @@ export default {
             type: 'text',
             width: '15rem',
             show: true,
-
+            seek: true,
             orden: 1,
         },
         {
@@ -58,7 +58,7 @@ export default {
             type: 'text',
             width: '20rem',
             show: true,
-            seek: false,
+            seek: true,
             orden: 4,
         },
     ],

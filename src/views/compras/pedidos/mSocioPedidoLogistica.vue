@@ -92,10 +92,10 @@ export default {
     computed: {
         direcciones() {
             if (this.modal.socio_pedido.tipo == 1) {
-                return this.modal.empresa?.direcciones || []
+                return this.useAuth.empresa?.direcciones || []
             } else {
                 return this.modal.entre_tipo == 'retiro'
-                    ? this.modal.empresa?.direcciones || []
+                    ? this.useAuth.empresa?.direcciones || []
                     : this.modal.socio_elegido?.direcciones || []
             }
         },
@@ -111,7 +111,7 @@ export default {
                 if (this.modal.socio_pedido.tipo == 1) {
                     if (this.modal.socio_pedido.direccion_entrega) return
 
-                    const direccion_principal = this.modal.empresa.direcciones.find(
+                    const direccion_principal = this.useAuth.empresa.direcciones.find(
                         (a) => a.principal == true,
                     )
 

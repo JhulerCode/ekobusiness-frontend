@@ -130,7 +130,6 @@ export default {
                 width: '23rem',
                 show: true,
                 sort: true,
-
             },
             {
                 id: 'unidad',
@@ -291,7 +290,8 @@ export default {
 
                 pu: supplier ? supplier.price : null,
                 igv_afectacion: item.igv_afectacion,
-                igv_porcentaje: item.igv_afectacion == '10' ? this.modal.empresa.igv_porcentaje : 0,
+                igv_porcentaje:
+                    item.igv_afectacion == '10' ? this.useAuth.empresa.igv_porcentaje : 0,
 
                 mtoValorVenta: 0,
                 igv: 0,

@@ -171,7 +171,6 @@ export default {
 
         this.showButtons()
 
-        this.loadEmpresa()
         this.loadDatosSistema()
 
         if (this.modal.mode == 1) {
@@ -344,15 +343,6 @@ export default {
             }
         },
 
-        async loadEmpresa() {
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.empresas}/uno/${this.useAuth.usuario.empresa}`)
-            this.useAuth.setLoading(false)
-
-            if (res.code != 0) return
-
-            this.modal.empresa = res.data
-        },
         async loadSocios() {
             const qry = {
                 fltr: {

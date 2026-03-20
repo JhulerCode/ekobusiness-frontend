@@ -68,7 +68,6 @@
             @onInput="runMethod"
             @rowOptionSelected="runMethod"
         >
-
             <template v-slot:cFv="{ item }">
                 <div class="container-compra-fv">
                     <p class="lote">{{ item.lote }}</p>
@@ -146,7 +145,6 @@ export default {
                 width: '25rem',
                 show: true,
                 sort: true,
-
             },
             {
                 id: 'unidad',
@@ -175,7 +173,10 @@ export default {
     }),
     computed: {
         rowActions() {
-            if (this.modal.mode == 1 || (this.modal.mode == 2 && this.modal.transaccion.tipo != 5)) {
+            if (
+                this.modal.mode == 1 ||
+                (this.modal.mode == 2 && this.modal.transaccion.tipo != 5)
+            ) {
                 return [
                     {
                         icon: 'fa-solid fa-trash-can',
@@ -192,15 +193,6 @@ export default {
         this.loadEmpresa()
     },
     methods: {
-        async loadEmpresa() {
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.empresas}/uno/${this.useAuth.usuario.empresa}`)
-            this.useAuth.setLoading(false)
-
-            if (res.code != 0) return
-
-            this.modal.empresa = res.data
-        },
         setLoteHoy() {
             if (this.modal.transaccion.tipo != 1) return null
             return `${obtenerNumeroJuliano(this.modal.transaccion.fecha)}-${Math.floor(Math.random() * 90 + 10)}`
@@ -260,7 +252,8 @@ export default {
 
                 pu: null,
                 igv_afectacion: item.igv_afectacion,
-                igv_porcentaje: item.igv_afectacion == '10' ? this.modal.empresa.igv_porcentaje : 0,
+                igv_porcentaje:
+                    item.igv_afectacion == '10' ? this.useAuth.empresa.igv_porcentaje : 0,
 
                 mtoValorVenta: 0,
                 igv: 0,

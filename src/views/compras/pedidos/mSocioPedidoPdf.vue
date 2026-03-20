@@ -3,31 +3,31 @@
         <div ref="elementoPdf" class="pdfall">
             <div class="pdfheader">
                 <div class="left">
-                    <img src="@/assets/img/logo-sunka-black.webp" />
+                    <img :src="useAuth.empresa.logo.url" />
                 </div>
 
                 <div class="center">
                     <p>
-                        <strong>{{ modal.empresa?.razon_social }}</strong>
+                        <strong>{{ useAuth.empresa?.razon_social }}</strong>
                     </p>
                     <p>
                         <span>{{
-                            modal.empresa?.direcciones.find((a) => a.principal == true).direccion
+                            useAuth.empresa?.direcciones.find((a) => a.principal == true).direccion
                         }}</span
                         ><br />
                         <span>{{
-                            modal.empresa?.direcciones.find((a) => a.principal == true).distrito
+                            useAuth.empresa?.direcciones.find((a) => a.principal == true).distrito
                         }}</span
                         ><br />
-                        <span>{{ modal.empresa?.telefono }}</span
+                        <span>{{ useAuth.empresa?.telefono }}</span
                         ><br />
-                        <span>{{ modal.empresa?.correo }}</span>
+                        <span>{{ useAuth.empresa?.correo }}</span>
                     </p>
                 </div>
 
                 <div class="right">
                     <div>
-                        <strong>R.U.C. {{ modal.empresa?.ruc }}</strong>
+                        <strong>R.U.C. {{ useAuth.empresa?.ruc }}</strong>
                     </div>
                     <div>
                         <strong>ORDEN DE COMPRA</strong>
@@ -201,7 +201,7 @@
                 </div>
 
                 <ul>
-                    <li v-for="(a, i) in modal.empresa?.bancos || []" :key="i">
+                    <li v-for="(a, i) in useAuth.empresa?.bancos || []" :key="i">
                         <span>{{ a.nombre }}</span
                         ><br />
                         <strong>Moneda:</strong> <span>{{ a.moneda }}</span
@@ -220,7 +220,6 @@
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
 
-import { urls, get } from '@/utils/crud'
 import { numeroATexto, redondear } from '@/utils/mine'
 import html2pdf from 'html2pdf.js'
 
@@ -233,7 +232,7 @@ export default {
 
         modal: {},
 
-        buttons: [{ text: 'Exportar en PDF', action: 'imprimir', show: true }],
+        buttons: [{ text: 'Exportar en PDF', action: 'exportarPdf', show: true }],
 
         columns: [
             {
@@ -284,7 +283,6 @@ export default {
     created() {
         this.modal = this.useModals.mSocioPedidoPdf
 
-        this.loadDatosSistema()
         this.sumarItems()
     },
     methods: {
@@ -325,20 +323,7 @@ export default {
                 this.modal.mtoOperInafectas
             this.modal.mtoImpVenta = this.modal.valorVenta + this.modal.mtoIGV
         },
-        async loadDatosSistema() {
-            // const qry = ['empresa']
-
-            useAuth().setLoading(true, 'Cargando...')
-            // const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
-            const res = await get(`${urls.empresas}/uno/${this.useAuth.usuario.empresa}`)
-            useAuth().setLoading(false)
-
-            if (res.code != 0) return
-
-            // Object.assign(this.modal, res.data)
-            this.modal.empresa = res.data
-        },
-        imprimir() {
+        exportarPdf() {
             const element = this.$refs.elementoPdf
 
             const opciones = {
@@ -385,10 +370,15 @@ export default {
     gap: 1rem;
     margin-bottom: 1rem;
 
-    img {
-        max-width: 100%;
-        max-height: 100%;
-        margin-top: 1rem;
+    .left {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        img {
+            max-width: 100%;
+            max-height: 100%;
+        }
     }
 
     .center {

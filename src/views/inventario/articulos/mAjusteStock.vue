@@ -236,7 +236,7 @@ export default {
         shapeDatos() {
             if (this.modal.is_nuevo_lote) {
                 this.modal.transaccion.igv_afectacion = this.modal.articulo1.igv_afectacion
-                this.modal.transaccion.igv_porcentaje = this.modal.empresa.igv_porcentaje
+                this.modal.transaccion.igv_porcentaje = this.useAuth.empresa.igv_porcentaje
                 this.modal.transaccion.tipo_cambio = this.modal.transaccion.moneda == 1 ? 1 : 3.5
 
                 this.modal.transaccion.is_lote_padre = true

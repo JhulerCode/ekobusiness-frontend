@@ -3,7 +3,7 @@
         <div ref="elementoPdf" class="pdfall">
             <div class="pdfheader">
                 <div class="left">
-                    <img :src="useAuth.empresa.logo.url" />
+                    <img :src="useAuth.empresa.logo.url" crossorigin="anonymous" />
                 </div>
 
                 <div class="center">
@@ -330,11 +330,35 @@ export default {
                 margin: 0.5,
                 filename: `oc${this.modal.socio_pedido.codigo}.pdf`,
                 image: { type: 'jpeg', quality: 1 },
-                html2canvas: { scale: 4 },
+                html2canvas: { scale: 4, useCORS: true },
                 jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' },
             }
 
-            html2pdf().set(opciones).from(element).save()
+            // html2pdf().set(opciones).from(element).save()
+            html2pdf()
+                .set(opciones)
+                .from(element)
+                .toPdf()
+                .get('pdf')
+                .then((pdf) => {
+                    const totalPages = pdf.internal.getNumberOfPages() // Obtenemos el total de páginas
+                    for (let i = 1; i <= totalPages; i++) {
+                        pdf.setPage(i) // Nos situamos en la página i
+                        pdf.setFontSize(8)
+                        pdf.setTextColor(150)
+
+                        // Añadimos el texto: Página X de Y
+                        // El formato es: texto, x (horizontal), y (vertical)
+                        // 8.27 es el ancho de A4 en pulgadas, 11.69 es el alto
+                        pdf.text(
+                            `Página ${i} de ${totalPages}`,
+                            pdf.internal.pageSize.getWidth() / 2,
+                            pdf.internal.pageSize.getHeight() - 0.25,
+                            { align: 'center' },
+                        )
+                    }
+                })
+                .save()
         },
     },
 }

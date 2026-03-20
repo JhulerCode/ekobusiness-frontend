@@ -1,19 +1,25 @@
 import { fileURLToPath, URL } from 'node:url'
+import { readFileSync } from 'node:fs'
 
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
 import { VitePWA } from 'vite-plugin-pwa'
 
+const pkg = JSON.parse(readFileSync('./package.json', 'utf-8'))
+
 export default defineConfig({
+    define: {
+        __APP_VERSION__: JSON.stringify(pkg.version),
+    },
     plugins: [
         vue(),
         vueDevTools(),
         VitePWA({
-            registerType: 'autoUpdate',
-            // registerType: 'prompt',
+            registerType: 'prompt', // Cambiado a 'prompt' para permitir notificación de actualización
             workbox: {
                 maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
+                cleanupOutdatedCaches: true,
             },
             includeAssets: ['robots.txt', 'apple-touch-icon.png'], //apple 180x180 px
             manifest: {

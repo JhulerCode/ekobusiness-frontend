@@ -7,14 +7,17 @@
         scale="1.5"
         style="z-index: 3"
     />
+    <ReloadPrompt />
 </template>
 
 <script>
 import { useAuth } from '@/pinia/auth.js'
 import { useVistas } from '@/pinia/vistas.js'
 import { useModals } from '@/pinia/modals.js'
+import ReloadPrompt from '@/components/ReloadPrompt.vue'
 
 export default {
+    components: { ReloadPrompt },
     data: () => ({
         useAuth: useAuth(),
         useVistas: useVistas(),

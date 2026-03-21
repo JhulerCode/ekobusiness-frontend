@@ -1,14 +1,16 @@
 <template>
-    <div v-if="needRefresh" class="pwa-toast" role="alert">
-        <div class="message">
-            <span>
-                Nueva versión disponible, haga clic en el botón de actualización para
-                actualizar.
-            </span>
-        </div>
-        <div class="actions">
-            <button @click="updateServiceWorker()">Actualizar</button>
-            <button @click="close()">Cerrar</button>
+    <!-- Overlay de pantalla completa si hay una nueva versión -->
+    <div v-if="needRefresh" class="pwa-overlay" role="alert">
+        <div class="pwa-card">
+            <div class="pwa-icon">🚀</div>
+            <h2>¡Hay una nueva versión disponible!</h2>
+            <p>
+                Actualizamos el sistema para brindarte una mejor experiencia y asegurar la
+                consistencia de tus datos.
+            </p>
+            <div class="actions">
+                <button class="update-btn" @click="updateServiceWorker()">Actualizar Ahora</button>
+            </div>
         </div>
     </div>
 </template>
@@ -16,49 +18,98 @@
 <script setup>
 import { useRegisterSW } from 'virtual:pwa-register/vue'
 
-const { needRefresh, updateServiceWorker } = useRegisterSW()
-
-const close = () => {
-    needRefresh.value = false
-}
+const { needRefresh, updateServiceWorker } = useRegisterSW({
+    onRegistered(r) {
+        if (r) {
+            // Buscamos actualizaciones automáticamente cada 1 minuto (60000ms)
+            setInterval(() => {
+                console.log('Verificando nueva versión de la aplicación...')
+                r.update()
+            }, 60000)
+        }
+    },
+})
 </script>
 
 <style scoped>
-.pwa-toast {
+/* Full screen overlay que bloquea toda la aplicación */
+.pwa-overlay {
     position: fixed;
-    right: 0;
-    bottom: 0;
-    margin: 16px;
-    padding: 12px;
-    border: 1px solid #8885;
-    border-radius: 4px;
-    z-index: 1000;
-    text-align: left;
-    box-shadow: 3px 4px 5px 0px #8885;
-    background-color: white;
-}
-.pwa-toast .message {
-    margin-bottom: 8px;
-}
-.pwa-toast button {
-    border: 1px solid #8885;
-    outline: none;
-    margin-right: 5px;
-    border-radius: 2px;
-    padding: 3px 10px;
-    cursor: pointer;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.7); /* Fondo oscuro con transparencia */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 99999; /* Por encima de todo, incluso modales */
+    backdrop-filter: blur(4px); /* Efecto de desenfoque */
 }
 
-/* Dark mode support */
-:global(.dark-mode) .pwa-toast {
+.pwa-card {
+    background-color: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+    animation: slideIn 0.3s ease-out;
+}
+
+.pwa-icon {
+    font-size: 3rem;
+    margin-bottom: 20px;
+}
+
+h2 {
+    margin-top: 0;
+    color: #333;
+}
+
+p {
+    color: #666;
+    margin-bottom: 25px;
+}
+
+.update-btn {
+    background-color: #2492c2; /* Tu color principal */
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 6px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    width: 100%;
+}
+
+.update-btn:hover {
+    background-color: #1a6f94;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Soporte para Dark Mode */
+:global(.dark-mode) .pwa-card {
     background-color: #1a1a1a;
     color: white;
-    border-color: #444;
 }
-
-:global(.dark-mode) .pwa-toast button {
-    background-color: #333;
+:global(.dark-mode) h2 {
     color: white;
-    border-color: #555;
+}
+:global(.dark-mode) p {
+    color: #bbb;
 }
 </style>

@@ -1,0 +1,18 @@
+{
+  "name": "ITD ERP",
+  "short_name": "ITD ERP",
+  "description": "Gestión empresarial inteligente",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2492c2",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

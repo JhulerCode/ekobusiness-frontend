@@ -54,6 +54,18 @@ body.dark-mode {
 
 body {
     background-color: var(--bg-color);
+    /* Mobile Native Feel */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    user-select: none;
+    overscroll-behavior-y: none; /* Evita el "pull-to-refresh" del navegador */
+}
+
+/* Permitir selección solo en inputs o áreas de texto */
+input,
+textarea,
+[contenteditable] {
+    user-select: text;
 }
 
 p,

@@ -5,7 +5,6 @@ export const useSystem = defineStore('system', {
     state: () => ({
         data: {},
         loaded: false,
-        versionMismatch: false,
     }),
     actions: {
         async load(keys = []) {

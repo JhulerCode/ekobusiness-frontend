@@ -1,5 +1,5 @@
 {
-  "name": "ekobusiness-frontend",
+  "name": "itd-erp-frontend",
   "version": "1.0.0",
   "private": true,
   "engines": {
@@ -24,8 +24,7 @@
     "sweetalert2": "11.22.0",
     "vue": "3.5.13",
     "vue-echarts": "7.0.3",
-    "vue-router": "4.5.0",
-    "workbox-window": "^7.4.0"
+    "vue-router": "4.5.0"
   },
   "devDependencies": {
     "@eslint/js": "9.22.0",
@@ -36,7 +35,6 @@
     "globals": "16.0.0",
     "prettier": "3.5.3",
     "vite": "6.2.4",
-    "vite-plugin-pwa": "1.0.3",
     "vite-plugin-vue-devtools": "7.7.2"
   },
   "packageManager": "pnpm@10.12.1+sha512.f0dda8580f0ee9481c5c79a1d927b9164f2c478e90992ad268bbb2465a736984391d6333d2c327913578b2804af33474ca554ba29c04a8b13060a717675ae3ac"

@@ -1,6 +1,5 @@
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
-import { useSystem } from '@/pinia/system'
 import { jmsg } from '@/utils/swal'
 
 const host = import.meta.env.VITE_API_HOST
@@ -177,7 +176,9 @@ async function process(response, ms) {
 
         if ([401, 403, 404, 426].includes(response.status)) {
             if (response.status == 426) {
-                useSystem().versionMismatch = true
+                jmsg('error', 'Nueva versión disponible. Recargando página...').then(() => {
+                    window.location.reload()
+                })
                 return { code: response.status }
             }
 

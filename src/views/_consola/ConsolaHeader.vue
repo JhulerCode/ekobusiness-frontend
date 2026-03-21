@@ -41,7 +41,7 @@
             </div>
 
             <div class="tenant-logo" v-if="useAuth.empresa">
-                <img :src="useAuth.empresa.logo.url" />
+                <img :src="useAuth.empresa.logo?.url" />
             </div>
         </div>
     </header>

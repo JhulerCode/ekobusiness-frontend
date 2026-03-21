@@ -175,13 +175,6 @@ async function process(response, ms) {
         const res = await response.json()
 
         if ([401, 403, 404, 426].includes(response.status)) {
-            if (response.status == 426) {
-                jmsg('error', 'Nueva versión disponible. Recargando página...').then(() => {
-                    window.location.reload()
-                })
-                return { code: response.status }
-            }
-
             jmsg('error', res.msg)
 
             if (response.status == 401) {

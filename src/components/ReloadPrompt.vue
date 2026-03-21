@@ -1,6 +1,6 @@
 <template>
     <!-- Overlay de pantalla completa si hay una nueva versión -->
-    <div v-if="needRefresh" class="pwa-overlay" role="alert">
+    <div v-if="needRefresh || system.versionMismatch" class="pwa-overlay" role="alert">
         <div class="pwa-card">
             <div class="pwa-icon">🚀</div>
             <h2>¡Hay una nueva versión disponible!</h2>
@@ -9,7 +9,7 @@
                 consistencia de tus datos.
             </p>
             <div class="actions">
-                <button class="update-btn" @click="updateServiceWorker()">Actualizar Ahora</button>
+                <button class="update-btn" @click="handleUpdate()">Actualizar Ahora</button>
             </div>
         </div>
     </div>
@@ -17,6 +17,9 @@
 
 <script setup>
 import { useRegisterSW } from 'virtual:pwa-register/vue'
+import { useSystem } from '@/pinia/system'
+
+const system = useSystem()
 
 const { needRefresh, updateServiceWorker } = useRegisterSW({
     onRegistered(r) {
@@ -29,6 +32,32 @@ const { needRefresh, updateServiceWorker } = useRegisterSW({
         }
     },
 })
+
+const handleUpdate = async () => {
+    if (system.versionMismatch) {
+        // 1. Desregistrar todos los Service Workers
+        if ('serviceWorker' in navigator) {
+            const registrations = await navigator.serviceWorker.getRegistrations()
+            for (const registration of registrations) {
+                await registration.unregister()
+            }
+        }
+
+        // 2. Limpiar las cachés del navegador (Cache Storage)
+        if (window.caches) {
+            const cacheNames = await caches.keys()
+            for (const name of cacheNames) {
+                await caches.delete(name)
+            }
+        }
+
+        // 3. Forzar la recarga
+        window.location.reload()
+    } else {
+        // Lógica normal de PWA para actualizaciones suaves
+        updateServiceWorker()
+    }
+}
 </script>
 
 <style scoped>

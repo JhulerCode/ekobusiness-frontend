@@ -19,7 +19,7 @@ export default {
         vista: {},
     }),
     created() {
-        this.vista = this.vistas.vArticuloDetalle
+        this.vista = this.vistas.vArticulo
     },
 }
 </script>

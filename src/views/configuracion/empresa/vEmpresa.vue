@@ -1,10 +1,5 @@
 <template>
-    <VistaDetalleLayout
-        v-if="vista && vista.data"
-        vistaName="vEmpresa"
-        :pestanas="availableTabs"
-        @runMethod="runMethod"
-    >
+    <VistaDetalleLayout :config="VIEW_CONFIG" :pestanas="availableTabs" @runMethod="runMethod">
         <template #principal-datos>
             <JdInput
                 label="RUC"
@@ -48,15 +43,14 @@
 </template>
 
 <script>
-// Componentes locales
+import VIEW_CONFIG from './empresa.config.js'
+
 import vEmpresaGeneral from './vEmpresaGeneral.vue'
 import vEmpresaSocial from './vEmpresaSocial.vue'
 import vEmpresaDirecciones from './vEmpresaDirecciones.vue'
 import vEmpresaBancos from './vEmpresaBancos.vue'
 import vEmpresaModulos from './vEmpresaModulos.vue'
 
-// Configuración y Stores
-import VIEW_CONFIG from './empresa.config.js'
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
 import { urls, get, post, patch } from '@/utils/crud'
@@ -71,6 +65,9 @@ export default {
         vEmpresaBancos,
         vEmpresaModulos,
     },
+    data: () => ({
+        VIEW_CONFIG,
+    }),
     computed: {
         auth: () => useAuth(),
         vistas: () => useVistas(),
@@ -99,15 +96,6 @@ export default {
         },
     },
     async created() {
-        // 1. Inicialización de la vista
-        this.vistas.initVista(VIEW_CONFIG.name, {
-            ...JSON.parse(JSON.stringify(VIEW_CONFIG)),
-            apiUrl: urls[VIEW_CONFIG.apiPath],
-            pestana: 1,
-            mode: 'view',
-        })
-
-        // 2. Carga de datos
         await this.loadEmpresa()
     },
     unmounted() {
@@ -138,7 +126,10 @@ export default {
 
             if (res.code === 0) {
                 this.vista.data = res.data
-                document.title = `${this.vista.data.razon_social}`
+
+                if (this.$route.name != 'vEmpresa') {
+                    document.title = `${this.vista.data.razon_social}`
+                }
             }
         },
 

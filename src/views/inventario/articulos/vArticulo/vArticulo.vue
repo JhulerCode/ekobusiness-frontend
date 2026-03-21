@@ -1,11 +1,5 @@
 <template>
-    <VistaDetalleLayout
-        v-if="vista && vista.data"
-        :vistaName="VIEW_CONFIG_NAME"
-        :title="vista.data.nombre"
-        :pestanas="availableTabs"
-        @runMethod="runMethod"
-    >
+    <VistaDetalleLayout :config="VIEW_CONFIG" :pestanas="availableTabs" @runMethod="runMethod">
         <template #principal-datos>
             <JdInput
                 label="Nombre"
@@ -18,7 +12,7 @@
             <JdSelect
                 label="Tipo"
                 :nec="true"
-                :lista="vista.articulo_tipos || []"
+                :lista="useSystem.data.articulo_tipos || []"
                 v-model="vista.data.type"
                 style="grid-column: 1/2"
                 :disabled="vista.mode != 'edit'"
@@ -97,7 +91,7 @@ export default {
         vArticuloComponentes,
     },
     data: () => ({
-        pestana: 1,
+        VIEW_CONFIG,
     }),
     computed: {
         auth: () => useAuth(),
@@ -106,12 +100,7 @@ export default {
         vista() {
             return this.vistas[VIEW_CONFIG.name]
         },
-        VIEW_CONFIG_NAME() {
-            return VIEW_CONFIG.name
-        },
         availableTabs() {
-            if (!this.vista.data) return []
-
             return [
                 { id: 1, label: 'General', show: true },
                 { id: 2, label: 'Compra', show: this.vista.data.purchase_ok },
@@ -123,15 +112,7 @@ export default {
         },
     },
     async created() {
-        // 1. Inicialización de la vista
-        this.vistas.initVista(VIEW_CONFIG.name, {
-            ...JSON.parse(JSON.stringify(VIEW_CONFIG)),
-            apiUrl: urls[VIEW_CONFIG.apiPath],
-            pestana: 1,
-        })
-
-        // 2. Carga inicial
-        await this.loadArticuloTipos()
+        await this.useSystem.load(['articulo_tipos'])
         await this.loadArticulo()
     },
     unmounted() {
@@ -240,12 +221,6 @@ export default {
             if (this.vista.data.precio_anterior == '') {
                 this.vista.data.precio_anterior = null
             }
-        },
-
-        // --- Data auxiliar ---
-        async loadArticuloTipos() {
-            await this.useSystem.load(['articulo_tipos'])
-            this.vista.articulo_tipos = this.useSystem.get('articulo_tipos')
         },
     },
 }

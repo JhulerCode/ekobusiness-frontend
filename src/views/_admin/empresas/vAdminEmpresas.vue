@@ -65,9 +65,6 @@ export default {
             if (!this.auth.verifyPermiso('vAdminEmpresas:ver')) return
             this.$router.push({ name: 'vAdminEmpresaDetalle', params: { id: item.id } })
         },
-        async editar(item) {
-            this.ver(item)
-        },
     },
 }
 </script>

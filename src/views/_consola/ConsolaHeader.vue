@@ -81,41 +81,41 @@ export default {
 
             if (!activeSection || !activeChild) return crumbs
 
-            // 2. Construir la cadena de padres basándose en el path
-            // Ejemplo: inventario/articulos/:id/kardex -> [inventario/articulos, inventario/articulos/:id, inventario/articulos/:id/kardex]
+            // 2. Construir los crumbs procesando los segmentos del path
             const pathParts = activeChild.path.split('/')
-            const breadcrumbChain = []
 
-            for (let i = 1; i <= pathParts.length; i++) {
-                const subPath = pathParts.slice(0, i).join('/')
-                const parent = activeSection.children.find(
-                    (c) => c.path === subPath && c.showInMenu !== false,
-                )
-                if (parent) {
-                    breadcrumbChain.push(parent)
+            // La sección principal (Ventas, Compras, etc.)
+            crumbs.push({
+                label: activeSection.label,
+                icon: activeSection.icon,
+                name: activeSection.goto || null,
+            })
+
+            let cumulativePath = ''
+            pathParts.forEach((part, index) => {
+                // Ignorar el primer segmento si coincide con el ID de la sección (ya se agregó arriba)
+                if (index === 0 && part === activeSection.id) {
+                    cumulativePath = part
+                    return
                 }
-            }
 
-            // 3. Construir el array final de crumbs
-            crumbs.push({ label: activeSection.label, icon: activeSection.icon })
+                cumulativePath += (cumulativePath ? '/' : '') + part
 
-            breadcrumbChain.forEach((item, index) => {
-                const isLast = index === breadcrumbChain.length - 1
+                // Buscar la configuración del ítem para este subpath
+                const item = activeSection.children.find((c) => c.path === cumulativePath)
+                if (!item) return
+
                 let label = item.label
+                const isLast = index === pathParts.length - 1
 
-                // Si es un nivel que contiene parámetros (:id), intentar obtener el nombre dinámico
-                if (item.path.includes(':') && isLast) {
-                    let dynamicName = this.$route.meta.breadcrumbName
-                    if (!dynamicName || dynamicName === 'Detalle') {
-                        const vista = this.useVistas[item.goto]
-                        if (vista?.data?.nombre) {
-                            dynamicName = vista.data.nombre
-                        } else {
-                            const title = document.title.split(' - ')[0].trim()
-                            dynamicName = title && title !== item.label ? title : 'Detalle'
-                        }
-                    }
-                    label = dynamicName
+                // Si es un parámetro dinámico (:id, :slug), intentar obtener el nombre real del objeto
+                if (part.startsWith(':')) {
+                    const vista = this.useVistas[item.goto]
+
+                    const dynamicName =
+                        vista?.data?.nombre || vista?.data?.nombres || vista?.data?.label
+
+                    label = dynamicName || label
                 }
 
                 if (label.length > 30) {
@@ -176,7 +176,7 @@ export default {
 
         navigateTo(name) {
             if (this.$route.name !== name) {
-                this.$router.push({ name })
+                this.$router.push({ name, params: this.$route.params })
             }
         },
     },
@@ -233,11 +233,15 @@ header {
                         }
 
                         &.clickable:hover {
-                            color: var(--primary-color);
                             cursor: pointer;
+                            color: var(--text-color);
+                            * {
+                                color: var(--text-color);
+                            }
                         }
 
                         &.active {
+                            color: var(--text-color);
                             * {
                                 color: var(--text-color) !important;
                             }

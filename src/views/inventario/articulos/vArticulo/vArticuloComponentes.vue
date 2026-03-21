@@ -61,7 +61,7 @@ export default {
         },
     },
     created() {
-        this.vista = this.vistas.vArticuloDetalle
+        this.vista = this.vistas.vArticulo
 
         if (this.vista.mode != 1 && !this.vista.articulo_componentes_loaded) {
             this.loadArticuloComponentes()

@@ -215,8 +215,8 @@ export default {
 
 <style scoped>
 .night-container {
+    height: 100dvh;
     width: 100%;
-    height: 100vh;
     overflow: hidden;
 }
 canvas {

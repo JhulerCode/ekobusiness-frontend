@@ -122,7 +122,6 @@ export default {
 
         // Table row actions
         ver(item) {
-            console.log('ASD')
             if (!this.auth.verifyPermiso(`${VIEW_CONFIG.name}:ver`)) return
             this.$router.push(`/consola/inventario/articulos/${item.id}`)
         },

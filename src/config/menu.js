@@ -60,16 +60,16 @@ export default [
                 permisos: [{ id: 'vInventarioArticulos:listar', label: 'Listar' }],
             },
             {
-                label: 'Detalle Artículo',
-                goto: 'vArticuloDetalle',
+                label: 'Detalle',
+                goto: 'vArticulo',
                 path: 'inventario/articulos/:id',
                 view: 'inventario/articulos/vArticulo/vArticulo.vue',
-                showInMenu: false, // Esta no aparecerá en el menú lateral
-                permission: 'vArticulo:ver', // Usar el prefijo de permisos de artículos
+                showInMenu: false,
+                permission: 'vArticulos:ver',
                 viewType: 'detail',
             },
             {
-                label: 'Kardex Artículo',
+                label: 'Kardex',
                 goto: 'vKardex',
                 path: 'inventario/articulos/:id/kardex',
                 view: 'inventario/kardex/vKardex.vue',
@@ -511,7 +511,7 @@ export default [
         icon: 'fa-solid fa-screwdriver-wrench',
         children: [
             {
-                label: 'Mi Empresa',
+                label: 'Mi empresa',
                 goto: 'vEmpresa',
                 path: 'configuracion/empresa',
                 view: 'configuracion/empresa/vEmpresa.vue',

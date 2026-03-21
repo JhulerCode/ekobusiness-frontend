@@ -50,15 +50,24 @@ import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useVistas } from '@/pinia/vistas'
 import JdButtonsOverflow from './VistaLayout/JdButtonsOverflow.vue'
+import { urls } from '@/utils/crud'
 
 const props = defineProps({
-    vistaName: { type: String, required: true },
+    config: { type: Object, required: true },
     pestanas: { type: Array, default: () => [] },
 })
 
 const route = useRoute()
 const vistas = useVistas()
-const vista = computed(() => vistas[props.vistaName])
+
+// --- Inicialización de la vista ---
+const vista = computed(() => vistas[props.config.name])
+vistas.initVista(props.config.name, {
+    ...JSON.parse(JSON.stringify(props.config)),
+    apiUrl: urls[props.config.apiPath],
+    pestana: 1,
+    mode: 'view',
+})
 
 const emit = defineEmits(['runMethod'])
 
@@ -76,7 +85,7 @@ const basicActions = computed(() => {
             text: 'Editar',
             action: 'editar',
             icon: 'fa-solid fa-pen-to-square',
-            permiso: ['vEmpresa:editar', 'vAdminSuscripciones:editar'],
+            // permiso: ['vEmpresa:editar', 'vAdminSuscripciones:editar'],
             show: !isEdit,
         },
         {

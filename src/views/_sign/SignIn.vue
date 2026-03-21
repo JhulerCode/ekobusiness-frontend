@@ -41,8 +41,8 @@ export default {
 
 <style lang="scss" scoped>
 .signin {
-    height: 100vh;
-    width: 100vw;
+    height: 100dvh;
+    width: 100%;
     overflow: hidden;
     display: flex;
     justify-content: center;

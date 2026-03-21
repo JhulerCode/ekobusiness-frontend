@@ -146,7 +146,7 @@ export default {
         },
     },
     created() {
-        this.vista = this.vistas.vArticuloDetalle
+        this.vista = this.vistas.vArticulo
     },
     methods: {
         runMethod(method, item) {

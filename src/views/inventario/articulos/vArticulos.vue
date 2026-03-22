@@ -16,11 +16,11 @@
     </VistaLayout>
 
     <!-- Modales -->
-    <mImportarArticulos v-if="modals.show.mImportarArticulos" />
-    <mArticulo v-if="modals.show.mArticulo" />
-    <mLotes v-if="modals.show.mLotes" />
-    <mAjusteStock v-if="modals.show.mAjusteStock" />
-    <mUploadFiles v-if="modals.show.mUploadFiles" />
+    <mImportarArticulos v-if="modals.show?.mImportarArticulos" />
+    <mArticulo v-if="modals.show?.mArticulo" />
+    <mLotes v-if="modals.show?.mLotes" />
+    <mAjusteStock v-if="modals.show?.mAjusteStock" />
+    <mUploadFiles v-if="modals.show?.mUploadFiles" />
 </template>
 
 <script>

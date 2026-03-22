@@ -67,6 +67,7 @@ vistas.initVista(props.config.name, {
     apiUrl: urls[props.config.apiPath],
     pestana: 1,
     mode: 'view',
+    data: {},
 })
 
 const emit = defineEmits(['runMethod'])

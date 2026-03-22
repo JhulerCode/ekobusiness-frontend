@@ -150,7 +150,6 @@ export default {
                 prop: 'articulo1.unidad',
                 width: '5rem',
                 show: true,
-
             },
             {
                 id: 'cantidad',
@@ -159,7 +158,6 @@ export default {
                 toRight: true,
                 width: '8rem',
                 show: true,
-
             },
             {
                 id: 'lote',
@@ -167,7 +165,6 @@ export default {
                 prop: 'lote_padre1.lote',
                 width: '7rem',
                 show: true,
-
             },
             {
                 id: 'fv',
@@ -175,7 +172,6 @@ export default {
                 prop: 'lote_padre1.fv',
                 width: '7rem',
                 show: true,
-
             },
         ],
     }),
@@ -366,6 +362,7 @@ export default {
                     tipo: 3,
                     fecha: item.fecha,
                     produccion_orden: this.modal.produccion_orden.id,
+                    maquina: this.modal.produccion_orden.maquina,
                     articulo: item.articulo,
                     lote_padre: item.lote_padre,
                 },

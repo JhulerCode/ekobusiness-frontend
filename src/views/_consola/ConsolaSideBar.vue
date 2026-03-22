@@ -182,7 +182,6 @@ export default {
             }
 
             if (event) {
-                event.stopPropagation()
                 const rect = event.currentTarget.getBoundingClientRect()
                 this.userFlyoutPosition = {
                     top: rect.top,
@@ -239,7 +238,6 @@ export default {
             }
 
             if (event) {
-                event.stopPropagation()
                 const rect = event.currentTarget.getBoundingClientRect()
                 this.flyoutPosition = {
                     top: rect.top,

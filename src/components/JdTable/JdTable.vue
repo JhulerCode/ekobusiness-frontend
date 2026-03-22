@@ -232,18 +232,19 @@ const toogleRowOptions = (item) => {
             el.style.top = `${rect.bottom + window.scrollY + 5}px`
         }
 
-        setTimeout(() => document.body.addEventListener('click', closeOnOutside), 0)
+        setTimeout(() => document.addEventListener('mousedown', closeOnOutside), 0)
     })
 }
 
 const closeOnOutside = (e) => {
     const el = document.getElementById('options-case-' + props.name)
-    if (el && !el.contains(e.target)) hide()
+    const btn = document.getElementById(`button-options-${optionsCaseItem.value.id}`)
+    if (el && !el.contains(e.target) && btn && !btn.contains(e.target)) hide()
 }
 
 const hide = () => {
     optionsCaseItem.value = {}
-    document.body.removeEventListener('click', closeOnOutside)
+    document.removeEventListener('mousedown', closeOnOutside)
 }
 
 const selectOption = (a) => {

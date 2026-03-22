@@ -45,7 +45,7 @@
                 tipo="2"
                 :small="true"
                 :id="`button-options-${item.id}`"
-                @click.stop="$emit('toggleOptions', { ...item, i: index })"
+                @click="$emit('toggleOptions', { ...item, i: index })"
             />
         </td>
 

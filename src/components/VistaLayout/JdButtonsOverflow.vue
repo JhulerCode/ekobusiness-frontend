@@ -167,8 +167,7 @@ export default {
             this.visibleCount = newCount
             this.calculating = false
         },
-        toggleMenu(e) {
-            e.stopPropagation()
+        toggleMenu() {
             this.menuOpen = !this.menuOpen
         },
         closeMenuOutside(e) {

@@ -1,28 +1,5 @@
 <template>
-    <VistaLayout :vista="vista">
-        <template #header-left>
-            <!-- <div class="header-info">
-                <div class="resumen">
-                    <p>
-                        <small>Stock:</small>
-                        {{ redondear(stock) }}
-                    </p>
-                    <p>
-                        <small>Valor:</small>
-                        {{ redondear(valor) }}
-                    </p>
-                </div>
-            </div> -->
-        </template>
-
-        <JdTable
-            :name="vista.name"
-            :columns="vista.tableColumns"
-            :datos="vista.tableData || []"
-            :rowOptions="vista.tableRowActions"
-            @rowOptionSelected="runMethod"
-            ref="TableKardex"
-        />
+    <VistaLayout :config="VIEW_CONFIG" :setQuery="setQuery" :askToInicialLoad="false">
     </VistaLayout>
 
     <mTransaccion v-if="modals.show.mTransaccion" />
@@ -30,14 +7,13 @@
 
 <script>
 import mTransaccion from '@/views/compras/compras/mTransaccion.vue'
-import VIEW_CONFIG from './kardex.config.js'
 
+import VIEW_CONFIG from './kardex.config.js'
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
 import { useModals } from '@/pinia/modals'
 import { urls, get, delet } from '@/utils/crud'
 import { jqst } from '@/utils/swal'
-import { redondear } from '@/utils/mine'
 
 export default {
     name: 'vKardex',
@@ -45,9 +21,7 @@ export default {
         mTransaccion,
     },
     data: () => ({
-        redondear,
-        // stock: 0,
-        // valor: 0,
+        VIEW_CONFIG,
     }),
     computed: {
         auth: () => useAuth(),
@@ -58,17 +32,11 @@ export default {
         },
     },
     async created() {
-        this.vistas.initVista(VIEW_CONFIG.name, {
-            ...JSON.parse(JSON.stringify(VIEW_CONFIG)),
-            apiUrl: urls[VIEW_CONFIG.apiPath],
-            runMethod: this.runMethod,
-        })
-
-        this.vista.loadTableData()
+        // this.vista.loadTableData()
     },
     methods: {
         runMethod(method, item) {
-            this.vistas.runMethod(this, method, item)
+            this[method](item)
         },
         async setQuery() {
             this.vista.qry = {
@@ -95,17 +63,6 @@ export default {
                 'stock',
             )
         },
-        // calculateStock() {
-        //     this.stock = 0
-        //     this.valor = 0
-
-        //     for (const a of this.vista.tableData) {
-        //         if (a.is_lote_padre) {
-        //             this.stock += Number(a.stock)
-        //             this.valor += Number(a.stock) * a.vu_real
-        //         }
-        //     }
-        // },
         async eliminar(item) {
             const resQst = await jqst('¿Está seguro de eliminar?')
             if (resQst.isConfirmed == false) return
@@ -147,15 +104,3 @@ export default {
     },
 }
 </script>
-
-<style lang="scss" scoped>
-.header-info {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    .resumen {
-        display: flex;
-        gap: 1rem;
-    }
-}
-</style>

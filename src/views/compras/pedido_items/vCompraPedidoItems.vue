@@ -1,17 +1,11 @@
 <template>
-    <VistaLayout :vista="vista">
-        <JdTable :name="vista.name" :columns="vista.tableColumns" :datos="vista.tableData || []" />
-    </VistaLayout>
+    <VistaLayout :config="VIEW_CONFIG" :setQuery="setQuery" @runMethod="runMethod"> </VistaLayout>
 </template>
 
 <script>
-// Configuración de la vista
 import VIEW_CONFIG from './compra_pedido_items.config.js'
-
-// Pinia y Utils
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
-import { urls } from '@/utils/crud'
 import dayjs from 'dayjs'
 
 export default {
@@ -24,27 +18,12 @@ export default {
             return this.vistas[VIEW_CONFIG.name]
         },
     },
-    async created() {
-        // 1. Inicialización de la vista
-        this.vistas.initVista(VIEW_CONFIG.name, {
-            ...JSON.parse(JSON.stringify(VIEW_CONFIG)),
-            apiUrl: urls[VIEW_CONFIG.apiPath],
-            runMethod: this.runMethod,
-        })
-        this.initFiltros()
-        this.auth.setColumns(this.vista.name, this.vista.tableColumns)
-
-        // 2. Carga inicial
-        if (!this.vista.loaded && this.auth.verifyPermiso(`${VIEW_CONFIG.name}:listar`)) {
-            this.vista.loadTableData()
-        }
-    },
-    unmounted() {
-        if (this.vista) this.vista.runMethod = null
-    },
+    data: () => ({
+        VIEW_CONFIG,
+    }),
     methods: {
         runMethod(method, item) {
-            this.vistas.runMethod(this, method, item)
+            this[method](item)
         },
         initFiltros() {
             const i = this.vista.tableColumns.findIndex((a) => a.id == 'socio_pedido1.fecha')

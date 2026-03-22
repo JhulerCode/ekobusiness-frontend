@@ -140,14 +140,6 @@ export default {
         },
 
         // --- Header actions ---
-        editar() {
-            this.vista.original_data = JSON.parse(JSON.stringify(this.vista.data))
-            this.updateHeaderActions('edit')
-        },
-        cancelar() {
-            this.vista.data = JSON.parse(JSON.stringify(this.vista.original_data))
-            this.updateHeaderActions('view')
-        },
         async guardar() {
             if (this.checkDatos()) return
             this.shapeDatos()
@@ -159,6 +151,9 @@ export default {
             if (res.code != 0) return
 
             this.updateHeaderActions('view')
+        },
+        verKardex() {
+            this.$router.push(`/consola/inventario/articulos/${this.vista.data.id}/kardex`)
         },
 
         // -- Methods auxiliares ---

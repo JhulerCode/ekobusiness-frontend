@@ -1,26 +1,13 @@
 <template>
-    <VistaLayout :vista="vista">
-        <JdTable
-            :name="vista.name"
-            :columns="vista.tableColumns"
-            :datos="vista.tableData || []"
-            :rowOptions="vista.tableRowActions"
-            @rowOptionSelected="vista.runMethod"
-        />
-    </VistaLayout>
+    <VistaLayout :config="VIEW_CONFIG" :setQuery="setQuery" @runMethod="runMethod"> </VistaLayout>
 
-    <!-- Modales -->
     <mAsistencia v-if="modals.show.mAsistencia" />
 </template>
 
 <script>
-// Modales específicos
 import mAsistencia from './mAsistencia.vue'
 
-// Configuración de la vista
 import VIEW_CONFIG from './asistencias.config.js'
-
-// Pinia y Utils
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
 import { useModals } from '@/pinia/modals'
@@ -39,26 +26,12 @@ export default {
             return this.vistas[VIEW_CONFIG.name]
         },
     },
-    created() {
-        // 1. Inicialización de la vista
-        this.vistas.initVista(VIEW_CONFIG.name, {
-            ...JSON.parse(JSON.stringify(VIEW_CONFIG)),
-            apiUrl: urls[VIEW_CONFIG.apiPath],
-            runMethod: this.runMethod,
-        })
-
-        // 3. Carga inicial
-        this.auth.setColumns(this.vista.name, this.vista.tableColumns)
-        if (!this.vista.loaded && this.auth.verifyPermiso(`${VIEW_CONFIG.name}:listar`)) {
-            this.vista.loadTableData()
-        }
-    },
-    unmounted() {
-        if (this.vista) this.vista.runMethod = null
-    },
+    data: () => ({
+        VIEW_CONFIG,
+    }),
     methods: {
         runMethod(method, item) {
-            this.vistas.runMethod(this, method, item)
+            this[method](item)
         },
         setQuery() {
             this.vista.qry = {
@@ -69,7 +42,7 @@ export default {
             this.auth.updateQuery(this.vista.tableColumns, this.vista.qry)
         },
 
-        // Header actions
+        // --- Header actions ---
         async nuevo() {
             if (!this.vista.colaboradores) await this.loadColaboradores()
             const send = {
@@ -79,7 +52,7 @@ export default {
             this.modals.setModal('mAsistencia', 'Nueva asistencia', 1, send, true)
         },
 
-        // Table row actions
+        // --- Table row actions ---
         async editar(item) {
             this.auth.setLoading(true, 'Cargando...')
             const res = await get(`${this.vista.apiUrl}/uno/${item.id}`)

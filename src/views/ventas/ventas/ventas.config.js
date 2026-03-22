@@ -16,12 +16,6 @@ export default {
             tipo: '2',
             showIfAvance: 'mVenta',
         },
-        {
-            icon: 'fa-solid fa-download',
-            text: 'Exportar página actual',
-            action: 'vista.downloadActualTablePage',
-            tipo: '2',
-        },
     ],
 
     tableColumns: [

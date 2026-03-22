@@ -27,12 +27,6 @@ export default {
             permiso: 'vVentaPedidos:verProductosPedidos',
             tipo: '2',
         },
-        {
-            icon: 'fa-solid fa-download',
-            text: 'Exportar página actual',
-            action: 'vista.downloadActualTablePage',
-            tipo: '2',
-        },
     ],
 
     tableColumns: [

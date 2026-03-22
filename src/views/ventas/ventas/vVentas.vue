@@ -1,28 +1,15 @@
 <template>
-    <VistaLayout :vista="vista">
-        <JdTable
-            :name="vista.name"
-            :columns="vista.tableColumns"
-            :datos="vista.tableData"
-            :rowOptions="vista.tableRowActions"
-            @rowOptionSelected="vista.runMethod"
-        />
-    </VistaLayout>
+    <VistaLayout :config="VIEW_CONFIG" :setQuery="setQuery" @runMethod="runMethod"> </VistaLayout>
 
-    <!-- Modales -->
     <mTransaccion v-if="modals.show.mTransaccion" />
     <mFormato v-if="modals.show.mFormato" @created="setTransaccionDespachoRevisado" />
 </template>
 
 <script>
-// Modales específicos
 import mTransaccion from '@/views/compras/compras/mTransaccion.vue'
 import mFormato from '@/views/calidad/formatos/mFormato.vue'
 
-// Configuración de la vista
 import VIEW_CONFIG from './ventas.config.js'
-
-// Pinia y Utils
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
 import { useModals } from '@/pinia/modals'
@@ -43,27 +30,12 @@ export default {
             return this.vistas[VIEW_CONFIG.name]
         },
     },
-    created() {
-        // 1. Inicialización de la vista
-        this.vistas.initVista(VIEW_CONFIG.name, {
-            ...JSON.parse(JSON.stringify(VIEW_CONFIG)),
-            apiUrl: urls[VIEW_CONFIG.apiPath],
-            runMethod: this.runMethod,
-        })
-        this.initFiltros()
-
-        // 2. Carga inicial
-        this.auth.setColumns(this.vista.name, this.vista.tableColumns)
-        if (!this.vista.loaded && this.auth.verifyPermiso(`${VIEW_CONFIG.name}:listar`)) {
-            this.vista.loadTableData()
-        }
-    },
-    unmounted() {
-        if (this.vista) this.vista.runMethod = null
-    },
+    data: () => ({
+        VIEW_CONFIG,
+    }),
     methods: {
         runMethod(method, item) {
-            this.vistas.runMethod(this, method, item)
+            this[method](item)
         },
         initFiltros() {
             if (!this.vista.tableColumns[0].val) {
@@ -99,7 +71,9 @@ export default {
             const send = { transaccion: this.auth.avances.mVenta }
             if (this.auth.avances.mVenta.socio_pedido) {
                 this.auth.setLoading(true, 'Cargando...')
-                const res = await get(`${urls.socio_pedidos}/uno/${this.auth.avances.mVenta.socio_pedido}`)
+                const res = await get(
+                    `${urls.socio_pedidos}/uno/${this.auth.avances.mVenta.socio_pedido}`,
+                )
                 this.auth.setLoading(false)
                 if (res.code != 0) return
                 send.socio_pedido_items = res.data.socio_pedido_items

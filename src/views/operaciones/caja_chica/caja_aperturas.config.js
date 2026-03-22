@@ -9,12 +9,6 @@ export default {
             action: 'nuevo',
             permiso: 'vCajaAperturas:aperturarCaja',
         },
-        {
-            icon: 'fa-solid fa-download',
-            text: 'Exportar página actual',
-            action: 'vista.downloadActualTablePage',
-            tipo: '2',
-        },
     ],
 
     tableColumns: [
@@ -83,14 +77,6 @@ export default {
             icon: 'fa-solid fa-up-right-from-square',
             action: 'ver',
             permiso: 'vCajaAperturas:ver',
-        },
-        {
-            id: 3,
-            label: 'Eliminar',
-            icon: 'fa-solid fa-trash-can',
-            action: 'vista.eliminar',
-            permiso: 'vCajaAperturas:eliminar',
-            ocultar: { estado: 2 },
         },
         {
             id: 4,

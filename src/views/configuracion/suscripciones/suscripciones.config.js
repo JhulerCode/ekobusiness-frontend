@@ -3,14 +3,7 @@ export default {
     title: 'Suscripciones',
     apiPath: 'suscripciones',
 
-    headerActions: [
-        {
-            icon: 'fa-solid fa-download',
-            text: 'Exportar página actual',
-            action: 'vista.downloadActualTablePage',
-            tipo: '2',
-        },
-    ],
+    headerActions: [],
 
     tableColumns: [
         {

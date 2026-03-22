@@ -10,11 +10,6 @@ export default {
             permiso: 'vPtsIngresos:verCuarentena',
             tipo: '2',
         },
-        {
-            text: 'Exportar página actual',
-            action: 'vista.downloadActualTablePage',
-            tipo: '2',
-        },
     ],
 
     tableColumns: [

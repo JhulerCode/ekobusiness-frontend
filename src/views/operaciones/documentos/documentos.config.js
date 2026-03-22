@@ -9,12 +9,6 @@ export default {
             action: 'nuevo',
             permiso: 'vDocumentos:crear',
         },
-        {
-            icon: 'fa-solid fa-download',
-            text: 'Exportar página actual',
-            action: 'vista.downloadActualTablePage',
-            tipo: '2',
-        },
     ],
 
     tableColumns: [
@@ -97,12 +91,6 @@ export default {
             action: 'verFile',
             permiso: 'vRegistrosSanitarios:editar',
             ocultar: { file: {} },
-        },
-        {
-            label: 'Eliminar',
-            icon: 'fa-solid fa-trash-can',
-            action: 'vista.eliminar',
-            permiso: 'vDocumentos:eliminar',
         },
     ],
 }

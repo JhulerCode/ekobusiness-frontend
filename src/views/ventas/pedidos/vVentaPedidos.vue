@@ -1,15 +1,6 @@
 <template>
-    <VistaLayout :vista="vista">
-        <JdTable
-            :name="vista.name"
-            :columns="vista.tableColumns"
-            :datos="vista.tableData || []"
-            :rowOptions="vista.tableRowActions"
-            @rowOptionSelected="vista.runMethod"
-        />
-    </VistaLayout>
+    <VistaLayout :config="VIEW_CONFIG" :setQuery="setQuery" @runMethod="runMethod"> </VistaLayout>
 
-    <!-- Modales -->
     <mSocioPedido v-if="modals.show.mSocioPedido" />
     <mSocioPedidoPdf v-if="modals.show.mSocioPedidoPdf" />
     <mTransaccion v-if="modals.show.mTransaccion" />
@@ -17,16 +8,12 @@
 </template>
 
 <script>
-// Modales específicos
 import mSocioPedido from '@/views/compras/pedidos/mSocioPedido.vue'
 import mSocioPedidoPdf from '@/views/compras/pedidos/mSocioPedidoPdf.vue'
 import mTransaccion from '@/views/compras/compras/mTransaccion.vue'
 import mPedidosClientes from './mPedidosClientes.vue'
 
-// Configuración de la vista
 import VIEW_CONFIG from './venta_pedidos.config.js'
-
-// Pinia y Utils
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
 import { useModals } from '@/pinia/modals'
@@ -51,27 +38,12 @@ export default {
             return this.vistas[VIEW_CONFIG.name]
         },
     },
-    created() {
-        // 1. Inicialización de la vista
-        this.vistas.initVista(VIEW_CONFIG.name, {
-            ...JSON.parse(JSON.stringify(VIEW_CONFIG)),
-            apiUrl: urls[VIEW_CONFIG.apiPath],
-            runMethod: this.runMethod,
-        })
-        this.initFiltros()
-
-        // 2. Carga inicial
-        this.auth.setColumns(this.vista.name, this.vista.tableColumns)
-        if (!this.vista.loaded && this.auth.verifyPermiso(`${VIEW_CONFIG.name}:listar`)) {
-            this.vista.loadTableData()
-        }
-    },
-    unmounted() {
-        if (this.vista) this.vista.runMethod = null
-    },
+    data: () => ({
+        VIEW_CONFIG,
+    }),
     methods: {
         runMethod(method, item) {
-            this.vistas.runMethod(this, method, item)
+            this[method](item)
         },
         initFiltros() {
             if (!this.vista.tableColumns[1].val) {
@@ -93,7 +65,7 @@ export default {
             this.auth.updateQuery(this.vista.tableColumns, this.vista.qry)
         },
 
-        // Header actions
+        // --- Header actions ---
         nuevo() {
             const send = {
                 socio_pedido: {
@@ -126,7 +98,7 @@ export default {
             downloadExcel(columns, [], 'plantilla_pedidos.xlsx')
         },
 
-        // Table row actions
+        // --- Table row actions ---
         async ver(item) {
             const qry = {
                 incl: ['socio1', 'moneda1', 'socio_pedido_items'],

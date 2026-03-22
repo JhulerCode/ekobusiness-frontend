@@ -1,13 +1,5 @@
 <template>
-    <VistaLayout :vista="vista">
-        <JdTable
-            :name="vista.name"
-            :columns="vista.tableColumns"
-            :datos="vista.tableData"
-            :rowOptions="vista.tableRowActions"
-            @rowOptionSelected="runMethod"
-        />
-    </VistaLayout>
+    <VistaLayout :config="VIEW_CONFIG" :setQuery="setQuery" @runMethod="runMethod"> </VistaLayout>
 
     <!-- Modales -->
     <mSocioPedido v-if="modals.show.mSocioPedido" />
@@ -17,16 +9,12 @@
 </template>
 
 <script>
-// Modales específicos
 import mSocioPedido from '@/views/compras/pedidos/mSocioPedido.vue'
 import mSocioPedidoPdf from '@/views/compras/pedidos/mSocioPedidoPdf.vue'
 import mTransaccion from '@/views/compras/compras/mTransaccion.vue'
 import mStockPicking from '@/views/compras/pedidos/mStockPicking.vue'
 
-// Configuración de la vista
 import VIEW_CONFIG from './compra_pedidos.config.js'
-
-// Pinia y Utils
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
 import { useModals } from '@/pinia/modals'
@@ -50,27 +38,12 @@ export default {
             return this.vistas[VIEW_CONFIG.name]
         },
     },
-    async created() {
-        // 1. Inicialización de la vista
-        this.vistas.initVista(VIEW_CONFIG.name, {
-            ...JSON.parse(JSON.stringify(VIEW_CONFIG)),
-            apiUrl: urls[VIEW_CONFIG.apiPath],
-            runMethod: this.runMethod,
-        })
-        this.initFiltros()
-        this.auth.setColumns(this.vista.name, this.vista.tableColumns)
-
-        // 2. Carga inicial
-        if (!this.vista.loaded && this.auth.verifyPermiso(`${VIEW_CONFIG.name}:listar`)) {
-            this.vista.loadTableData()
-        }
-    },
-    unmounted() {
-        if (this.vista) this.vista.runMethod = null
-    },
+    data: () => ({
+        VIEW_CONFIG,
+    }),
     methods: {
         runMethod(method, item) {
-            this.vistas.runMethod(this, method, item)
+            this[method](item)
         },
         initFiltros() {
             const i = this.vista.tableColumns.findIndex((a) => a.id == 'fecha')
@@ -92,7 +65,7 @@ export default {
             this.vista.qry.cols.push('is_maquila')
         },
 
-        // --- Acciones de Registro ---
+        // --- Header actions ---
         nuevo() {
             const send = {
                 socio_pedido: {
@@ -110,6 +83,8 @@ export default {
             const send = { socio_pedido: this.auth.avances.mCompraPedido }
             this.modals.setModal('mSocioPedido', 'Nuevo pedido de compra', 1, send, true)
         },
+
+        // --- Table row actions ---
         async ver(item) {
             const qry = {
                 incl: ['socio1', 'moneda1', 'socio_pedido_items'],

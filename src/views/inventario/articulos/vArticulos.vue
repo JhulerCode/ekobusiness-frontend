@@ -1,21 +1,25 @@
 <template>
-    <VistaLayout :vista="vista">
+    <VistaLayout
+        :config="VIEW_CONFIG"
+        :setQuery="setQuery"
+        :rowSelectable="true"
+        @runMethod="runMethod"
+    >
         <template #header-left>
             <input ref="excel" type="file" accept=".xlsx, .xls, .csv" hidden @change="importar" />
         </template>
 
-        <JdTable
+        <!-- <JdTable
             :name="vista.name"
             :columns="vista.tableColumns"
             :datos="vista.tableData || []"
             :rowSelectable="true"
             :rowOptions="vista.tableRowActions"
-            @rowOptionSelected="vista.runMethod"
+            @rowOptionSelected="runMethod"
             @rowDblclick="ver"
-        />
+        /> -->
     </VistaLayout>
 
-    <!-- Modales -->
     <mImportarArticulos v-if="modals.show?.mImportarArticulos" />
     <mArticulo v-if="modals.show?.mArticulo" />
     <mLotes v-if="modals.show?.mLotes" />
@@ -24,22 +28,18 @@
 </template>
 
 <script>
-// Modales específicos
 import mImportarArticulos from '@/views/inventario/articulos/mImportarArticulos.vue'
 import mArticulo from '@/views/inventario/articulos/mArticulo.vue'
 import mLotes from '@/views/inventario/articulos/mLotes.vue'
 import mAjusteStock from '@/views/inventario/articulos/mAjusteStock.vue'
 import mUploadFiles from '@/components/mUploadFiles.vue'
 
-// Configuración de la vista
 import VIEW_CONFIG from './articulos.config.js'
-
-// Pinia y Utils
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
 import { useModals } from '@/pinia/modals'
 import { useSystem } from '@/pinia/system'
-import { urls, get } from '@/utils/crud'
+import { get } from '@/utils/crud'
 import { tryOficialExcel } from '@/utils/mine'
 import { jmsg } from '@/utils/swal'
 import dayjs from 'dayjs'
@@ -62,26 +62,12 @@ export default {
             return this.vistas[VIEW_CONFIG.name]
         },
     },
-    created() {
-        // 1. Inicialización de la vista
-        this.vistas.initVista(VIEW_CONFIG.name, {
-            ...JSON.parse(JSON.stringify(VIEW_CONFIG)),
-            apiUrl: urls[VIEW_CONFIG.apiPath],
-            runMethod: this.runMethod,
-        })
-        this.auth.setColumns(this.vista.name, this.vista.tableColumns)
-
-        // 2. Carga inicial
-        if (!this.vista.loaded && this.auth.verifyPermiso(`${VIEW_CONFIG.name}:listar`)) {
-            this.vista.loadTableData()
-        }
-    },
-    unmounted() {
-        if (this.vista) this.vista.runMethod = null
-    },
+    data: () => ({
+        VIEW_CONFIG,
+    }),
     methods: {
         runMethod(method, item) {
-            this.vistas.runMethod(this, method, item)
+            this[method](item)
         },
         setQuery() {
             this.vista.qry = {
@@ -91,6 +77,7 @@ export default {
                 ordr: [['nombre', 'ASC']],
                 page: this.vista.table_page,
             }
+
             this.auth.updateQuery(this.vista.tableColumns, this.vista.qry)
             this.vista.qry.cols.push('fotos')
             if (this.vista.tableColumns[3].show == true) {
@@ -98,7 +85,7 @@ export default {
             }
         },
 
-        // Header actions
+        // --- Header actions ---
         nuevo() {
             const send = {
                 articulo: {
@@ -120,11 +107,7 @@ export default {
             this.$refs.excel.click()
         },
 
-        // Table row actions
-        ver(item) {
-            if (!this.auth.verifyPermiso(`${VIEW_CONFIG.name}:ver`)) return
-            this.$router.push(`/consola/inventario/articulos/${item.id}`)
-        },
+        // --- Table row actions ---
         async editar(item) {
             const qry = {
                 incl: ['categoria1', 'linea1', 'articulo_suppliers', 'combo_componentes'],
@@ -188,7 +171,7 @@ export default {
             this.modals.setModal('mUploadFiles', 'Actualizar fotos', 2, send, true)
         },
 
-        // @actions
+        // --- @actions ---
         async importar(event) {
             this.auth.setLoading(true, 'Cargando archivo...')
             const file = event.target.files[0]

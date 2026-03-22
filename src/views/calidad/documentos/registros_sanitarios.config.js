@@ -9,12 +9,6 @@ export default {
             action: 'nuevo',
             permiso: 'vRegistrosSanitarios:crear',
         },
-        {
-            icon: 'fa-solid fa-download',
-            text: 'Exportar página actual',
-            action: 'vista.downloadActualTablePage',
-            tipo: '2',
-        },
     ],
 
     tableColumns: [
@@ -92,14 +86,7 @@ export default {
         },
     ],
 
-    tableBulkActions: [
-        {
-            icon: 'fa-solid fa-trash-can',
-            text: 'Eliminar',
-            action: 'vista.eliminarBulk',
-            permiso: 'vRegistrosSanitarios:eliminarBulk',
-        },
-    ],
+    tableBulkActions: [],
 
     tableRowActions: [
         {
@@ -114,12 +101,6 @@ export default {
             action: 'verFile',
             permiso: 'vRegistrosSanitarios:editar',
             ocultar: { file_name: null },
-        },
-        {
-            label: 'Eliminar',
-            icon: 'fa-solid fa-trash-can',
-            action: 'vista.eliminar',
-            permiso: 'vRegistrosSanitarios:eliminar',
         },
     ],
 }

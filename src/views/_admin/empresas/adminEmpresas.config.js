@@ -2,6 +2,7 @@ export default {
     name: 'vAdminEmpresas',
     title: 'Empresas',
     apiPath: 'empresas',
+    detailViewName: 'vAdminSuscripciones',
 
     headerActions: [
         {
@@ -62,12 +63,5 @@ export default {
         },
     ],
 
-    tableRowActions: [
-        {
-            label: 'Eliminar',
-            icon: 'fa-solid fa-trash-can',
-            action: 'vista.eliminar',
-            permiso: 'vAdminEmpresas:eliminar',
-        },
-    ],
+    tableRowActions: [],
 }

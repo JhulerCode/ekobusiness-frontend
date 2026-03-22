@@ -9,12 +9,6 @@ export default {
             action: 'nuevo',
             permiso: 'vArticuloCategorias:crear',
         },
-        {
-            icon: 'fa-solid fa-download',
-            text: 'Exportar página actual',
-            action: 'vista.downloadActualTablePage',
-            tipo: '2',
-        },
     ],
 
     tableColumns: [
@@ -75,33 +69,12 @@ export default {
         },
     ],
 
-    // tableBulkActions: [
-    //     {
-    //         icon: 'fa-solid fa-pen-to-square',
-    //         text: 'Editar',
-    //         action: 'vista.editarBulk',
-    //         permiso: 'vArticuloCategorias:editarBulk',
-    //     },
-    //     {
-    //         icon: 'fa-solid fa-trash-can',
-    //         text: 'Eliminar',
-    //         action: 'vista.eliminarBulk',
-    //         permiso: 'vArticuloCategorias:eliminarBulk',
-    //     },
-    // ],
-
     tableRowActions: [
         {
             label: 'Editar',
             icon: 'fa-solid fa-pen-to-square',
             action: 'editar',
             permiso: 'vArticuloCategorias:editar',
-        },
-        {
-            label: 'Eliminar',
-            icon: 'fa-solid fa-trash-can',
-            action: 'vista.eliminar',
-            permiso: 'vArticuloCategorias:eliminar',
         },
         {
             label: 'Actualizar fotos',

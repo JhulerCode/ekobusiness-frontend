@@ -9,12 +9,6 @@ export default {
             action: 'nuevo',
             permiso: 'vColaboradores:crear',
         },
-        {
-            icon: 'fa-solid fa-download',
-            text: 'Exportar página actual',
-            action: 'vista.downloadActualTablePage',
-            tipo: '2',
-        },
     ],
 
     tableColumns: [
@@ -145,12 +139,6 @@ export default {
             icon: 'fa-solid fa-pen-to-square',
             action: 'editar',
             permiso: 'vColaboradores:editar',
-        },
-        {
-            label: 'Eliminar',
-            icon: 'fa-solid fa-trash-can',
-            action: 'vista.eliminar',
-            permiso: 'vColaboradores:eliminar',
         },
     ],
 }

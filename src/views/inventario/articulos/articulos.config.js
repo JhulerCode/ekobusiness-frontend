@@ -2,6 +2,7 @@ export default {
     name: 'vArticulos',
     title: 'Artículos',
     apiPath: 'articulos',
+    detailViewName: 'vArticulo',
 
     headerActions: [
         {
@@ -14,12 +15,6 @@ export default {
             text: 'Importar',
             action: 'abrirExcel',
             permiso: 'vArticulos:importar',
-            tipo: '2',
-        },
-        {
-            icon: 'fa-solid fa-download',
-            text: 'Exportar página actual',
-            action: 'vista.downloadActualTablePage',
             tipo: '2',
         },
     ],
@@ -211,28 +206,9 @@ export default {
         },
     ],
 
-    tableBulkActions: [
-        {
-            icon: 'fa-solid fa-pen-to-square',
-            text: 'Editar',
-            action: 'vista.editarBulk',
-            permiso: 'vArticulos:editarBulk',
-        },
-        {
-            icon: 'fa-solid fa-trash-can',
-            text: 'Eliminar',
-            action: 'vista.eliminarBulk',
-            permiso: 'vArticulos:eliminarBulk',
-        },
-    ],
+    tableBulkActions: [],
 
     tableRowActions: [
-        {
-            label: 'Ver',
-            icon: 'fa-solid fa-eye',
-            action: 'ver',
-            permiso: 'vArticulos:ver',
-        },
         {
             label: 'Editar',
             icon: 'fa-solid fa-pen-to-square',
@@ -244,12 +220,6 @@ export default {
             icon: 'fa-solid fa-image',
             action: 'openUploadFiles',
             permiso: 'vArticulos:actualizarFotos',
-        },
-        {
-            label: 'Eliminar',
-            icon: 'fa-solid fa-trash-can',
-            action: 'vista.eliminar',
-            permiso: 'vArticulos:eliminar',
         },
         {
             label: 'Clonar',

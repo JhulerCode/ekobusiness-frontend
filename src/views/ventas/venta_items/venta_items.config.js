@@ -3,14 +3,7 @@ export default {
     title: 'Artículos vendidos',
     apiPath: 'transaccion_items',
 
-    headerActions: [
-        {
-            icon: 'fa-solid fa-download',
-            text: 'Exportar página actual',
-            action: 'vista.downloadActualTablePage',
-            tipo: '2',
-        },
-    ],
+    headerActions: [],
 
     tableColumns: [
         {

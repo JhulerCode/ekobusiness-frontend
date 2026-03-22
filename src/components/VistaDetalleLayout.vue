@@ -10,9 +10,9 @@
             <div class="header-right">
                 <JdButtonsOverflow
                     v-if="vista.headerActions"
-                    :actions="[...basicActions, ...(vista.headerActions || [])]"
+                    :actions="basicActions"
+                    @actionSelected="handleHeaderAction"
                     align="right"
-                    @actionSelected="handleAction"
                 />
 
                 <slot name="header-right"></slot>
@@ -49,16 +49,20 @@
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useVistas } from '@/pinia/vistas'
-import JdButtonsOverflow from './VistaLayout/JdButtonsOverflow.vue'
 import { urls } from '@/utils/crud'
+
+import JdButtonsOverflow from './VistaLayout/JdButtonsOverflow.vue'
+
+const route = useRoute()
+const router = useRouter()
+const vistas = useVistas()
 
 const props = defineProps({
     config: { type: Object, required: true },
     pestanas: { type: Array, default: () => [] },
 })
 
-const route = useRoute()
-const vistas = useVistas()
+const emit = defineEmits(['runMethod'])
 
 // --- Inicialización de la vista ---
 const vista = computed(() => vistas[props.config.name])
@@ -70,15 +74,7 @@ vistas.initVista(props.config.name, {
     data: {},
 })
 
-const emit = defineEmits(['runMethod'])
-
-const resolvedTitle = computed(() => {
-    const id = route?.params?.id
-    if (id === 'nuevo') return 'Nuevo'
-    if (id) return vista.value?.data?.[vista.value?.titleKey ?? 'nombre']
-    return vista.value?.title
-})
-
+// --- Header actions ---
 const basicActions = computed(() => {
     const isEdit = vista.value?.mode === 'edit'
     return [
@@ -102,34 +98,50 @@ const basicActions = computed(() => {
             icon: 'fa-solid fa-floppy-disk',
             show: isEdit,
         },
+        ...(vista.value.headerActions || []),
     ]
+})
+
+function editar() {
+    const v = vista.value
+    v.original_data = JSON.parse(JSON.stringify(v.data))
+    v.mode = 'edit'
+}
+
+function cancelar() {
+    if (route?.params?.id === 'nuevo') {
+        router.back()
+        return
+    }
+    const v = vista.value
+    v.data = JSON.parse(JSON.stringify(v.original_data))
+    v.mode = 'view'
+}
+
+const handleHeaderAction = (action, item) => {
+    const localActions = {
+        editar,
+        cancelar,
+    }
+
+    if (localActions[action]) {
+        localActions[action]()
+        return
+    }
+
+    emit('runMethod', action, item)
+}
+
+// --- Methods de apoyo ---
+const resolvedTitle = computed(() => {
+    const id = route?.params?.id
+    if (id === 'nuevo') return 'Nuevo'
+    if (id) return vista.value?.data?.[vista.value?.titleKey ?? 'nombre']
+    return vista.value?.title
 })
 
 const handleTabClick = (tabId) => {
     vista.value.pestana = tabId
-}
-
-const router = useRouter()
-
-const handleAction = (action) => {
-    if (action === 'editar') {
-        const v = vista.value
-        v.original_data = JSON.parse(JSON.stringify(v.data))
-        v.mode = 'edit'
-        return
-    }
-    if (action === 'cancelar') {
-        if (route?.params?.id === 'nuevo') {
-            router.back()
-            return
-        }
-        const v = vista.value
-        v.data = JSON.parse(JSON.stringify(v.original_data))
-        v.mode = 'view'
-        return
-    }
-    // Cualquier otra acción (guardar, etc.) se delega al parent
-    emit('runMethod', action)
 }
 </script>
 

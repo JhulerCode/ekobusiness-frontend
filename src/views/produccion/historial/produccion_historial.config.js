@@ -15,12 +15,6 @@ export default {
             permiso: 'vProduccionHistorial:salidaInsumos',
             tipo: '2',
         },
-        {
-            icon: 'fa-solid fa-download',
-            text: 'Exportar página actual',
-            action: 'vista.downloadActualTablePage',
-            tipo: '2',
-        },
     ],
 
     tableColumns: [
@@ -191,13 +185,6 @@ export default {
             icon: 'fa-solid fa-pen-to-square',
             action: 'editar',
             permiso: 'vProduccionHistorial:editar',
-            ocultar: { estado: 2 },
-        },
-        {
-            label: 'Eliminar',
-            icon: 'fa-solid fa-trash-can',
-            action: 'vista.eliminar',
-            permiso: 'vProduccionHistorial:eliminar',
             ocultar: { estado: 2 },
         },
         {

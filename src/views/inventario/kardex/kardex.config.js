@@ -48,12 +48,6 @@ export default {
     ],
     tableRowActions: [
         {
-            label: 'Eliminar',
-            icon: 'fa-regular fa-trash-can',
-            action: 'eliminar',
-            permiso: 'vArticulos:kardexDelete',
-        },
-        {
             label: 'Ver compra',
             icon: 'fa-regular fa-folder-open',
             action: 'verCompra',

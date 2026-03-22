@@ -16,12 +16,6 @@ export default {
             tipo: '2',
             showIfAvance: 'mCompra',
         },
-        {
-            icon: 'fa-solid fa-download',
-            text: 'Exportar página actual',
-            action: 'vista.downloadActualTablePage',
-            tipo: '2',
-        },
     ],
 
     tableColumns: [
@@ -130,13 +124,6 @@ export default {
             label: 'Editar',
             icon: 'fa-solid fa-pen-to-square',
             action: 'editar',
-            permiso: 'vCompras:editar',
-            ocultar: { estado: 2 },
-        },
-        {
-            label: 'Eliminar',
-            icon: 'fa-solid fa-trash',
-            action: 'vista.eliminar',
             permiso: 'vCompras:editar',
             ocultar: { estado: 2 },
         },

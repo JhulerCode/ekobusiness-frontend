@@ -9,12 +9,6 @@ export default {
             action: 'nuevo',
             permiso: 'vInspecciones:crear',
         },
-        {
-            icon: 'fa-solid fa-download',
-            text: 'Exportar página actual',
-            action: 'vista.downloadActualTablePage',
-            tipo: '2',
-        },
     ],
 
     tableColumns: [
@@ -64,14 +58,7 @@ export default {
         },
     ],
 
-    tableBulkActions: [
-        {
-            icon: 'fa-solid fa-trash-can',
-            text: 'Eliminar',
-            action: 'vista.eliminarBulk',
-            permiso: 'vInspecciones:eliminarBulk',
-        },
-    ],
+    tableBulkActions: [],
 
     tableRowActions: [
         {
@@ -85,12 +72,6 @@ export default {
             icon: 'fa-solid fa-pen-to-square',
             action: 'editar',
             permiso: 'vInspecciones:editar',
-        },
-        {
-            label: 'Eliminar',
-            icon: 'fa-solid fa-trash-can',
-            action: 'vista.eliminar',
-            permiso: 'vInspecciones:eliminar',
         },
     ],
 }

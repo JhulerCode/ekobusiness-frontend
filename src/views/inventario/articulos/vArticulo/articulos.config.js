@@ -3,5 +3,13 @@ export default {
     titleKey: 'nombre',
     apiPath: 'articulos',
 
-    headerActions: [],
+    headerActions: [
+        {
+            text: 'Ver kardex',
+            icon: 'fa-solid fa-table-list',
+            tipo: '2',
+            action: 'verKardex',
+            permiso: 'vArticulos:kardex',
+        },
+    ],
 }

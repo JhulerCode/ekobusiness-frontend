@@ -1,14 +1,15 @@
 <template>
-    <VistaLayout :vista="vista">
-        <JdTable :name="vista.name" :columns="vista.tableColumns" :datos="vista.tableData || []" />
+    <VistaLayout
+        :config="VIEW_CONFIG"
+        :setQuery="setQuery"
+        :loadDataPers="loadTableData"
+        @runMethod="runMethod"
+    >
     </VistaLayout>
 </template>
 
 <script>
-// Configuración de la vista
 import VIEW_CONFIG from './inventario.config.js'
-
-// Pinia y Utils
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
 import { useModals } from '@/pinia/modals'
@@ -27,27 +28,12 @@ export default {
             return this.vistas[VIEW_CONFIG.name]
         },
     },
-    created() {
-        // 1. Inicialización de la vista
-        this.vistas.initVista(VIEW_CONFIG.name, {
-            ...JSON.parse(JSON.stringify(VIEW_CONFIG)),
-            apiUrl: urls[VIEW_CONFIG.apiPath],
-            runMethod: this.runMethod,
-        })
-        this.initFiltros()
-        this.vista.loadTableData = this.loadTableData
-
-        // 2. Carga inicial
-        if (!this.vista.loaded && this.auth.verifyPermiso(`${VIEW_CONFIG.name}:listar`)) {
-            this.vista.loadTableData()
-        }
-    },
-    unmounted() {
-        if (this.vista) this.vista.runMethod = null
-    },
+    data: () => ({
+        VIEW_CONFIG,
+    }),
     methods: {
         runMethod(method, item) {
-            this.vistas.runMethod(this, method, item)
+            this[method](item)
         },
         initFiltros() {
             if (!this.vista.tableColumns[0].val) {
@@ -55,7 +41,7 @@ export default {
                 this.vista.tableColumns[0].val = dayjs().format('YYYY-MM-DD')
             }
         },
-        checkDatos() {
+        checkFiltros() {
             if (!this.vista.tableColumns[0].val) {
                 jmsg('error', 'Ingrese la fecha límite')
                 return true
@@ -80,9 +66,8 @@ export default {
             this.auth.updateQuery(this.vista.tableColumns, this.vista.qry)
         },
         async loadTableData(init_page) {
+            if (this.checkFiltros()) return
             if (init_page) this.vista.table_page = 1
-            if (this.checkDatos()) return
-
             this.setQuery()
 
             this.vista.tableData = []

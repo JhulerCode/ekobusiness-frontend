@@ -1,7 +1,9 @@
 <template>
     <JdModal modal="mLotes">
         <div class="header">
-            <p>{{ modal.articulo.nombre }} ({{ modal.articulo.unidad }})</p>
+            <p v-if="modal.articulo.nombre">
+                {{ modal.articulo.nombre }} ({{ modal.articulo.unidad }})
+            </p>
 
             <div>
                 <p>

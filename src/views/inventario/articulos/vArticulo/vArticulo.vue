@@ -62,11 +62,13 @@
             <vArticuloComponentes v-if="vista.pestana == 6" />
         </template>
     </VistaDetalleLayout>
+
+    <mLotes v-if="modals.show?.mLotes" />
+    <mAjusteStock v-if="modals.show?.mAjusteStock" />
+    <mUploadFiles v-if="modals.show?.mUploadFiles" />
 </template>
 
 <script>
-import VIEW_CONFIG from './articulo.config.js'
-
 import vArticuloGeneral from './vArticuloGeneral.vue'
 import vArticuloCompra from './vArticuloCompra.vue'
 import vArticuloVenta from './vArticuloVenta.vue'
@@ -74,12 +76,19 @@ import vArticuloInventario from './vArticuloInventario.vue'
 import vArticuloProduccion from './vArticuloProduccion.vue'
 import vArticuloComponentes from './vArticuloComponentes.vue'
 
+import mLotes from '@/views/inventario/articulos/mLotes.vue'
+import mAjusteStock from '@/views/inventario/articulos/mAjusteStock.vue'
+import mUploadFiles from '@/components/mUploadFiles.vue'
+
+import VIEW_CONFIG from './articulo.config.js'
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
+import { useModals } from '@/pinia/modals'
 import { useSystem } from '@/pinia/system'
 import { urls, get, post, patch } from '@/utils/crud'
 import { incompleteData } from '@/utils/mine.js'
 import { jmsg } from '@/utils/swal.js'
+import dayjs from 'dayjs'
 
 export default {
     components: {
@@ -89,25 +98,28 @@ export default {
         vArticuloInventario,
         vArticuloProduccion,
         vArticuloComponentes,
+
+        mLotes,
+        mAjusteStock,
+        mUploadFiles,
     },
     data: () => ({
         VIEW_CONFIG,
+        useSystem: useSystem(),
+        auth: useAuth(),
+        vistas: useVistas(),
+        modals: useModals(),
+        vista: {},
     }),
     computed: {
-        auth: () => useAuth(),
-        vistas: () => useVistas(),
-        useSystem: () => useSystem(),
-        vista() {
-            return this.vistas[VIEW_CONFIG.name]
-        },
         availableTabs() {
             return [
                 { id: 1, label: 'General', show: true },
-                { id: 2, label: 'Compra', show: this.vista.data.purchase_ok },
-                { id: 3, label: 'Venta', show: this.vista.data.sale_ok },
-                { id: 4, label: 'Inventario', show: this.vista.data.type == 'consumable' },
-                { id: 5, label: 'Producción', show: this.vista.data.produce_ok },
-                { id: 6, label: 'Componentes', show: this.vista.data.type == 'combo' },
+                { id: 2, label: 'Compra', show: this.vista?.data.purchase_ok },
+                { id: 3, label: 'Venta', show: this.vista?.data.sale_ok },
+                { id: 4, label: 'Inventario', show: this.vista?.data.type == 'consumable' },
+                { id: 5, label: 'Producción', show: this.vista?.data.produce_ok },
+                { id: 6, label: 'Componentes', show: this.vista?.data.type == 'combo' },
             ]
         },
         is_nuevo() {
@@ -115,6 +127,7 @@ export default {
         },
     },
     async created() {
+        this.vista = this.vistas[VIEW_CONFIG.name]
         await this.useSystem.load(['articulo_tipos'])
         await this.loadArticulo()
     },
@@ -192,6 +205,45 @@ export default {
         },
         verKardex() {
             this.$router.push(`/consola/inventario/articulos/${this.vista.data.id}/kardex`)
+        },
+        verLotes() {
+            const send = {
+                articulo: {
+                    id: this.vista.data.id,
+                    // nombre: this.vista.data.nombre,
+                    // unidad: this.vista.data.unidad,
+                },
+            }
+            this.modals.setModal('mLotes', 'Lotes del artículo', null, send, true)
+        },
+        ajusteStock() {
+            const send = {
+                transaccion: { fecha: dayjs().format('YYYY-MM-DD'), articulo: this.vista.data.id },
+                articulo1: {
+                    igv_afectacion: this.vista.data.igv_afectacion,
+                    has_fv: this.vista.data.has_fv,
+                },
+                articulos: [{ id: this.vista.data.id, nombre: this.vista.data.nombre }],
+                articulo_tipo: 1,
+                is_nuevo_lote: false,
+            }
+            this.modals.setModal('mAjusteStock', 'Ajuste de stock', null, send, true)
+        },
+        actualizarFotos() {
+            const send = {
+                item: {
+                    id: this.vista.data.id,
+                    nombre: this.vista.data.nombre,
+                    archivos: this.vista.data.fotos || [],
+                },
+                accept: 'image/*',
+                cantidad: 10,
+                url: `${this.vista.apiUrl}/fotos`,
+                vista: this.vista.name,
+                object: 'data',
+                prop: 'fotos',
+            }
+            this.modals.setModal('mUploadFiles', 'Actualizar fotos', 2, send, true)
         },
 
         // -- Methods auxiliares ---

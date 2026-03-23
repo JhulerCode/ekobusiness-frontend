@@ -6,7 +6,6 @@
 
                 <slot name="header-left"></slot>
             </div>
-            {{ permisoEditar }}
 
             <div class="header-right">
                 <JdButtonsOverflow
@@ -79,6 +78,15 @@ vistas.initVista(props.config.name, {
 const basicActions = computed(() => {
     const isEdit = vista.value?.mode === 'edit'
     return [
+        ...(!isEdit ? vista.value.headerActions || [] : []),
+        {
+            text: 'Clonar',
+            action: 'clonar',
+            tipo: '2',
+            icon: 'fa-solid fa-copy',
+            permiso: props.config.permisoEditar,
+            show: !isEdit,
+        },
         {
             text: 'Editar',
             action: 'editar',
@@ -99,30 +107,33 @@ const basicActions = computed(() => {
             icon: 'fa-solid fa-floppy-disk',
             show: isEdit,
         },
-        ...(vista.value.headerActions || []),
     ]
 })
 
 function editar() {
-    const v = vista.value
-    v.original_data = JSON.parse(JSON.stringify(v.data))
-    v.mode = 'edit'
+    vista.value.original_data = JSON.parse(JSON.stringify(vista.value.data))
+    vista.value.mode = 'edit'
 }
 
 function cancelar() {
-    if (route?.params?.id === 'nuevo') {
-        router.back()
-        return
-    }
-    const v = vista.value
-    v.data = JSON.parse(JSON.stringify(v.original_data))
-    v.mode = 'view'
+    if (route?.params?.id === 'nuevo') router.back()
+
+    vista.value.data = JSON.parse(JSON.stringify(vista.value.original_data))
+    vista.value.mode = 'view'
+}
+
+function clonar() {
+    vista.value.original_data = JSON.parse(JSON.stringify(vista.value.data))
+    router.push({ name: props.config.name, params: { id: 'nuevo' } })
+    delete vista.value.data.id
+    vista.value.mode = 'edit'
 }
 
 const handleHeaderAction = (action, item) => {
     const localActions = {
         editar,
         cancelar,
+        clonar,
     }
 
     if (localActions[action]) {

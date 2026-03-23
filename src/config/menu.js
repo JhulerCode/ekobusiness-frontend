@@ -43,6 +43,7 @@ export default [
                     { id: 'vArticulos:eliminar', label: 'Eliminar' },
                     { id: 'vArticulos:actualizarFotos', label: 'Actualizar fotos' },
                     { id: 'vArticulos:clonar', label: 'Clonar' },
+                    { id: 'vArticulos:listaMateriales', label: 'Lista de materiales' },
                     { id: 'vArticulos:kardex', label: 'Ver kardex' },
                     { id: 'vArticulos:lotes', label: 'Ver Lotes' },
                     { id: 'vArticulos:kardexDelete', label: 'Eliminar movimiento kardex' },

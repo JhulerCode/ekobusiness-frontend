@@ -22,33 +22,27 @@
 
     <mImportarArticulos v-if="modals.show?.mImportarArticulos" />
     <mLotes v-if="modals.show?.mLotes" />
-    <mAjusteStock v-if="modals.show?.mAjusteStock" />
-    <mUploadFiles v-if="modals.show?.mUploadFiles" />
 </template>
 
 <script>
 import mImportarArticulos from '@/views/inventario/articulos/mImportarArticulos.vue'
 import mLotes from '@/views/inventario/articulos/mLotes.vue'
-import mAjusteStock from '@/views/inventario/articulos/mAjusteStock.vue'
-import mUploadFiles from '@/components/mUploadFiles.vue'
 
 import VIEW_CONFIG from './articulos.config.js'
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
 import { useModals } from '@/pinia/modals'
 import { useSystem } from '@/pinia/system'
-import { get } from '@/utils/crud'
+// import { get } from '@/utils/crud'
 import { tryOficialExcel } from '@/utils/mine'
 import { jmsg } from '@/utils/swal'
-import dayjs from 'dayjs'
+// import dayjs from 'dayjs'
 
 export default {
     name: 'vArticulos',
     components: {
         mImportarArticulos,
         mLotes,
-        mAjusteStock,
-        mUploadFiles,
     },
     computed: {
         auth: () => useAuth(),
@@ -76,7 +70,7 @@ export default {
             }
 
             this.auth.updateQuery(this.vista.tableColumns, this.vista.qry)
-            this.vista.qry.cols.push('fotos')
+            // this.vista.qry.cols.push('fotos')
             if (this.vista.tableColumns[3].show == true) {
                 this.vista.qry.sqls.push('articulo_stock')
             }
@@ -91,50 +85,12 @@ export default {
         },
 
         // --- Table row actions ---
-        async clonar(item) {
-            const qry = {
-                incl: ['categoria1', 'linea1', 'articulo_suppliers', 'combo_componentes'],
-            }
-            this.auth.setLoading(true, 'Cargando...')
-            const res = await get(`${this.vista.apiUrl}/uno/${item.id}?qry=${JSON.stringify(qry)}`)
-            this.auth.setLoading(false)
-            if (res.code != 0) return
-            const send = {
-                articulo: { ...res.data, id: null },
-                pestana: 1,
-                articulo_categorias: [{ ...res.data.categoria1 }],
-                articulo_lineas: [{ ...res.data.linea1 }],
-            }
-            this.modals.setModal('mArticulo', 'Nuevo artículo', 1, send, true)
-        },
         verKardex(item) {
             this.$router.push(`/consola/inventario/articulos/${item.id}/kardex`)
         },
         verLotes(item) {
             const send = { articulo: { id: item.id, nombre: item.nombre, unidad: item.unidad } }
             this.modals.setModal('mLotes', 'Lotes del artículo', null, send, true)
-        },
-        ajusteStock(item) {
-            const send = {
-                transaccion: { fecha: dayjs().format('YYYY-MM-DD'), articulo: item.id },
-                articulo1: { igv_afectacion: item.igv_afectacion, has_fv: item.has_fv },
-                articulos: [{ id: item.id, nombre: item.nombre }],
-                articulo_tipo: 1,
-                is_nuevo_lote: false,
-            }
-            this.modals.setModal('mAjusteStock', 'Ajuste de stock', null, send, true)
-        },
-        openUploadFiles(item) {
-            const send = {
-                item: { id: item.id, nombre: item.nombre, archivos: item.fotos || [] },
-                accept: 'image/*',
-                cantidad: 10,
-                url: `${this.vista.apiUrl}/fotos`,
-                vista: this.vista.name,
-                tabla: 'tableData',
-                prop: 'fotos',
-            }
-            this.modals.setModal('mUploadFiles', 'Actualizar fotos', 2, send, true)
         },
 
         // --- @actions ---

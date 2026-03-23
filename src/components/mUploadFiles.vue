@@ -117,9 +117,16 @@ export default {
             if (res.code !== 0) return
 
             if (this.modal.prop) {
-                const tabla = this.useVistas[this.modal.vista][this.modal.tabla]
-                const i = tabla.findIndex((a) => a.id == this.modal.item.id)
-                tabla[i][this.modal.prop] = res.data
+                if (this.modal.tabla) {
+                    const tabla = this.useVistas[this.modal.vista][this.modal.tabla]
+                    const i = tabla.findIndex((a) => a.id == this.modal.item.id)
+                    tabla[i][this.modal.prop] = res.data
+                }
+
+                if (this.modal.object) {
+                    const object = this.useVistas[this.modal.vista][this.modal.object]
+                    object[this.modal.prop] = res.data
+                }
             }
 
             this.useModals.show.mUploadFiles = false

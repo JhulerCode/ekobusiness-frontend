@@ -2,7 +2,7 @@
     <div class="vista">
         <header class="header">
             <div class="header-left" style="flex-wrap: nowrap">
-                <strong style="white-space: nowrap">{{ vista.title }}</strong>
+                <strong style="white-space: nowrap">{{ title }}</strong>
 
                 <JdButtonsOverflow
                     v-if="vista.headerActions"
@@ -73,7 +73,7 @@
 
 <script setup>
 import { computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
 import { useModals } from '@/pinia/modals'
@@ -90,6 +90,7 @@ import mConfigFiltros from '@/components/VistaLayout/mConfigFiltros.vue'
 import mEditar from '@/components/VistaLayout/mEditar.vue'
 
 const router = useRouter()
+const route = useRoute()
 const auth = useAuth()
 const modals = useModals()
 const vistas = useVistas()
@@ -97,6 +98,7 @@ const vistas = useVistas()
 const props = defineProps({
     config: { type: Object, required: true },
     initFiltros: { type: Function },
+    checkFiltros: { type: Function },
     setQuery: { type: Function, required: true },
     loadDataPers: { type: Function },
     askToInicialLoad: { type: Boolean, default: true },
@@ -134,6 +136,7 @@ async function loadTableData(init_page) {
         return
     }
 
+    if (props.checkFiltros && props.checkFiltros()) return
     if (init_page) vista.value.table_page = 1
     props.setQuery()
 
@@ -304,6 +307,10 @@ function handleRowAction(action, item) {
 }
 
 // --- Methods de apoyo ---
+const title = computed(() => {
+    return route.meta.title
+})
+
 const selectedCount = computed(() => {
     return (vista.value.tableData || []).filter((a) => a.selected).length
 })

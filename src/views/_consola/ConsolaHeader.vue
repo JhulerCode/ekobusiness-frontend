@@ -67,62 +67,46 @@ export default {
             const currentRouteName = this.$route.name
             if (!currentRouteName) return crumbs
 
-            // 1. Encontrar la sección y el elemento activo
-            let activeChild = null
-            let activeSection = null
-
-            for (const section of this.useAuth.menu) {
-                activeChild = section.children.find((c) => c.goto === currentRouteName)
-                if (activeChild) {
-                    activeSection = section
-                    break
+            const findCrumbs = (items) => {
+                if (!items) return null
+                for (const item of items) {
+                    if (item.goto === currentRouteName) {
+                        return [item]
+                    }
+                    if (item.children && item.children.length > 0) {
+                        const childCrumbs = findCrumbs(item.children)
+                        if (childCrumbs) {
+                            return [item, ...childCrumbs]
+                        }
+                    }
                 }
+                return null
             }
 
-            if (!activeSection || !activeChild) return crumbs
+            const pathItems = findCrumbs(this.useAuth.menu)
+            if (!pathItems) return crumbs
 
-            // 2. Construir los crumbs procesando los segmentos del path
-            const pathParts = activeChild.path.split('/')
-
-            // La sección principal (Ventas, Compras, etc.)
-            crumbs.push({
-                label: activeSection.label,
-                icon: activeSection.icon,
-                name: activeSection.goto || null,
-            })
-
-            let cumulativePath = ''
-            pathParts.forEach((part, index) => {
-                // Ignorar el primer segmento si coincide con el ID de la sección (ya se agregó arriba)
-                if (index === 0 && part === activeSection.id) {
-                    cumulativePath = part
-                    return
-                }
-
-                cumulativePath += (cumulativePath ? '/' : '') + part
-
-                // Buscar la configuración del ítem para este subpath
-                const item = activeSection.children.find((c) => c.path === cumulativePath)
-                if (!item) return
-
+            pathItems.forEach((item, index) => {
                 let label = item.label
-                const isLast = index === pathParts.length - 1
+                const isLast = index === pathItems.length - 1
 
-                // Si es un parámetro dinámico (:id, :slug), intentar obtener el nombre real del objeto
-                if (part.startsWith(':')) {
+                if (item.path && item.path.includes(':')) {
                     const vista = this.useVistas[item.goto]
-
                     const dynamicName =
                         vista?.data?.nombre || vista?.data?.nombres || vista?.data?.label
 
                     label = dynamicName || label
                 }
 
-                if (label.length > 30) {
+                if (label && label.length > 30) {
                     label = label.substring(0, 27) + '...'
                 }
 
-                crumbs.push({ label, name: isLast ? null : item.goto })
+                crumbs.push({
+                    label,
+                    icon: item.icon,
+                    name: isLast ? null : item.goto,
+                })
             })
 
             return crumbs

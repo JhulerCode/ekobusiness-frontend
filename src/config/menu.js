@@ -3,11 +3,12 @@ export default [
         id: 'inventario',
         label: 'Inventario',
         icon: 'fa-solid fa-boxes-stacked',
+        path: 'inventario',
         children: [
             {
                 label: 'Líneas de productos',
                 goto: 'vProductoLineas',
-                path: 'inventario/lineas',
+                path: 'lineas',
                 view: 'inventario/lineas/vProductoLineas.vue',
                 permisos: [
                     { id: 'vProductoLineas:listar', label: 'Listar' },
@@ -20,7 +21,7 @@ export default [
             {
                 label: 'Categorías',
                 goto: 'vArticuloCategorias',
-                path: 'inventario/categorias',
+                path: 'categorias',
                 view: 'inventario/categorias/vArticuloCategorias.vue',
                 permisos: [
                     { id: 'vArticuloCategorias:listar', label: 'Listar' },
@@ -33,7 +34,7 @@ export default [
             {
                 label: 'Artículos',
                 goto: 'vArticulos',
-                path: 'inventario/articulos',
+                path: 'articulos',
                 view: 'inventario/articulos/vArticulos.vue',
                 permisos: [
                     { id: 'vArticulos:listar', label: 'Listar' },
@@ -52,31 +53,39 @@ export default [
                     { id: 'vArticulos:editarBulk', label: 'Editar masivo' },
                     { id: 'vArticulos:eliminarBulk', label: 'Eliminar masivo' },
                 ],
+                children: [
+                    {
+                        label: 'Detalle',
+                        goto: 'vArticulo',
+                        path: ':id',
+                        view: 'inventario/articulos/vArticulo/vArticulo.vue',
+                        permission: 'vArticulos:ver',
+                        viewType: 'detail',
+                        children: [
+                            {
+                                label: 'Historial de movimientos',
+                                goto: 'vArticuloKardex',
+                                path: 'kardex',
+                                view: 'inventario/kardex/vKardex.vue',
+                                permission: 'vArticulos:kardex',
+                            },
+                        ],
+                    },
+                ],
             },
             {
-                label: 'Inventario',
-                goto: 'vInventarioArticulos',
-                path: 'inventario/stock',
-                view: 'inventario/inventario/vInventarioArticulos.vue',
-                permisos: [{ id: 'vInventarioArticulos:listar', label: 'Listar' }],
+                label: 'Existencias',
+                goto: 'vStock',
+                path: 'stock',
+                view: 'inventario/stock/vStock.vue',
+                permisos: [{ id: 'vStock:listar', label: 'Listar' }],
             },
             {
-                label: 'Detalle',
-                goto: 'vArticulo',
-                path: 'inventario/articulos/:id',
-                view: 'inventario/articulos/vArticulo/vArticulo.vue',
-                showInMenu: false,
-                permission: 'vArticulos:ver',
-                viewType: 'detail',
-            },
-            {
-                label: 'Kardex',
+                label: 'Historial de movimientos',
                 goto: 'vKardex',
-                path: 'inventario/articulos/:id/kardex',
+                path: 'kardex',
                 view: 'inventario/kardex/vKardex.vue',
-                showInMenu: false,
-                permission: 'vArticulos:kardex',
-                viewType: 'list',
+                permisos: [{ id: 'vKardex:listar', label: 'Listar' }],
             },
         ],
     },
@@ -84,11 +93,12 @@ export default [
         id: 'compras',
         label: 'Compras',
         icon: 'fa-solid fa-cart-shopping',
+        path: 'compras',
         children: [
             {
                 label: 'Proveedores',
                 goto: 'vProveedores',
-                path: 'compras/proveedores',
+                path: 'proveedores',
                 view: 'compras/proveedores/vProveedores.vue',
                 permisos: [
                     { id: 'vProveedores:listar', label: 'Listar' },
@@ -103,7 +113,7 @@ export default [
             {
                 label: 'Precios',
                 goto: 'vPreciosCompra',
-                path: 'compras/precios-compra',
+                path: 'precios-compra',
                 view: 'compras/precios_compra/vPreciosCompra.vue',
                 permisos: [
                     { id: 'vPreciosCompra:listar', label: 'Listar' },
@@ -115,7 +125,7 @@ export default [
             {
                 label: 'Pedidos',
                 goto: 'vCompraPedidos',
-                path: 'compras/pedidos',
+                path: 'pedidos',
                 view: 'compras/pedidos/vCompraPedidos.vue',
                 permisos: [
                     { id: 'vCompraPedidos:listar', label: 'Listar' },
@@ -133,14 +143,14 @@ export default [
             {
                 label: 'Pedidos detalle',
                 goto: 'vCompraPedidoItems',
-                path: 'compras/pedido-items',
+                path: 'pedido-items',
                 view: 'compras/pedido_items/vCompraPedidoItems.vue',
                 permisos: [{ id: 'vCompraPedidoItems:listar', label: 'Listar' }],
             },
             {
                 label: 'Compras',
                 goto: 'vCompras',
-                path: 'compras/compras',
+                path: 'compras',
                 view: 'compras/compras/vCompras.vue',
                 permisos: [
                     { id: 'vCompras:listar', label: 'Listar' },
@@ -152,7 +162,7 @@ export default [
             {
                 label: 'Compras detalle',
                 goto: 'vCompraItems',
-                path: 'compras/compra-items',
+                path: 'compra-items',
                 view: 'compras/compra_items/vCompraItems.vue',
                 permisos: [
                     { id: 'vCompraItems:listar', label: 'Listar' },
@@ -165,11 +175,12 @@ export default [
         id: 'ventas',
         label: 'Ventas',
         icon: 'fa-solid fa-truck',
+        path: 'ventas',
         children: [
             {
                 label: 'Clientes',
                 goto: 'vClientes',
-                path: 'ventas/clientes',
+                path: 'clientes',
                 view: 'ventas/clientes/vClientes.vue',
                 permisos: [
                     { id: 'vClientes:listar', label: 'Listar' },
@@ -182,7 +193,7 @@ export default [
             {
                 label: 'Pedidos',
                 goto: 'vVentaPedidos',
-                path: 'ventas/pedidos',
+                path: 'pedidos',
                 view: 'ventas/pedidos/vVentaPedidos.vue',
                 permisos: [
                     { id: 'vVentaPedidos:listar', label: 'Listar' },
@@ -201,14 +212,14 @@ export default [
             {
                 label: 'Pedidos detalle',
                 goto: 'vVentaPedidoItems',
-                path: 'ventas/pedido-items',
+                path: 'pedido-items',
                 view: 'ventas/pedido_items/vVentaPedidoItems.vue',
                 permisos: [{ id: 'vVentaPedidoItems:listar', label: 'Listar' }],
             },
             {
                 label: 'Ventas',
                 goto: 'vVentas',
-                path: 'ventas/ventas',
+                path: 'ventas',
                 view: 'ventas/ventas/vVentas.vue',
                 permisos: [
                     { id: 'vVentas:listar', label: 'Listar' },
@@ -221,14 +232,14 @@ export default [
             {
                 label: 'Ventas detalle',
                 goto: 'vVentaItems',
-                path: 'ventas/venta-items',
+                path: 'venta-items',
                 view: 'ventas/venta_items/vVentaItems.vue',
                 permisos: [{ id: 'vVentaItems:listar', label: 'Listar' }],
             },
             {
                 label: 'Soporte al cliente',
                 goto: 'vHelpdeskTickets',
-                path: 'ventas/soporte',
+                path: 'soporte',
                 view: 'ventas/soporte_cliente/vHelpdeskTickets.vue',
                 permisos: [
                     { id: 'vHelpdeskTickets:listar', label: 'Listar' },
@@ -244,11 +255,12 @@ export default [
         id: 'produccion',
         label: 'Producción',
         icon: 'fa-solid fa-oil-well',
+        path: 'produccion',
         children: [
             {
                 label: 'Lista de materiales',
                 goto: 'vMrpBom',
-                path: 'produccion/mrp-bom',
+                path: 'mrp-bom',
                 view: 'produccion/mrp_bom/vMrpBom.vue',
                 permisos: [
                     { id: 'vMrpBom:listar', label: 'Listar' },
@@ -261,7 +273,7 @@ export default [
             {
                 label: 'Programa',
                 goto: 'vPrograma',
-                path: 'produccion/programa',
+                path: 'programa',
                 view: 'produccion/vPrograma.vue',
                 permisos: [
                     { id: 'vPrograma:listar', label: 'Listar' },
@@ -282,7 +294,7 @@ export default [
             {
                 label: 'Órdenes de producción',
                 goto: 'vProduccionHistorial',
-                path: 'produccion/ordenes',
+                path: 'ordenes',
                 view: 'produccion/historial/vProduccionHistorial.vue',
                 permisos: [
                     { id: 'vProduccionHistorial:listar', label: 'Listar' },
@@ -312,7 +324,7 @@ export default [
             {
                 label: 'Ingreso de productos',
                 goto: 'vPtsIngresos',
-                path: 'produccion/ingresos',
+                path: 'ingresos',
                 view: 'produccion/ingreso_pt/vPtsIngresos.vue',
                 permisos: [
                     { id: 'vPtsIngresos:listar', label: 'Listar' },
@@ -325,7 +337,7 @@ export default [
             {
                 label: 'Reporte',
                 goto: 'vReporteProduccion',
-                path: 'produccion/reporte',
+                path: 'reporte',
                 view: 'produccion/vReporteProduccion.vue',
                 permisos: [{ id: 'vReporteProduccion:listar', label: 'Listar' }],
             },
@@ -335,11 +347,12 @@ export default [
         id: 'calidad',
         label: 'Calidad',
         icon: 'fa-solid fa-magnifying-glass',
+        path: 'calidad',
         children: [
             // {
             //     label: 'Formatos BPM',
             //     goto: 'vFormatosBpm',
-            //     path: 'calidad/formatos-bpm',
+            //     path: 'formatos-bpm',
             //     view: 'calidad/formatos/vFormatosBpm.vue',
             //     permisos: [
             //         { id: 'vFormatosBpm:listar', label: 'Listar' },
@@ -352,7 +365,7 @@ export default [
             // {
             //     label: 'Formatos PHS',
             //     goto: 'vFormatosPhs',
-            //     path: 'calidad/formatos-phs',
+            //     path: 'formatos-phs',
             //     view: 'calidad/formatos/vFormatosPhs.vue',
             //     permisos: [
             //         { id: 'vFormatosPhs:listar', label: 'Listar' },
@@ -365,7 +378,7 @@ export default [
             // {
             //     label: 'Formatos HACCP',
             //     goto: 'vFormatosHaccp',
-            //     path: 'calidad/formatos-haccp',
+            //     path: 'formatos-haccp',
             //     view: 'calidad/formatos/vFormatosHaccp.vue',
             //     permisos: [
             //         { id: 'vFormatosHaccp:listar', label: 'Listar' },
@@ -378,7 +391,7 @@ export default [
             {
                 label: 'Registros sanitarios',
                 goto: 'vRegistrosSanitarios',
-                path: 'calidad/registros-sanitarios',
+                path: 'registros-sanitarios',
                 view: 'calidad/documentos/vRegistrosSanitarios.vue',
                 permisos: [
                     { id: 'vRegistrosSanitarios:listar', label: 'Listar' },
@@ -390,7 +403,7 @@ export default [
             {
                 label: 'Inspecciones de clientes',
                 goto: 'vInspecciones',
-                path: 'calidad/inspecciones',
+                path: 'inspecciones',
                 view: 'calidad/inspecciones/vInspecciones.vue',
                 permisos: [
                     { id: 'vInspecciones:listar', label: 'Listar' },
@@ -406,11 +419,12 @@ export default [
         id: 'operaciones',
         label: 'Operaciones',
         icon: 'fa-solid fa-gears',
+        path: 'operaciones',
         children: [
             {
                 label: 'Documentos clave',
                 goto: 'vDocumentos',
-                path: 'operaciones/documentos',
+                path: 'documentos',
                 view: 'operaciones/documentos/vDocumentos.vue',
                 permisos: [
                     { id: 'vDocumentos:listar', label: 'Listar' },
@@ -422,7 +436,7 @@ export default [
             {
                 label: 'Caja chica',
                 goto: 'vCajaAperturas',
-                path: 'operaciones/caja-chica',
+                path: 'caja-chica',
                 view: 'operaciones/caja_chica/vCajaAperturas.vue',
                 permisos: [
                     { id: 'vCajaAperturas:listar', label: 'Listar' },
@@ -439,7 +453,7 @@ export default [
             {
                 label: 'Tipos de cambio',
                 goto: 'vTipoCambios',
-                path: 'operaciones/tipo-cambios',
+                path: 'tipo-cambios',
                 view: 'operaciones/tipo_cambios/vTipoCambios.vue',
                 permisos: [
                     { id: 'vTipoCambios:listar', label: 'Listar' },
@@ -451,7 +465,7 @@ export default [
             {
                 label: 'Máquinas',
                 goto: 'vMaquinas',
-                path: 'operaciones/maquinas',
+                path: 'maquinas',
                 view: 'operaciones/maquinas/vMaquinas.vue',
                 permisos: [
                     { id: 'vMaquinas:listar', label: 'Listar' },
@@ -463,7 +477,7 @@ export default [
             {
                 label: 'Equipos',
                 goto: 'vEquipos',
-                path: 'operaciones/equipos',
+                path: 'equipos',
                 view: 'operaciones/equipos/vEquipos.vue',
                 permisos: [
                     { id: 'vEquipos:listar', label: 'Listar' },
@@ -475,7 +489,7 @@ export default [
             {
                 label: 'Colaboradores',
                 goto: 'vColaboradores',
-                path: 'operaciones/colaboradores',
+                path: 'colaboradores',
                 view: 'operaciones/colaboradores/vColaboradores.vue',
                 permisos: [
                     { id: 'vColaboradores:listar', label: 'Listar' },
@@ -488,7 +502,7 @@ export default [
             {
                 label: 'Asistencias',
                 goto: 'vAsistencias',
-                path: 'operaciones/asistencias',
+                path: 'asistencias',
                 view: 'operaciones/asistencias/vAsistencias.vue',
                 permisos: [
                     { id: 'vAsistencias:listar', label: 'Listar' },
@@ -500,7 +514,7 @@ export default [
             // {
             //     label: 'Usuarios conectados',
             //     goto: 'vSessions',
-            //     path: 'operaciones/sesiones',
+            //     path: 'sesiones',
             //     view: 'operaciones/sessions/vSessions.vue',
             //     permisos: [{ id: 'vSessions:listar', label: 'Listar' }],
             // },
@@ -510,11 +524,12 @@ export default [
         id: 'configuracion',
         label: 'Configuración',
         icon: 'fa-solid fa-screwdriver-wrench',
+        path: 'configuracion',
         children: [
             {
                 label: 'Mi empresa',
                 goto: 'vEmpresa',
-                path: 'configuracion/empresa',
+                path: 'empresa',
                 view: 'configuracion/empresa/vEmpresa.vue',
                 permisos: [
                     { id: 'vEmpresa:ver', label: 'Ver' },
@@ -524,7 +539,7 @@ export default [
             {
                 label: 'Suscripciones',
                 goto: 'vSuscripciones',
-                path: 'configuracion/suscripciones',
+                path: 'suscripciones',
                 view: 'configuracion/suscripciones/vSuscripciones.vue',
                 permisos: [{ id: 'vSuscripciones:listar', label: 'Listar' }],
             },

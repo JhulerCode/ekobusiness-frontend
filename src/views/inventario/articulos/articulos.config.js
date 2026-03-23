@@ -1,9 +1,7 @@
 export default {
     name: 'vArticulos',
-    title: 'Artículos',
     apiPath: 'articulos',
     detailViewName: 'vArticulo',
-    // permisoEliminarRow: '',
 
     headerActions: [
         {
@@ -210,24 +208,6 @@ export default {
     tableBulkActions: [],
 
     tableRowActions: [
-        // {
-        //     label: 'Editar',
-        //     icon: 'fa-solid fa-pen-to-square',
-        //     action: 'editar',
-        //     permiso: 'vArticulos:editar',
-        // },
-        // {
-        //     label: 'Actualizar fotos',
-        //     icon: 'fa-solid fa-image',
-        //     action: 'openUploadFiles',
-        //     permiso: 'vArticulos:actualizarFotos',
-        // },
-        // {
-        //     label: 'Clonar',
-        //     icon: 'fa-solid fa-copy',
-        //     action: 'clonar',
-        //     permiso: 'vArticulos:clonar',
-        // },
         {
             label: 'Ver kardex',
             icon: 'fa-solid fa-table-list',
@@ -240,11 +220,5 @@ export default {
             action: 'verLotes',
             permiso: 'vArticulos:lotes',
         },
-        // {
-        //     label: 'Ajuste stock',
-        //     icon: 'fa-solid fa-wrench',
-        //     action: 'ajusteStock',
-        //     permiso: 'vArticulos:ajusteStock',
-        // },
     ],
 }

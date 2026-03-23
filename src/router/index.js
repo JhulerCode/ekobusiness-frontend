@@ -9,37 +9,43 @@ const viewsModules = import.meta.glob('../views/**/*.vue')
 // ----- RUTAS HIJAS DE LA CONSOLA (DINÁMICAS) ----- //
 const consolaChildren = []
 
-menuConfig.forEach((section) => {
-    section.children.forEach((item) => {
-        consolaChildren.push({
-            path: item.path,
-            name: item.goto,
-            meta: {
-                title: item.label,
-                vistaName: item.goto,
-                viewType: item.viewType || 'list',
-                permission: item.permission || item.goto,
-            },
-            component: viewsModules[`../views/${item.view}`],
-        })
-    })
-})
+const traverseRoutes = (items, parentPath = '') => {
+    if (!items) return
+    items.forEach((item) => {
+        let currentPath = parentPath
 
-menuAdmin.forEach((section) => {
-    section.children.forEach((item) => {
-        consolaChildren.push({
-            path: item.path,
-            name: item.goto,
-            meta: {
-                title: item.label,
-                vistaName: item.goto,
-                viewType: item.viewType || 'list',
-                permission: item.permission || item.goto,
-            },
-            component: viewsModules[`../views/${item.view}`],
-        })
+        if (item.path) {
+            if (parentPath && !item.path.startsWith(parentPath) && !item.path.startsWith('/')) {
+                currentPath = `${parentPath}/${item.path}`
+            } else if (item.path.startsWith('/')) {
+                currentPath = item.path.substring(1)
+            } else {
+                currentPath = item.path
+            }
+        }
+
+        if (item.path && item.view) {
+            consolaChildren.push({
+                path: currentPath,
+                name: item.goto,
+                meta: {
+                    title: item.label,
+                    vistaName: item.goto,
+                    viewType: item.viewType || 'list',
+                    permission: item.permission || item.goto,
+                },
+                component: viewsModules[`../views/${item.view}`],
+                // component: () => import(`@/views/${item.view}`),
+            })
+        }
+        if (item.children && item.children.length > 0) {
+            traverseRoutes(item.children, currentPath)
+        }
     })
-})
+}
+
+traverseRoutes(menuConfig)
+traverseRoutes(menuAdmin)
 
 // ----- RUTAS PRINCIPALES ----- //
 const routes = [

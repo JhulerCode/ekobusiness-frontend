@@ -10,10 +10,22 @@
             <div v-for="(a, i) in menu" :key="i" class="menu-item-wrapper">
                 <div
                     class="btn option"
-                    @click="this.toggleList(a.label, $event)"
+                    @click="
+                        a.children && a.children.length > 0
+                            ? this.toggleList(a.label, $event)
+                            : navigateTo(a.goto)
+                    "
                     :key="a.label"
                     :class="{
-                        'option-active': a.children.some((b) => $route.name === b.goto),
+                        'option-active':
+                            a.children && a.children.length > 0
+                                ? a.children.some(
+                                      (b) =>
+                                          $route.name === b.goto ||
+                                          (b.children &&
+                                              b.children.some((c) => $route.name === c.goto)),
+                                  )
+                                : $route.name === a.goto,
                         'is-expanded': grupoExpandido === a.label,
                     }"
                 >
@@ -43,7 +55,10 @@
                         :key="j"
                         class="btn"
                         :class="{
-                            'option-active': useVistas.show?.[b.goto] || $route.name === b.goto,
+                            'option-active':
+                                useVistas.show?.[b.goto] ||
+                                $route.name === b.goto ||
+                                (b.children && b.children.some((c) => $route.name === c.goto)),
                         }"
                         @click="navigateTo(b.goto)"
                     >
@@ -148,6 +163,15 @@ export default {
         menu() {
             return this.useAuth.menu
                 .map((seccion) => {
+                    if (!seccion.children || seccion.children.length === 0) {
+                        return seccion.showInMenu !== false &&
+                            (this.useAuth.usuario.permisos || []).some((p) =>
+                                p.startsWith(seccion.goto + ':'),
+                            )
+                            ? seccion
+                            : null
+                    }
+
                     const hijosFiltrados = seccion.children.filter(
                         (a) =>
                             a.showInMenu !== false &&

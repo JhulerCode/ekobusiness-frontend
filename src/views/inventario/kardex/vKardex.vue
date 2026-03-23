@@ -1,5 +1,10 @@
 <template>
-    <VistaLayout :config="VIEW_CONFIG" :setQuery="setQuery" :askToInicialLoad="false">
+    <VistaLayout
+        :config="VIEW_CONFIG"
+        :checkFiltros="checkFiltros"
+        :setQuery="setQuery"
+        :askToInicialLoad="false"
+    >
     </VistaLayout>
 
     <mTransaccion v-if="modals.show.mTransaccion" />
@@ -13,7 +18,7 @@ import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
 import { useModals } from '@/pinia/modals'
 import { urls, get, delet } from '@/utils/crud'
-import { jqst } from '@/utils/swal'
+import { jmsg, jqst } from '@/utils/swal'
 
 export default {
     name: 'vKardex',
@@ -38,11 +43,16 @@ export default {
         runMethod(method, item) {
             this[method](item)
         },
+        checkFiltros() {
+            if (!this.vista.tableColumns.some((a) => a.val || a.val1)) {
+                jmsg('error', 'Ingrese al menos un filtro')
+                return true
+            }
+            return false
+        },
         async setQuery() {
             this.vista.qry = {
-                fltr: {
-                    articulo: { op: 'Es', val: this.$route.params.id },
-                },
+                fltr: {},
                 incl: ['lote_padre1', 'transaccion1', 'maquina1'],
                 iccl: {
                     transaccion1: {
@@ -51,6 +61,15 @@ export default {
                 },
                 ordr: [['fecha', 'DESC']],
                 page: this.vista.table_page,
+            }
+
+            if (this.$route.params.id) {
+                this.vista.qry.fltr.articulo = { op: 'Es', val: this.$route.params.id }
+
+                this.vista.tableColumns.find((a) => a.id == 'articulo').show = false
+                this.vista.tableColumns.find((a) => a.id == 'articulo').seek = false
+            } else {
+                this.vista.qry.incl.push('articulo1')
             }
 
             this.auth.updateQuery(this.vista.tableColumns, this.vista.qry)
@@ -63,6 +82,8 @@ export default {
                 'stock',
             )
         },
+
+        //--- Row actions ---//
         async eliminar(item) {
             const resQst = await jqst('¿Está seguro de eliminar?')
             if (resQst.isConfirmed == false) return

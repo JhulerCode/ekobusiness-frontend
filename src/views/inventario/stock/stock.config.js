@@ -1,6 +1,5 @@
 export default {
-    name: 'vInventarioArticulos',
-    title: 'Inventario',
+    name: 'vStock',
     apiPath: 'kardex',
 
     headerActions: [],
@@ -67,6 +66,7 @@ export default {
             title: 'Se compra',
             prop: 'purchase_ok1.nombre',
             type: 'select',
+            systemKey: 'estados',
             format: 'estado',
             color: 'purchase_ok1.color',
             width: '8rem',
@@ -78,6 +78,7 @@ export default {
             title: 'Se vende',
             prop: 'sale_ok1.nombre',
             type: 'select',
+            systemKey: 'estados',
             format: 'estado',
             color: 'sale_ok1.color',
             width: '8rem',
@@ -89,6 +90,7 @@ export default {
             title: 'Se produce',
             prop: 'produce_ok1.nombre',
             type: 'select',
+            systemKey: 'estados',
             format: 'estado',
             color: 'produce_ok1.color',
             width: '8rem',

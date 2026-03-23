@@ -1,6 +1,7 @@
 <template>
     <VistaLayout
         :config="VIEW_CONFIG"
+        :initFiltros="initFiltros"
         :setQuery="setQuery"
         :loadDataPers="loadTableData"
         @runMethod="runMethod"
@@ -9,7 +10,7 @@
 </template>
 
 <script>
-import VIEW_CONFIG from './inventario.config.js'
+import VIEW_CONFIG from './stock.config.js'
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
 import { useModals } from '@/pinia/modals'
@@ -18,7 +19,7 @@ import dayjs from 'dayjs'
 import { jmsg } from '@/utils/swal'
 
 export default {
-    name: 'vInventarioArticulos',
+    name: 'vStock',
     components: {},
     computed: {
         auth: () => useAuth(),

@@ -95,7 +95,7 @@ export default {
             )
             if (resQst.isConfirmed == false) return
 
-            const send = { id: selected.map((b) => b.id) }
+            const send = { id: 'bulk', ids: selected.map((b) => b.id) }
             this.auth.setLoading(true, 'Cargando...')
             const res = await patch(
                 `${this.vista.apiUrl}/abrir`,
@@ -124,7 +124,7 @@ export default {
             )
             if (resQst.isConfirmed == false) return
 
-            const send = { id: selected.map((b) => b.id) }
+            const send = { id: 'bulk', ids: selected.map((b) => b.id) }
             this.auth.setLoading(true, 'Cargando...')
             const res = await patch(
                 `${this.vista.apiUrl}/terminar`,
@@ -205,10 +205,11 @@ export default {
             const resQst = await jqst('¿Está seguro de abrir la orden de producción?')
             if (resQst.isConfirmed == false) return
 
+            const send = { id: item.id, ids: item.id }
             this.auth.setLoading(true, 'Cargando...')
             const res = await patch(
                 `${this.vista.apiUrl}/abrir`,
-                item,
+                send,
                 'Orden de producción abierta',
             )
             this.auth.setLoading(false)
@@ -225,10 +226,11 @@ export default {
             const resQst = await jqst('¿Está seguro de terminar la orden de producción?')
             if (resQst.isConfirmed == false) return
 
+            const send = { id: item.id, ids: item.id }
             this.auth.setLoading(true, 'Cargando...')
             const res = await patch(
                 `${this.vista.apiUrl}/terminar`,
-                item,
+                send,
                 'Orden de producción terminada',
             )
             this.auth.setLoading(false)

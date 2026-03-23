@@ -6,6 +6,7 @@
 
                 <slot name="header-left"></slot>
             </div>
+            {{ permisoEditar }}
 
             <div class="header-right">
                 <JdButtonsOverflow
@@ -82,7 +83,7 @@ const basicActions = computed(() => {
             text: 'Editar',
             action: 'editar',
             icon: 'fa-solid fa-pen-to-square',
-            // permiso: ['vEmpresa:editar', 'vAdminSuscripciones:editar'],
+            permiso: props.config.permisoEditar,
             show: !isEdit,
         },
         {

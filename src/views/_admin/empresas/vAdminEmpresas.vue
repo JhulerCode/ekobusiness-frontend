@@ -37,8 +37,8 @@ export default {
         },
 
         // --- Header actions ---
-        async nuevo() {
-            this.$router.push({ name: 'vAdminEmpresaDetalle', params: { id: 'nuevo' } })
+        nuevo() {
+            this.$router.push({ name: 'vAdminEmpresa', params: { id: 'nuevo' } })
         },
     },
 }

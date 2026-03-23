@@ -19,7 +19,7 @@ export default [
             },
             {
                 label: 'Detalle Empresa',
-                goto: 'vAdminEmpresaDetalle',
+                goto: 'vAdminEmpresa',
                 path: 'admin/empresas/:id',
                 view: 'configuracion/empresa/vEmpresa.vue',
                 showInMenu: false,

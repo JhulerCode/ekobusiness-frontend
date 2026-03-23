@@ -210,13 +210,13 @@ const bulkActions = computed(() => {
             icon: 'fa-solid fa-pen-to-square',
             text: 'Editar',
             action: 'editarBulk',
-            // permiso: 'vArticulos:editarBulk',
+            permiso: `${props.config.name}:editarBulk`,
         },
         {
             icon: 'fa-solid fa-trash-can',
             text: 'Eliminar',
             action: 'eliminarBulk',
-            // permiso: 'vArticulos:eliminarBulk',
+            permiso: `${props.config.name}:eliminarBulk`,
         },
         ...(vista.value.tableBulkActions || []),
     ]
@@ -273,7 +273,7 @@ const rowActions = computed(() => {
             label: 'Eliminar',
             icon: 'fa-solid fa-trash-can',
             action: 'eliminarRow',
-            // permiso: 'vArticulos:eliminar',
+            permiso: `${props.config.name}:eliminar`,
         },
         ...(vista.value.tableRowActions || []),
     ]

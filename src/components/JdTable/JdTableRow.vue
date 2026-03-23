@@ -14,7 +14,7 @@
         @dragleave="onDragLeave"
         @drop="onDrop"
         @dragend="onDragEnd"
-        @dblclick="$emit('rowDblclick', item)"
+        @dblclick="onRowDblclick"
     >
         <td v-if="reorderable" class="td-reorder">
             <i class="fa-solid fa-grip-vertical"></i>
@@ -184,6 +184,16 @@ const onDrop = (e) => {
 const onDragEnd = () => {
     isDragging.value = false
     emit('dragEnd')
+}
+
+const onRowDblclick = (e) => {
+    const isInput = ['INPUT', 'SELECT', 'TEXTAREA'].includes(e.target.tagName)
+    const isInsideInput = e.target.closest('input, select, textarea')
+    const isInsideAct = e.target.closest('.td-act, .td-reorder, .td-checkbox')
+
+    if (isInput || isInsideInput || isInsideAct) return
+
+    emit('rowDblclick', props.item)
 }
 
 const onRowClick = (e) => {

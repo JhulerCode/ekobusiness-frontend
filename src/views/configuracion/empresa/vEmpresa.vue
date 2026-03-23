@@ -74,9 +74,6 @@ export default {
         vista() {
             return this.vistas[VIEW_CONFIG.name]
         },
-        VIEW_CONFIG_NAME() {
-            return VIEW_CONFIG.name
-        },
         availableTabs() {
             const tabs = [
                 { id: 1, label: 'General', show: true },
@@ -150,7 +147,7 @@ export default {
             if (res.code != 0) return
 
             if (this.is_nuevo) {
-                this.$router.push({ name: 'vAdminEmpresaDetalle', params: { id: res.data.id } })
+                this.$router.push({ name: 'vAdminEmpresa', params: { id: res.data.id } })
             }
 
             this.vista.mode = 'view'

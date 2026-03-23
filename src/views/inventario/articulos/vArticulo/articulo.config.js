@@ -2,6 +2,7 @@ export default {
     name: 'vArticulo',
     titleKey: 'nombre',
     apiPath: 'articulos',
+    permisoEditar: ['vArticulos:editar'],
 
     headerActions: [
         {

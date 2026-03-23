@@ -63,9 +63,9 @@ export default {
     created() {
         this.vista = this.vistas.vArticulo
 
-        if (this.vista.mode != 1 && !this.vista.articulo_componentes_loaded) {
-            this.loadArticuloComponentes()
-        }
+        // if (this.vista.mode != 1 && !this.vista.articulo_componentes_loaded) {
+        //     this.loadArticuloComponentes()
+        // }
     },
     methods: {
         runMethod(method, item) {

@@ -3,6 +3,7 @@ export default {
     title: 'Artículos',
     apiPath: 'articulos',
     detailViewName: 'vArticulo',
+    // permisoEliminarRow: '',
 
     headerActions: [
         {
@@ -209,12 +210,12 @@ export default {
     tableBulkActions: [],
 
     tableRowActions: [
-        {
-            label: 'Editar',
-            icon: 'fa-solid fa-pen-to-square',
-            action: 'editar',
-            permiso: 'vArticulos:editar',
-        },
+        // {
+        //     label: 'Editar',
+        //     icon: 'fa-solid fa-pen-to-square',
+        //     action: 'editar',
+        //     permiso: 'vArticulos:editar',
+        // },
         {
             label: 'Actualizar fotos',
             icon: 'fa-solid fa-image',

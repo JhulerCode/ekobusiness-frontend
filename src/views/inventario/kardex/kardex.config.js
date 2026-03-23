@@ -2,6 +2,7 @@ export default {
     name: 'vKardex',
     title: 'Kardex',
     apiPath: 'kardex',
+    headerActions: [],
     tableColumns: [
         { id: 'fecha', title: 'Fecha', prop: 'fecha1', width: '8rem', show: true, sort: true },
         {

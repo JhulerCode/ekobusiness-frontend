@@ -65,7 +65,7 @@
 </template>
 
 <script>
-import VIEW_CONFIG from './articulos.config.js'
+import VIEW_CONFIG from './articulo.config.js'
 
 import vArticuloGeneral from './vArticuloGeneral.vue'
 import vArticuloCompra from './vArticuloCompra.vue'
@@ -77,7 +77,7 @@ import vArticuloComponentes from './vArticuloComponentes.vue'
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
 import { useSystem } from '@/pinia/system'
-import { urls, get, patch } from '@/utils/crud'
+import { urls, get, post, patch } from '@/utils/crud'
 import { incompleteData } from '@/utils/mine.js'
 import { jmsg } from '@/utils/swal.js'
 
@@ -110,6 +110,9 @@ export default {
                 { id: 6, label: 'Componentes', show: this.vista.data.type == 'combo' },
             ]
         },
+        is_nuevo() {
+            return this.$route.params.id === 'nuevo'
+        },
     },
     async created() {
         await this.useSystem.load(['articulo_tipos'])
@@ -123,8 +126,34 @@ export default {
             this[method](item)
         },
         async loadArticulo() {
+            const param_id = this.$route.params.id
+
+            if (param_id === 'nuevo') {
+                this.vista.data = {
+                    type: 'consumable',
+                    activo: true,
+                    articulo_suppliers: [],
+                    combo_componentes: [],
+                    ingredientes: [],
+                    beneficios: [],
+                    tipo: 1,
+                    igv_afectacion: 10,
+                    has_fv: false,
+                }
+                this.vista.mode = 'edit'
+                return
+            }
+
             const qry = {
-                incl: ['categoria1', 'linea1'],
+                incl: ['categoria1', 'linea1', 'articulo_suppliers', 'combo_componentes'],
+                iccl: {
+                    articulo_suppliers: {
+                        incl: ['socio1', 'currency_id1'],
+                    },
+                    combo_componentes: {
+                        incl: ['articulo1'],
+                    },
+                },
             }
 
             this.auth.setLoading(true, 'Cargando artículo...')
@@ -145,12 +174,21 @@ export default {
             this.shapeDatos()
 
             this.auth.setLoading(true)
-            const res = await patch(urls.articulos, this.vista.data)
+            let res
+            if (this.is_nuevo) {
+                res = await post(this.vista.apiUrl, this.vista.data)
+            } else {
+                res = await patch(this.vista.apiUrl, this.vista.data)
+            }
             this.auth.setLoading(false)
 
             if (res.code != 0) return
 
-            this.updateHeaderActions('view')
+            if (this.is_nuevo) {
+                this.$router.push({ name: 'vArticulo', params: { id: res.data.id } })
+            }
+
+            this.vista.mode = 'view'
         },
         verKardex() {
             this.$router.push(`/consola/inventario/articulos/${this.vista.data.id}/kardex`)

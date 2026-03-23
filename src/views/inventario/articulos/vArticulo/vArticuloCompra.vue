@@ -129,9 +129,9 @@ export default {
     created() {
         this.vista = this.vistas.vArticulo
 
-        if (this.vista.mode != 1 && !this.vista.articulo_suppliers_loaded) {
-            this.loadArticuloSuppliers()
-        }
+        // if (this.vista.mode != 1 && !this.vista.articulo_suppliers_loaded) {
+        //     this.loadArticuloSuppliers()
+        // }
     },
     methods: {
         runMethod(method, item) {

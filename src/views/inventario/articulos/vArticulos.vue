@@ -21,7 +21,6 @@
     </VistaLayout>
 
     <mImportarArticulos v-if="modals.show?.mImportarArticulos" />
-    <mArticulo v-if="modals.show?.mArticulo" />
     <mLotes v-if="modals.show?.mLotes" />
     <mAjusteStock v-if="modals.show?.mAjusteStock" />
     <mUploadFiles v-if="modals.show?.mUploadFiles" />
@@ -29,7 +28,6 @@
 
 <script>
 import mImportarArticulos from '@/views/inventario/articulos/mImportarArticulos.vue'
-import mArticulo from '@/views/inventario/articulos/mArticulo.vue'
 import mLotes from '@/views/inventario/articulos/mLotes.vue'
 import mAjusteStock from '@/views/inventario/articulos/mAjusteStock.vue'
 import mUploadFiles from '@/components/mUploadFiles.vue'
@@ -48,7 +46,6 @@ export default {
     name: 'vArticulos',
     components: {
         mImportarArticulos,
-        mArticulo,
         mLotes,
         mAjusteStock,
         mUploadFiles,
@@ -87,44 +84,13 @@ export default {
 
         // --- Header actions ---
         nuevo() {
-            const send = {
-                articulo: {
-                    type: 'consumable',
-                    activo: true,
-                    articulo_suppliers: [],
-                    combo_componentes: [],
-                    ingredientes: [],
-                    beneficios: [],
-                    tipo: 1,
-                    igv_afectacion: 10,
-                    has_fv: false,
-                },
-                pestana: 1,
-            }
-            this.modals.setModal('mArticulo', 'Nuevo artículo', 1, send, true)
+            this.$router.push({ name: this.VIEW_CONFIG.detailViewName, params: { id: 'nuevo' } })
         },
         abrirExcel() {
             this.$refs.excel.click()
         },
 
         // --- Table row actions ---
-        async editar(item) {
-            const qry = {
-                incl: ['categoria1', 'linea1', 'articulo_suppliers', 'combo_componentes'],
-            }
-
-            this.auth.setLoading(true, 'Cargando...')
-            const res = await get(`${this.vista.apiUrl}/uno/${item.id}?qry=${JSON.stringify(qry)}`)
-            this.auth.setLoading(false)
-            if (res.code != 0) return
-            const send = {
-                articulo: { ...res.data },
-                pestana: 1,
-                articulo_categorias: [{ ...res.data.categoria1 }],
-                articulo_lineas: [{ ...res.data.linea1 }],
-            }
-            this.modals.setModal('mArticulo', 'Editar artículo', 2, send, true)
-        },
         async clonar(item) {
             const qry = {
                 incl: ['categoria1', 'linea1', 'articulo_suppliers', 'combo_componentes'],

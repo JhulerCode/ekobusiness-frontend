@@ -95,7 +95,7 @@ export default {
             if (!this.vista.data.bancos) this.vista.data.bancos = []
             this.vista.data.bancos.push({
                 nombre: '',
-                moneda: 'SOL',
+                moneda: null,
                 nc: '',
                 cci: '',
                 principal: this.vista.data.bancos.length === 0,

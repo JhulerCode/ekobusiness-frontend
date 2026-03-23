@@ -150,7 +150,7 @@ export default {
                 pu: 1, // FALTA CALCULAR EL COSTO UNITARIO
                 igv_afectacion: 10, // FALTA QUE LO OBTENGA DEL PRODUCTO
                 igv_porcentaje: 18, // FALTA QUE TRAIGA DE LA EMPRESA
-                moneda: 1,
+                moneda: this.useAuth.empresa.moneda,
                 tipo_cambio: 1,
             }
         },

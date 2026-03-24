@@ -1,5 +1,6 @@
 <template>
     <VistaLayout
+        :key="$route.fullPath"
         :config="VIEW_CONFIG"
         :checkFiltros="checkFiltros"
         :setQuery="setQuery"
@@ -36,14 +37,13 @@ export default {
             return this.vistas[VIEW_CONFIG.name]
         },
     },
-    async created() {
-        // this.vista.loadTableData()
-    },
     methods: {
         runMethod(method, item) {
             this[method](item)
         },
         checkFiltros() {
+            if (this.$route.params.id) return false
+
             if (!this.vista.tableColumns.some((a) => a.val || a.val1)) {
                 jmsg('error', 'Ingrese al menos un filtro')
                 return true
@@ -51,9 +51,17 @@ export default {
             return false
         },
         async setQuery() {
+            // Forzar visibilidad de columna artículo según la ruta para que prevalezca sobre settings
+            const colArt = this.vista.tableColumns.find((a) => a.id == 'articulo')
+            if (colArt) {
+                const isDetail = !!this.$route.params.id
+                colArt.show = !isDetail
+                colArt.seek = !isDetail
+            }
+
             this.vista.qry = {
                 fltr: {},
-                incl: ['lote_padre1', 'transaccion1', 'maquina1'],
+                incl: ['lote_padre1', 'transaccion1', 'maquina1', 'articulo1'],
                 iccl: {
                     transaccion1: {
                         incl: ['socio1'],
@@ -65,9 +73,6 @@ export default {
 
             if (this.$route.params.id) {
                 this.vista.qry.fltr.articulo = { op: 'Es', val: this.$route.params.id }
-
-                this.vista.tableColumns.find((a) => a.id == 'articulo').show = false
-                this.vista.tableColumns.find((a) => a.id == 'articulo').seek = false
             } else {
                 this.vista.qry.incl.push('articulo1')
             }

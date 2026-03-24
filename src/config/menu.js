@@ -139,6 +139,16 @@ export default [
                     { id: 'vCompraPedidos:entregarMercaderia', label: 'Entregar mercadería' },
                     { id: 'vCompraPedidos:ingresarMercaderia', label: 'Ingresar mercadería' },
                 ],
+                children: [
+                    {
+                        label: 'Detalle',
+                        goto: 'vSocioPedido',
+                        path: ':id',
+                        view: 'compras/pedidos/vSocioPedido/vSocioPedido.vue',
+                        permission: 'vCompraPedidos:ver',
+                        viewType: 'detail',
+                    },
+                ],
             },
             {
                 label: 'Pedidos detalle',

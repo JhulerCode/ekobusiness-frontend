@@ -8,16 +8,6 @@
         <template #header-left>
             <input ref="excel" type="file" accept=".xlsx, .xls, .csv" hidden @change="importar" />
         </template>
-
-        <!-- <JdTable
-            :name="vista.name"
-            :columns="vista.tableColumns"
-            :datos="vista.tableData || []"
-            :rowSelectable="true"
-            :rowOptions="vista.tableRowActions"
-            @rowOptionSelected="runMethod"
-            @rowDblclick="ver"
-        /> -->
     </VistaLayout>
 
     <mImportarArticulos v-if="modals.show?.mImportarArticulos" />

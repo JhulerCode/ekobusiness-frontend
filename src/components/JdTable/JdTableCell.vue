@@ -29,7 +29,7 @@
             v-model="item[column.id]"
             v-bind="column.select"
             :disabled="item.table_columns?.[`${column.id}_disabled`] || disabled"
-            @elegir="column.select.elegir ? (val) => column.select.elegir(val, item, column) : null"
+            @elegir="column.select.elegir ? column.select.elegir($event, item, column) : null"
             @reload="() => column.select.reload(item, column)"
         />
 
@@ -38,8 +38,11 @@
             v-model="item[column.id]"
             v-bind="column.select_query"
             :search="(txt) => column.select_query.search(txt, item, column)"
-            :selectedObject="item[column.select_query.selectedObjectProp || (column.id + '1')]"
+            :selectedObject="item[column.select_query.selectedObjectProp || column.id + '1']"
             :disabled="item.table_columns?.[`${column.id}_disabled`] || disabled"
+            @elegir="
+                column.select_query.elegir ? column.select_query.elegir($event, item, column) : null
+            "
         />
 
         <JdCheckBox

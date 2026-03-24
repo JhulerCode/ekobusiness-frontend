@@ -78,6 +78,7 @@ export default {
                 },
             }
             this.modals.setModal('mSocioPedido', 'Nuevo pedido de compra', 1, send, true)
+            // this.$router.push({ name: this.VIEW_CONFIG.detailViewName, params: { id: 'nuevo' } })
         },
         recuperarGuardado() {
             const send = { socio_pedido: this.auth.avances.mCompraPedido }

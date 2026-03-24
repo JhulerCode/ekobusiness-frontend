@@ -34,7 +34,6 @@ export default {
                     width: '30rem',
                     input: true,
                     select_query: {
-                        mostrar: 'nombre',
                         search: this.loadArticulos,
                     },
                     show: true,
@@ -99,7 +98,6 @@ export default {
         },
         async addComponente() {
             this.vista.data.combo_componentes.push({
-                table_columns: {},
                 id: crypto.randomUUID(),
                 orden: genCorrelativo(this.vista.data.combo_componentes),
             })

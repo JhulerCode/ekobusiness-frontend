@@ -2,6 +2,7 @@ export default {
     name: 'vCompraPedidos',
     title: 'Pedidos de compra',
     apiPath: 'socio_pedidos',
+    // detailViewName: 'vSocioPedido',
 
     headerActions: [
         {

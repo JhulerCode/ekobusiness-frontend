@@ -5,7 +5,7 @@
                 <strong style="white-space: nowrap">{{ title }}</strong>
 
                 <JdButtonsOverflow
-                    v-if="vista.headerActions"
+                    v-if="headerActions"
                     :actions="headerActions"
                     @actionSelected="handleHeaderAction"
                 />
@@ -25,7 +25,7 @@
 
                 <JdBuscador
                     v-else
-                    :tableName="vista.name"
+                    :tableName="route.name"
                     :columns="vista.tableColumns"
                     @reload="loadTableData"
                     @open-filters="openConfigFiltros"
@@ -54,7 +54,7 @@
             <slot name="content-top"></slot>
 
             <JdTable
-                :name="config.name"
+                :name="route.name"
                 :columns="vista.tableColumns"
                 :datos="vista.tableData || []"
                 :rowSelectable="props.rowSelectable"
@@ -109,20 +109,20 @@ const props = defineProps({
 const emit = defineEmits(['runMethod'])
 
 // --- Inicialización de la vista ---
-const vista = computed(() => vistas[props.config.name])
-vistas.initVista(props.config.name, {
+const vista = computed(() => vistas[route.name])
+vistas.initVista(route.name, {
     ...JSON.parse(JSON.stringify(props.config)),
     apiUrl: urls[props.config.apiPath],
 })
 
-auth.setColumns(vista.value.name, vista.value.tableColumns)
+auth.setColumns(route.name, vista.value.tableColumns)
 
 if (props.initFiltros) {
     props.initFiltros()
 }
 
 if (props.askToInicialLoad) {
-    if (!vista.value.loaded && auth.verifyPermiso(`${props.config.name}:listar`)) {
+    if (!vista.value.loaded && auth.verifyPermiso(`${route.name}:listar`)) {
         loadTableData()
     }
 } else {
@@ -156,7 +156,7 @@ async function loadTableData(init_page) {
 function openConfigCols() {
     const modals = useModals()
     const send = {
-        table: vista.value.name,
+        table: route.name,
         cols: vista.value.tableColumns,
         reload: loadTableData,
     }
@@ -166,7 +166,7 @@ function openConfigCols() {
 function openConfigFiltros() {
     const modals = useModals()
     const send = {
-        table: vista.value.name,
+        table: route.name,
         cols: vista.value.tableColumns,
         reload: loadTableData,
     }
@@ -175,8 +175,16 @@ function openConfigFiltros() {
 
 // --- Header actions ---
 const headerActions = computed(() => {
+    let configHeaderActions = []
+    if (props.config.headerActions) {
+        configHeaderActions = props.config.headerActions.map((a) => ({
+            ...a,
+            show: a.permiso ? auth.verifyPermiso(a.permiso) : true,
+        }))
+    }
+
     return [
-        ...(vista.value.headerActions || []),
+        ...configHeaderActions,
         {
             icon: 'fa-solid fa-download',
             text: 'Exportar página actual',
@@ -206,20 +214,20 @@ const handleHeaderAction = (action, item) => {
     emit('runMethod', action, item)
 }
 
-// --- Table bulk actions ---
+//--- Bulk actions ---//
 const bulkActions = computed(() => {
     return [
         {
             icon: 'fa-solid fa-pen-to-square',
             text: 'Editar',
             action: 'editarBulk',
-            permiso: `${props.config.name}:editarBulk`,
+            permiso: `${route.name}:editarBulk`,
         },
         {
             icon: 'fa-solid fa-trash-can',
             text: 'Eliminar',
             action: 'eliminarBulk',
-            permiso: `${props.config.name}:eliminarBulk`,
+            permiso: `${route.name}:eliminarBulk`,
         },
         ...(vista.value.tableBulkActions || []),
     ]
@@ -269,14 +277,14 @@ function handleBulkAction(action, item) {
     emit('runMethod', action, item)
 }
 
-// --- Table row actions ---
+//--- Row actions ---//
 const rowActions = computed(() => {
     return [
         {
             label: 'Eliminar',
             icon: 'fa-solid fa-trash-can',
             action: 'eliminarRow',
-            permiso: `${props.config.name}:eliminar`,
+            permiso: `${route.name}:eliminar`,
         },
         ...(vista.value.tableRowActions || []),
     ]
@@ -299,7 +307,7 @@ function handleRowAction(action, item) {
     }
 
     if (localActions[action]) {
-        localActions[action]()
+        localActions[action](item)
         return
     }
 
@@ -326,7 +334,7 @@ function updatedBulk(item) {
 
 function verRow(item) {
     if (!vista.value.detailViewName) return
-    if (!auth.verifyPermiso(`${props.config.name}:ver`)) return
+    if (!auth.verifyPermiso(`${route.name}:ver`)) return
     router.push({ name: vista.value.detailViewName, params: { id: item.id } })
 }
 </script>

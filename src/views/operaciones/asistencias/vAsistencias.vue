@@ -52,7 +52,7 @@ export default {
             this.modals.setModal('mAsistencia', 'Nueva asistencia', 1, send, true)
         },
 
-        // --- Table row actions ---
+        //--- Row actions ---//
         async editar(item) {
             this.auth.setLoading(true, 'Cargando...')
             const res = await get(`${this.vista.apiUrl}/uno/${item.id}`)

@@ -67,12 +67,12 @@ export default {
     },
     data: () => ({
         VIEW_CONFIG,
+        auth: useAuth(),
+        vistas: useVistas(),
     }),
     computed: {
-        auth: () => useAuth(),
-        vistas: () => useVistas(),
         vista() {
-            return this.vistas[VIEW_CONFIG.name]
+            return this.vistas[this.$route.name]
         },
         availableTabs() {
             const tabs = [

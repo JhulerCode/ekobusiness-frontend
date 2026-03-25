@@ -10,7 +10,7 @@
             <div class="header-right">
                 <JdButtonsOverflow
                     v-if="vista.headerActions"
-                    :actions="basicActions"
+                    :actions="headerActions"
                     @actionSelected="handleHeaderAction"
                     align="right"
                 />
@@ -50,6 +50,7 @@ import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useVistas } from '@/pinia/vistas'
 import { urls } from '@/utils/crud'
+import { buttonVerifyPermission } from '@/utils/mine'
 
 import JdButtonsOverflow from './VistaLayout/JdButtonsOverflow.vue'
 
@@ -65,8 +66,8 @@ const props = defineProps({
 const emit = defineEmits(['runMethod'])
 
 // --- Inicialización de la vista ---
-const vista = computed(() => vistas[props.config.name])
-vistas.initVista(props.config.name, {
+const vista = computed(() => vistas[route.name])
+vistas.initVista(route.name, {
     ...JSON.parse(JSON.stringify(props.config)),
     apiUrl: urls[props.config.apiPath],
     pestana: 1,
@@ -75,16 +76,25 @@ vistas.initVista(props.config.name, {
 })
 
 // --- Header actions ---
-const basicActions = computed(() => {
+const headerActions = computed(() => {
     const isEdit = vista.value?.mode === 'edit'
+
+    let configHeaderActions = []
+    if (props.config.headerActions) {
+        configHeaderActions = props.config.headerActions.map((a) => ({
+            ...a,
+            show: !isEdit && buttonVerifyPermission(vista.value.data, a),
+        }))
+    }
+
     return [
-        ...(!isEdit ? vista.value.headerActions || [] : []),
+        ...configHeaderActions,
         {
             text: 'Clonar',
             action: 'clonar',
             tipo: '2',
             icon: 'fa-solid fa-copy',
-            permiso: props.config.permisoEditar,
+            permiso: props.config.permisoClonar,
             show: !isEdit,
         },
         {
@@ -124,7 +134,7 @@ function cancelar() {
 
 function clonar() {
     vista.value.original_data = JSON.parse(JSON.stringify(vista.value.data))
-    router.push({ name: props.config.name, params: { id: 'nuevo' } })
+    router.push({ name: route.name, params: { id: 'nuevo' } })
     delete vista.value.data.id
     vista.value.mode = 'edit'
 }
@@ -148,8 +158,8 @@ const handleHeaderAction = (action, item) => {
 const resolvedTitle = computed(() => {
     const id = route?.params?.id
     if (id === 'nuevo') return 'Nuevo'
-    if (id) return vista.value?.data?.[vista.value?.titleKey ?? 'nombre']
-    return vista.value?.title
+    if (id) return vista.value?.data?.[props.config?.titleKey ?? 'nombre']
+    return props.config?.title
 })
 
 const handleTabClick = (tabId) => {

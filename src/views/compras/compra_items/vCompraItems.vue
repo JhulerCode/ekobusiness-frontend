@@ -55,7 +55,7 @@ export default {
             this.auth.updateQuery(this.vista.tableColumns, this.vista.qry)
         },
 
-        // --- Table row actions ---
+        //--- Row actions ---//
         // async crearFormatoValue(item) {
         //     const formato_id = 'RE-BPM-05.01'
         //     this.auth.setLoading(true, 'Cargando...')

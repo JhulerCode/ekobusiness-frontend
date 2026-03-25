@@ -163,13 +163,13 @@ export default {
             text: 'Abrir',
             icon: 'fa-solid fa-check-double',
             action: 'abrirMasivo',
-            permiso: 'vProduccionHistorial:terminar',
+            permiso: 'vProduccionHistorial:abrirCerrar',
         },
         {
             text: 'Terminar',
             icon: 'fa-solid fa-check-double',
-            action: 'terminarMasivo',
-            permiso: 'vProduccionHistorial:terminar',
+            action: 'cerrarMasivo',
+            permiso: 'vProduccionHistorial:abrirCerrar',
         },
     ],
 
@@ -188,18 +188,18 @@ export default {
             ocultar: { estado: 2 },
         },
         {
-            label: 'Terminar',
-            icon: 'fa-solid fa-check-double',
-            action: 'terminar',
-            permiso: 'vProduccionHistorial:terminar',
-            ocultar: { estado: 2 },
-        },
-        {
             label: 'Abrir',
             icon: 'fa-solid fa-check-double',
             action: 'abrir',
-            permiso: 'vProduccionHistorial:terminar',
+            permiso: 'vProduccionHistorial:abrirCerrar',
             ocultar: { estado: 1 },
+        },
+        {
+            label: 'Terminar',
+            icon: 'fa-solid fa-check-double',
+            action: 'cerrar',
+            permiso: 'vProduccionHistorial:abrirCerrar',
+            ocultar: { estado: 2 },
         },
         {
             label: 'Salida de insumos',

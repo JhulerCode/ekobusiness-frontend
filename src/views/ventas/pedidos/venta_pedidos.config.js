@@ -2,6 +2,7 @@ export default {
     name: 'vVentaPedidos',
     title: 'Pedidos de venta',
     apiPath: 'socio_pedidos',
+    detailViewName: 'vVentaPedidoDetalle',
 
     headerActions: [
         {
@@ -17,15 +18,10 @@ export default {
             showIfAvance: 'mVentaPedido',
         },
         {
-            text: 'Descargar plantilla',
-            action: 'descargarPlantilla',
-            tipo: '2',
-        },
-        {
             text: 'Ver productos pedidos',
             action: 'verPedidos',
-            permiso: 'vVentaPedidos:verProductosPedidos',
             tipo: '2',
+            permiso: 'vVentaPedidos:verProductosPedidos',
         },
     ],
 
@@ -162,33 +158,29 @@ export default {
         },
     ],
 
+    tableBulkActions: [
+        {
+            text: 'Abrir',
+            icon: 'fa-solid fa-check-double',
+            action: 'abrirMasivo',
+            permiso: 'vVentaPedidos:abrirCerrar',
+        },
+        {
+            text: 'Terminar',
+            icon: 'fa-solid fa-check-double',
+            action: 'cerrarMasivo',
+            permiso: 'vVentaPedidos:abrirCerrar',
+        },
+    ],
+
     tableRowActions: [
-        {
-            label: 'Ver',
-            icon: 'fa-regular fa-folder-open',
-            action: 'ver',
-            permiso: 'vVentaPedidos:ver',
-        },
-        {
-            label: 'Editar',
-            icon: 'fa-solid fa-pen-to-square',
-            action: 'editar',
-            permiso: 'vVentaPedidos:editar',
-            ocultar: { estado: ['0', '2'], origin: 'ecommerce' },
-        },
-        {
-            label: 'Eliminar',
-            icon: 'fa-solid fa-trash-can',
-            action: 'vista.eliminar',
-            permiso: 'vVentaPedidos:eliminar',
-            ocultar: { pagado: true, origin: 'ecommerce' },
-        },
-        {
-            label: 'Exportar en PDF',
-            icon: 'fa-regular fa-file-pdf',
-            action: 'generarPdf',
-            permiso: 'vVentaPedidos:generarPdf',
-        },
+        // {
+        //     label: 'Eliminar',
+        //     icon: 'fa-solid fa-trash-can',
+        //     action: 'vista.eliminar',
+        //     permiso: 'vVentaPedidos:eliminar',
+        //     ocultar: { pagado: true, origin: 'ecommerce' },
+        // },
         {
             label: 'Confirmar pago',
             icon: 'fa-solid fa-hand-holding-dollar',
@@ -216,13 +208,6 @@ export default {
             action: 'confirmarEntrega',
             permiso: 'vVentaPedidos:confirmarEntrega',
             ocultar: { entregado: true, listo: false },
-        },
-        {
-            label: 'Entregar mercadería',
-            icon: 'fa-regular fa-circle-down',
-            action: 'entregarMercaderia',
-            permiso: 'vVentaPedidos:entregarMercaderia',
-            ocultar: { estado: ['0', '2'] },
         },
     ],
 }

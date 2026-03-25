@@ -30,7 +30,7 @@
             <div class="acts" v-if="rowOptionsMode === 'buttons'">
                 <template v-for="(b, i) in rowOptions" :key="i">
                     <JdButton
-                        v-if="verifyPermission(item, b)"
+                        v-if="buttonVerifyPermission(item, b)"
                         v-bind="b"
                         tipo="2"
                         :small="true"
@@ -82,8 +82,9 @@
 
 <script setup>
 import { ref } from 'vue'
-import { useAuth } from '@/pinia/auth'
+// import { useAuth } from '@/pinia/auth'
 import TableCell from './JdTableCell.vue'
+import { buttonVerifyPermission } from '@/utils/mine'
 
 const props = defineProps([
     'item',
@@ -111,46 +112,46 @@ const emit = defineEmits([
     'rowDblclick',
 ])
 
-const auth = useAuth()
+// const auth = useAuth()
 const isDragging = ref(false)
 
-const verifyPermission = (item, option) => {
-    if (option.ocultar) {
-        for (const prop in option.ocultar) {
-            const cond = option.ocultar[prop]
-            const val = item[prop]
-            if (val === undefined) continue
-            if (Array.isArray(cond)) {
-                if (cond.includes(val)) return false
-            } else if (typeof cond === 'object' && cond.op) {
-                if (comparar(val, cond.op, cond.val)) return false
-            } else if (cond == val) return false
-        }
-    }
-    if (!option.permiso) return true
-    return Array.isArray(option.permiso)
-        ? auth.verifyPermiso(...option.permiso)
-        : auth.verifyPermiso(option.permiso)
-}
+// const verifyPermission = (item, option) => {
+//     if (option.ocultar) {
+//         for (const prop in option.ocultar) {
+//             const cond = option.ocultar[prop]
+//             const val = item[prop]
+//             if (val === undefined) continue
+//             if (Array.isArray(cond)) {
+//                 if (cond.includes(val)) return false
+//             } else if (typeof cond === 'object' && cond.op) {
+//                 if (comparar(val, cond.op, cond.val)) return false
+//             } else if (cond == val) return false
+//         }
+//     }
+//     if (!option.permiso) return true
+//     return Array.isArray(option.permiso)
+//         ? auth.verifyPermiso(...option.permiso)
+//         : auth.verifyPermiso(option.permiso)
+// }
 
-const comparar = (a, op, b) => {
-    switch (op) {
-        case '>':
-            return a > b
-        case '<':
-            return a < b
-        case '>=':
-            return a >= b
-        case '<=':
-            return a <= b
-        case '==':
-            return a == b
-        case '!=':
-            return a != b
-        default:
-            return false
-    }
-}
+// const comparar = (a, op, b) => {
+//     switch (op) {
+//         case '>':
+//             return a > b
+//         case '<':
+//             return a < b
+//         case '>=':
+//             return a >= b
+//         case '<=':
+//             return a <= b
+//         case '==':
+//             return a == b
+//         case '!=':
+//             return a != b
+//         default:
+//             return false
+//     }
+// }
 
 const onDragStart = (e) => {
     isDragging.value = true

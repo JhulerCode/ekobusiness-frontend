@@ -49,7 +49,7 @@ export default {
             this.modals.setModal('mTipoCambio', 'Nuevo tipo de cambio', 1, send, true)
         },
 
-        // --- Table row actions ---
+        //--- Row actions ---//
         async editar(item) {
             const qry = {
                 incl: ['moneda1'],

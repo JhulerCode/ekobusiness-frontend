@@ -86,7 +86,7 @@ export default {
             this.modals.setModal('mTransaccion', 'Nueva compra', 1, send, true)
         },
 
-        // --- Table row actions ---
+        //--- Row actions ---//
         async ver(item) {
             const qry = {
                 incl: ['socio1', 'moneda1', 'socio_pedido1', 'transaccion_items'],

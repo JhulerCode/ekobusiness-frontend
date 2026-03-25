@@ -75,7 +75,7 @@ export default {
         activeButtons() {
             return this.actions.filter((b) => {
                 if (b.show === false) return false
-                if (b.permiso && !this.useAuth.verifyPermiso(b.permiso)) return false
+                // if (b.permiso && !this.useAuth.verifyPermiso(b.permiso)) return false
                 if (b.showIfAvance && !this.useAuth.avances[b.showIfAvance]) return false
                 return true
             })

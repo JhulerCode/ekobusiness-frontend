@@ -71,7 +71,7 @@ export default {
             this.modals.setModal('mProductosCuarentena', `Cuarentena`, null, send, true)
         },
 
-        // --- Table row actions ---
+        //--- Row actions ---//
         async verTrazabilidad(item) {
             console.log('ASD')
             this.auth.setLoading(true, 'Cargando...')

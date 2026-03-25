@@ -2,10 +2,17 @@
     <div class="pedido-items">
         <div class="agregar" v-if="vista.mode != 'view'">
             <JdButton
-                icon="fa-solid fa-file-excel"
-                text="Importar"
+                icon="fa-solid fa-upload"
+                text="Importar items"
                 tipo="3"
                 @click="this.$refs.excel.click()"
+            />
+
+            <JdButton
+                icon="fa-solid fa-download"
+                text="Descargar plantilla"
+                tipo="3"
+                @click="descargarPlantilla"
             />
 
             <input type="file" ref="excel" accept=".xlsx, .xls" hidden @change="importar" />
@@ -55,7 +62,7 @@ import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
 import { urls, get } from '@/utils/crud'
 import { jmsg } from '@/utils/swal'
-import { tryOficialExcel, genCorrelativo, redondear } from '@/utils/mine'
+import { tryOficialExcel, genCorrelativo, redondear, downloadExcel } from '@/utils/mine'
 
 export default {
     data: () => ({
@@ -63,9 +70,11 @@ export default {
         auth: useAuth(),
         vistas: useVistas(),
         redondear,
-        vista: {},
     }),
     computed: {
+        vista() {
+            return this.vistas[this.$route.name] || { data: {} }
+        },
         columns() {
             return [
                 {
@@ -99,7 +108,7 @@ export default {
                     title: 'Entregado',
                     type: 'number',
                     width: '6rem',
-                    show: false,
+                    show: this.vista.mode == 'view',
                 },
                 {
                     id: 'pu',
@@ -159,8 +168,6 @@ export default {
         },
     },
     created() {
-        this.vista = this.vistas.vSocioPedido
-
         // if (this.vista.mode == 'view') {
         //     const colEntregado = this.columns.find((c) => c.id == 'entregado')
         //     if (colEntregado) colEntregado.show = true
@@ -250,7 +257,6 @@ export default {
 
                 this.vista.data.socio_pedido_items = res.data.map((a) => {
                     const matchedItem = articulosMap[a.EAN] || {}
-                    console.log(matchedItem?.nombre)
                     return {
                         orden: genCorrelativo(this.vista.data.socio_pedido_items, 'orden'),
                         articulo: matchedItem?.id,
@@ -282,7 +288,6 @@ export default {
             item.mtoValorVenta = cantidad * pu
             item.igv = item.igv_afectacion == '10' ? item.mtoValorVenta * (igv_porcentaje / 100) : 0
             item.total = item.mtoValorVenta + item.igv
-            console.log(item.mtoValorVenta, item.igv, item.total)
         },
         calcularTotales() {
             let mtoOperGravadas = 0
@@ -315,6 +320,15 @@ export default {
         sumarUno(item) {
             this.calcularUno(item)
             this.calcularTotales()
+        },
+        descargarPlantilla() {
+            const columns = [
+                { title: 'EAN' },
+                { title: 'Nombre' },
+                { title: 'Cantidad' },
+                { title: 'Valor unitario' },
+            ]
+            downloadExcel(columns, [], 'plantilla_pedidos.xlsx')
         },
 
         //--- Auxiliar data ---//
@@ -350,8 +364,7 @@ export default {
 
 <style scoped>
 .agregar {
-    display: grid;
-    grid-template-columns: 1fr auto auto;
+    display: flex;
     gap: 0.5rem;
     margin-bottom: 1rem;
 }

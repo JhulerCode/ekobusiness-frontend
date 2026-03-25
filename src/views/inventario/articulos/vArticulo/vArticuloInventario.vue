@@ -13,13 +13,12 @@ import { useVistas } from '@/pinia/vistas'
 
 export default {
     computed: {
-        vistas: () => useVistas(),
+        vista() {
+            return this.vistas[this.$route.name] || { data: {} }
+        },
     },
     data: () => ({
-        vista: {},
+        vistas: useVistas(),
     }),
-    created() {
-        this.vista = this.vistas.vArticulo
-    },
 }
 </script>

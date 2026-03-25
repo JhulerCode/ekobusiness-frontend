@@ -74,7 +74,7 @@ export default {
             this.$refs.excel.click()
         },
 
-        // --- Table row actions ---
+        //--- Row actions ---//
         verKardex(item) {
             this.$router.push(`/consola/inventario/articulos/${item.id}/kardex`)
         },

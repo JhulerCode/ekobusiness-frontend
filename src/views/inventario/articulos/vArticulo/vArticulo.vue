@@ -109,9 +109,11 @@ export default {
         auth: useAuth(),
         vistas: useVistas(),
         modals: useModals(),
-        vista: {},
     }),
     computed: {
+        vista() {
+            return this.vistas[this.$route.name] || { data: {} }
+        },
         availableTabs() {
             return [
                 { id: 1, label: 'General', show: true },
@@ -127,7 +129,6 @@ export default {
         },
     },
     async created() {
-        this.vista = this.vistas[VIEW_CONFIG.name]
         await this.useSystem.load(['articulo_tipos'])
         await this.loadArticulo()
     },
@@ -186,7 +187,7 @@ export default {
             if (this.checkDatos()) return
             this.shapeDatos()
 
-            this.auth.setLoading(true)
+            this.auth.setLoading(true, 'Guardando...')
             let res
             if (this.is_nuevo) {
                 res = await post(this.vista.apiUrl, this.vista.data)

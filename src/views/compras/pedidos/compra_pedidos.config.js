@@ -2,7 +2,7 @@ export default {
     name: 'vCompraPedidos',
     title: 'Pedidos de compra',
     apiPath: 'socio_pedidos',
-    // detailViewName: 'vSocioPedido',
+    detailViewName: 'vCompraPedidoDetalle',
 
     headerActions: [
         {
@@ -108,53 +108,56 @@ export default {
         },
     ],
 
+    tableBulkActions: [
+        {
+            text: 'Abrir',
+            icon: 'fa-solid fa-check-double',
+            action: 'abrirMasivo',
+            permiso: 'vCompraPedidos:abrirCerrar',
+        },
+        {
+            text: 'Terminar',
+            icon: 'fa-solid fa-check-double',
+            action: 'cerrarMasivo',
+            permiso: 'vCompraPedidos:abrirCerrar',
+        },
+    ],
+
     tableRowActions: [
         {
-            label: 'Ver',
-            icon: 'fa-regular fa-folder-open',
-            action: 'ver',
-            permiso: 'vCompraPedidos:ver',
-        },
-        {
-            label: 'Editar',
-            icon: 'fa-solid fa-pen-to-square',
-            action: 'editar',
-            permiso: 'vCompraPedidos:editar',
-            ocultar: { estado: ['0', '2'] },
-        },
-        {
-            label: 'Exportar en PDF',
-            icon: 'fa-regular fa-file-pdf',
-            action: 'generarPdf',
-            permiso: 'vCompraPedidos:generarPdf',
+            label: 'Abrir',
+            icon: 'fa-solid fa-check-double',
+            action: 'abrir',
+            permiso: 'vCompraPedidos:abrirCerrar',
+            ocultar: { estado: 1 },
         },
         {
             label: 'Terminar',
             icon: 'fa-solid fa-check-double',
-            action: 'terminar',
-            permiso: 'vCompraPedidos:terminar',
-            ocultar: { estado: ['0', '2'] },
+            action: 'cerrar',
+            permiso: 'vCompraPedidos:abrirCerrar',
+            ocultar: { estado: 2 },
         },
-        {
-            label: 'Recalcular entregados',
-            icon: 'fa-solid fa-calculator',
-            action: 'recalcularEntregados',
-            permiso: 'vCompraPedidos:recalcularEntregados',
-            ocultar: { estado: ['0', '2'] },
-        },
-        {
-            label: 'Entregar mercadería',
-            icon: 'fa-regular fa-circle-down',
-            action: 'entregarMercaderia',
-            permiso: 'vCompraPedidos:entregarMercaderia',
-            ocultar: { estado: ['0', '2'], is_maquila: false },
-        },
-        {
-            label: 'Ingresar mercadería',
-            icon: 'fa-regular fa-circle-up',
-            action: 'ingresarMercaderia',
-            permiso: 'vCompraPedidos:ingresarMercaderia',
-            ocultar: { estado: ['0', '2'] },
-        },
+        // {
+        //     label: 'Recalcular entregados',
+        //     icon: 'fa-solid fa-calculator',
+        //     action: 'recalcularEntregados',
+        //     permiso: 'vCompraPedidos:recalcularEntregados',
+        //     ocultar: { estado: ['0', '2'] },
+        // },
+        // {
+        //     label: 'Entregar mercadería',
+        //     icon: 'fa-regular fa-circle-down',
+        //     action: 'entregarMercaderia',
+        //     permiso: 'vCompraPedidos:entregarMercaderia',
+        //     ocultar: { estado: ['0', '2'], is_maquila: false },
+        // },
+        // {
+        //     label: 'Ingresar mercadería',
+        //     icon: 'fa-regular fa-circle-up',
+        //     action: 'ingresarMercaderia',
+        //     permiso: 'vCompraPedidos:ingresarMercaderia',
+        //     ocultar: { estado: ['0', '2'] },
+        // },
     ],
 }

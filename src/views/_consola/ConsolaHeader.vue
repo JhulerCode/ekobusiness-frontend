@@ -92,8 +92,12 @@ export default {
 
                 if (item.path && item.path.includes(':')) {
                     const vista = this.useVistas[item.goto]
+
                     const dynamicName =
-                        vista?.data?.nombre || vista?.data?.nombres || vista?.data?.label
+                        vista?.data?.nombre ||
+                        vista?.data?.nombres ||
+                        vista?.data?.label ||
+                        vista?.data?.codigo
 
                     label = dynamicName || label
                 }

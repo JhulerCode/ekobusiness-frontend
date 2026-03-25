@@ -136,7 +136,7 @@ export default {
         this.modal = this.useModals.mTransaccionItemLotes
 
         this.setColumns()
-        this.loadLotes()
+        // this.loadLotes()
     },
     methods: {
         runMethod(method, item) {

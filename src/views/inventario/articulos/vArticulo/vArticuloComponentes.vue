@@ -21,11 +21,13 @@ import { genCorrelativo } from '@/utils/mine'
 
 export default {
     data: () => ({
-        vista: {},
+        auth: useAuth(),
+        vistas: useVistas(),
     }),
     computed: {
-        auth: () => useAuth(),
-        vistas: () => useVistas(),
+        vista() {
+            return this.vistas[this.$route.name] || { data: {} }
+        },
         columns_componentes() {
             return [
                 {
@@ -58,13 +60,6 @@ export default {
                 },
             ]
         },
-    },
-    created() {
-        this.vista = this.vistas.vArticulo
-
-        // if (this.vista.mode != 1 && !this.vista.articulo_componentes_loaded) {
-        //     this.loadArticuloComponentes()
-        // }
     },
     methods: {
         runMethod(method, item) {

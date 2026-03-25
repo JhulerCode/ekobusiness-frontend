@@ -49,18 +49,17 @@ import { useVistas } from '@/pinia/vistas'
 import { get, urls } from '@/utils/crud'
 
 export default {
-    computed: {
-        useSystem: () => useSystem(),
-        vistas: () => useVistas(),
-    },
     data: () => ({
-        vista: {},
-
+        useSystem: useSystem(),
+        vistas: useVistas(),
         materiaprima_id: 'f000be66-e4b1-4334-b57a-0e356eb8c7a6',
     }),
+    computed: {
+        vista() {
+            return this.vistas[this.$route.name] || { data: {} }
+        },
+    },
     async created() {
-        this.vista = this.vistas.vArticulo
-
         await this.useSystem.load(['igv_afectaciones', 'unidades', 'mp_tipos'])
     },
     methods: {

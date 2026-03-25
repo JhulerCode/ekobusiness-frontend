@@ -50,7 +50,7 @@ export default {
             this.modals.setModal('mPrecioCompra', 'Nuevo precio', 1, send, true)
         },
 
-        // --- Table row actions ---
+        //--- Row actions ---//
         async editar(item) {
             const qry = {
                 incl: ['articulo1', 'socio1'],

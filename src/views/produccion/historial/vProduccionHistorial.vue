@@ -85,67 +85,45 @@ export default {
             this.vista.qry.cols.push('articulo', 'mrp_bom')
         },
 
-        // --- Table bulk actions ---
+        //--- Bulk actions ---//
+        async abrirCerrarMasivo(estado) {
+            const selected = this.vista.tableData.filter((a) => a.selected)
+            if (selected.length == 0) return jmsg('warning', 'Seleccione al menos una orden')
+
+            const resQst = await jqst(
+                `¿Está seguro de ${estado == 1 ? 'abrir' : 'cerrar'} ${selected.length} órdenes de producción?`,
+            )
+            if (resQst.isConfirmed == false) return
+
+            const send = { id: 'bulk', ids: selected.map((b) => b.id), estado }
+
+            this.auth.setLoading(true, 'Cargando...')
+            const res = await patch(
+                `${this.vista.apiUrl}/abrir-cerrar`,
+                send,
+                `Órdenes de producción ${estado == 1 ? 'abiertas' : 'cerradas'}`,
+            )
+            this.auth.setLoading(false)
+
+            if (res.code == 0) {
+                for (const a of selected) {
+                    this.vistas.updateItem(
+                        this.vista.name,
+                        'tableData',
+                        { id: a.id, estado, estado1: res.data.estado1, selected: false },
+                        true,
+                    )
+                }
+            }
+        },
         async abrirMasivo() {
-            const selected = this.vista.tableData.filter((a) => a.selected)
-            if (selected.length == 0) return jmsg('warning', 'Seleccione al menos una orden')
-
-            const resQst = await jqst(
-                `¿Está seguro de abrir ${selected.length} órdenes de producción?`,
-            )
-            if (resQst.isConfirmed == false) return
-
-            const send = { id: 'bulk', ids: selected.map((b) => b.id) }
-            this.auth.setLoading(true, 'Cargando...')
-            const res = await patch(
-                `${this.vista.apiUrl}/abrir`,
-                send,
-                'Órdenes abiertas correctamente',
-            )
-            this.auth.setLoading(false)
-
-            if (res.code == 0) {
-                for (const a of selected) {
-                    this.vistas.updateItem(
-                        'vProduccionHistorial',
-                        'tableData',
-                        { id: a.id, estado: 1, estado1: res.data.estado1, selected: false },
-                        true,
-                    )
-                }
-            }
+            this.abrirCerrarMasivo('1')
         },
-        async terminarMasivo() {
-            const selected = this.vista.tableData.filter((a) => a.selected)
-            if (selected.length == 0) return jmsg('warning', 'Seleccione al menos una orden')
-
-            const resQst = await jqst(
-                `¿Está seguro de terminar ${selected.length} órdenes de producción?`,
-            )
-            if (resQst.isConfirmed == false) return
-
-            const send = { id: 'bulk', ids: selected.map((b) => b.id) }
-            this.auth.setLoading(true, 'Cargando...')
-            const res = await patch(
-                `${this.vista.apiUrl}/terminar`,
-                send,
-                'Órdenes terminadas correctamente',
-            )
-            this.auth.setLoading(false)
-
-            if (res.code == 0) {
-                for (const a of selected) {
-                    this.vistas.updateItem(
-                        'vProduccionHistorial',
-                        'tableData',
-                        { id: a.id, estado: 2, estado1: res.data.estado1, selected: false },
-                        true,
-                    )
-                }
-            }
+        async cerrarMasivo() {
+            this.abrirCerrarMasivo('2')
         },
 
-        // --- Table row actions ---
+        //--- Row actions ---//
         nuevo() {
             const send = {
                 produccion_orden: {
@@ -201,47 +179,36 @@ export default {
             }
             this.modals.setModal('mProduccionOrden', 'Editar órden de producción', 2, send, true)
         },
-        async abrir(item) {
-            const resQst = await jqst('¿Está seguro de abrir la orden de producción?')
+        async abrirCerrar(item, estado) {
+            const resQst = await jqst(
+                `¿Está seguro de ${estado == 1 ? 'abrir' : 'cerrar'} la orden de producción?`,
+            )
             if (resQst.isConfirmed == false) return
 
-            const send = { id: item.id, ids: item.id }
+            const send = { id: item.id, ids: item.id, estado }
+
             this.auth.setLoading(true, 'Cargando...')
             const res = await patch(
-                `${this.vista.apiUrl}/abrir`,
+                `${this.vista.apiUrl}/abrir-cerrar`,
                 send,
-                'Orden de producción abierta',
+                `Orden de producción ${estado == 1 ? 'abierta' : 'cerrado'}`,
             )
             this.auth.setLoading(false)
+
             if (res.code != 0) return
 
             this.vistas.updateItem(
-                'vProduccionHistorial',
+                this.vista.name,
                 'tableData',
-                { id: res.data.id, estado: 1, estado1: res.data.estado1 },
+                { id: res.data.id, estado, estado1: res.data.estado1 },
                 true,
             )
         },
-        async terminar(item) {
-            const resQst = await jqst('¿Está seguro de terminar la orden de producción?')
-            if (resQst.isConfirmed == false) return
-
-            const send = { id: item.id, ids: item.id }
-            this.auth.setLoading(true, 'Cargando...')
-            const res = await patch(
-                `${this.vista.apiUrl}/terminar`,
-                send,
-                'Orden de producción terminada',
-            )
-            this.auth.setLoading(false)
-            if (res.code != 0) return
-
-            this.vistas.updateItem(
-                'vProduccionHistorial',
-                'tableData',
-                { id: res.data.id, estado: 2, estado1: res.data.estado1 },
-                true,
-            )
+        abrir(item) {
+            this.abrirCerrar(item, '1')
+        },
+        cerrar(item) {
+            this.abrirCerrar(item, '2')
         },
         async salidaInsumos(item) {
             const qry1 = {

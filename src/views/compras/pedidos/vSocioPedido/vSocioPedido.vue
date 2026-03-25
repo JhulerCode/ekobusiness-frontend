@@ -24,7 +24,7 @@
                 v-model="vista.data.socio"
                 :selectedObject="vista.data.socio1"
                 @elegir="setSocio"
-                :disabled="vista.mode == 'view' || vista.socio_elegido?.id != null"
+                :disabled="vista.mode == 'view'"
                 style="grid-column: 1/3"
             />
 
@@ -58,7 +58,7 @@
                 :search="loadMonedas"
                 v-model="vista.data.moneda"
                 :selectedObject="vista.data.moneda1"
-                :disabled="vista.mode == 'view' || vista.data.moneda != null"
+                :disabled="vista.mode == 'view'"
             />
         </template>
 
@@ -66,7 +66,6 @@
             <vSocioPedidoItems v-if="vista.pestana == 1" />
             <vSocioPedidoLogistica v-if="vista.pestana == 2" />
             <vSocioPedidoFinanzas v-if="vista.pestana == 3" />
-            <vSocioPedidoTransacciones v-if="vista.pestana == 4" />
         </template>
     </VistaDetalleLayout>
 
@@ -77,7 +76,6 @@
 import vSocioPedidoItems from './vSocioPedidoItems.vue'
 import vSocioPedidoLogistica from './vSocioPedidoLogistica.vue'
 import vSocioPedidoFinanzas from './vSocioPedidoFinanzas.vue'
-import vSocioPedidoTransacciones from './vSocioPedidoTransacciones.vue'
 
 import mSocioPedidoPdf from '@/views/compras/pedidos/mSocioPedidoPdf.vue'
 
@@ -88,7 +86,7 @@ import { useModals } from '@/pinia/modals'
 import { useSystem } from '@/pinia/system'
 import { urls, get, post, patch } from '@/utils/crud'
 import { getItemFromArray, redondear, incompleteData, genId } from '@/utils/mine'
-import { jmsg } from '@/utils/swal'
+import { jmsg, jqst } from '@/utils/swal'
 import dayjs from 'dayjs'
 
 export default {
@@ -96,7 +94,7 @@ export default {
         vSocioPedidoItems,
         vSocioPedidoLogistica,
         vSocioPedidoFinanzas,
-        vSocioPedidoTransacciones,
+
         mSocioPedidoPdf,
     },
     data: () => ({
@@ -107,19 +105,16 @@ export default {
         modals: useModals(),
         getItemFromArray,
         redondear,
-        vista: {},
     }),
     computed: {
+        vista() {
+            return this.vistas[this.$route.name] || { data: {} }
+        },
         availableTabs() {
             return [
                 { id: 1, label: 'Contenido', show: true },
                 { id: 2, label: 'Logística', show: true },
                 { id: 3, label: 'Finanzas', show: true },
-                {
-                    id: 4,
-                    label: this.vista.data?.tipo == 1 ? 'Ingresos' : 'Entregas',
-                    show: this.vista.mode == 'view',
-                },
             ]
         },
         is_nuevo() {
@@ -127,7 +122,6 @@ export default {
         },
     },
     async created() {
-        this.vista = this.vistas[VIEW_CONFIG.name]
         await this.useSystem.load([
             'pedido_estados',
             'entrega_tipos',
@@ -137,9 +131,10 @@ export default {
             'igv_afectaciones',
         ])
         await this.loadPedido()
+        this.setSocio(this.vista.data.socio1)
     },
     unmounted() {
-        delete this.vistas[VIEW_CONFIG.name]
+        delete this.vistas[this.$route.name]
     },
     methods: {
         runMethod(method, item) {
@@ -166,7 +161,7 @@ export default {
             }
 
             const qry = {
-                incl: ['socio1', 'moneda1', 'socio_pedido_items'],
+                incl: ['socio1', 'moneda1', 'socio_pedido_items', 'createdBy1'],
                 iccl: {
                     socio1: {
                         cols: [
@@ -178,6 +173,7 @@ export default {
                         ],
                     },
                     socio_pedido_items: { incl: ['articulo1'] },
+                    createdBy1: { cols: ['cargo', 'telefono'] },
                 },
             }
 
@@ -187,13 +183,10 @@ export default {
 
             if (res.code === 0) {
                 this.vista.data = res.data
-                this.vista.socio_elegido = { ...res.data.socio1 }
-                this.vista.socios = [{ ...res.data.socio1 }]
-                this.vista.monedas = [{ ...res.data.moneda1 }]
                 document.title = `Pedido ${this.vista.data.codigo}`
 
                 // Calcular totales iniciales
-                this.calcularTotales()
+                // this.calcularTotales()
             }
         },
 
@@ -214,37 +207,43 @@ export default {
             if (res.code != 0) return
 
             if (this.is_nuevo) {
-                this.$router.push({ name: 'vSocioPedido', params: { id: res.data.id } })
+                this.$router.push({ name: this.$route.name, params: { id: res.data.id } })
             }
 
             this.vista.mode = 'view'
         },
         async generarPdf() {
-            const qry = {
-                incl: ['socio1', 'moneda1', 'socio_pedido_items', 'createdBy1'],
-                iccl: {
-                    socio1: {
-                        incl: ['precio_lista1'],
-                        cols: ['doc_numero', 'contactos', 'direcciones', 'precio_lista'],
-                    },
-                    socio_pedido_items: { incl: ['articulo1'] },
-                    createdBy1: { cols: ['cargo', 'telefono'] },
-                },
-            }
-
-            this.auth.setLoading(true, 'Cargando...')
-            const res = await get(
-                `${this.vista.apiUrl}/uno/${this.vista.data.id}?qry=${JSON.stringify(qry)}`,
-            )
-            this.auth.setLoading(false)
-
-            if (res.code != 0) return
-
             const send = {
-                socio_pedido: res.data,
+                socio_pedido: this.vista.data,
             }
 
             this.modals.setModal('mSocioPedidoPdf', 'Orden de compra', null, send, true)
+        },
+        async recalcularEntregados() {
+            const resQst = await jqst('¿Está seguro de recalcular los entregados del pedido?')
+            if (resQst.isConfirmed == false) return
+            this.auth.setLoading(true, 'Cargando...')
+            const res = await post(
+                `${urls.socio_pedido_items}/recalcular-entregados`,
+                { socio_pedido: this.vista.data.id },
+                'Entregados recalculados',
+            )
+            this.auth.setLoading(false)
+            if (res.code != 0) return
+        },
+        ingresar() {
+            this.openStockMove(1)
+        },
+        entregar() {
+            this.openStockMove(2)
+        },
+        async openStockMove() {
+            this.$router.push({
+                name: this.$route.path.includes('compras')
+                    ? 'vCompraStockPicking'
+                    : 'vVentaStockPicking',
+                params: { id: this.vista.data.id, picking_id: 'nuevo' },
+            })
         },
 
         //--- Methods --//
@@ -271,37 +270,6 @@ export default {
                 }
             }
         },
-        calcularTotales() {
-            let mtoOperGravadas = 0
-            let mtoOperExoneradas = 0
-            let mtoOperInafectas = 0
-            let mtoIGV = 0
-
-            for (const a of this.vista.data.socio_pedido_items) {
-                const pu = parseFloat(a.pu) || 0
-                const cantidad = parseFloat(a.cantidad) || 0
-                const igv_porcentaje = parseFloat(a.igv_porcentaje) || 0
-
-                const mtoValorVenta = cantidad * pu
-                const igv = a.igv_afectacion == '10' ? mtoValorVenta * (igv_porcentaje / 100) : 0
-
-                if (a.igv_afectacion == '10') {
-                    mtoOperGravadas += mtoValorVenta
-                    mtoIGV += igv
-                } else if (a.igv_afectacion == '20') {
-                    mtoOperExoneradas += mtoValorVenta
-                } else if (a.igv_afectacion == '30') {
-                    mtoOperInafectas += mtoValorVenta
-                }
-            }
-
-            this.vista.mtoOperGravadas = mtoOperGravadas
-            this.vista.mtoOperExoneradas = mtoOperExoneradas
-            this.vista.mtoOperInafectas = mtoOperInafectas
-            this.vista.mtoIGV = mtoIGV
-            this.vista.valorVenta = mtoOperGravadas + mtoOperExoneradas + mtoOperInafectas
-            this.vista.mtoImpVenta = this.vista.valorVenta + mtoIGV
-        },
         checkDatos() {
             const props = ['tipo', 'fecha', 'socio', 'moneda', 'entrega_tipo', 'pago_condicion']
             if (incompleteData(this.vista.data, props)) {
@@ -327,6 +295,17 @@ export default {
             if (this.is_nuevo && !this.vista.data.codigo) {
                 this.vista.data.codigo = genId()
             }
+
+            this.vista.data.socio_datos = {
+                doc_tipo1: this.vista.socio_elegido.doc_tipo1,
+                doc_numero: this.vista.socio_elegido.doc_numero,
+                nombres: this.vista.socio_elegido.nombres,
+            }
+
+            this.vista.data.contacto_datos = this.vista.socio_elegido.contactos.find(
+                (a) => a.id == this.vista.data.contacto,
+            )
+
             this.vista.data.monto = this.vista.mtoImpVenta.toFixed(2)
         },
 

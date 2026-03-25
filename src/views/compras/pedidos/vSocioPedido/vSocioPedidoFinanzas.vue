@@ -7,6 +7,7 @@
                 :lista="useSystem.data.pago_condiciones || []"
                 v-model="vista.data.pago_condicion"
                 :disabled="vista.mode == 'view'"
+                style="grid-column: 1/4"
             />
 
             <JdSelect
@@ -14,12 +15,14 @@
                 :lista="useSystem.data.pago_metodos || []"
                 v-model="vista.data.pago_metodo"
                 :disabled="vista.mode == 'view'"
+                style="grid-column: 1/4"
             />
 
             <JdInput
                 label="Id de pago"
                 v-model="vista.data.pago_id"
                 :disabled="vista.mode == 'view'"
+                style="grid-column: 1/3"
             />
         </div>
 
@@ -29,11 +32,10 @@
                 :lista="useSystem.data.comprobante_tipos"
                 v-model="vista.data.comprobante_tipo"
                 :disabled="vista.mode == 'view'"
+                style="grid-column: 1/4"
             />
 
-            <template
-                v-if="vista.data.tipo == 2 && vista.data.comprobante_tipo == '01'"
-            >
+            <template v-if="vista.data.tipo == 2 && vista.data.comprobante_tipo == '01'">
                 <JdInput
                     label="RUC"
                     v-model="vista.data.comprobante_ruc"
@@ -54,7 +56,6 @@
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
 import { useSystem } from '@/pinia/system'
-import VIEW_CONFIG from './socio_pedido.config.js'
 
 export default {
     data: () => ({
@@ -64,7 +65,7 @@ export default {
     }),
     computed: {
         vista() {
-            return this.vistas[VIEW_CONFIG.name]
+            return this.vistas[this.$route.name] || { data: {} }
         },
     },
 }
@@ -75,10 +76,5 @@ export default {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 3rem;
-
-    .container-datos {
-        display: grid;
-        gap: 0.5rem 2rem;
-    }
 }
 </style>

@@ -1,10 +1,16 @@
 <template>
-    <VistaLayout :config="VIEW_CONFIG" :setQuery="setQuery" @runMethod="runMethod"> </VistaLayout>
+    <VistaLayout
+        :config="VIEW_CONFIG"
+        :setQuery="setQuery"
+        :rowSelectable="true"
+        @runMethod="runMethod"
+    >
+    </VistaLayout>
 
-    <mSocioPedido v-if="modals.show.mSocioPedido" />
-    <mSocioPedidoPdf v-if="modals.show.mSocioPedidoPdf" />
-    <mTransaccion v-if="modals.show.mTransaccion" />
-    <mPedidosClientes v-if="modals.show.mPedidosClientes" />
+    <mSocioPedido v-if="modals.show?.mSocioPedido" />
+    <mSocioPedidoPdf v-if="modals.show?.mSocioPedidoPdf" />
+    <mTransaccion v-if="modals.show?.mTransaccion" />
+    <mPedidosClientes v-if="modals.show?.mPedidosClientes" />
 </template>
 
 <script>
@@ -18,8 +24,7 @@ import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
 import { useModals } from '@/pinia/modals'
 import { urls, get, patch } from '@/utils/crud'
-import { jqst } from '@/utils/swal'
-import { downloadExcel } from '@/utils/mine'
+import { jqst, jmsg } from '@/utils/swal'
 import dayjs from 'dayjs'
 
 export default {
@@ -30,6 +35,9 @@ export default {
         mTransaccion,
         mPedidosClientes,
     },
+    data: () => ({
+        VIEW_CONFIG,
+    }),
     computed: {
         auth: () => useAuth(),
         vistas: () => useVistas(),
@@ -38,9 +46,6 @@ export default {
             return this.vistas[VIEW_CONFIG.name]
         },
     },
-    data: () => ({
-        VIEW_CONFIG,
-    }),
     methods: {
         runMethod(method, item) {
             this[method](item)
@@ -67,17 +72,7 @@ export default {
 
         // --- Header actions ---
         nuevo() {
-            const send = {
-                socio_pedido: {
-                    tipo: 2,
-                    fecha: dayjs().format('YYYY-MM-DD'),
-                    estado: 1,
-                    socio_pedido_items: [],
-                    entrega_tipo: 'envio',
-                    entrega_direccion_datos: {},
-                },
-            }
-            this.modals.setModal('mSocioPedido', 'Nuevo pedido de venta', 1, send, true)
+            this.$router.push({ name: this.VIEW_CONFIG.detailViewName, params: { id: 'nuevo' } })
         },
         recuperarGuardado() {
             const send = {
@@ -88,97 +83,46 @@ export default {
         verPedidos() {
             this.modals.setModal('mPedidosClientes', 'Productos pedidos')
         },
-        descargarPlantilla() {
-            const columns = [
-                { title: 'EAN' },
-                { title: 'Nombre' },
-                { title: 'Cantidad' },
-                { title: 'Valor unitario' },
-            ]
-            downloadExcel(columns, [], 'plantilla_pedidos.xlsx')
-        },
 
-        // --- Table row actions ---
-        async ver(item) {
-            const qry = {
-                incl: ['socio1', 'moneda1', 'socio_pedido_items'],
-                iccl: {
-                    socio1: {
-                        incl: ['precio_lista1'],
-                        cols: ['doc_numero', 'contactos', 'direcciones', 'precio_lista'],
-                    },
-                    socio_pedido_items: {
-                        incl: ['articulo1'],
-                    },
-                },
-            }
+        //--- Bulk actions ---//
+        async abrirCerrarMasivo(estado) {
+            const selected = this.vista.tableData.filter((a) => a.selected)
+            if (selected.length == 0) return jmsg('warning', 'Seleccione al menos una orden')
+
+            const resQst = await jqst(
+                `¿Está seguro de ${estado == 1 ? 'abrir' : 'cerrar'} ${selected.length} pedidos?`,
+            )
+            if (resQst.isConfirmed == false) return
+
+            const send = { id: 'bulk', ids: selected.map((b) => b.id), estado }
 
             this.auth.setLoading(true, 'Cargando...')
-            const res = await get(`${this.vista.apiUrl}/uno/${item.id}?qry=${JSON.stringify(qry)}`)
+            const res = await patch(
+                `${this.vista.apiUrl}/abrir-cerrar`,
+                send,
+                `Pedidos ${estado == 1 ? 'abiertos' : 'cerrados'}`,
+            )
             this.auth.setLoading(false)
 
-            if (res.code != 0) return
-
-            const send = {
-                socio_pedido: res.data,
-                socio_elegido: { ...res.data.socio1 },
-                socios: [{ ...res.data.socio1 }],
-                monedas: [{ ...res.data.moneda1 }],
+            if (res.code == 0) {
+                for (const a of selected) {
+                    this.vistas.updateItem(
+                        this.vista.name,
+                        'tableData',
+                        { id: a.id, estado, estado1: res.data.estado1, selected: false },
+                        true,
+                    )
+                }
             }
-
-            this.modals.setModal('mSocioPedido', 'Ver pedido de venta', 3, send, true)
         },
-        async editar(item) {
-            const qry = {
-                incl: ['socio1', 'moneda1', 'socio_pedido_items'],
-                iccl: {
-                    socio1: {
-                        incl: ['precio_lista1'],
-                        cols: ['doc_numero', 'contactos', 'direcciones', 'precio_lista'],
-                    },
-                    socio_pedido_items: {
-                        incl: ['articulo1'],
-                    },
-                },
-            }
-
-            this.auth.setLoading(true, 'Cargando...')
-            const res = await get(`${this.vista.apiUrl}/uno/${item.id}?qry=${JSON.stringify(qry)}`)
-            this.auth.setLoading(false)
-
-            if (res.code != 0) return
-
-            const send = {
-                socio_pedido: res.data,
-                socio_elegido: { ...res.data.socio1 },
-                socios: [{ ...res.data.socio1 }],
-                monedas: [{ ...res.data.moneda1 }],
-            }
-
-            this.modals.setModal('mSocioPedido', 'Editar pedido de venta', 2, send, true)
+        async abrirMasivo() {
+            this.abrirCerrarMasivo('1')
         },
-        async generarPdf(item) {
-            const qry = {
-                incl: ['socio1', 'moneda1', 'socio_pedido_items', 'createdBy1'],
-                iccl: {
-                    socio1: {
-                        incl: ['precio_lista1'],
-                        cols: ['doc_numero', 'contactos', 'direcciones', 'precio_lista'],
-                    },
-                    socio_pedido_items: {
-                        incl: ['articulo1'],
-                    },
-                },
-            }
-
-            this.auth.setLoading(true, 'Cargando...')
-            const res = await get(`${this.vista.apiUrl}/uno/${item.id}?qry=${JSON.stringify(qry)}`)
-            this.auth.setLoading(false)
-
-            if (res.code != 0) return
-
-            this.modals.setModal('mSocioPedidoPdf', 'Orden de compra', null, res.data)
+        async cerrarMasivo() {
+            this.abrirCerrarMasivo('2')
         },
+
+        //--- Row actions ---//
         async confirmarPago(item) {
             const resQst = await jqst('¿Está seguro de confirmar el pago?')
             if (resQst.isConfirmed == false) return

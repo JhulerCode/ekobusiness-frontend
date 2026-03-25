@@ -20,11 +20,13 @@ import { urls, get } from '@/utils/crud'
 
 export default {
     data: () => ({
-        vista: {},
+        auth: useAuth(),
+        vistas: useVistas(),
     }),
     computed: {
-        auth: () => useAuth(),
-        vistas: () => useVistas(),
+        vista() {
+            return this.vistas[this.$route.name] || { data: {} }
+        },
         columns_suppliers() {
             return [
                 {
@@ -125,13 +127,6 @@ export default {
                 },
             ]
         },
-    },
-    created() {
-        this.vista = this.vistas.vArticulo
-
-        // if (this.vista.mode != 1 && !this.vista.articulo_suppliers_loaded) {
-        //     this.loadArticuloSuppliers()
-        // }
     },
     methods: {
         runMethod(method, item) {

@@ -7,68 +7,64 @@
                 :lista="useSystem.data.entrega_tipos || []"
                 v-model="vista.data.entrega_tipo"
                 :disabled="vista.mode == 'view'"
+                @elegir="setDireccionEntrega(null)"
                 style="grid-column: 1/3"
             />
 
-            <template v-if="vista.data.entrega_tipo == 'envio'">
-                <JdSelect
-                    label="Direcciones"
-                    :nec="true"
-                    v-model="vista.direccion_elegida"
-                    :lista="direcciones"
-                    :disabled="vista.mode == 'view'"
-                    @elegir="setDireccionEntrega"
-                    v-if="vista.mode != 'view'"
-                    style="grid-column: 1/3"
-                />
-
-                <JdInput
-                    label="Distrito"
-                    :nec="true"
-                    v-model="vista.data.entrega_ubigeo"
-                    :disabled="vista.mode == 'view'"
-                    style="grid-column: 1/4"
-                />
-
-                <JdTextArea
-                    label="Dirección de entrega"
-                    :nec="true"
-                    v-model="vista.data.direccion_entrega"
-                    :disabled="vista.mode == 'view'"
-                    style="grid-column: 1/4"
-                />
-
-                <JdInput
-                    label="Número"
-                    v-model="vista.data.entrega_direccion_datos.numero"
-                    :disabled="vista.mode == 'view'"
-                    style="grid-column: 1/3"
-                />
-
-                <JdInput
-                    label="Piso / Dpto"
-                    v-model="vista.data.entrega_direccion_datos.piso"
-                    :disabled="vista.mode == 'view'"
-                    style="grid-column: 1/3"
-                />
-
-                <JdTextArea
-                    label="Referencia"
-                    v-model="vista.data.entrega_direccion_datos.referencia"
-                    :disabled="vista.mode == 'view'"
-                    style="grid-column: 1/4"
-                />
-            </template>
-        </div>
-
-        <div>
             <JdInput
                 label="Costo de envío"
                 type="number"
                 v-model="vista.data.entrega_costo"
                 :disabled="vista.mode == 'view'"
-                style="grid-column: 1/3"
+                style="grid-column: 3/5"
                 v-if="vista.data.entrega_tipo == 'envio'"
+            />
+        </div>
+
+        <div class="container-datos">
+            <JdSelect
+                label="Direcciones"
+                v-model="vista.direccion_elegida"
+                :lista="direcciones"
+                :disabled="vista.mode == 'view'"
+                @elegir="setDireccionEntrega"
+                v-if="vista.mode != 'view'"
+                style="grid-column: 1/4"
+            />
+
+            <JdInput
+                label="Distrito"
+                v-model="vista.data.entrega_ubigeo"
+                :disabled="vista.mode == 'view'"
+                style="grid-column: 1/4"
+            />
+
+            <JdTextArea
+                label="Dirección de entrega"
+                v-model="vista.data.direccion_entrega"
+                :disabled="vista.mode == 'view'"
+                style="grid-column: 1/5"
+            />
+
+            <JdInput
+                label="Número"
+                v-model="vista.data.entrega_direccion_datos.numero"
+                :disabled="vista.mode == 'view'"
+                style="grid-column: 1/3"
+            />
+
+            <JdInput
+                label="Piso / Dpto"
+                v-model="vista.data.entrega_direccion_datos.piso"
+                :disabled="vista.mode == 'view'"
+                style="grid-column: 1/3"
+            />
+
+            <JdTextArea
+                label="Referencia"
+                v-model="vista.data.entrega_direccion_datos.referencia"
+                :disabled="vista.mode == 'view'"
+                style="grid-column: 1/4"
             />
         </div>
     </div>
@@ -78,7 +74,6 @@
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
 import { useSystem } from '@/pinia/system'
-import VIEW_CONFIG from './socio_pedido.config.js'
 
 export default {
     data: () => ({
@@ -88,13 +83,15 @@ export default {
     }),
     computed: {
         vista() {
-            return this.vistas[VIEW_CONFIG.name]
+            return this.vistas[this.$route.name] || { data: {} }
         },
         direcciones() {
             if (this.vista.data.tipo == 1) {
-                return this.auth.empresa?.direcciones || []
+                return this.vista.data.entrega_tipo == 'retiro'
+                    ? this.vista.socio_elegido?.direcciones || []
+                    : this.auth.empresa?.direcciones || []
             } else {
-                return (this.vista.data.entre_tipo == 'retiro') // Se corrigió 'entre_tipo' si era un typo en original
+                return this.vista.data.entrega_tipo == 'retiro'
                     ? this.auth.empresa?.direcciones || []
                     : this.vista.socio_elegido?.direcciones || []
             }
@@ -120,6 +117,7 @@ export default {
         },
         setDireccionEntrega(item) {
             if (item == null) {
+                this.vista.direccion_elegida = null
                 this.vista.data.entrega_ubigeo = null
                 this.vista.data.direccion_entrega = null
                 this.vista.data.entrega_direccion_datos = {}
@@ -143,11 +141,5 @@ export default {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 3rem;
-
-    .container-datos {
-        display: grid;
-        grid-template-columns: repeat(3, 11rem);
-        gap: 0.5rem;
-    }
 }
 </style>

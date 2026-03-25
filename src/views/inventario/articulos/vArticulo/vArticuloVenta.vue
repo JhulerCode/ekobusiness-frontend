@@ -98,7 +98,7 @@ import { useVistas } from '@/pinia/vistas'
 
 export default {
     data: () => ({
-        vista: {},
+        vistas: useVistas(),
         columns_ingredientes: [
             {
                 id: 'nombre',
@@ -121,7 +121,9 @@ export default {
         ],
     }),
     computed: {
-        vistas: () => useVistas(),
+        vista() {
+            return this.vistas[this.$route.name] || { data: {} }
+        },
         rowActionsIngredientes() {
             if (this.vista.mode == 'view') return []
 
@@ -144,9 +146,6 @@ export default {
                 },
             ]
         },
-    },
-    created() {
-        this.vista = this.vistas.vArticulo
     },
     methods: {
         runMethod(method, item) {

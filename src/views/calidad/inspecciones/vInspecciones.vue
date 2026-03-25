@@ -55,7 +55,7 @@ export default {
             this.modals.setModal('mInspeccion', 'Nueva inspección', 1, send, true)
         },
 
-        // --- Table row actions ---
+        //--- Row actions ---//
         async ver(item) {
             this.auth.setLoading(true, 'Cargando...')
             const res = await get(`${this.vista.apiUrl}/uno/${item.id}`)

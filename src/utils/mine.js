@@ -1,5 +1,6 @@
 import ExcelJS from 'exceljs'
 import { saveAs } from 'file-saver'
+import { useAuth } from '@/pinia/auth'
 
 function playAudio(source) {
     const audio = new Audio(source)
@@ -308,6 +309,45 @@ function getNestedProp(obj, prop) {
     return result === undefined || result === null ? '' : result
 }
 
+const buttonVerifyPermission = (item, option) => {
+    if (option.ocultar) {
+        for (const prop in option.ocultar) {
+            const cond = option.ocultar[prop]
+            const val = item[prop]
+            if (val === undefined) continue
+            if (Array.isArray(cond)) {
+                if (cond.includes(val)) return false
+            } else if (typeof cond === 'object' && cond.op) {
+                if (comparar(val, cond.op, cond.val)) return false
+            } else if (cond == val) return false
+        }
+    }
+
+    if (!option.permiso) return true
+    return Array.isArray(option.permiso)
+        ? useAuth().verifyPermiso(...option.permiso)
+        : useAuth().verifyPermiso(option.permiso)
+}
+
+const comparar = (a, op, b) => {
+    switch (op) {
+        case '>':
+            return a > b
+        case '<':
+            return a < b
+        case '>=':
+            return a >= b
+        case '<=':
+            return a <= b
+        case '==':
+            return a == b
+        case '!=':
+            return a != b
+        default:
+            return false
+    }
+}
+
 export {
     playAudio,
     deepCopy,
@@ -323,4 +363,5 @@ export {
     // selectRow,
     obtenerNumeroJuliano,
     downloadExcel,
+    buttonVerifyPermission,
 }

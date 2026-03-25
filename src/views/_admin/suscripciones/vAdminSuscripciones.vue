@@ -59,7 +59,7 @@ export default {
             this.modals.setModal('mAdminSuscripcion', 'Nueva Suscripción Global', 1, send, true)
         },
 
-        // --- Table row actions ---
+        //--- Row actions ---//
         async editar(item) {
             const qry = {
                 incl: ['empresa1', 'moneda1'],

@@ -2,7 +2,7 @@ export default {
     apiPath: 'socio_pedidos',
     titleKey: 'codigo',
     permisoEditar: ['vCompraPedidos:editar', 'vVentaPedidos:editar'],
-    permisoClonar: ['vCompraPedidos:clonar'],
+    permisoClonar: ['vCompraPedidos:clonar', 'vVentaPedidos:clonar'],
 
     headerActions: [
         {

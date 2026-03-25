@@ -114,7 +114,7 @@ router.beforeEach(async (to, from, next) => {
         // Inicializar datos de la vista
         if (to.meta.vistaName) {
             const vistas = useVistas()
-            vistas.initVista(to.meta.vistaName, {}, to.meta.viewType)
+            vistas.initVista(to.meta.vistaName, to.meta.viewType)
         }
 
         // Si navega a /consola sin vista específica, redirigir a vista inicial

@@ -164,7 +164,26 @@ export default {
 
         navigateTo(name) {
             if (this.$route.name !== name) {
-                this.$router.push({ name, params: this.$route.params })
+                // Filtramos los params para que solo pasen los que la ruta destino necesita.
+                // Esto evita el warning de "Discarded invalid param(s)" de Vue Router.
+                const allRoutes = this.$router.getRoutes()
+                const targetRoute = allRoutes.find((r) => r.name === name)
+                const targetParams = {}
+
+                if (targetRoute) {
+                    // Buscamos los tokens :nombreParam en el path de la ruta.
+                    const paramMatches = targetRoute.path.match(/:([a-zA-Z0-9_]+)/g)
+                    if (paramMatches) {
+                        paramMatches.forEach((m) => {
+                            const paramKey = m.substring(1)
+                            if (this.$route.params[paramKey] !== undefined) {
+                                targetParams[paramKey] = this.$route.params[paramKey]
+                            }
+                        })
+                    }
+                }
+
+                this.$router.push({ name, params: targetParams })
             }
         },
     },

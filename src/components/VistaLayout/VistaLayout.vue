@@ -25,8 +25,8 @@
 
                 <JdBuscador
                     v-else
-                    :tableName="route.name"
-                    :columns="vista.tableColumns"
+                    :tableName="props.config.name"
+                    :columns="vista?.tableColumns || props.config.tableColumns || []"
                     @reload="loadTableData"
                     @open-filters="openConfigFiltros"
                 />
@@ -54,9 +54,9 @@
             <slot name="content-top"></slot>
 
             <JdTable
-                :name="route.name"
-                :columns="vista.tableColumns"
-                :datos="vista.tableData || []"
+                :name="props.config.name"
+                :columns="vista?.tableColumns || props.config.tableColumns || []"
+                :datos="vista?.tableData || []"
                 :rowSelectable="props.rowSelectable"
                 :rowOptions="rowActions"
                 @rowOptionSelected="handleRowAction"
@@ -109,20 +109,21 @@ const props = defineProps({
 const emit = defineEmits(['runMethod'])
 
 // --- Inicialización de la vista ---
-const vista = computed(() => vistas[route.name])
-vistas.initVista(route.name, {
+vistas.updateVista(props.config.name, {
     ...JSON.parse(JSON.stringify(props.config)),
     apiUrl: urls[props.config.apiPath],
 })
 
-auth.setColumns(route.name, vista.value.tableColumns)
+const vista = vistas[props.config.name]
+
+auth.setColumns(props.config.name, vista?.tableColumns)
 
 if (props.initFiltros) {
     props.initFiltros()
 }
 
 if (props.askToInicialLoad) {
-    if (!vista.value.loaded && auth.verifyPermiso(`${route.name}:listar`)) {
+    if (!vista?.loaded && auth.verifyPermiso(`${props.config.name}:listar`)) {
         loadTableData()
     }
 } else {
@@ -137,18 +138,18 @@ async function loadTableData(init_page) {
     }
 
     if (props.checkFiltros && props.checkFiltros()) return
-    if (init_page) vista.value.table_page = 1
+    if (init_page) vista.table_page = 1
     props.setQuery()
 
-    vista.value.tableData = []
+    vista.tableData = []
     auth.setLoading(true, 'Cargando...')
-    const res = await get(`${urls[vista.value.apiPath]}?qry=${JSON.stringify(vista.value.qry)}`)
+    const res = await get(`${urls[vista.apiPath]}?qry=${JSON.stringify(vista.qry)}`)
     auth.setLoading(false)
 
-    vista.value.loaded = true
+    vista.loaded = true
     if (res.code === 0) {
-        vista.value.tableData = res.data
-        vista.value.table_meta = res.meta
+        vista.tableData = res.data
+        vista.table_meta = res.meta
     }
     return res
 }
@@ -156,8 +157,8 @@ async function loadTableData(init_page) {
 function openConfigCols() {
     const modals = useModals()
     const send = {
-        table: route.name,
-        cols: vista.value.tableColumns,
+        table: props.config.name,
+        cols: vista?.tableColumns,
         reload: loadTableData,
     }
     modals.setModal('mConfigCols', 'Configurar columnas', null, send, true)
@@ -166,8 +167,8 @@ function openConfigCols() {
 function openConfigFiltros() {
     const modals = useModals()
     const send = {
-        table: route.name,
-        cols: vista.value.tableColumns,
+        table: props.config.name,
+        cols: vista?.tableColumns,
         reload: loadTableData,
     }
     modals.setModal('mConfigFiltros', 'Filtros', null, send, true)
@@ -196,8 +197,8 @@ const headerActions = computed(() => {
 
 function downloadActualTablePage() {
     downloadExcel(
-        vista.value.tableColumns.filter((a) => a.show),
-        vista.value.tableData || [],
+        vista.tableColumns.filter((a) => a.show),
+        vista.tableData || [],
     )
 }
 
@@ -221,45 +222,45 @@ const bulkActions = computed(() => {
             icon: 'fa-solid fa-pen-to-square',
             text: 'Editar',
             action: 'editarBulk',
-            permiso: `${route.name}:editarBulk`,
+            permiso: `${props.config.name}:editarBulk`,
         },
         {
             icon: 'fa-solid fa-trash-can',
             text: 'Eliminar',
             action: 'eliminarBulk',
-            permiso: `${route.name}:eliminarBulk`,
+            permiso: `${props.config.name}:eliminarBulk`,
         },
-        ...(vista.value.tableBulkActions || []),
+        ...(vista?.tableBulkActions || []),
     ]
 })
 
 async function editarBulk() {
-    const selected = vista.value.tableData.filter((a) => a.selected)
+    const selected = vista.tableData.filter((a) => a.selected)
     if (selected.length == 0) return jmsg('warning', 'Seleccione al menos un artículo')
 
     const ids = selected.map((b) => b.id)
     const send = {
-        uri: vista.value.apiPath,
+        uri: vista.apiPath,
         nuevo: { prop: null, val: null },
-        cols: vista.value.tableColumns,
+        cols: vista.tableColumns,
         ids: ids,
     }
     modals.setModal('mEditar', `Editar ${ids.length} registros`, null, send, true)
 }
 
 async function eliminarBulk() {
-    const selected = vista.value.tableData.filter((a) => a.selected)
+    const selected = vista.tableData.filter((a) => a.selected)
     const ids = selected.map((b) => b.id)
 
     const resQst = await jqst(`¿Está seguro de eliminar ${ids.length} registros?`)
     if (resQst.isConfirmed == false) return
 
     auth.setLoading(true, 'Eliminando...')
-    const res = await delet(`${urls[vista.value.apiPath]}/bulk`, { id: 'bulk', ids })
+    const res = await delet(`${urls[vista.apiPath]}/bulk`, { id: 'bulk', ids })
     auth.setLoading(false)
 
     if (res.code == 0) {
-        vista.value.tableData = vista.value.tableData.filter((a) => !a.selected)
+        vista.tableData = vista.tableData.filter((a) => !a.selected)
     }
 }
 
@@ -284,9 +285,9 @@ const rowActions = computed(() => {
             label: 'Eliminar',
             icon: 'fa-solid fa-trash-can',
             action: 'eliminarRow',
-            permiso: `${route.name}:eliminar`,
+            permiso: `${props.config.name}:eliminar`,
         },
-        ...(vista.value.tableRowActions || []),
+        ...(vista?.tableRowActions || []),
     ]
 })
 
@@ -295,10 +296,10 @@ async function eliminarRow(item) {
     if (resQst.isConfirmed == false) return
 
     auth.setLoading(true, 'Eliminando...')
-    const res = await delet(vista.value.apiUrl, item)
+    const res = await delet(vista?.apiUrl, item)
     auth.setLoading(false)
 
-    if (res.code == 0) vista.value.removeItem(item)
+    if (res.code == 0) vista?.removeItem(item)
 }
 
 function handleRowAction(action, item) {
@@ -320,11 +321,11 @@ const title = computed(() => {
 })
 
 const selectedCount = computed(() => {
-    return (vista.value.tableData || []).filter((a) => a.selected).length
+    return (vista?.tableData || []).filter((a) => a.selected).length
 })
 
 function updatedBulk(item) {
-    for (const a of vista.value.tableData) {
+    for (const a of vista.tableData) {
         if (!item.ids.includes(a.id)) continue
         a.selected = false
         a[item.prop] = item.val
@@ -333,9 +334,9 @@ function updatedBulk(item) {
 }
 
 function verRow(item) {
-    if (!vista.value.detailViewName) return
-    if (!auth.verifyPermiso(`${route.name}:ver`)) return
-    router.push({ name: vista.value.detailViewName, params: { id: item.id } })
+    if (!vista?.detailViewName) return
+    if (!auth.verifyPermiso(`${props.config.name}:ver`)) return
+    router.push({ name: vista.detailViewName, params: { id: item.id } })
 }
 </script>
 

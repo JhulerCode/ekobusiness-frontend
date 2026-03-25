@@ -172,10 +172,10 @@ export default {
         //     const colEntregado = this.columns.find((c) => c.id == 'entregado')
         //     if (colEntregado) colEntregado.show = true
         // }
-        const asd = setInterval(() => {
+        const exec = setInterval(() => {
             if (this.vista.data?.socio_pedido_items) {
                 this.sumarItems()
-                clearInterval(asd)
+                clearInterval(exec)
             }
         }, 100)
     },

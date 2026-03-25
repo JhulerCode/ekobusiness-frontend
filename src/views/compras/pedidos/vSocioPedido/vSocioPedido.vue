@@ -97,7 +97,8 @@ export default {
 
         mSocioPedidoPdf,
     },
-    data: () => ({
+    data: (vm) => ({
+        currentRouteName: vm.$route.name,
         VIEW_CONFIG,
         useSystem: useSystem(),
         auth: useAuth(),
@@ -134,7 +135,7 @@ export default {
         this.setSocio(this.vista.data.socio1)
     },
     unmounted() {
-        delete this.vistas[this.$route.name]
+        delete this.vistas[this.currentRouteName]
     },
     methods: {
         runMethod(method, item) {

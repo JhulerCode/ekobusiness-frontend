@@ -7,7 +7,6 @@
     >
     </VistaLayout>
 
-    <!-- Modales -->
     <mSocioPedido v-if="modals.show?.mSocioPedido" />
     <mSocioPedidoPdf v-if="modals.show?.mSocioPedidoPdf" />
     <mTransaccion v-if="modals.show?.mTransaccion" />
@@ -52,15 +51,17 @@ export default {
             this[method](item)
         },
         initFiltros() {
+            if (!this.vista?.tableColumns) return
             const i = this.vista.tableColumns.findIndex((a) => a.id == 'fecha')
 
-            if (!this.vista.tableColumns[i].val) {
+            if (i !== -1 && !this.vista.tableColumns[i].val) {
                 this.vista.tableColumns[i].op = 'Está dentro de'
                 this.vista.tableColumns[i].val = dayjs().startOf('month').format('YYYY-MM-DD')
                 this.vista.tableColumns[i].val1 = dayjs().format('YYYY-MM-DD')
             }
         },
         setQuery() {
+            if (!this.vista) return
             this.vista.qry = {
                 fltr: { tipo: { op: 'Es', val: 1 } },
                 incl: ['socio1', 'moneda1', 'createdBy1'],

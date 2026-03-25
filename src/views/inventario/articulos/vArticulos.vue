@@ -51,6 +51,7 @@ export default {
             this[method](item)
         },
         setQuery() {
+            if (!this.vista) return
             this.vista.qry = {
                 fltr: {},
                 incl: ['linea1', 'categoria1'],
@@ -61,7 +62,7 @@ export default {
 
             this.auth.updateQuery(this.vista.tableColumns, this.vista.qry)
             // this.vista.qry.cols.push('fotos')
-            if (this.vista.tableColumns[3].show == true) {
+            if (this.vista.tableColumns[3]?.show == true) {
                 this.vista.qry.sqls.push('articulo_stock')
             }
         },

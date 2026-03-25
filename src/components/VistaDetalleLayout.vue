@@ -9,7 +9,7 @@
 
             <div class="header-right">
                 <JdButtonsOverflow
-                    v-if="vista.headerActions"
+                    v-if="headerActions"
                     :actions="headerActions"
                     @actionSelected="handleHeaderAction"
                     align="right"
@@ -48,6 +48,7 @@
 <script setup>
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
 import { urls } from '@/utils/crud'
 import { buttonVerifyPermission } from '@/utils/mine'
@@ -56,6 +57,7 @@ import JdButtonsOverflow from './VistaLayout/JdButtonsOverflow.vue'
 
 const route = useRoute()
 const router = useRouter()
+const auth = useAuth()
 const vistas = useVistas()
 
 const props = defineProps({
@@ -66,17 +68,16 @@ const props = defineProps({
 const emit = defineEmits(['runMethod'])
 
 // --- Inicialización de la vista ---
-const vista = computed(() => vistas[route.name])
-vistas.initVista(route.name, {
+vistas.updateVista(route.name, {
     ...JSON.parse(JSON.stringify(props.config)),
     apiUrl: urls[props.config.apiPath],
-    pestana: 1,
-    mode: 'view',
-    data: {},
 })
+const vista = computed(() => vistas[route.name])
 
 // --- Header actions ---
 const headerActions = computed(() => {
+    if (!vista.value.data.id) return []
+
     const isEdit = vista.value?.mode === 'edit'
 
     let configHeaderActions = []
@@ -94,15 +95,13 @@ const headerActions = computed(() => {
             action: 'clonar',
             tipo: '2',
             icon: 'fa-solid fa-copy',
-            permiso: props.config.permisoClonar,
-            show: !isEdit,
+            show: !isEdit && auth.verifyPermiso(props.config.permisoClonar),
         },
         {
             text: 'Editar',
             action: 'editar',
             icon: 'fa-solid fa-pen-to-square',
-            permiso: props.config.permisoEditar,
-            show: !isEdit,
+            show: !isEdit && auth.verifyPermiso(props.config.permisoEditar),
         },
         {
             text: 'Cancelar',

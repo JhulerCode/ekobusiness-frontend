@@ -8,18 +8,8 @@
                 mostrar="nombres"
                 v-model="vista.data.socio"
                 :selectedObject="vista.data.socio1"
-                :disabled="vista.mode == 'view' || vista.data.socio_pedido"
+                :disabled="vista.mode == 'view' || vista.data.socio_pedido != null"
                 style="grid-column: 1/3"
-            />
-
-            <JdSelectQuery
-                label="Nro pedido"
-                :nec="true"
-                mostrar="codigo"
-                v-model="vista.data.socio_pedido"
-                :selectedObject="vista.data.socio_pedido1"
-                :disabled="true"
-                style="grid-column: 3/4"
             />
 
             <JdInput
@@ -32,12 +22,22 @@
                 style="grid-column: 4/5"
             />
 
+            <JdSelectQuery
+                label="Nro pedido"
+                :nec="true"
+                mostrar="codigo"
+                v-model="vista.data.socio_pedido"
+                :selectedObject="vista.data.socio_pedido1"
+                :disabled="true"
+                style="grid-column: 1/2"
+            />
+
             <JdInput
                 label="Guía de remisión"
                 :nec="true"
                 v-model="vista.data.guia"
                 :disabled="vista.mode == 'view'"
-                style="grid-column: 1/3"
+                style="grid-column: 4/5"
             />
         </template>
 
@@ -55,7 +55,7 @@ import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
 import { useModals } from '@/pinia/modals'
 import { urls, post, get, patch } from '@/utils/crud'
-import { getItemFromArray, redondear, incompleteData } from '@/utils/mine'
+import { getItemFromArray, redondear, incompleteData, obtenerNumeroJuliano } from '@/utils/mine'
 import { jmsg } from '@/utils/swal'
 import dayjs from 'dayjs'
 
@@ -63,7 +63,8 @@ export default {
     components: {
         vStockPickingLine,
     },
-    data: () => ({
+    data: (vm) => ({
+        currentRouteName: vm.$route.name,
         VIEW_CONFIG,
         auth: useAuth(),
         vistas: useVistas(),
@@ -79,14 +80,19 @@ export default {
             return [{ id: 1, label: 'Contenido', show: true }]
         },
         is_nuevo() {
-            return this.$route.params.id === 'nuevo'
+            return this.$route.params.picking_id === 'nuevo'
         },
     },
     async created() {
-        await this.loadStockPicking()
+        const exec = setInterval(() => {
+            if (this.vista) {
+                this.loadStockPicking()
+                clearInterval(exec)
+            }
+        }, 100)
     },
     unmounted() {
-        delete this.vistas[this.$route.name]
+        delete this.vistas[this.currentRouteName]
     },
     methods: {
         runMethod(method, item) {
@@ -105,7 +111,6 @@ export default {
                 }
 
                 if (socio_pedido_id) {
-                    console.log('ASD1', this.vista.data.socio_pedido)
                     await this.loadSocioPedido(socio_pedido_id)
                 }
 
@@ -116,7 +121,7 @@ export default {
             const qry = {
                 incl: ['socio1', 'socio_pedido1', 'transaccion_items'],
                 iccl: {
-                    transaccion_items: { incl: ['articulo1'] },
+                    transaccion_items: { incl: ['articulo1', 'lotes', 'kardexes_all'] },
                 },
             }
 
@@ -125,8 +130,19 @@ export default {
             this.auth.setLoading(false)
 
             if (res.code === 0) {
+                for (const a of res.data.transaccion_items) {
+                    for (const b of a.lotes) {
+                        const i = a.kardexes.find((c) => c.lote_id == b.id)
+                        b.cantidad = i ? Number(i.cantidad) : 0
+                    }
+                }
+
                 this.vista.data = res.data
                 document.title = `Guía ${this.vista.data.guia || ''}`
+            }
+
+            if (res.data == null) {
+                this.$router.back()
             }
         },
 
@@ -174,12 +190,51 @@ export default {
                     return true
                 }
 
-                if (this.vista.data.tipo == 'abastacer_maquila') {
-                    // Logic for maquila if needed
+                if (!a.lotes || a.lotes.length == 0) {
+                    jmsg('warning', `Agregue al menos un lote en ${a.articulo1.nombre}`)
+                    return true
+                }
+
+                if (a.articulo1.type != 'combo') {
+                    const kardexesTotal = a.lotes.reduce((sum, a) => sum + (a.cantidad ?? 0), 0)
+
+                    if (kardexesTotal != a.cantidad) {
+                        jmsg('warning', `Cantidades diferentes en ${a.articulo1.nombre}`)
+                        return true
+                    }
+                } else {
+                    const kardexesTotales = {}
+                    for (const b of a.lotes) {
+                        if (!kardexesTotales[b.articulo]) {
+                            kardexesTotales[b.articulo] = 0
+                        }
+                        kardexesTotales[b.articulo] += b.cantidad
+                    }
+
+                    for (const b of a.articulo1.combo_articulos) {
+                        const cantidadComponente = b.cantidad * a.cantidad
+                        if (cantidadComponente != kardexesTotales[b.articulo]) {
+                            jmsg('warning', `Cantidades diferentes en ${b.articulo1.nombre}`)
+                            return true
+                        }
+                    }
                 }
             }
 
             return false
+        },
+        async changeDate() {
+            if (this.vista.data.tipo == 1) {
+                for (const a of this.vista.data.transaccion_items) {
+                    for (const b of a.lotes) {
+                        console.log(b)
+                        b.codigo = this.setLote()
+                    }
+                }
+            }
+        },
+        setLote() {
+            return `${obtenerNumeroJuliano(this.vista.data.fecha)}-${Math.floor(Math.random() * 90 + 10)}`
         },
 
         //--- Auxiliar data ---//
@@ -206,7 +261,6 @@ export default {
             return res.data
         },
         async loadSocioPedido(pedido_id) {
-            console.log('ASD2', this.vista.data.socio_pedido)
             const qry = {
                 incl: ['socio1', 'moneda1', 'socio_pedido_items', 'createdBy1'],
                 iccl: {
@@ -230,10 +284,7 @@ export default {
             )
             this.auth.setLoading(false)
 
-            console.log('ASD3', this.vista.data.socio_pedido)
-
             if (res.code === 0) {
-                console.log(this.vista.data)
                 const pedido = res.data
                 this.vista.data.tipo = pedido.tipo == 1 ? 1 : 5
                 this.vista.data.socio = pedido.socio
@@ -245,20 +296,6 @@ export default {
                 // Add items from pedido
                 this.vista.socio_pedido_items = pedido.socio_pedido_items
             }
-
-            console.log('ASD4', this.vista.data.socio_pedido)
-        },
-
-        async changeDate() {
-            if (this.vista.data.tipo == 1) {
-                for (const a of this.vista.data.transaccion_items) {
-                    a.lote = this.setLote()
-                }
-            }
-        },
-        setLote() {
-            console.log('1')
-            // return `${obtenerNumeroJuliano(this.vista.data.fecha)}-${Math.floor(Math.random() * 90 + 10)}`
         },
     },
 }

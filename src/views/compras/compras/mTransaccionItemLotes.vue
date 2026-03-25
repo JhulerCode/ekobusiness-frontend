@@ -23,7 +23,7 @@
                 v-else
             />
 
-            <JdSelect
+            <!-- <JdSelect
                 label="Lotes"
                 v-model="nuevo.lote_padre"
                 :lista="modal.lotes"
@@ -31,7 +31,7 @@
                 :loaded="modal.lotesLoaded"
                 @reload="loadLotes"
                 @elegir="agregarLote"
-            />
+            /> -->
 
             <div class="resumen">
                 <p>
@@ -53,12 +53,12 @@
 
         <JdTable
             :columns="columns"
-            :datos="modal.kardexes || []"
+            :datos="modal.lotes || []"
             :colNro="false"
             :rowOptions="rowActions"
             rowOptionsMode="buttons"
-            maxHeight="30rem"
             @rowOptionSelected="runMethod"
+            :agregarFila="addLote"
         />
     </JdModal>
 </template>
@@ -70,6 +70,7 @@ import { useVistas } from '@/pinia/vistas'
 
 import { urls, get } from '@/utils/crud'
 import { jmsg } from '@/utils/swal'
+import { obtenerNumeroJuliano } from '@/utils/mine'
 
 export default {
     data: () => ({
@@ -81,32 +82,6 @@ export default {
         nuevo: {},
 
         buttons: [{ text: 'Agregar articulos', action: 'sendItems', spin: false, show: true }],
-
-        columns: [
-            {
-                id: 'articulo',
-                title: 'Artículo',
-                prop: 'articulo1.nombre',
-                width: '20rem',
-                show: false,
-            },
-            {
-                id: 'lote_padre',
-                title: 'Lote | Fv | Stock',
-                prop: 'lote_padre1.lote_fv_stock',
-                width: '20rem',
-                show: true,
-            },
-            {
-                id: 'cantidad',
-                title: 'Cantidad',
-                width: '8rem',
-                input: true,
-                type: 'number',
-                toRight: true,
-                show: true,
-            },
-        ],
     }),
     computed: {
         totalRequerido() {
@@ -120,7 +95,69 @@ export default {
             }
         },
         totalCantidad() {
-            return this.modal.kardexes.reduce((sum, a) => sum + (a.cantidad ?? 0), 0)
+            return this.modal.lotes.reduce((sum, a) => sum + (a.cantidad ?? 0), 0)
+        },
+        columns() {
+            return [
+                {
+                    id: 'articulo',
+                    title: 'Artículo',
+                    prop: 'articulo1.nombre',
+                    width: '20rem',
+                    show: this.modal.articulo1.type == 'combo',
+                },
+                {
+                    id: 'componente',
+                    title: 'Componente',
+                    prop: 'componente1.nombre',
+                    width: '20rem',
+                    input: true,
+                    select: {
+                        lista: this.modal.lotes,
+                        mostrar: 'componente1.nombre',
+                        reload: this.loadLotes,
+                    },
+                    show: this.modal.tipo == 5,
+                },
+                {
+                    id: 'lote_padre',
+                    title: 'Lote | Fv | Stock',
+                    prop: 'lote_padre1.lote_fv_stock',
+                    width: '20rem',
+                    input: true,
+                    select: {
+                        lista: this.modal.lotes,
+                        mostrar: 'lote_fv_stock',
+                        reload: this.loadLotes,
+                    },
+                    show: this.modal.tipo == 5,
+                },
+                {
+                    id: 'codigo',
+                    title: 'Lote',
+                    width: '12rem',
+                    input: true,
+                    type: 'text',
+                    show: this.modal.tipo == 1,
+                },
+                {
+                    id: 'fv',
+                    title: 'F.v.',
+                    width: '12rem',
+                    input: true,
+                    type: 'date',
+                    show: this.modal.tipo == 1,
+                },
+                {
+                    id: 'cantidad',
+                    title: 'Cantidad',
+                    width: '10rem',
+                    input: true,
+                    type: 'number',
+                    toRight: true,
+                    show: true,
+                },
+            ]
         },
         rowActions() {
             return [
@@ -135,18 +172,13 @@ export default {
     async created() {
         this.modal = this.useModals.mTransaccionItemLotes
 
-        this.setColumns()
-        // this.loadLotes()
+        if (this.modal.articulo1.type == 'combo') {
+            this.setNuevoArticulo(this.modal.articulo1.combo_articulos[0])
+        }
     },
     methods: {
         runMethod(method, item) {
             this[method](item)
-        },
-        async setColumns() {
-            if (this.modal.articulo1.type == 'combo') {
-                this.columns[0].show = true
-                this.setNuevoArticulo(this.modal.articulo1.combo_articulos[0])
-            }
         },
 
         setNuevoArticulo(item) {
@@ -161,6 +193,64 @@ export default {
             this.nuevo.articulo1 = { ...item.articulo1 }
         },
 
+        //--- Methods ---//
+        addLote() {
+            if (this.modal.tipo == '1') {
+                this.modal.lotes.push({
+                    id: crypto.randomUUID(),
+                    codigo: `${obtenerNumeroJuliano(this.modal.fecha)}-${Math.floor(Math.random() * 90 + 10)}`,
+                })
+            } else {
+                this.modal.lotes.push({
+                    id: crypto.randomUUID(),
+                })
+            }
+        },
+        // agregarLote(item) {
+        //     if (item.stock == 0) return jmsg('warning', 'Selecciona un lote con stock disponible')
+
+        //     const i = this.modal.lotes.findIndex((a) => a.lote_padre == item.id)
+        //     if (i !== -1) return jmsg('warning', 'El lote ya está agregado')
+
+        //     this.modal.lotes.push({
+        //         articulo1: { ...this.nuevo.articulo1 },
+
+        //         articulo:
+        //             this.modal.articulo1.type != 'combo'
+        //                 ? this.modal.articulo
+        //                 : this.nuevo.articulo,
+        //         lote_padre: item.id,
+        //         lote_padre1: {
+        //             lote_fv_stock: item.lote_fv_stock,
+        //             stock: item.stock,
+        //         },
+        //     })
+
+        //     this.nuevo.lote_padre = null
+        // },
+        quitar(item) {
+            const i = this.modal.lotes.findIndex((a) => a.id == item.id)
+            this.modal.lotes.splice(i, 1)
+        },
+        sendItems() {
+            if (this.modal.tipo != '1') {
+                const items_fallados = this.modal.lotes.some((a) => a.stock < a.cantidad)
+                if (items_fallados) return jmsg('warning', 'Stock insuficiente en uno o más lotes')
+            }
+
+            if (this.totalRequerido != this.totalCantidad) {
+                return jmsg('warning', 'La cantidad ingresada no coincide con el total')
+            }
+
+            this.$emit('sendItems', {
+                transaccion_item_id: this.modal.transaccion_item_id,
+                lotes: this.modal.lotes,
+            })
+
+            this.useModals.show.mTransaccionItemLotes = false
+        },
+
+        //--- Auxiliar data ---//
         async loadLotes() {
             const qry = {
                 incl: ['articulo1'],
@@ -203,48 +293,6 @@ export default {
 
             this.modal.lotes = res.data
         },
-        agregarLote(item) {
-            if (item.stock == 0) return jmsg('warning', 'Selecciona un lote con stock disponible')
-
-            const i = this.modal.kardexes.findIndex((a) => a.lote_padre == item.id)
-            if (i !== -1) return jmsg('warning', 'El lote ya está agregado')
-
-            this.modal.kardexes.push({
-                articulo1: { ...this.nuevo.articulo1 },
-
-                articulo:
-                    this.modal.articulo1.type != 'combo'
-                        ? this.modal.articulo
-                        : this.nuevo.articulo,
-                lote_padre: item.id,
-                lote_padre1: {
-                    lote_fv_stock: item.lote_fv_stock,
-                    stock: item.stock,
-                },
-            })
-
-            this.nuevo.lote_padre = null
-        },
-        quitar(item) {
-            const i = this.modal.kardexes.findIndex((a) => a.lote_padre == item.lote_padre)
-            this.modal.kardexes.splice(i, 1)
-        },
-
-        sendItems() {
-            const items_fallados = this.modal.kardexes.some((a) => a.stock < a.cantidad)
-            if (items_fallados) return jmsg('warning', 'Stock insuficiente en uno o más lotes')
-
-            if (this.totalRequerido != this.totalCantidad) {
-                return jmsg('warning', 'La cantidad ingresada no coincide con el total')
-            }
-
-            this.$emit('sendItems', {
-                transaccion_item: this.modal.transaccion_item,
-                kardexes: this.modal.kardexes,
-            })
-
-            this.useModals.show.mTransaccionItemLotes = false
-        },
     },
 }
 </script>
@@ -253,12 +301,12 @@ export default {
 .container-agregar {
     display: grid;
     gap: 0.5rem;
-    margin-bottom: 1rem;
 }
 
 .resumen {
     display: flex;
     justify-content: flex-end;
     gap: 2rem;
+    margin: 1rem 0;
 }
 </style>

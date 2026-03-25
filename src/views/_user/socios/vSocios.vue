@@ -1,5 +1,6 @@
 <template>
     <VistaLayout
+        :key="$route.fullPath"
         :config="VIEW_CONFIG"
         :setQuery="setQuery"
         :rowSelectable="true"
@@ -11,16 +12,16 @@
 </template>
 
 <script>
-import mSocio from '@/views/compras/proveedores/mSocio.vue'
+import mSocio from './mSocio.vue'
 
-import VIEW_CONFIG from './proveedores.config.js'
+import VIEW_CONFIG from './socios.config.js'
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
 import { useModals } from '@/pinia/modals'
 import { get } from '@/utils/crud'
 
 export default {
-    name: 'vProveedores',
+    name: 'vSocios',
     components: {
         mSocio,
     },
@@ -29,7 +30,7 @@ export default {
         vistas: () => useVistas(),
         modals: () => useModals(),
         vista() {
-            return this.vistas[VIEW_CONFIG.name]
+            return this.vistas[this.$route.name]
         },
     },
     data: () => ({
@@ -41,17 +42,27 @@ export default {
         },
         setQuery() {
             this.vista.qry = {
-                fltr: { tipo: { op: 'Es', val: 1 } },
+                fltr: {},
                 ordr: [['nombres', 'ASC']],
                 page: this.vista.table_page,
             }
+
+            if (this.$route.path.includes('compras')) {
+                this.vista.qry.fltr.tipo = { op: 'Es', val: 1 }
+            }
+            if (this.$route.path.includes('ventas')) {
+                this.vista.qry.fltr.tipo = { op: 'Es', val: 2 }
+            }
+
             this.auth.updateQuery(this.vista.tableColumns, this.vista.qry)
         },
 
-        // --- Header actions ---
+        //--- Header actions ---//
         nuevo() {
+            const tipo = this.$route.path.includes('compras') ? 1 : 2
+
             const item = {
-                tipo: 1,
+                tipo,
                 doc_tipo: 6,
                 direcciones: [],
                 contactos: [],

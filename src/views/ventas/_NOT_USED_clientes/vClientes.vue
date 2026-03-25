@@ -49,7 +49,7 @@ export default {
             this.auth.updateQuery(this.vista.tableColumns, this.vista.qry)
         },
 
-        // --- Header actions ---
+        //--- Header actions ---//
         nuevo() {
             const item = {
                 tipo: 2,

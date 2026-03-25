@@ -43,7 +43,7 @@ export default {
             this.auth.updateQuery(this.vista.tableColumns, this.vista.qry)
         },
 
-        // --- Header actions ---
+        //--- Header actions ---//
         nuevo() {
             const send = { tipo_cambio: { fecha: dayjs().format('YYYY-MM-DD') } }
             this.modals.setModal('mTipoCambio', 'Nuevo tipo de cambio', 1, send, true)

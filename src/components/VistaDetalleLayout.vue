@@ -68,23 +68,28 @@ const props = defineProps({
 const emit = defineEmits(['runMethod'])
 
 // --- Inicialización de la vista ---
-vistas.updateVista(route.name, {
+const viewName = route.name
+
+vistas.updateVista(viewName, {
     ...JSON.parse(JSON.stringify(props.config)),
     apiUrl: urls[props.config.apiPath],
 })
-const vista = computed(() => vistas[route.name])
 
-// --- Header actions ---
+const vista = vistas[viewName]
+// const vista1 = computed(() => vistas[viewName])
+// const vista = vista1.value
+
+//--- Header actions ---//
 const headerActions = computed(() => {
-    if (!vista.value.data.id) return []
+    // if (!vista.data.id) return []
 
-    const isEdit = vista.value?.mode === 'edit'
+    const isEdit = vista?.mode === 'edit'
 
     let configHeaderActions = []
     if (props.config.headerActions) {
         configHeaderActions = props.config.headerActions.map((a) => ({
             ...a,
-            show: !isEdit && buttonVerifyPermission(vista.value.data, a),
+            show: !isEdit && buttonVerifyPermission(vista.data, a),
         }))
     }
 
@@ -120,22 +125,28 @@ const headerActions = computed(() => {
 })
 
 function editar() {
-    vista.value.original_data = JSON.parse(JSON.stringify(vista.value.data))
-    vista.value.mode = 'edit'
+    vista.original_data = JSON.parse(JSON.stringify(vista.data))
+    vista.mode = 'edit'
 }
 
 function cancelar() {
-    if (route?.params?.id === 'nuevo') router.back()
+    if (route.params[props.config.pathKey] === 'nuevo') {
+        if (window.history.state && window.history.state.back) {
+            router.back()
+        } else {
+            router.push({ name: auth.usuario.vista_inicial })
+        }
+    }
 
-    vista.value.data = JSON.parse(JSON.stringify(vista.value.original_data))
-    vista.value.mode = 'view'
+    vista.data = JSON.parse(JSON.stringify(vista.original_data))
+    vista.mode = 'view'
 }
 
 function clonar() {
-    vista.value.original_data = JSON.parse(JSON.stringify(vista.value.data))
-    router.push({ name: route.name, params: { id: 'nuevo' } })
-    delete vista.value.data.id
-    vista.value.mode = 'edit'
+    vista.original_data = JSON.parse(JSON.stringify(vista.data))
+    router.push({ name: viewName, params: { id: 'nuevo' } })
+    delete vista.data.id
+    vista.mode = 'edit'
 }
 
 const handleHeaderAction = (action, item) => {
@@ -155,14 +166,14 @@ const handleHeaderAction = (action, item) => {
 
 // --- Methods de apoyo ---
 const resolvedTitle = computed(() => {
-    const id = route?.params?.id
+    const id = route?.params[props.config.pathKey]
     if (id === 'nuevo') return 'Nuevo'
-    if (id) return vista.value?.data?.[props.config?.titleKey ?? 'nombre']
+    if (id) return vista?.data?.[props.config?.titleKey ?? 'nombre']
     return props.config?.title
 })
 
 const handleTabClick = (tabId) => {
-    vista.value.pestana = tabId
+    vista.pestana = tabId
 }
 </script>
 

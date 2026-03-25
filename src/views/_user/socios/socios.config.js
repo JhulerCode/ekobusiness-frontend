@@ -1,5 +1,4 @@
 export default {
-    name: 'vProveedores',
     title: 'Proveedores',
     apiPath: 'socios',
 
@@ -74,33 +73,20 @@ export default {
         },
     ],
 
-    tableBulkActions: [
-        {
-            icon: 'fa-solid fa-pen-to-square',
-            text: 'Editar',
-            action: 'editarBulk',
-            permiso: 'vProveedores:editarBulk',
-        },
-        {
-            icon: 'fa-solid fa-trash-can',
-            text: 'Eliminar',
-            action: 'eliminarBulk',
-            permiso: 'vProveedores:eliminarBulk',
-        },
-    ],
+    tableBulkActions: [],
 
     tableRowActions: [
         {
             label: 'Ver',
             icon: 'fa-regular fa-folder-open',
             action: 'ver',
-            permiso: 'vProveedores:ver',
+            permiso: ['vProveedores:ver', 'vClientes:ver'],
         },
         {
             label: 'Editar',
             icon: 'fa-solid fa-pen-to-square',
             action: 'editar',
-            permiso: 'vProveedores:editar',
+            permiso: ['vProveedores:editar', 'vClientes:editar'],
         },
     ],
 }

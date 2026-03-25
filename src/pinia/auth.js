@@ -3,7 +3,7 @@ import { urls, get, post, patch } from '@/utils/crud.js'
 import { deepCopy } from '@/utils/mine'
 import { useVistas } from '@/pinia/vistas.js'
 import { useModals } from '@/pinia/modals.js'
-import menuConfig from '@/config/menu.js'
+import menuConfig from '@/config/menuUser.js'
 import menuAdmin from '@/config/menuAdmin.js'
 
 export const useAuth = defineStore('auth', {

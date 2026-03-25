@@ -42,7 +42,7 @@ export default {
             this.auth.updateQuery(this.vista.tableColumns, this.vista.qry)
         },
 
-        // --- Header actions ---
+        //--- Header actions ---//
         async nuevo() {
             if (!this.vista.colaboradores) await this.loadColaboradores()
             const send = {

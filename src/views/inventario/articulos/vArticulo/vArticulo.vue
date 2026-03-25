@@ -132,9 +132,6 @@ export default {
         await this.useSystem.load(['articulo_tipos'])
         await this.loadArticulo()
     },
-    unmounted() {
-        delete this.vistas[VIEW_CONFIG.name]
-    },
     methods: {
         runMethod(method, item) {
             this[method](item)
@@ -182,7 +179,7 @@ export default {
             }
         },
 
-        // --- Header actions ---
+        //--- Header actions ---//
         async guardar() {
             if (this.checkDatos()) return
             this.shapeDatos()

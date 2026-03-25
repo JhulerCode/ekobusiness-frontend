@@ -82,22 +82,20 @@ export default {
                 }
                 return null
             }
-
             const pathItems = findCrumbs(this.useAuth.menu)
             if (!pathItems) return crumbs
 
             pathItems.forEach((item, index) => {
                 let label = item.label
                 const isLast = index === pathItems.length - 1
-
                 if (item.path && item.path.includes(':')) {
                     const vista = this.useVistas[item.goto]
 
                     const dynamicName =
                         vista?.data?.nombre ||
                         vista?.data?.nombres ||
-                        vista?.data?.label ||
-                        vista?.data?.codigo
+                        vista?.data?.codigo ||
+                        vista?.data?.fecha
 
                     label = dynamicName || label
                 }

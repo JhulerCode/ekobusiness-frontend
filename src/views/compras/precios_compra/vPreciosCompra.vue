@@ -44,7 +44,7 @@ export default {
             this.auth.updateQuery(this.vista.tableColumns, this.vista.qry)
         },
 
-        // --- Header actions ---
+        //--- Header actions ---//
         nuevo() {
             const send = { precio: { activo: true } }
             this.modals.setModal('mPrecioCompra', 'Nuevo precio', 1, send, true)

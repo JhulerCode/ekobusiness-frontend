@@ -36,7 +36,7 @@ export default {
             this.auth.updateQuery(this.vista.tableColumns, this.vista.qry)
         },
 
-        // --- Header actions ---
+        //--- Header actions ---//
         nuevo() {
             this.$router.push({ name: 'vAdminEmpresa', params: { id: 'nuevo' } })
         },

@@ -47,7 +47,7 @@ export default {
             this.vista.qry.cols.push('fotos')
         },
 
-        // --- Header actions ---
+        //--- Header actions ---//
         nuevo() {
             const send = { articulo_categoria: { activo: true } }
             this.modals.setModal('mArticuloCategoria', 'Nueva categoría', 1, send, true)

@@ -46,7 +46,7 @@ export default {
             this.vista.qry.cols.push('fotos')
         },
 
-        // --- Header actions ---
+        //--- Header actions ---//
         nuevo() {
             const send = { articulo_linea: { activo: true } }
             this.modals.setModal('mArticuloLinea', 'Nueva línea', 1, send, true)

@@ -41,7 +41,7 @@ export default {
             this.auth.updateQuery(this.vista.tableColumns, this.vista.qry)
         },
 
-        // --- Header actions ---
+        //--- Header actions ---//
         nuevo() {
             const send = { documento: { tipo: 2 } }
             this.modals.setModal('mDocumento', 'Nuevo registro sanitario', 1, send, true)

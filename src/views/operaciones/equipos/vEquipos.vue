@@ -43,7 +43,7 @@ export default {
             this.auth.updateQuery(this.vista.tableColumns, this.vista.qry)
         },
 
-        // --- Header actions ---
+        //--- Header actions ---//
         nuevo() {
             const send = { maquina: { tipo: 2 } }
             this.modals.setModal('mMaquina', 'Nuevo equipo', 1, send, true)

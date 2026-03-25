@@ -97,8 +97,7 @@ export default {
 
         mSocioPedidoPdf,
     },
-    data: (vm) => ({
-        currentRouteName: vm.$route.name,
+    data: () => ({
         VIEW_CONFIG,
         useSystem: useSystem(),
         auth: useAuth(),
@@ -119,7 +118,7 @@ export default {
             ]
         },
         is_nuevo() {
-            return this.$route.params.id === 'nuevo'
+            return this.$route.params[this.vista.pathKey] === 'nuevo'
         },
     },
     async created() {
@@ -134,15 +133,13 @@ export default {
         await this.loadPedido()
         this.setSocio(this.vista.data.socio1)
     },
-    unmounted() {
-        delete this.vistas[this.currentRouteName]
-    },
     methods: {
         runMethod(method, item) {
             this[method](item)
         },
         async loadPedido() {
-            const param_id = this.$route.params.id
+            const param_id = this.$route.params[this.vista.pathKey]
+            this.vista.data = {}
 
             if (param_id === 'nuevo') {
                 const tipo = this.$route.path.includes('compras') ? 1 : 2
@@ -185,13 +182,10 @@ export default {
             if (res.code === 0) {
                 this.vista.data = res.data
                 document.title = `Pedido ${this.vista.data.codigo}`
-
-                // Calcular totales iniciales
-                // this.calcularTotales()
             }
         },
 
-        // --- Header actions ---
+        //--- Header actions ---//
         async guardar() {
             if (this.checkDatos()) return
             this.shapeDatos()
@@ -239,12 +233,24 @@ export default {
             this.openStockMove(2)
         },
         async openStockMove() {
-            this.$router.push({
-                name: this.$route.path.includes('compras')
-                    ? 'vCompraStockPicking'
-                    : 'vVentaStockPicking',
-                params: { id: this.vista.data.id, picking_id: 'nuevo' },
-            })
+            const cantidad_traslados = await this.loadTrasladosCantidad()
+
+            if (cantidad_traslados == 0) {
+                console.log('ASD')
+                this.$router.push({
+                    name: this.$route.path.includes('compras')
+                        ? 'vCompraPedidoTraslado'
+                        : 'vVentaPedidoTraslado',
+                    params: { traslado_id: 'nuevo' },
+                })
+            } else {
+                console.log('ASD1')
+                this.$router.push({
+                    name: this.$route.path.includes('compras')
+                        ? 'vCompraPedidoTraslados'
+                        : 'vVentaPedidoTraslados',
+                })
+            }
         },
 
         //--- Methods --//
@@ -352,6 +358,19 @@ export default {
             if (res.code != 0) return
 
             return res.data
+        },
+        async loadTrasladosCantidad() {
+            const qry = {
+                fltr: {
+                    socio_pedido: { op: 'Es', val: this.vista.data.id },
+                },
+            }
+
+            const res = await get(`${urls.transacciones}?qry=${JSON.stringify(qry)}`)
+
+            if (res.code != 0) return
+
+            return res.data.length
         },
     },
 }

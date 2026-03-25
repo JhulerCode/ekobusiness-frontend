@@ -46,7 +46,7 @@ export default {
             this.auth.updateQuery(this.vista.tableColumns, this.vista.qry)
         },
 
-        // --- Header actions ---
+        //--- Header actions ---//
         async nuevo() {
             const send = {
                 suscripcion: {

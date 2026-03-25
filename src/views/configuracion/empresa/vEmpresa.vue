@@ -95,9 +95,6 @@ export default {
     async created() {
         await this.loadEmpresa()
     },
-    unmounted() {
-        delete this.vistas[VIEW_CONFIG.name]
-    },
     methods: {
         runMethod(method, item) {
             this[method](item)
@@ -130,7 +127,7 @@ export default {
             }
         },
 
-        // --- Header actions ---
+        //--- Header actions ---//
         async guardar() {
             if (this.checkDatos()) return
             this.shapeDatos()

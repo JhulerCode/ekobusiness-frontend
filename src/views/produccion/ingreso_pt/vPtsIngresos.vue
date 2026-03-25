@@ -63,7 +63,7 @@ export default {
             this.vista.qry.cols.push('produccion_orden')
         },
 
-        // --- Header actions ---
+        //--- Header actions ---//
         async verCuarentena() {
             const send = {
                 transaccion: {},

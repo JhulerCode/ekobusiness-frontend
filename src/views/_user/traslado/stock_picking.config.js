@@ -1,6 +1,7 @@
 export default {
     apiPath: 'transacciones',
-    titleKey: 'guia',
+    titleKey: 'fecha',
+    pathKey: 'traslado_id',
     permisoEditar: ['no'],
     permisoClonar: ['no'],
 

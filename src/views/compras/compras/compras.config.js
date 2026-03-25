@@ -2,12 +2,18 @@ export default {
     name: 'vCompras',
     title: 'Compras',
     apiPath: 'transacciones',
+    detailPath: 'traslado_id',
 
     headerActions: [
         {
             text: 'Nuevo',
             action: 'nuevo',
-            permiso: 'vCompras:crear',
+            permiso: [
+                'vCompras:crear',
+                'vVentas:crear',
+                'vCompraPedidos:ingresarMercaderia',
+                'vVentaPedidos:entregarMercaderia',
+            ],
         },
         {
             text: 'Recuperar',
@@ -115,17 +121,11 @@ export default {
 
     tableRowActions: [
         {
-            label: 'Ver',
-            icon: 'fa-regular fa-folder-open',
-            action: 'ver',
-            permiso: 'vCompras:ver',
-        },
-        {
-            label: 'Editar',
-            icon: 'fa-solid fa-pen-to-square',
-            action: 'editar',
-            permiso: 'vCompras:editar',
-            ocultar: { estado: 2 },
+            label: 'Control de despacho',
+            icon: 'fa-solid fa-star',
+            action: 'controlDespacho',
+            permiso: 'vVentas:controlDespacho',
+            ocultar: { tipo: 1 },
         },
     ],
 }

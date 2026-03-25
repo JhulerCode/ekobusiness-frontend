@@ -30,6 +30,7 @@
                 :selectedObject="vista.data.socio_pedido1"
                 :disabled="true"
                 style="grid-column: 1/2"
+                v-if="vista.data.socio_pedido"
             />
 
             <JdInput
@@ -42,13 +43,14 @@
         </template>
 
         <template #pestanas-body>
-            <vStockPickingLine v-if="vista.pestana == 1" />
+            {{ vista.mode }}
+            <vTrasladoLine v-if="vista.pestana == 1" />
         </template>
     </VistaDetalleLayout>
 </template>
 
 <script>
-import vStockPickingLine from './vStockPickingLine.vue'
+import vTrasladoLine from './vTrasladoLine.vue'
 
 import VIEW_CONFIG from './stock_picking.config.js'
 import { useAuth } from '@/pinia/auth'
@@ -61,10 +63,9 @@ import dayjs from 'dayjs'
 
 export default {
     components: {
-        vStockPickingLine,
+        vTrasladoLine,
     },
-    data: (vm) => ({
-        currentRouteName: vm.$route.name,
+    data: () => ({
         VIEW_CONFIG,
         auth: useAuth(),
         vistas: useVistas(),
@@ -74,13 +75,13 @@ export default {
     }),
     computed: {
         vista() {
-            return this.vistas[this.$route.name] || { data: {} }
+            return this.vistas[this.$route.name]
         },
         availableTabs() {
             return [{ id: 1, label: 'Contenido', show: true }]
         },
         is_nuevo() {
-            return this.$route.params.picking_id === 'nuevo'
+            return this.$route.params.traslado_id === 'nuevo'
         },
     },
     async created() {
@@ -91,19 +92,19 @@ export default {
             }
         }, 100)
     },
-    unmounted() {
-        delete this.vistas[this.currentRouteName]
-    },
     methods: {
         runMethod(method, item) {
             this[method](item)
         },
         async loadStockPicking() {
-            const socio_pedido_id = this.$route.params.id
-            const param_id = this.$route.params.picking_id
+            const socio_pedido_id = this.$route.params.pedido_id
+            const param_id = this.$route.params.traslado_id
 
             if (param_id === 'nuevo') {
+                const tipo = this.$route.path.includes('compras') ? 1 : 2
+
                 this.vista.data = {
+                    tipo,
                     fecha: dayjs().format('YYYY-MM-DD'),
                     socio_pedido: socio_pedido_id,
                     estado: 1,
@@ -129,7 +130,7 @@ export default {
             const res = await get(`${this.vista.apiUrl}/uno/${param_id}?qry=${JSON.stringify(qry)}`)
             this.auth.setLoading(false)
 
-            if (res.code === 0) {
+            if (res.code === 0 && res.data) {
                 for (const a of res.data.transaccion_items) {
                     for (const b of a.lotes) {
                         const i = a.kardexes.find((c) => c.lote_id == b.id)
@@ -139,14 +140,16 @@ export default {
 
                 this.vista.data = res.data
                 document.title = `Guía ${this.vista.data.guia || ''}`
-            }
-
-            if (res.data == null) {
-                this.$router.back()
+            } else {
+                if (window.history.state && window.history.state.back) {
+                    this.$router.back()
+                } else {
+                    this.$router.push({ name: this.auth.usuario.vista_inicial })
+                }
             }
         },
 
-        // --- Header actions ---
+        //--- Header actions ---//
         async guardar() {
             if (this.checkDatos()) return
 
@@ -195,27 +198,43 @@ export default {
                     return true
                 }
 
-                if (a.articulo1.type != 'combo') {
-                    const kardexesTotal = a.lotes.reduce((sum, a) => sum + (a.cantidad ?? 0), 0)
-
-                    if (kardexesTotal != a.cantidad) {
-                        jmsg('warning', `Cantidades diferentes en ${a.articulo1.nombre}`)
-                        return true
-                    }
-                } else {
-                    const kardexesTotales = {}
+                if (this.vista.data.tipo == 1) {
                     for (const b of a.lotes) {
-                        if (!kardexesTotales[b.articulo]) {
-                            kardexesTotales[b.articulo] = 0
-                        }
-                        kardexesTotales[b.articulo] += b.cantidad
-                    }
-
-                    for (const b of a.articulo1.combo_articulos) {
-                        const cantidadComponente = b.cantidad * a.cantidad
-                        if (cantidadComponente != kardexesTotales[b.articulo]) {
-                            jmsg('warning', `Cantidades diferentes en ${b.articulo1.nombre}`)
+                        if (!b.codigo) {
+                            jmsg('warning', `Falta codigo de lote en ${a.articulo1.nombre}`)
                             return true
+                        }
+
+                        if (a.articulo1.has_fv && !b.fv) {
+                            jmsg('warning', `Falta fecha de vencimiento en ${a.articulo1.nombre}`)
+                            return true
+                        }
+                    }
+                }
+
+                if (this.vista.data.tipo == 5) {
+                    if (a.articulo1.type != 'combo') {
+                        const kardexesTotal = a.lotes.reduce((sum, a) => sum + (a.cantidad ?? 0), 0)
+
+                        if (kardexesTotal != a.cantidad) {
+                            jmsg('warning', `Cantidades diferentes en ${a.articulo1.nombre}`)
+                            return true
+                        }
+                    } else {
+                        const kardexesTotales = {}
+                        for (const b of a.lotes) {
+                            if (!kardexesTotales[b.articulo]) {
+                                kardexesTotales[b.articulo] = 0
+                            }
+                            kardexesTotales[b.articulo] += b.cantidad
+                        }
+
+                        for (const b of a.articulo1.combo_articulos) {
+                            const cantidadComponente = b.cantidad * a.cantidad
+                            if (cantidadComponente != kardexesTotales[b.articulo]) {
+                                jmsg('warning', `Cantidades diferentes en ${b.articulo1.nombre}`)
+                                return true
+                            }
                         }
                     }
                 }
@@ -241,7 +260,7 @@ export default {
         async loadSocios(txtBuscar) {
             const qry = {
                 fltr: {
-                    tipo: { op: 'Es', val: this.vista.data.tipo == 1 ? 1 : 5 },
+                    tipo: { op: 'Es', val: this.vista.data.tipo == 1 ? 1 : 2 },
                     activo: { op: 'Es', val: true },
                 },
                 cols: ['nombres', 'contactos', 'direcciones', 'precio_lista', 'pago_condicion'],

@@ -43,7 +43,7 @@ export default {
             this.vista.qry.cols.push('file')
         },
 
-        // --- Header actions ---
+        //--- Header actions ---//
         nuevo() {
             const send = { documento: { tipo: 1 } }
             this.modals.setModal('mDocumento', 'Nuevo documento', 1, send, true)

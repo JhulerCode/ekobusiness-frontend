@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
 
-import menuConfig from '@/config/menu.js'
+import menuUser from '@/config/menuUser.js'
 import menuAdmin from '@/config/menuAdmin.js'
 const viewsModules = import.meta.glob('../views/**/*.vue')
 
@@ -44,7 +44,7 @@ const traverseRoutes = (items, parentPath = '') => {
     })
 }
 
-traverseRoutes(menuConfig)
+traverseRoutes(menuUser)
 traverseRoutes(menuAdmin)
 
 // ----- RUTAS PRINCIPALES ----- //

@@ -36,7 +36,7 @@
 
 <script>
 import { useVistas } from '@/pinia/vistas'
-import menuConfig from '@/config/menu.js'
+import menuConfig from '@/config/menuUser.js'
 import JdCheckBox from '@/components/inputs/JdCheckBox.vue'
 
 export default {

@@ -1,46 +1,22 @@
 <template>
     <div class="pedido-items">
-        <div class="agregar" v-if="vista.mode != 'view' && vista.data.socio != null">
-            <template v-if="vista.data.tipo == 1 || vista.data.tipo == 5">
-                <template v-if="vista.data.socio_pedido">
-                    <JdButton
-                        icon="fa-solid fa-list-ul"
-                        text="Items del pedido"
-                        tipo="3"
-                        @click="openPedidoItems"
-                    />
-                </template>
-            </template>
-
-            <template v-if="vista.data.tipo == 'abastacer_maquila'">
-                <JdSelectQuery
-                    text="asd"
-                    icon="fa-solid fa-magnifying-glass"
-                    placeholder="Buscar artículos"
-                    v-model="nuevo"
-                    :spin="vista.spinArticulos"
-                    :lista="vista.articulos"
-                    @search="searchArticulos"
-                    @elegir="addArticulo"
-                />
-
+        <div class="agregar" v-if="vista.mode != 'view'">
+            <template v-if="vista.data.socio_pedido">
                 <JdButton
                     icon="fa-solid fa-list-ul"
-                    text="Lista de materiales"
+                    text="Items del pedido"
                     tipo="3"
-                    @click="openPedidoMrpBomLines"
+                    @click="openPedidoItems"
                 />
             </template>
 
-            <template v-if="vista.data.tipo == 5 || vista.data.tipo == 'abastacer_maquila'">
-                <JdButton
-                    icon="fa-solid fa-wrench"
-                    text="Auto colocar lotes"
-                    tipo="3"
-                    @click="setLotesAutomatic"
-                    v-if="vista.data.transaccion_items?.length > 0"
-                />
-            </template>
+            <JdButton
+                icon="fa-solid fa-wrench"
+                text="Auto colocar lotes"
+                tipo="3"
+                @click="setLotesAutomatic"
+                v-if="vista.data.tipo == 5"
+            />
         </div>
 
         <JdTable
@@ -51,20 +27,9 @@
             @rowOptionSelected="runMethod"
             :inputsDisabled="vista.mode == 'view' || (vista.mode == 'edit' && vista.data.tipo == 5)"
             @onInput="runMethod"
+            @onChange="runMethod"
+            :agregarFila="agregarFila"
         >
-            <!-- <template v-slot:cFv="{ item }">
-                <div class="container-compra-fv">
-                    <p class="lote">{{ item.lote }}</p>
-
-                    <JdInput
-                        type="date"
-                        v-model="item.fv"
-                        :disabled="vista.mode == 'view'"
-                        v-if="item.articulo1?.has_fv"
-                    />
-                </div>
-            </template> -->
-
             <template v-slot:cLotes="{ item }">
                 <div class="container-lotes">
                     <JdButton
@@ -91,18 +56,21 @@
     </div>
 
     <mPedidoItems v-if="modals.show.mPedidoItems" @sendItems="agregarPedidoItems" />
-    <mTransaccionItemLotes v-if="modals.show.mTransaccionItemLotes" @sendItems="setArticuloLotes" />
+    <mTransaccionItemLotes
+        v-if="modals.show.mTransaccionItemLotes"
+        @sendItems="updateArticuloLotes"
+    />
 </template>
 
 <script>
-import mPedidoItems from '@/views/compras/compras/mPedidoItems.vue'
-import mTransaccionItemLotes from '@/views/compras/compras/mTransaccionItemLotes.vue'
+import mPedidoItems from './mPedidoItems.vue'
+import mTransaccionItemLotes from './mTransaccionItemLotes.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
 import { useVistas } from '@/pinia/vistas'
 
-import { urls, get, patch } from '@/utils/crud'
+import { urls, get } from '@/utils/crud'
 import { jmsg } from '@/utils/swal'
 import { obtenerNumeroJuliano, genCorrelativo } from '@/utils/mine'
 
@@ -117,44 +85,50 @@ export default {
         vistas: useVistas(),
 
         nuevo: null,
-
-        columns: [
-            {
-                id: 'articulo',
-                title: 'Artículo',
-                prop: 'articulo1.nombre',
-                width: '30rem',
-                show: true,
-                sort: true,
-            },
-            {
-                id: 'unidad',
-                title: 'Unidad',
-                prop: 'articulo1.unidad',
-                width: '5rem',
-                show: true,
-            },
-            {
-                id: 'cantidad',
-                title: 'Cantidad',
-                input: true,
-                type: 'number',
-                oninput: 'sumarUno',
-                width: '8rem',
-                show: true,
-            },
-            {
-                id: 'lote_padre',
-                title: 'Lote | Fv',
-                slot: 'cLotes',
-                width: '30rem',
-                show: true,
-            },
-        ],
     }),
     computed: {
         vista() {
             return this.vistas[this.$route.name] || { data: { transaccion_items: [] } }
+        },
+        columns() {
+            return [
+                {
+                    id: 'articulo',
+                    title: 'Artículo',
+                    prop: 'articulo1.nombre',
+                    width: '30rem',
+                    input: !this.$route.params.pedido_id,
+                    select_query: {
+                        search: this.loadArticulos,
+                        elegir: this.elegirArticulo,
+                    },
+                    show: true,
+                    sort: true,
+                },
+                {
+                    id: 'unidad',
+                    title: 'Unidad',
+                    prop: 'articulo1.unidad',
+                    width: '5rem',
+                    show: true,
+                },
+                {
+                    id: 'cantidad',
+                    title: 'Cantidad',
+                    input: true,
+                    type: 'number',
+                    onchange: 'setArticuloLotes',
+                    width: '8rem',
+                    show: true,
+                },
+                {
+                    id: 'lote_padre',
+                    title: 'Lote | Fv',
+                    slot: 'cLotes',
+                    width: '30rem',
+                    show: true,
+                },
+            ]
         },
         rowActions() {
             if (this.vista.mode == 'view') return []
@@ -162,22 +136,54 @@ export default {
                 {
                     icon: 'fa-solid fa-trash-can',
                     title: 'Eliminar',
-                    action: 'quitar',
+                    action: 'removeLine',
                 },
             ]
         },
+        agregarFila() {
+            if (this.vista.mode == 'view') return null
+            if (!this.vista.data.socio) return null
+            if (this.vista.data.socio_pedido) return null
+            return this.addLine
+        },
     },
     created() {
-        const exec = setInterval(() => {
-            if (this.vista.socio_pedido_items) {
-                this.agregarPedidoItems(this.vista.socio_pedido_items)
-                clearInterval(exec)
-            }
-        }, 100)
+        if (this.$route.params.pedido_id) {
+            const exec = setInterval(() => {
+                if (this.vista.socio_pedido_items) {
+                    this.agregarPedidoItems(this.vista.socio_pedido_items)
+                    clearInterval(exec)
+                }
+            }, 100)
+        }
     },
     methods: {
         runMethod(method, item) {
             this[method](item)
+        },
+        async addLine() {
+            this.vista.data.transaccion_items.push({
+                id: crypto.randomUUID(),
+                orden: genCorrelativo(this.vista.data.transaccion_items),
+            })
+        },
+        async removeLine(item) {
+            const i = this.vista.data.transaccion_items.findIndex((a) => a.id == item.id)
+            this.vista.data.transaccion_items.splice(i, 1)
+        },
+        async elegirArticulo(articulo, item) {
+            if (!articulo) return
+
+            item.articulo = articulo.id
+            item.articulo1 = {
+                id: articulo.id,
+                type: articulo.type,
+                nombre: articulo.nombre,
+                unidad: articulo.unidad,
+                has_fv: articulo.has_fv,
+                combo_articulos: articulo.combo_articulos,
+            }
+            // item.lotes = this.setLotesHoy(articulo)
         },
 
         //--- Methods ---//
@@ -200,6 +206,7 @@ export default {
                     combo_articulos,
                     cantidad: a.cantidad,
                     has_fv: a.has_fv,
+                    vu: a.pu,
                 })
             }
         },
@@ -212,19 +219,16 @@ export default {
                 orden: genCorrelativo(this.vista.data.transaccion_items),
                 articulo: item.id,
                 articulo1: {
+                    id: item.id,
                     type: item.type,
                     nombre: item.nombre,
                     unidad: item.unidad,
                     has_fv: item.has_fv,
                     combo_articulos: item.combo_articulos,
                 },
+                lotes: this.setLotesHoy(item),
 
                 cantidad: item.cantidad,
-                lotes: this.setLotesHoy(item.cantidad),
-
-                igv_afectacion: item.igv_afectacion,
-                igv_porcentaje: item.igv_afectacion == '10' ? this.auth.empresa.igv_porcentaje : 0,
-
                 mtoValorVenta: 0,
                 igv: 0,
                 total: 0,
@@ -232,37 +236,46 @@ export default {
 
             this.vista.data.transaccion_items.push(send)
         },
-        setLotesHoy(cantidad) {
+        setLotesHoy(item) {
             if (this.vista.data.tipo != 1) return []
 
             return [
                 {
                     id: crypto.randomUUID(),
-                    cantidad,
                     codigo: `${obtenerNumeroJuliano(this.vista.data.fecha)}-${Math.floor(Math.random() * 90 + 10)}`,
+                    vu: item.vu,
+                    igv_afectacion: item.igv_afectacion,
+                    igv_porcentaje:
+                        item.igv_afectacion == '10' ? this.auth.empresa.igv_porcentaje : 0,
+
+                    cantidad: item.cantidad,
+                    articulo: item.id,
                 },
             ]
         },
         openLotes(item) {
+            const type = this.vista.data.tipo == 1 ? 'new' : 'old'
             const send = {
+                type,
+                fecha: this.vista.data.fecha,
                 transaccion_item_id: item.id,
                 articulo: item.articulo,
                 articulo1: { ...item.articulo1 },
                 cantidad: item.cantidad,
                 lotes: JSON.parse(JSON.stringify(item.lotes)) || [],
-                tipo: this.vista.data.tipo,
-                fecha: this.vista.data.fecha,
             }
 
             this.modals.setModal('mTransaccionItemLotes', 'Asignar lotes', null, send, true)
         },
-        setArticuloLotes({ transaccion_item_id, lotes }) {
+        updateArticuloLotes({ transaccion_item_id, lotes }) {
             const i = this.vista.data.transaccion_items.findIndex(
                 (a) => a.id == transaccion_item_id,
             )
             this.vista.data.transaccion_items[i].lotes = lotes
         },
         async setLotesAutomatic() {
+            if (this.vista.data.transaccion_items?.length == 0) return
+
             const falta = this.vista.data.transaccion_items.some((a) => !a.cantidad)
 
             if (falta == true) return jmsg('warning', 'Ingresa todas las cantidades')
@@ -379,19 +392,56 @@ export default {
                 }
             }
         },
+        setArticuloLotes(line) {
+            if (this.vista.data.tipo == 5) return
 
-        async modificar(item) {
-            if (this.vista.mode != 'edit') return
-
-            this.auth.setLoading(true, 'Actualizando...')
-            const res = await patch(urls.transaccion_items, item)
-            this.auth.setLoading(false)
-
-            if (res.code != 0) return
+            if (line.cantidad == '' || line.cantidad == 0) {
+                line.lotes = []
+            } else {
+                line.lotes = this.setLotesHoy({ ...line.articulo1, cantidad: line.cantidad })
+            }
         },
-        async quitar(item) {
-            const i = this.vista.data.transaccion_items.findIndex((a) => a.id == item.id)
-            this.vista.data.transaccion_items.splice(i, 1)
+
+        // async modificar(item) {
+        //     if (this.vista.mode != 'edit') return
+
+        //     this.auth.setLoading(true, 'Actualizando...')
+        //     const res = await patch(urls.transaccion_items, item)
+        //     this.auth.setLoading(false)
+
+        //     if (res.code != 0) return
+        // },
+        // async quitar(item) {
+        //     const i = this.vista.data.transaccion_items.findIndex((a) => a.id == item.id)
+        //     this.vista.data.transaccion_items.splice(i, 1)
+        // },
+
+        //--- Auxiliar data ---//
+        async loadArticulos(txtBuscar) {
+            const qry = {
+                fltr: {
+                    activo: { op: 'Es', val: true },
+                },
+                cols: ['nombre', 'unidad', 'igv_afectacion', 'has_fv'],
+                ordr: [['nombre', 'ASC']],
+                limt: 25,
+            }
+
+            if (txtBuscar) {
+                qry.fltr.nombre = { op: 'Contiene', val: txtBuscar }
+            }
+
+            if (this.vista.data.tipo == 1) {
+                qry.fltr.purchase_ok = { op: 'Es', val: true }
+                // qry.incl = ['articulo_suppliers']
+            } else {
+                qry.fltr.sale_ok = { op: 'Es', val: true }
+            }
+
+            const res = await get(`${urls.articulos}?qry=${JSON.stringify(qry)}`)
+
+            if (res.code !== 0) return []
+            return res.data
         },
     },
 }
@@ -402,16 +452,6 @@ export default {
     display: flex;
     gap: 0.5rem;
     margin-bottom: 1rem;
-}
-
-.container-compra-fv {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-
-    .lote {
-        font-size: 0.8rem;
-    }
 }
 
 .container-lotes {

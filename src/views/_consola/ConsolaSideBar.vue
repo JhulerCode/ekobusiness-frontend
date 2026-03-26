@@ -10,6 +10,8 @@
             <div v-for="(a, i) in menu" :key="i" class="menu-item-wrapper">
                 <div
                     class="btn option"
+                    @mouseenter="onMouseEnter(a, $event)"
+                    @mouseleave="onMouseLeave"
                     @click="
                         a.children && a.children.length > 0
                             ? this.toggleList(a.label, $event)
@@ -55,6 +57,23 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Hover Flyout for labels when collapsed -->
+            <transition name="fade-fast">
+                <div
+                    v-if="hoveredItem && !useAuth.showNavbar && !grupoExpandido"
+                    class="items-container hover-flyout"
+                    :style="{
+                        position: 'fixed',
+                        top: hoverPosition.top + 'px',
+                        left: hoverPosition.left + 14 + 'px',
+                    }"
+                >
+                    <strong class="items-container-daddy">
+                        {{ hoveredItem.label }}
+                    </strong>
+                </div>
+            </transition>
         </div>
 
         <div class="footer">
@@ -147,6 +166,10 @@ export default {
         showUserFlyout: false,
         flyoutPosition: { top: 0, left: 0 },
         userFlyoutPosition: { top: 0, left: 0 },
+
+        hoveredItem: null,
+        hoverPosition: { top: 0, left: 0 },
+        hoverTimeout: null,
     }),
     computed: {
         menu() {
@@ -181,12 +204,15 @@ export default {
     },
     unmounted() {
         document.removeEventListener('mousedown', this.handleClickOutside)
+        clearTimeout(this.hoverTimeout)
     },
     methods: {
         toogleNavbar() {
             this.useAuth.showNavbar = !this.useAuth.showNavbar
             this.grupoExpandido = null
             this.showUserFlyout = false
+            this.hoveredItem = null
+            clearTimeout(this.hoverTimeout)
         },
         async toggleUserMenu(event) {
             if (this.showUserFlyout) {
@@ -204,6 +230,8 @@ export default {
 
             this.showUserFlyout = true
             this.grupoExpandido = null
+            this.hoveredItem = null
+            clearTimeout(this.hoverTimeout)
 
             await nextTick()
             this.calculateUserFlyoutPosition()
@@ -260,6 +288,8 @@ export default {
 
             this.grupoExpandido = label
             this.showUserFlyout = false
+            this.hoveredItem = null
+            clearTimeout(this.hoverTimeout)
 
             // Ajustar posición si se sale de la pantalla
             await nextTick()
@@ -302,6 +332,7 @@ export default {
         },
         navigateTo(routeName) {
             this.grupoExpandido = null
+            this.hoveredItem = null
             if (this.$route.name !== routeName) {
                 this.$router.push({ name: routeName })
             }
@@ -313,6 +344,25 @@ export default {
                 return item.children.some((child) => this.isRouteInItem(child))
             }
             return false
+        },
+        onMouseEnter(item, event) {
+            if (this.useAuth.showNavbar || this.grupoExpandido) return
+
+            clearTimeout(this.hoverTimeout)
+            const rect = event.currentTarget.getBoundingClientRect()
+
+            this.hoverTimeout = setTimeout(() => {
+                if (this.grupoExpandido) return
+                this.hoverPosition = {
+                    top: rect.top + rect.height / 2,
+                    left: rect.right,
+                }
+                this.hoveredItem = item
+            }, 10)
+        },
+        onMouseLeave() {
+            clearTimeout(this.hoverTimeout)
+            this.hoveredItem = null
         },
     },
 }
@@ -424,6 +474,21 @@ export default {
             display: flex;
             align-items: center;
             font-size: 1.2rem;
+        }
+    }
+
+    .hover-flyout {
+        min-width: auto;
+        pointer-events: none;
+        padding: 0.2rem 0.5rem;
+        z-index: 1000;
+        transform: translateY(-50%);
+        background-color: var(--bg-color2) !important;
+
+        .items-container-daddy {
+            font-size: 1rem;
+            padding: 0.4rem 0.8rem;
+            white-space: nowrap;
         }
     }
 
@@ -570,5 +635,15 @@ export default {
 .to-width-cero-leave-active {
     transition: width 0.2s ease;
     overflow: hidden;
+}
+
+.fade-fast-enter-active,
+.fade-fast-leave-active {
+    transition: opacity 0.1s ease;
+}
+
+.fade-fast-enter-from,
+.fade-fast-leave-to {
+    opacity: 0;
 }
 </style>

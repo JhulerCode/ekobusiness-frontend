@@ -91,11 +91,12 @@ export default {
                 if (item.path && item.path.includes(':')) {
                     const vista = this.useVistas[item.goto]
 
-                    const dynamicName =
-                        vista?.data?.nombre ||
-                        vista?.data?.nombres ||
-                        vista?.data?.codigo ||
-                        vista?.data?.fecha
+                    let dynamicName
+                    if (this.$route.params[vista?.pathKey] === 'nuevo') {
+                        dynamicName = 'Nuevo'
+                    } else {
+                        dynamicName = vista?.data?.[vista?.titleKey]
+                    }
 
                     label = dynamicName || label
                 }

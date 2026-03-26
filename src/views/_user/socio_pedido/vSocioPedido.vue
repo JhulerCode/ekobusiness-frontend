@@ -158,6 +158,7 @@ export default {
                 return
             }
 
+            this.vista.mode = 'view'
             const qry = {
                 incl: ['socio1', 'moneda1', 'socio_pedido_items', 'createdBy1'],
                 iccl: {
@@ -256,23 +257,26 @@ export default {
         //--- Methods --//
         setSocio(item) {
             this.vista.socio_elegido = { ...item }
-            this.vista.data.contacto = this.vista.socio_elegido.contactos.find(
-                (a) => a.principal == true,
-            )?.id
-            this.vista.data.pago_condicion = this.vista.socio_elegido.pago_condicion
 
-            if (this.vista.data.tipo == 2) {
-                const direccion_principal = this.vista.socio_elegido.direcciones.find(
+            if (this.is_nuevo) {
+                this.vista.data.contacto = this.vista.socio_elegido.contactos.find(
                     (a) => a.principal == true,
-                )
-                if (direccion_principal) {
-                    this.vista.direccion_elegida = direccion_principal.id
-                    this.vista.data.entrega_ubigeo = direccion_principal.ubigeo
-                    this.vista.data.direccion_entrega = direccion_principal.direccion
-                    this.vista.data.entrega_direccion_datos = {
-                        numero: direccion_principal.numero,
-                        piso: direccion_principal.piso,
-                        referencia: direccion_principal.referencia,
+                )?.id
+                this.vista.data.pago_condicion = this.vista.socio_elegido.pago_condicion
+
+                if (this.vista.data.tipo == 2) {
+                    const direccion_principal = this.vista.socio_elegido.direcciones.find(
+                        (a) => a.principal == true,
+                    )
+                    if (direccion_principal) {
+                        this.vista.direccion_elegida = direccion_principal.id
+                        this.vista.data.entrega_ubigeo = direccion_principal.ubigeo
+                        this.vista.data.direccion_entrega = direccion_principal.direccion
+                        this.vista.data.entrega_direccion_datos = {
+                            numero: direccion_principal.numero,
+                            piso: direccion_principal.piso,
+                            referencia: direccion_principal.referencia,
+                        }
                     }
                 }
             }

@@ -14,7 +14,6 @@ import VistaDetalleLayout from '@/components/VistaDetalleLayout.vue'
 import {
     JdButton,
     JdInputPassword,
-    JdSelect,
     JdSwitch,
     JdTextArea,
     // Modals
@@ -25,6 +24,7 @@ import {
     LoadingSpin,
 } from '@jhuler/components'
 import JdInput from '@/components/inputs/JdInput.vue'
+import JdSelect from './components/inputs/JdSelect.vue'
 import JdSelectQuery from '@/components/inputs/JdSelectQuery.vue'
 import JdCheckBox from '@/components/inputs/JdCheckBox.vue'
 import JdInputFile from '@/components/inputs/JdInputFile.vue'

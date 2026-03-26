@@ -25,29 +25,29 @@
             :rowOptions="rowActions"
             rowOptionsMode="buttons"
             @rowOptionSelected="runMethod"
-            :inputsDisabled="vista.mode == 'view' || (vista.mode == 'edit' && vista.data.tipo == 5)"
+            :inputsDisabled="vista.mode == 'view'"
             @onInput="runMethod"
             @onChange="runMethod"
             :agregarFila="agregarFila"
         >
             <template v-slot:cLotes="{ item }">
-                <div class="container-lotes">
+                <div class="container-kardexes">
                     <JdButton
                         :small="true"
                         tipo="2"
                         icon="fa-solid fa-list-ul"
                         title="Lotes"
-                        @click="openLotes(item)"
+                        @click="openKardexes(item)"
                         v-if="vista.mode != 'view' && item.cantidad > 0"
                     />
 
                     <ul>
-                        <li v-for="(a, i) in item.lotes" :key="i">
-                            <div>({{ a.cantidad }})</div>
+                        <li v-for="(a, i) in item.kardexes" :key="i">
                             <div>
-                                {{ a.codigo }}{{ a.fv ? ' | ' + a.fv : '' }}
-                                {{ i == item.lotes.length - 1 ? '' : ',' }}
+                                {{ a.lote1?.lote_fv }}
+                                {{ i == item.kardexes.length - 1 ? '' : ',' }}
                             </div>
+                            <div>({{ a.cantidad }})</div>
                         </li>
                     </ul>
                 </div>
@@ -56,15 +56,12 @@
     </div>
 
     <mPedidoItems v-if="modals.show.mPedidoItems" @sendItems="agregarPedidoItems" />
-    <mTransaccionItemLotes
-        v-if="modals.show.mTransaccionItemLotes"
-        @sendItems="updateArticuloLotes"
-    />
+    <mTrasladoItemLotes v-if="modals.show.mTrasladoItemLotes" @sendItems="updateArticuloKardexes" />
 </template>
 
 <script>
 import mPedidoItems from './mPedidoItems.vue'
-import mTransaccionItemLotes from './mTransaccionItemLotes.vue'
+import mTrasladoItemLotes from './mTrasladoItemLotes.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
@@ -77,7 +74,7 @@ import { obtenerNumeroJuliano, genCorrelativo } from '@/utils/mine'
 export default {
     components: {
         mPedidoItems,
-        mTransaccionItemLotes,
+        mTrasladoItemLotes,
     },
     data: () => ({
         auth: useAuth(),
@@ -95,9 +92,9 @@ export default {
                 {
                     id: 'articulo',
                     title: 'Artículo',
-                    prop: 'articulo1.nombre',
                     width: '30rem',
-                    input: !this.$route.params.pedido_id,
+                    input: true,
+                    disabled: this.$route.params.pedido_id,
                     select_query: {
                         search: this.loadArticulos,
                         elegir: this.elegirArticulo,
@@ -117,7 +114,7 @@ export default {
                     title: 'Cantidad',
                     input: true,
                     type: 'number',
-                    onchange: 'setArticuloLotes',
+                    onchange: 'setKardexesOnUpdateCantidad',
                     width: '8rem',
                     show: true,
                 },
@@ -148,7 +145,7 @@ export default {
         },
     },
     created() {
-        if (this.$route.params.pedido_id) {
+        if (this.$route.params.pedido_id && this.$route.params.pedido_id != 'nuevo') {
             const exec = setInterval(() => {
                 if (this.vista.socio_pedido_items) {
                     this.agregarPedidoItems(this.vista.socio_pedido_items)
@@ -161,6 +158,8 @@ export default {
         runMethod(method, item) {
             this[method](item)
         },
+
+        //--- Agregar filas ---//
         async addLine() {
             this.vista.data.transaccion_items.push({
                 id: crypto.randomUUID(),
@@ -183,95 +182,68 @@ export default {
                 has_fv: articulo.has_fv,
                 combo_articulos: articulo.combo_articulos,
             }
-            // item.lotes = this.setLotesHoy(articulo)
-        },
-
-        //--- Methods ---//
-        async openPedidoItems() {
-            const send = {
-                articulos: this.vista.socio_pedido_items,
-                socio_pedido: this.vista.data.socio_pedido,
-            }
-
-            this.modals.setModal('mPedidoItems', 'Items del pedido', null, send, true)
         },
         async agregarPedidoItems(items) {
             for (const a of items) {
-                const { type, nombre, unidad, combo_articulos } = a.articulo1
-                this.addArticulo({
-                    id: a.articulo,
-                    type,
-                    nombre,
-                    unidad,
-                    combo_articulos,
+                const i = this.vista.data.transaccion_items.findIndex(
+                    (b) => b.articulo == a.articulo,
+                )
+
+                if (i !== -1) {
+                    jmsg('warning', 'El artículo ya está agregado')
+                    continue
+                }
+
+                const send = {
+                    id: crypto.randomUUID(),
+                    orden: genCorrelativo(this.vista.data.transaccion_items),
+                    articulo: a.articulo,
                     cantidad: a.cantidad,
-                    has_fv: a.has_fv,
-                    vu: a.pu,
-                })
+                    //--- RELACIONADOS ---//
+                    articulo1: {
+                        ...a.articulo1,
+                        has_fv: a.has_fv,
+                    },
+                    kardexes: this.setKardexesHoy(a),
+                }
+
+                this.vista.data.transaccion_items.push(send)
             }
         },
-        async addArticulo(item) {
-            const i = this.vista.data.transaccion_items.findIndex((a) => a.articulo == item.id)
-            if (i !== -1) return jmsg('warning', 'El artículo ya está agregado')
 
-            const send = {
-                id: crypto.randomUUID(),
-                orden: genCorrelativo(this.vista.data.transaccion_items),
-                articulo: item.id,
-                articulo1: {
-                    id: item.id,
-                    type: item.type,
-                    nombre: item.nombre,
-                    unidad: item.unidad,
-                    has_fv: item.has_fv,
-                    combo_articulos: item.combo_articulos,
-                },
-                lotes: this.setLotesHoy(item),
-
-                cantidad: item.cantidad,
-                mtoValorVenta: 0,
-                igv: 0,
-                total: 0,
-            }
-
-            this.vista.data.transaccion_items.push(send)
-        },
-        setLotesHoy(item) {
+        //--- Lotes ---//
+        setKardexesHoy(item) {
             if (this.vista.data.tipo != 1) return []
 
             return [
                 {
                     id: crypto.randomUUID(),
-                    codigo: `${obtenerNumeroJuliano(this.vista.data.fecha)}-${Math.floor(Math.random() * 90 + 10)}`,
-                    vu: item.vu,
-                    igv_afectacion: item.igv_afectacion,
-                    igv_porcentaje:
-                        item.igv_afectacion == '10' ? this.auth.empresa.igv_porcentaje : 0,
-
+                    lote1: {
+                        id: crypto.randomUUID(),
+                        codigo: `${obtenerNumeroJuliano(this.vista.data.fecha)}-${Math.floor(Math.random() * 90 + 10)}`,
+                        vu: item.vu,
+                        igv_afectacion: item.igv_afectacion,
+                        igv_porcentaje:
+                            item.igv_afectacion == '10' ? this.auth.empresa.igv_porcentaje : 0,
+                    },
                     cantidad: item.cantidad,
-                    articulo: item.id,
                 },
             ]
         },
-        openLotes(item) {
-            const type = this.vista.data.tipo == 1 ? 'new' : 'old'
-            const send = {
-                type,
-                fecha: this.vista.data.fecha,
-                transaccion_item_id: item.id,
-                articulo: item.articulo,
-                articulo1: { ...item.articulo1 },
-                cantidad: item.cantidad,
-                lotes: JSON.parse(JSON.stringify(item.lotes)) || [],
-            }
+        setKardexesOnUpdateCantidad(line) {
+            if (this.vista.data.tipo == 5) return
 
-            this.modals.setModal('mTransaccionItemLotes', 'Asignar lotes', null, send, true)
+            if (line.cantidad == '' || line.cantidad == 0) {
+                line.kardexes = []
+            } else {
+                line.kardexes = this.setKardexesHoy({ ...line.articulo1, cantidad: line.cantidad })
+            }
         },
-        updateArticuloLotes({ transaccion_item_id, lotes }) {
+        updateArticuloKardexes({ transaccion_item_id, kardexes }) {
             const i = this.vista.data.transaccion_items.findIndex(
                 (a) => a.id == transaccion_item_id,
             )
-            this.vista.data.transaccion_items[i].lotes = lotes
+            this.vista.data.transaccion_items[i].kardexes = kardexes
         },
         async setLotesAutomatic() {
             if (this.vista.data.transaccion_items?.length == 0) return
@@ -323,14 +295,14 @@ export default {
             }
 
             for (const a of this.vista.data.transaccion_items) {
-                a.lotes = []
+                a.kardexes = []
 
                 if (a.articulo1.type == 'combo') {
                     for (const c of a.articulo1.combo_articulos) {
-                        const lotes = lotesMap[c.articulo] ?? []
+                        const kardexes = lotesMap[c.articulo] ?? []
 
-                        for (const lote of lotes) {
-                            const kardexes_componente = a.lotes.filter(
+                        for (const lote of kardexes) {
+                            const kardexes_componente = a.kardexes.filter(
                                 (d) => d.articulo == c.articulo,
                             )
                             const total = kardexes_componente.reduce(
@@ -358,14 +330,14 @@ export default {
                                 send.cantidad = Number(lote.stock)
                             }
 
-                            a.lotes.push(send)
+                            a.kardexes.push(send)
                         }
                     }
                 } else {
-                    const lotes = lotesMap[a.articulo] ?? []
+                    const kardexes = lotesMap[a.articulo] ?? []
 
-                    for (const lote of lotes) {
-                        const total = a.lotes.reduce((sum, s) => sum + (s.cantidad ?? 0), 0)
+                    for (const lote of kardexes) {
+                        const total = a.kardexes.reduce((sum, s) => sum + (s.cantidad ?? 0), 0)
                         const falta = a.cantidad - total
                         if (falta == 0) break
 
@@ -387,34 +359,35 @@ export default {
                             send.cantidad = Number(lote.stock)
                         }
 
-                        a.lotes.push(send)
+                        a.kardexes.push(send)
                     }
                 }
             }
         },
-        setArticuloLotes(line) {
-            if (this.vista.data.tipo == 5) return
 
-            if (line.cantidad == '' || line.cantidad == 0) {
-                line.lotes = []
-            } else {
-                line.lotes = this.setLotesHoy({ ...line.articulo1, cantidad: line.cantidad })
+        //--- Methods ---//
+        async openPedidoItems() {
+            const send = {
+                articulos: this.vista.socio_pedido_items,
+                socio_pedido: this.vista.data.socio_pedido,
             }
+
+            this.modals.setModal('mPedidoItems', 'Items del pedido', null, send, true)
         },
+        openKardexes(item) {
+            const type = this.vista.data.tipo == 1 ? 'new' : 'old'
+            const send = {
+                type,
+                fecha: this.vista.data.fecha,
+                transaccion_item_id: item.id,
+                articulo: item.articulo,
+                articulo1: { ...item.articulo1 },
+                cantidad: item.cantidad,
+                kardexes: JSON.parse(JSON.stringify(item.kardexes)) || [],
+            }
 
-        // async modificar(item) {
-        //     if (this.vista.mode != 'edit') return
-
-        //     this.auth.setLoading(true, 'Actualizando...')
-        //     const res = await patch(urls.transaccion_items, item)
-        //     this.auth.setLoading(false)
-
-        //     if (res.code != 0) return
-        // },
-        // async quitar(item) {
-        //     const i = this.vista.data.transaccion_items.findIndex((a) => a.id == item.id)
-        //     this.vista.data.transaccion_items.splice(i, 1)
-        // },
+            this.modals.setModal('mTrasladoItemLotes', 'Asignar lotes', null, send, true)
+        },
 
         //--- Auxiliar data ---//
         async loadArticulos(txtBuscar) {
@@ -454,7 +427,7 @@ export default {
     margin-bottom: 1rem;
 }
 
-.container-lotes {
+.container-kardexes {
     display: flex;
 
     ul {

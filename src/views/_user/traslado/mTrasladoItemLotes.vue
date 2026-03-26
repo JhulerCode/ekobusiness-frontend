@@ -1,6 +1,6 @@
 <template>
     <JdModal
-        modal="mTransaccionItemLotes"
+        modal="mTrasladoItemLotes"
         :buttons="buttons"
         @button-click="(action) => this[action]()"
     >
@@ -26,7 +26,7 @@
             <!-- <JdSelect
                 label="Lotes"
                 v-model="nuevo.lote_padre"
-                :lista="modal.lotes"
+                :lista="modal.kardexes"
                 mostrar="lote_fv_stock"
                 :loaded="modal.lotesLoaded"
                 @reload="loadLotes"
@@ -53,12 +53,12 @@
 
         <JdTable
             :columns="columns"
-            :datos="modal.lotes || []"
+            :datos="modal.kardexes || []"
             :colNro="false"
             :rowOptions="rowActions"
             rowOptionsMode="buttons"
             @rowOptionSelected="runMethod"
-            :agregarFila="addLote"
+            :agregarFila="addKardex"
         />
     </JdModal>
 </template>
@@ -95,7 +95,8 @@ export default {
             }
         },
         totalCantidad() {
-            return this.modal.lotes.reduce((sum, a) => sum + (a.cantidad ?? 0), 0)
+            if (!this.modal.kardexes) return 0
+            return this.modal.kardexes.reduce((sum, a) => sum + (a.cantidad ?? 0), 0)
         },
         columns() {
             return [
@@ -113,28 +114,29 @@ export default {
                     width: '20rem',
                     input: true,
                     select: {
-                        lista: this.modal.lotes,
                         mostrar: 'componente1.nombre',
-                        reload: this.loadLotes,
+                        // reload: this.loadLotes,
                     },
                     show: this.modal.type == 'old' && this.modal.articulo1.type == 'combo',
                 },
                 {
-                    id: 'lote_padre',
+                    id: 'lote_id',
                     title: 'Lote | Fv | Stock',
-                    prop: 'lote_padre1.lote_fv_stock',
-                    width: '20rem',
+                    prop: 'lote_fv_stock',
+                    width: '22rem',
                     input: true,
                     select: {
-                        lista: this.modal.lotes,
+                        lista: this.modal.articulo_lotes,
                         mostrar: 'lote_fv_stock',
                         reload: this.loadLotes,
+                        elegir: this.setLote1,
                     },
                     show: this.modal.type == 'old',
                 },
                 {
                     id: 'codigo',
                     title: 'Lote',
+                    prop: 'lote1.codigo',
                     width: '12rem',
                     input: true,
                     type: 'text',
@@ -143,6 +145,7 @@ export default {
                 {
                     id: 'fv',
                     title: 'F.v.',
+                    prop: 'lote1.fv',
                     width: '12rem',
                     input: true,
                     type: 'date',
@@ -151,6 +154,7 @@ export default {
                 {
                     id: 'cantidad',
                     title: 'Cantidad',
+                    prop: 'cantidad',
                     width: '10rem',
                     input: true,
                     type: 'number',
@@ -170,7 +174,7 @@ export default {
         },
     },
     async created() {
-        this.modal = this.useModals.mTransaccionItemLotes
+        this.modal = this.useModals.mTrasladoItemLotes
 
         if (this.modal.articulo1.type == 'combo') {
             this.setNuevoArticulo(this.modal.articulo1.combo_articulos[0])
@@ -182,7 +186,7 @@ export default {
         },
 
         setNuevoArticulo(item) {
-            this.modal.lotes = []
+            this.modal.kardexes = []
 
             if (item == null) {
                 this.nuevo.articulo = null
@@ -194,14 +198,14 @@ export default {
         },
 
         //--- Methods ---//
-        addLote() {
+        addKardex() {
             if (this.modal.type == 'new') {
-                this.modal.lotes.push({
+                this.modal.kardexes.push({
                     id: crypto.randomUUID(),
                     codigo: `${obtenerNumeroJuliano(this.modal.fecha)}-${Math.floor(Math.random() * 90 + 10)}`,
                 })
             } else {
-                this.modal.lotes.push({
+                this.modal.kardexes.push({
                     id: crypto.randomUUID(),
                 })
             }
@@ -209,10 +213,10 @@ export default {
         // agregarLote(item) {
         //     if (item.stock == 0) return jmsg('warning', 'Selecciona un lote con stock disponible')
 
-        //     const i = this.modal.lotes.findIndex((a) => a.lote_padre == item.id)
+        //     const i = this.modal.kardexes.findIndex((a) => a.lote_padre == item.id)
         //     if (i !== -1) return jmsg('warning', 'El lote ya está agregado')
 
-        //     this.modal.lotes.push({
+        //     this.modal.kardexes.push({
         //         articulo1: { ...this.nuevo.articulo1 },
 
         //         articulo:
@@ -229,45 +233,44 @@ export default {
         //     this.nuevo.lote_padre = null
         // },
         quitar(item) {
-            const i = this.modal.lotes.findIndex((a) => a.id == item.id)
-            this.modal.lotes.splice(i, 1)
+            const i = this.modal.kardexes.findIndex((a) => a.id == item.id)
+            this.modal.kardexes.splice(i, 1)
+        },
+        setLote1(data, item) {
+            const i = this.modal.kardexes.findIndex((a) => a.id == item.id)
+            this.modal.kardexes[i].lote1 = data
         },
         sendItems() {
             if (this.modal.type == 'old') {
-                const items_fallados = this.modal.lotes.some((a) => a.stock < a.cantidad)
+                const items_fallados = this.modal.kardexes.some((a) => a.lote1.stock < a.cantidad)
                 if (items_fallados) return jmsg('warning', 'Stock insuficiente en uno o más lotes')
             }
 
             if (this.modal.type == 'new') {
-                for (const a of this.modal.lotes) {
-                    if (!a.codigo) return jmsg('warning', 'Falta codigo de lote')
-                    if (this.modal.articulo1.has_fv && !a.fv) {
+                for (const a of this.modal.kardexes) {
+                    if (!a.lote1.codigo) return jmsg('warning', 'Falta codigo de lote')
+                    if (this.modal.articulo1.has_fv && !a.lote1.fv) {
                         return jmsg('warning', 'Falta fecha de vencimiento')
                     }
                 }
             }
 
             if (this.totalRequerido != this.totalCantidad) {
-                return jmsg('warning', 'La cantidad ingresada no coincide con el total')
+                return jmsg('warning', 'La cantidad ingresada no coincide con el requerido')
             }
 
             this.$emit('sendItems', {
                 transaccion_item_id: this.modal.transaccion_item_id,
-                lotes: this.modal.lotes,
+                kardexes: this.modal.kardexes,
             })
 
-            this.useModals.show.mTransaccionItemLotes = false
+            this.useModals.show.mTrasladoItemLotes = false
         },
 
         //--- Auxiliar data ---//
         async loadLotes() {
             const qry = {
-                cols: [
-                    'codigo',
-                    'fv',
-                    'stock',
-                    // 'lote_fv_stock',
-                ],
+                cols: ['codigo', 'fv', 'stock', 'lote_fv_stock', 'lote_fv'],
                 fltr: {
                     articulo: {
                         op: 'Es',
@@ -293,7 +296,8 @@ export default {
 
             if (res.code !== 0) return
 
-            this.modal.lotes = res.data
+            this.modal.articulo_lotes = res.data
+            // return res.data
         },
     },
 }

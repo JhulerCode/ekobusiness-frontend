@@ -98,6 +98,7 @@ export default {
         async loadStockPicking() {
             const socio_pedido_id = this.$route.params.pedido_id
             const param_id = this.$route.params.traslado_id
+            this.vista.data = {}
 
             if (param_id === 'nuevo') {
                 const tipo = this.$route.path.includes('compras') ? 1 : 2
@@ -131,9 +132,9 @@ export default {
 
             if (res.code === 0 && res.data) {
                 for (const a of res.data.transaccion_items) {
-                    for (const b of a.lotes) {
-                        const i = a.kardexes.find((c) => c.lote_id == b.id)
-                        b.cantidad = i ? Number(i.cantidad) : 0
+                    for (const b of a.kardexes) {
+                        b.cantidad = Number(b.cantidad)
+                        b.lote1 = a.lotes.find((c) => c.id == b.lote_id)
                     }
                 }
 
@@ -192,19 +193,19 @@ export default {
                     return true
                 }
 
-                if (!a.lotes || a.lotes.length == 0) {
+                if (!a.kardexes || a.kardexes.length == 0) {
                     jmsg('warning', `Agregue al menos un lote en ${a.articulo1.nombre}`)
                     return true
                 }
 
                 if (this.vista.data.tipo == 1) {
-                    for (const b of a.lotes) {
-                        if (!b.codigo) {
+                    for (const b of a.kardexes) {
+                        if (!b.lote1.codigo) {
                             jmsg('warning', `Falta codigo de lote en ${a.articulo1.nombre}`)
                             return true
                         }
 
-                        if (a.articulo1.has_fv && !b.fv) {
+                        if (a.articulo1.has_fv && !b.lote1.fv) {
                             jmsg('warning', `Falta fecha de vencimiento en ${a.articulo1.nombre}`)
                             return true
                         }
@@ -213,7 +214,10 @@ export default {
 
                 if (this.vista.data.tipo == 5) {
                     if (a.articulo1.type != 'combo') {
-                        const kardexesTotal = a.lotes.reduce((sum, a) => sum + (a.cantidad ?? 0), 0)
+                        const kardexesTotal = a.kardexes.reduce(
+                            (sum, a) => sum + (a.cantidad ?? 0),
+                            0,
+                        )
 
                         if (kardexesTotal != a.cantidad) {
                             jmsg('warning', `Cantidades diferentes en ${a.articulo1.nombre}`)
@@ -221,7 +225,7 @@ export default {
                         }
                     } else {
                         const kardexesTotales = {}
-                        for (const b of a.lotes) {
+                        for (const b of a.kardexes) {
                             if (!kardexesTotales[b.articulo]) {
                                 kardexesTotales[b.articulo] = 0
                             }
@@ -244,9 +248,8 @@ export default {
         async changeDate() {
             if (this.vista.data.tipo == 1) {
                 for (const a of this.vista.data.transaccion_items) {
-                    for (const b of a.lotes) {
-                        console.log(b)
-                        b.codigo = this.setLote()
+                    for (const b of a.kardexes) {
+                        b.lote1.codigo = this.setLote()
                     }
                 }
             }

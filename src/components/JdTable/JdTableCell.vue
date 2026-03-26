@@ -7,7 +7,7 @@
     <template v-else-if="column.input">
         <JdInput
             v-if="['text', 'number', 'email', 'date', 'time'].includes(column.type)"
-            v-model="item[column.id]"
+            v-model="modelValue"
             :type="column.type"
             :disabled="disabled"
             :toRight="column.type === 'number'"
@@ -17,7 +17,7 @@
 
         <JdSelect
             v-else-if="column.type === 'select' && !column.select"
-            v-model="item[column.id]"
+            v-model="modelValue"
             :disabled="disabled"
             :lista="column.list"
             :mostrar="column.mostrar"
@@ -26,17 +26,19 @@
 
         <JdSelect
             v-else-if="column.select"
-            v-model="item[column.id]"
+            v-model="modelValue"
             v-bind="column.select"
             :disabled="item.table_columns?.[`${column.id}_disabled`] || disabled"
             @elegir="column.select.elegir ? column.select.elegir($event, item, column) : null"
             @reload="() => column.select.reload(item, column)"
+            :lista="column.select.lista"
+            :mostrar="column.select.mostrar"
             :loaded="true"
         />
 
         <JdSelectQuery
             v-else-if="column.select_query"
-            v-model="item[column.id]"
+            v-model="modelValue"
             v-bind="column.select_query"
             :search="(txt) => column.select_query.search(txt, item, column)"
             :selectedObject="item[column.select_query.selectedObjectProp || column.id + '1']"
@@ -48,16 +50,18 @@
 
         <JdCheckBox
             v-else-if="column.type === 'check'"
-            v-model="item[column.id]"
+            v-model="modelValue"
             :disabled="disabled"
             @change="column.onchange ? $emit('onChange', column.onchange, item) : null"
         />
 
         <JdTextArea
             v-else-if="column.type === 'longtext'"
-            v-model="item[column.id]"
+            v-model="modelValue"
             :disabled="disabled"
         />
+
+        <!-- {{ column.select?.lista }} -->
     </template>
 
     <!-- Format Mode -->
@@ -102,6 +106,22 @@ import { redondear } from '@/utils/mine'
 
 const props = defineProps(['column', 'item', 'disabled'])
 defineEmits(['onChange', 'onInput'])
+
+const modelValue = computed({
+    get: () => {
+        const prop = props.column.id
+        if (!prop) return ''
+        return prop.split('.').reduce((acc, part) => acc?.[part], props.item)
+    },
+    set: (val) => {
+        const prop = props.column.id
+        if (!prop) return
+        const parts = prop.split('.')
+        const lastPart = parts.pop()
+        const target = parts.reduce((acc, part) => acc?.[part], props.item)
+        if (target) target[lastPart] = val
+    },
+})
 
 const value = computed(() => {
     const prop = props.column.prop || props.column.id

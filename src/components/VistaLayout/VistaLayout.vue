@@ -340,7 +340,7 @@ function updatedBulk(item) {
 function verRow(item) {
     const detailViewName = props.detailViewName || vista.detailViewName
     if (!detailViewName) return
-    if (!auth.verifyPermiso(`${viewName}:ver`)) return
+    // if (!auth.verifyPermiso(`${viewName}:ver`)) return
     router.push({ name: detailViewName, params: { [vista.detailPath ?? 'id']: item.id } })
 }
 </script>

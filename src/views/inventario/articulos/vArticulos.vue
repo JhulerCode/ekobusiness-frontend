@@ -29,7 +29,6 @@ import { jmsg } from '@/utils/swal'
 // import dayjs from 'dayjs'
 
 export default {
-    name: 'vArticulos',
     components: {
         mImportarArticulos,
         mLotes,
@@ -40,7 +39,7 @@ export default {
         modals: () => useModals(),
         useSystem: () => useSystem(),
         vista() {
-            return this.vistas[VIEW_CONFIG.name]
+            return this.vistas[this.$route.name]
         },
     },
     data: () => ({

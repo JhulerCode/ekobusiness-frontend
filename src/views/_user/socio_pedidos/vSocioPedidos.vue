@@ -73,7 +73,7 @@ export default {
         //--- Header actions ---//
         nuevo() {
             this.$router.push({
-                name: this.VIEW_CONFIG.detailViewName,
+                name: this.detailViewName,
                 params: { pedido_id: 'nuevo' },
             })
         },

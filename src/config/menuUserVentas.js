@@ -76,9 +76,9 @@ export default {
             permisos: [{ id: 'vVentaPedidoItems:listar', label: 'Listar' }],
         },
         {
-            label: 'Ventas',
+            label: 'Despachos',
             goto: 'vVentas',
-            path: 'ventas',
+            path: 'despachos',
             view: '_user/traslados/vTraslados.vue',
             permisos: [
                 { id: 'vVentas:listar', label: 'Listar' },
@@ -100,17 +100,17 @@ export default {
             ],
         },
         {
-            label: 'Ventas detalle',
+            label: 'Despachos detalle',
             goto: 'vVentaItems',
-            path: 'venta-items',
-            view: 'ventas/venta_items/vVentaItems.vue',
+            path: 'despachos-items',
+            view: '_user/traslado_items/vTrasladoItems.vue',
             permisos: [{ id: 'vVentaItems:listar', label: 'Listar' }],
         },
         {
             label: 'Soporte al cliente',
             goto: 'vHelpdeskTickets',
             path: 'soporte',
-            view: 'ventas/soporte_cliente/vHelpdeskTickets.vue',
+            view: '_user/soporte_cliente/vHelpdeskTickets.vue',
             permisos: [
                 { id: 'vHelpdeskTickets:listar', label: 'Listar' },
                 { id: 'vHelpdeskTickets:crear', label: 'Crear' },

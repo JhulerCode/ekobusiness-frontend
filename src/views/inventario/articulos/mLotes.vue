@@ -25,13 +25,9 @@
             maxHeight="73vh"
         />
     </JdModal>
-
-    <mTransaccion v-if="useModals.show.mTransaccion" />
 </template>
 
 <script>
-import mTransaccion from '@/views/compras/compras/mTransaccion.vue'
-
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
 import { useVistas } from '@/pinia/vistas'
@@ -42,9 +38,7 @@ import { redondear } from '@/utils/mine'
 import dayjs from 'dayjs'
 
 export default {
-    components: {
-        mTransaccion,
-    },
+    components: {},
     data: () => ({
         useAuth: useAuth(),
         useModals: useModals(),

@@ -1,30 +1,29 @@
 <template>
     <VistaLayout :config="VIEW_CONFIG" :setQuery="setQuery" @runMethod="runMethod"> </VistaLayout>
 
-    <!-- Modales -->
-    <mPrecioCompra v-if="modals.show.mPrecioCompra" />
+    <mHelpdeskTicket v-if="modals.show.mHelpdeskTicket" />
 </template>
 
 <script>
-import mPrecioCompra from './mPrecioCompra.vue'
+import mHelpdeskTicket from './mHelpdeskTicket.vue'
 
-import VIEW_CONFIG from './precios_listas.config.js'
+import VIEW_CONFIG from './helpdesk_tickets.config.js'
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
 import { useModals } from '@/pinia/modals'
 import { get } from '@/utils/crud'
 
 export default {
-    name: 'vPrecioListas',
+    name: 'vHelpdeskTickets',
     components: {
-        mPrecioCompra,
+        mHelpdeskTicket,
     },
     computed: {
         auth: () => useAuth(),
         vistas: () => useVistas(),
         modals: () => useModals(),
         vista() {
-            return this.vistas[VIEW_CONFIG.name]
+            return this.vistas[this.$route.name]
         },
     },
     data: () => ({
@@ -37,43 +36,31 @@ export default {
         setQuery() {
             this.vista.qry = {
                 fltr: {},
-                incl: ['articulo1', 'socio1', 'currency_id1'],
-                ordr: [['articulo1', 'nombre', 'ASC']],
+                incl: ['socio1', 'articulo1', 'createdBy1'],
                 page: this.vista.table_page,
             }
+
             this.auth.updateQuery(this.vista.tableColumns, this.vista.qry)
         },
 
-        //--- Header actions ---//
+        // --- Acciones de Registro ---
         nuevo() {
-            const send = { precio: { activo: true } }
-            this.modals.setModal('mPrecioCompra', 'Nuevo precio', 1, send, true)
+            const send = { helpdesk_ticket: { estado: 1 } }
+            this.modals.setModal('mHelpdeskTicket', 'Nuevo ticket', 1, send, true)
         },
-
-        //--- Row actions ---//
         async editar(item) {
-            const qry = {
-                incl: ['articulo1', 'socio1'],
-            }
-
+            const qry = { incl: ['socio1', 'articulo1'] }
             this.auth.setLoading(true, 'Cargando...')
             const res = await get(`${this.vista.apiUrl}/uno/${item.id}?qry=${JSON.stringify(qry)}`)
             this.auth.setLoading(false)
             if (res.code != 0) return
 
             const send = {
-                precio: res.data,
-                articulos: [{ ...res.data.articulo1 }],
-                socios: [{ ...res.data.socio1 }],
+                helpdesk_ticket: res.data,
+                clientes: [{ ...res.data.socio1 }],
+                productos: [{ ...res.data.articulo1 }],
             }
-
-            this.modals.setModal('mPrecioCompra', 'Editar precio', 2, send, true)
-        },
-        async verArticulos(item) {
-            const send = {
-                precio_lista: item.id,
-            }
-            this.modals.setModal('mPrecioListaItems', item.nombre, null, send, true)
+            this.modals.setModal('mHelpdeskTicket', 'Editar ticket', 2, send, true)
         },
     },
 }

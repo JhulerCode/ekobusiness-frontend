@@ -1,6 +1,4 @@
 export default {
-    name: 'vHelpdeskTickets',
-    title: 'Soporte al cliente',
     apiPath: 'helpdesk_tickets',
 
     headerActions: [

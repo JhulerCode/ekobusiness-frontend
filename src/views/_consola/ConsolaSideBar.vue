@@ -17,15 +17,7 @@
                     "
                     :key="a.label"
                     :class="{
-                        'option-active':
-                            a.children && a.children.length > 0
-                                ? a.children.some(
-                                      (b) =>
-                                          $route.name === b.goto ||
-                                          (b.children &&
-                                              b.children.some((c) => $route.name === c.goto)),
-                                  )
-                                : $route.name === a.goto,
+                        'option-active': isRouteInItem(a),
                         'is-expanded': grupoExpandido === a.label,
                     }"
                 >
@@ -55,10 +47,7 @@
                         :key="j"
                         class="btn"
                         :class="{
-                            'option-active':
-                                useVistas.show?.[b.goto] ||
-                                $route.name === b.goto ||
-                                (b.children && b.children.some((c) => $route.name === c.goto)),
+                            'option-active': useVistas.show?.[b.goto] || isRouteInItem(b),
                         }"
                         @click="navigateTo(b.goto)"
                     >
@@ -316,6 +305,14 @@ export default {
             if (this.$route.name !== routeName) {
                 this.$router.push({ name: routeName })
             }
+        },
+        isRouteInItem(item) {
+            if (!item) return false
+            if (this.$route.name === item.goto) return true
+            if (item.children && item.children.length > 0) {
+                return item.children.some((child) => this.isRouteInItem(child))
+            }
+            return false
         },
     },
 }

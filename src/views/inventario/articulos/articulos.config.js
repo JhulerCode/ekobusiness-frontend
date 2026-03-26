@@ -1,5 +1,4 @@
 export default {
-    name: 'vArticulos',
     apiPath: 'articulos',
     detailViewName: 'vArticulo',
 

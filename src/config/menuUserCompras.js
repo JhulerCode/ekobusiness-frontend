@@ -85,9 +85,9 @@ export default {
             permisos: [{ id: 'vCompraPedidoItems:listar', label: 'Listar' }],
         },
         {
-            label: 'Compras',
+            label: 'Recepciones',
             goto: 'vCompras',
-            path: 'compras',
+            path: 'recepciones',
             view: '_user/traslados/vTraslados.vue',
             permisos: [
                 { id: 'vCompras:listar', label: 'Listar' },
@@ -108,10 +108,10 @@ export default {
             ],
         },
         {
-            label: 'Compras detalle',
+            label: 'Recepciones detalle',
             goto: 'vCompraItems',
-            path: 'compra-items',
-            view: 'compras/compra_items/vCompraItems.vue',
+            path: 'recepciones-items',
+            view: '_user/traslado_items/vTrasladoItems.vue',
             permisos: [
                 { id: 'vCompraItems:listar', label: 'Listar' },
                 { id: 'vCompraItems:inspeccion', label: 'Inspeccionar' },

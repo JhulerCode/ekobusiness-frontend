@@ -63,7 +63,7 @@ export default {
                 this.vista.qry.fltr['transaccion1.tipo'] = { op: 'Es', val: 1 }
             }
             if (this.$route.path.includes('ventas')) {
-                this.vista.qry.fltr['transaccion1.tipo'] = { op: 'Es', val: 2 }
+                this.vista.qry.fltr['transaccion1.tipo'] = { op: 'Es', val: 5 }
             }
 
             this.auth.updateQuery(this.vista.tableColumns, this.vista.qry)

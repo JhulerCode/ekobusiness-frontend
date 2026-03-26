@@ -157,25 +157,44 @@ export default {
                 this.ocultar()
             }
         },
-        toogleList() {
-            // this.isVisible = !this.isVisible
-
+        toggleList() {
             if (this.isVisible) {
                 this.$nextTick(() => {
-                    const rect = this.$refs.right.getBoundingClientRect()
-
-                    const el = this.$refs['lista-box']
-                    el.style.top = `${rect.bottom + window.scrollY}px`
-                    el.style.left = `${rect.left + window.scrollX}px`
-                    el.style.width = `${rect.width}px`
+                    this.updatePosition()
                 })
 
                 setTimeout(() => {
                     document.addEventListener('click', this.handleClickOutside)
                     window.addEventListener('keydown', this.handleEscapeKey)
+                    window.addEventListener('scroll', this.updatePosition, true)
+                    window.addEventListener('resize', this.updatePosition)
                 }, 0)
             } else {
                 this.ocultar()
+            }
+        },
+        updatePosition() {
+            const rect = this.$refs.right.getBoundingClientRect()
+            const el = this.$refs['lista-box']
+
+            if (el) {
+                const listHeight = el.offsetHeight
+                const windowHeight = window.innerHeight
+
+                // Decide si poner arriba o abajo
+                const spaceBelow = windowHeight - rect.bottom
+                const spaceAbove = rect.top
+
+                if (spaceBelow < listHeight && spaceAbove > spaceBelow) {
+                    // Poner arriba
+                    el.style.top = `${rect.top - listHeight}px`
+                } else {
+                    // Poner abajo
+                    el.style.top = `${rect.bottom}px`
+                }
+
+                el.style.left = `${rect.left}px`
+                el.style.width = `${rect.width}px`
             }
         },
         ocultar() {
@@ -184,6 +203,8 @@ export default {
 
             document.removeEventListener('click', this.handleClickOutside)
             window.removeEventListener('keydown', this.handleEscapeKey)
+            window.removeEventListener('scroll', this.updatePosition, true)
+            window.removeEventListener('resize', this.updatePosition)
         },
         elegir(id) {
             this.inputModel = id
@@ -210,7 +231,7 @@ export default {
             if (this.isVisible) return
 
             this.isVisible = true
-            this.toogleList()
+            this.toggleList()
 
             this.$nextTick(() => {
                 this.$refs.searchInput?.focus()
@@ -224,7 +245,7 @@ export default {
         handleInput() {
             clearTimeout(this.searchTimeOut)
             this.isVisible = true
-            this.toogleList()
+            this.toggleList()
 
             this.searchTimeOut = setTimeout(() => {
                 this.execSearch(this.txtBuscar)
@@ -246,6 +267,9 @@ export default {
                 this.$emit('search', txt)
             }
         },
+    },
+    beforeUnmount() {
+        this.ocultar()
     },
 }
 </script>
@@ -276,7 +300,7 @@ export default {
     }
 
     .right {
-        // position: relative;
+        position: relative;
 
         .se-muestra {
             min-height: 100%;
@@ -321,8 +345,8 @@ export default {
         }
 
         .lista-box {
-            z-index: 3;
-            position: absolute;
+            z-index: 1000;
+            position: fixed;
             background-color: var(--bg-color);
             box-shadow: 0 0.5rem 0.7rem var(--shadow-color);
 

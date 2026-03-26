@@ -39,6 +39,11 @@ export default {
             return this.vistas[this.$route.name]
         },
         detailViewName() {
+            if (this.$route.params.pedido_id) {
+                return this.$route.path.includes('compras')
+                    ? 'vCompraPedidoTraslado'
+                    : 'vVentaPedidoTraslado'
+            }
             return this.$route.path.includes('compras') ? 'vCompraTraslado' : 'vVentaTraslado'
         },
     },
@@ -91,9 +96,8 @@ export default {
             //     },
             // }
             // this.modals.setModal('mTransaccion', 'Nueva compra', 1, send, true)
-            const name = this.$route.path.includes('compras') ? 'vCompraTraslado' : 'vVentaTraslado'
             this.$router.push({
-                name,
+                name: this.detailViewName,
                 params: { traslado_id: 'nuevo' },
             })
         },

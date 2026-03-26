@@ -229,6 +229,13 @@ export const useAuth = defineStore('auth', {
 
             this.loading = { show, text }
         },
+        goBack(router) {
+            if (window.history.state && window.history.state.back) {
+                router.back()
+            } else {
+                router.push({ name: this.usuario.vista_inicial })
+            }
+        },
     },
     persist: {
         storage: localStorage,

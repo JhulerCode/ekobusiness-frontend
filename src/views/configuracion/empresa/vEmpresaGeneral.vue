@@ -34,7 +34,7 @@ export default {
             return this.vistas.vEmpresa
         },
         is_nuevo() {
-            return this.$route.params.id === 'nuevo'
+            return this.$route.params[this.vista.pathKey] === 'nuevo'
         },
     },
 }

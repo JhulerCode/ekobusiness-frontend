@@ -102,7 +102,7 @@ export default {
     },
     methods: {
         setMiDireccion() {
-            if (this.vista.mode != 'view' && this.$route.params.id === 'nuevo') {
+            if (this.vista.mode != 'view' && this.$route.params[this.vista.pathKey] === 'nuevo') {
                 if (this.vista.data.tipo == 1) {
                     if (this.vista.data.direccion_entrega) return
                     const direccion_principal = this.auth.empresa.direcciones.find(

@@ -87,18 +87,9 @@ export default {
 
         //--- Header actions ---//
         nuevo() {
-            // const send = {
-            //     transaccion: {
-            //         tipo: 1,
-            //         fecha: dayjs().format('YYYY-MM-DD'),
-            //         estado: 1,
-            //         transaccion_items: [],
-            //     },
-            // }
-            // this.modals.setModal('mTransaccion', 'Nueva compra', 1, send, true)
             this.$router.push({
                 name: this.detailViewName,
-                params: { traslado_id: 'nuevo' },
+                params: { [this.vista.detailPath]: 'nuevo' },
             })
         },
         // async recuperarGuardado() {

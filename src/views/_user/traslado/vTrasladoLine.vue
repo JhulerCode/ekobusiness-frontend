@@ -184,13 +184,14 @@ export default {
             }
         },
         async agregarPedidoItems(items) {
-            for (const a of items) {
+            const faltantes = items.filter((a) => a.cantidad > a.entregado)
+            for (const a of faltantes) {
                 const i = this.vista.data.transaccion_items.findIndex(
                     (b) => b.articulo == a.articulo,
                 )
 
                 if (i !== -1) {
-                    jmsg('warning', 'El artículo ya está agregado')
+                    // jmsg('warning', 'El artículo ya está agregado')
                     continue
                 }
 
@@ -231,12 +232,20 @@ export default {
             ]
         },
         setKardexesOnUpdateCantidad(line) {
-            if (this.vista.data.tipo == 5) return
-
-            if (line.cantidad == '' || line.cantidad == 0) {
+            if (this.vista.data.tipo == 5) {
                 line.kardexes = []
-            } else {
-                line.kardexes = this.setKardexesHoy({ ...line.articulo1, cantidad: line.cantidad })
+                return
+            }
+
+            if (this.vista.data.tipo == 1) {
+                if (line.cantidad == '' || line.cantidad == 0) {
+                    line.kardexes = []
+                } else {
+                    line.kardexes = this.setKardexesHoy({
+                        ...line.articulo1,
+                        cantidad: line.cantidad,
+                    })
+                }
             }
         },
         updateArticuloKardexes({ transaccion_item_id, kardexes }) {

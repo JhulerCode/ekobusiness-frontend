@@ -5,33 +5,7 @@
         @button-click="(action) => this[action]()"
     >
         <div class="container-agregar">
-            <JdInput
-                label="Artículo"
-                v-model="modal.articulo1.nombre"
-                :disabled="true"
-                v-if="modal.articulo1.type != 'combo'"
-            />
-
-            <JdSelect
-                label="Articulo"
-                v-model="nuevo.articulo"
-                :lista="modal.articulo1.combo_articulos || []"
-                id="articulo"
-                mostrar="articulo1.nombre"
-                :loaded="modal.combo_articulosLoaded"
-                @elegir="setNuevoArticulo"
-                v-else
-            />
-
-            <!-- <JdSelect
-                label="Lotes"
-                v-model="nuevo.lote_padre"
-                :lista="modal.kardexes"
-                mostrar="lote_fv_stock"
-                :loaded="modal.lotesLoaded"
-                @reload="loadLotes"
-                @elegir="agregarLote"
-            /> -->
+            <JdInput label="Artículo" v-model="modal.articulo1.nombre" :disabled="true" />
 
             <div class="resumen">
                 <p>
@@ -85,13 +59,15 @@ export default {
     }),
     computed: {
         totalRequerido() {
-            if (this.modal.articulo1.type != 'combo') {
-                return this.modal.cantidad
-            } else {
-                return this.modal.articulo1.combo_articulos.reduce(
+            if (this.modal.articulo1.type == 'combo') {
+                if (!this.modal.combo_componentes) return 0
+
+                return this.modal.combo_componentes.reduce(
                     (sum, a) => sum + this.modal.cantidad * a.cantidad,
                     0,
                 )
+            } else {
+                return this.modal.cantidad
             }
         },
         totalCantidad() {
@@ -101,34 +77,27 @@ export default {
         columns() {
             return [
                 {
-                    id: 'articulo',
-                    title: 'Artículo',
-                    prop: 'articulo1.nombre',
-                    width: '20rem',
-                    show: this.modal.articulo1.type == 'combo',
-                },
-                {
                     id: 'componente',
                     title: 'Componente',
-                    prop: 'componente1.nombre',
                     width: '20rem',
                     input: true,
                     select: {
-                        mostrar: 'componente1.nombre',
-                        // reload: this.loadLotes,
+                        lista: this.modal.combo_componentes,
+                        mostrar: 'articulo1.nombre',
+                        reload: this.loadComboComponentes,
+                        elegir: this.setComponente,
                     },
                     show: this.modal.type == 'old' && this.modal.articulo1.type == 'combo',
                 },
                 {
                     id: 'lote_id',
                     title: 'Lote | Fv | Stock',
-                    prop: 'lote_fv_stock',
                     width: '22rem',
                     input: true,
-                    select: {
-                        lista: this.modal.articulo_lotes,
+                    select_query: {
+                        search: this.loadLotes,
                         mostrar: 'lote_fv_stock',
-                        reload: this.loadLotes,
+                        selectedObjectProp: 'lote1',
                         elegir: this.setLote1,
                     },
                     show: this.modal.type == 'old',
@@ -177,24 +146,12 @@ export default {
         this.modal = this.useModals.mTrasladoItemLotes
 
         if (this.modal.articulo1.type == 'combo') {
-            this.setNuevoArticulo(this.modal.articulo1.combo_articulos[0])
+            this.loadComboComponentes()
         }
     },
     methods: {
         runMethod(method, item) {
             this[method](item)
-        },
-
-        setNuevoArticulo(item) {
-            this.modal.kardexes = []
-
-            if (item == null) {
-                this.nuevo.articulo = null
-                return
-            }
-
-            this.nuevo.articulo = item.articulo
-            this.nuevo.articulo1 = { ...item.articulo1 }
         },
 
         //--- Methods ---//
@@ -203,35 +160,15 @@ export default {
                 this.modal.kardexes.push({
                     id: crypto.randomUUID(),
                     codigo: `${obtenerNumeroJuliano(this.modal.fecha)}-${Math.floor(Math.random() * 90 + 10)}`,
+                    articulo: this.modal.articulo,
                 })
             } else {
                 this.modal.kardexes.push({
                     id: crypto.randomUUID(),
+                    articulo: this.modal.articulo1.type == 'combo' ? null : this.modal.articulo,
                 })
             }
         },
-        // agregarLote(item) {
-        //     if (item.stock == 0) return jmsg('warning', 'Selecciona un lote con stock disponible')
-
-        //     const i = this.modal.kardexes.findIndex((a) => a.lote_padre == item.id)
-        //     if (i !== -1) return jmsg('warning', 'El lote ya está agregado')
-
-        //     this.modal.kardexes.push({
-        //         articulo1: { ...this.nuevo.articulo1 },
-
-        //         articulo:
-        //             this.modal.articulo1.type != 'combo'
-        //                 ? this.modal.articulo
-        //                 : this.nuevo.articulo,
-        //         lote_padre: item.id,
-        //         lote_padre1: {
-        //             lote_fv_stock: item.lote_fv_stock,
-        //             stock: item.stock,
-        //         },
-        //     })
-
-        //     this.nuevo.lote_padre = null
-        // },
         quitar(item) {
             const i = this.modal.kardexes.findIndex((a) => a.id == item.id)
             this.modal.kardexes.splice(i, 1)
@@ -239,6 +176,10 @@ export default {
         setLote1(data, item) {
             const i = this.modal.kardexes.findIndex((a) => a.id == item.id)
             this.modal.kardexes[i].lote1 = data
+        },
+        setComponente(data, item) {
+            const i = this.modal.kardexes.findIndex((a) => a.id == item.id)
+            this.modal.kardexes[i].articulo = data.articulo1.id
         },
         sendItems() {
             if (this.modal.type == 'old') {
@@ -268,24 +209,22 @@ export default {
         },
 
         //--- Auxiliar data ---//
-        async loadLotes() {
+        async loadLotes(txt, item) {
             const qry = {
                 cols: ['codigo', 'fv', 'stock', 'lote_fv_stock', 'lote_fv'],
                 fltr: {
-                    articulo: {
-                        op: 'Es',
-                        val:
-                            this.modal.articulo1.type != 'combo'
-                                ? this.modal.articulo
-                                : this.nuevo.articulo,
-                    },
-                    // is_lote_padre: { op: 'Es', val: true },
+                    articulo: { op: 'Es', val: item.articulo },
                 },
                 ordr: [
                     ['createdAt', 'DESC'],
                     ['codigo', 'DESC'],
                     ['fv', 'DESC'],
                 ],
+                limt: 25,
+            }
+
+            if (txt) {
+                qry.fltr.codigo = { op: 'Contiene', val: txt }
             }
 
             this.useAuth.setLoading(true, 'Cargando...')
@@ -296,19 +235,36 @@ export default {
 
             if (res.code !== 0) return
 
-            this.modal.articulo_lotes = res.data
-            // return res.data
+            return res.data
+        },
+        async loadComboComponentes() {
+            const qry = {
+                cols: ['orden', 'cantidad'],
+                incl: ['articulo1'],
+                fltr: {
+                    articulo_principal: {
+                        op: 'Es',
+                        val: this.modal.articulo,
+                    },
+                },
+                ordr: [['orden', 'ASC']],
+            }
+
+            this.useAuth.setLoading(true, 'Cargando...')
+            this.modal.lotesLoaded = false
+            const res = await get(`${urls.combo_componentes}?qry=${JSON.stringify(qry)}`)
+            this.useAuth.setLoading(false)
+            this.modal.lotesLoaded = true
+
+            if (res.code !== 0) return
+
+            this.modal.combo_componentes = res.data
         },
     },
 }
 </script>
 
 <style lang="scss" scoped>
-// .container-agregar {
-//     display: grid;
-//     gap: 0.5rem;
-// }
-
 .resumen {
     display: flex;
     justify-content: flex-end;

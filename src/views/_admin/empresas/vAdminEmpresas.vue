@@ -38,7 +38,10 @@ export default {
 
         //--- Header actions ---//
         nuevo() {
-            this.$router.push({ name: 'vAdminEmpresa', params: { id: 'nuevo' } })
+            this.$router.push({
+                name: this.vista.detailViewName,
+                params: { [this.vista.detailPath]: 'nuevo' },
+            })
         },
     },
 }

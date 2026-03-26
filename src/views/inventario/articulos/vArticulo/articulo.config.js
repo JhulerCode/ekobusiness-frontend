@@ -1,7 +1,7 @@
 export default {
-    titleKey: 'nombre',
     apiPath: 'articulos',
-    pathKey: 'id',
+    titleKey: 'nombre',
+    pathKey: 'articulo_id',
     permisoEditar: ['vArticulos:editar'],
     permisoClonar: ['vArticulos:clonar'],
 

@@ -3,6 +3,7 @@ export default {
     title: 'Empresas',
     apiPath: 'empresas',
     detailViewName: 'vAdminSuscripciones',
+    detailPath: 'empresa_id',
 
     headerActions: [
         {

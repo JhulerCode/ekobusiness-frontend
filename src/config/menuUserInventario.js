@@ -56,7 +56,7 @@ export default {
                 {
                     label: 'Detalle',
                     goto: 'vArticulo',
-                    path: ':id',
+                    path: ':articulo_id',
                     view: 'inventario/articulos/vArticulo/vArticulo.vue',
                     permission: 'vArticulos:ver',
                     viewType: 'detail',

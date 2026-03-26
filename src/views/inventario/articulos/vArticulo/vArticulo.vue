@@ -1,5 +1,11 @@
 <template>
-    <VistaDetalleLayout :config="VIEW_CONFIG" :pestanas="availableTabs" @runMethod="runMethod">
+    <VistaDetalleLayout
+        :config="VIEW_CONFIG"
+        :loadNewData="loadNewData"
+        :loadExistingData="loadExistingData"
+        :pestanas="availableTabs"
+        @runMethod="runMethod"
+    >
         <template #principal-datos>
             <JdInput
                 label="Nombre"
@@ -125,35 +131,31 @@ export default {
             ]
         },
         is_nuevo() {
-            return this.$route.params.id === 'nuevo'
+            return this.$route.params[this.vista.pathKey] === 'nuevo'
         },
     },
     async created() {
         await this.useSystem.load(['articulo_tipos'])
-        await this.loadArticulo()
     },
     methods: {
         runMethod(method, item) {
             this[method](item)
         },
-        async loadArticulo() {
-            const param_id = this.$route.params.id
-
-            if (param_id === 'nuevo') {
-                this.vista.data = {
-                    type: 'consumable',
-                    activo: true,
-                    articulo_suppliers: [],
-                    combo_componentes: [],
-                    ingredientes: [],
-                    beneficios: [],
-                    tipo: 1,
-                    igv_afectacion: 10,
-                    has_fv: false,
-                }
-                this.vista.mode = 'edit'
-                return
+        async loadNewData() {
+            this.vista.data = {
+                type: 'consumable',
+                activo: true,
+                articulo_suppliers: [],
+                combo_componentes: [],
+                ingredientes: [],
+                beneficios: [],
+                tipo: 1,
+                igv_afectacion: 10,
+                has_fv: false,
             }
+        },
+        async loadExistingData() {
+            const param_id = this.$route.params[this.vista.pathKey]
 
             const qry = {
                 incl: ['categoria1', 'linea1', 'articulo_suppliers', 'combo_componentes'],
@@ -168,14 +170,12 @@ export default {
             }
 
             this.auth.setLoading(true, 'Cargando artículo...')
-            const res = await get(
-                `${urls.articulos}/uno/${this.$route.params.id}?qry=${JSON.stringify(qry)}`,
-            )
+            const res = await get(`${urls.articulos}/uno/${param_id}?qry=${JSON.stringify(qry)}`)
             this.auth.setLoading(false)
 
-            if (res.code === 0) {
+            if (res.code === 0 && res.data) {
                 this.vista.data = res.data
-                document.title = `${this.vista.data.nombre}`
+                document.title = `${this.vista.data[this.vista.titleKey]}`
             }
         },
 
@@ -196,7 +196,10 @@ export default {
             if (res.code != 0) return
 
             if (this.is_nuevo) {
-                this.$router.push({ name: 'vArticulo', params: { id: res.data.id } })
+                this.$router.push({
+                    name: 'vArticulo',
+                    params: { [this.vista.pathKey]: res.data.id },
+                })
             }
 
             this.vista.mode = 'view'

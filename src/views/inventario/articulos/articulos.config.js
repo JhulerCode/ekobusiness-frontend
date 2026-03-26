@@ -1,6 +1,7 @@
 export default {
     apiPath: 'articulos',
     detailViewName: 'vArticulo',
+    detailPath: 'articulo_id',
 
     headerActions: [
         {

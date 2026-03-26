@@ -1,5 +1,11 @@
 <template>
-    <VistaDetalleLayout :config="VIEW_CONFIG" :pestanas="availableTabs" @runMethod="runMethod">
+    <VistaDetalleLayout
+        :config="VIEW_CONFIG"
+        :pestanas="availableTabs"
+        :loadNewData="loadNewData"
+        :loadExistingData="loadExistingData"
+        @runMethod="runMethod"
+    >
         <template #principal-datos>
             <JdInput
                 label="Nro pedido"
@@ -130,46 +136,34 @@ export default {
             'comprobante_tipos',
             'igv_afectaciones',
         ])
-        await this.loadPedido()
-        this.setSocio(this.vista.data.socio1)
     },
     methods: {
         runMethod(method, item) {
             this[method](item)
         },
-        async loadPedido() {
-            const param_id = this.$route.params[this.vista.pathKey]
-            this.vista.data = {}
+        async loadNewData() {
+            const tipo = this.$route.path.includes('compras') ? 1 : 2
 
-            if (param_id === 'nuevo') {
-                const tipo = this.$route.path.includes('compras') ? 1 : 2
-
-                this.vista.data = {
-                    tipo,
-                    origin: 'erp',
-                    fecha: dayjs().format('YYYY-MM-DD'),
-                    estado: 1,
-                    socio_pedido_items: [],
-                    entrega_tipo: 'envio',
-                    entrega_direccion_datos: {},
-                }
-                this.vista.mode = 'edit'
-                this.loadMonedas()
-                return
+            this.vista.data = {
+                tipo,
+                origin: 'erp',
+                fecha: dayjs().format('YYYY-MM-DD'),
+                estado: 1,
+                socio_pedido_items: [],
+                entrega_tipo: 'envio',
+                entrega_direccion_datos: {},
             }
 
-            this.vista.mode = 'view'
+            this.setSocio(this.vista.data.socio1)
+        },
+        async loadExistingData() {
+            const param_id = this.$route.params[this.vista.pathKey]
+
             const qry = {
                 incl: ['socio1', 'moneda1', 'socio_pedido_items', 'createdBy1'],
                 iccl: {
                     socio1: {
-                        cols: [
-                            'doc_numero',
-                            'contactos',
-                            'direcciones',
-                            'precio_lista',
-                            'pago_condicion',
-                        ],
+                        cols: ['doc_numero', 'contactos', 'direcciones', 'pago_condicion'],
                     },
                     socio_pedido_items: { incl: ['articulo1'] },
                     createdBy1: { cols: ['cargo', 'telefono'] },
@@ -180,9 +174,10 @@ export default {
             const res = await get(`${this.vista.apiUrl}/uno/${param_id}?qry=${JSON.stringify(qry)}`)
             this.auth.setLoading(false)
 
-            if (res.code === 0) {
+            if (res.code === 0 && res.data) {
                 this.vista.data = res.data
-                document.title = `Pedido ${this.vista.data.codigo}`
+                document.title = `Pedido ${this.vista.data[this.vista.titleKey]}`
+                this.setSocio(this.vista.data.socio1)
             }
         },
 
@@ -237,7 +232,6 @@ export default {
             const cantidad_traslados = await this.loadTrasladosCantidad()
 
             if (cantidad_traslados == 0) {
-                console.log('ASD')
                 this.$router.push({
                     name: this.$route.path.includes('compras')
                         ? 'vCompraPedidoTraslado'
@@ -245,7 +239,6 @@ export default {
                     params: { traslado_id: 'nuevo' },
                 })
             } else {
-                console.log('ASD1')
                 this.$router.push({
                     name: this.$route.path.includes('compras')
                         ? 'vCompraPedidoTraslados'

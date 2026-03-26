@@ -13,8 +13,7 @@ import VIEW_CONFIG from './kardex.config.js'
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
 import { useModals } from '@/pinia/modals'
-import { urls, delet } from '@/utils/crud'
-import { jmsg, jqst } from '@/utils/swal'
+import { jmsg } from '@/utils/swal'
 
 export default {
     name: 'vKardex',
@@ -31,7 +30,7 @@ export default {
         },
     },
     created() {
-        if (this.$route.params.id) {
+        if (this.$route.params.articulo_id) {
             const colArticulo = this.VIEW_CONFIG.tableColumns.find((a) => a.id == 'articulo')
             if (colArticulo) {
                 colArticulo.show = false
@@ -44,7 +43,7 @@ export default {
             this[method](item)
         },
         checkFiltros() {
-            if (this.$route.params.id) return false
+            if (this.$route.params.articulo_id) return false
 
             if (!this.vista.tableColumns.some((a) => a.val || a.val1)) {
                 jmsg('error', 'Ingrese al menos un filtro')
@@ -65,8 +64,8 @@ export default {
                 page: this.vista.table_page,
             }
 
-            if (this.$route.params.id) {
-                this.vista.qry.fltr.articulo = { op: 'Es', val: this.$route.params.id }
+            if (this.$route.params.articulo_id) {
+                this.vista.qry.fltr.articulo = { op: 'Es', val: this.$route.params.articulo_id }
             } else {
                 this.vista.qry.incl.push('articulo1')
             }
@@ -83,27 +82,6 @@ export default {
         },
 
         //--- Row actions ---//
-        async eliminar(item) {
-            const resQst = await jqst('¿Está seguro de eliminar?')
-            if (resQst.isConfirmed == false) return
-
-            const send = {
-                id: item.id,
-                tipo: item.tipo,
-                lote_padre: item.lote_padre,
-                cantidad: Math.abs(item.cantidad),
-            }
-
-            this.auth.setLoading(true, 'Eliminando...')
-            const res = await delet(urls.kardex, send)
-            this.auth.setLoading(false)
-
-            if (res.code != 0) return
-
-            const i = this.vista.tableData.findIndex((a) => a.id == item.id)
-            this.vista.tableData.splice(i, 1)
-            this.calculateStock()
-        },
         async verCompra(item) {
             console.log('por implementtar', item)
         },

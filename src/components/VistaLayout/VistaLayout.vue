@@ -101,7 +101,7 @@ const props = defineProps({
     checkFiltros: { type: Function },
     setQuery: { type: Function, required: true },
     loadDataPers: { type: Function },
-    askToInicialLoad: { type: Boolean, default: true },
+    // askToInicialLoad: { type: Boolean, default: true },
     showConfigCols: { type: Boolean, default: true },
     rowSelectable: { type: Boolean, default: false },
     detailViewName: { type: String },
@@ -109,7 +109,7 @@ const props = defineProps({
 
 const emit = defineEmits(['runMethod'])
 
-// --- Inicialización de la vista ---
+//--- Inicialización de la vista ---//
 const viewName = route.name
 
 vistas.updateVista(viewName, {
@@ -125,16 +125,16 @@ if (props.initFiltros) {
     props.initFiltros()
 }
 
-if (props.askToInicialLoad) {
-    // if ( auth.verifyPermiso(`${viewName}:listar`)) {
-    if (vista.last_path != route.fullPath) {
-        loadTableData()
-    }
-} else {
+// if (props.askToInicialLoad) {
+// if ( auth.verifyPermiso(`${viewName}:listar`)) {
+if (vista.last_path != route.fullPath) {
     loadTableData()
 }
+// } else {
+//     loadTableData()
+// }
 
-// --- Principal data ---
+//--- Principal data ---//
 async function loadTableData(init_page) {
     if (props.loadDataPers) {
         props.loadDataPers()
@@ -341,7 +341,7 @@ function verRow(item) {
     const detailViewName = props.detailViewName || vista.detailViewName
     if (!detailViewName) return
     // if (!auth.verifyPermiso(`${viewName}:ver`)) return
-    router.push({ name: detailViewName, params: { [vista.detailPath ?? 'id']: item.id } })
+    router.push({ name: detailViewName, params: { [vista.detailPath]: item.id } })
 }
 </script>
 

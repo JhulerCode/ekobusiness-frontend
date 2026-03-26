@@ -21,13 +21,13 @@ export default [
                     {
                         label: 'Detalle Empresa',
                         goto: 'vAdminEmpresa',
-                        path: ':id',
+                        path: ':empresa_id',
                         view: 'configuracion/empresa/vEmpresa.vue',
                         showInMenu: false,
                         permission: ['vAdminEmpresas:ver', 'vAdminEmpresas:crear'],
                         viewType: 'detail',
                     },
-                ]
+                ],
             },
             {
                 label: 'Suscripciones',

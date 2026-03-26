@@ -1,5 +1,11 @@
 <template>
-    <VistaDetalleLayout :config="VIEW_CONFIG" :pestanas="availableTabs" @runMethod="runMethod">
+    <VistaDetalleLayout
+        :config="VIEW_CONFIG"
+        :pestanas="availableTabs"
+        :loadNewData="loadNewData"
+        :loadExistingData="loadExistingData"
+        @runMethod="runMethod"
+    >
         <template #principal-datos>
             <JdInput
                 label="RUC"
@@ -89,40 +95,33 @@ export default {
             return tabs
         },
         is_nuevo() {
-            return this.$route.params.id === 'nuevo'
+            return this.$route.params[this.vista.pathKey] === 'nuevo'
         },
-    },
-    async created() {
-        await this.loadEmpresa()
     },
     methods: {
         runMethod(method, item) {
             this[method](item)
         },
-        async loadEmpresa() {
-            const param_id = this.$route.params.id
-
-            if (param_id === 'nuevo') {
-                this.vista.data = {
-                    igv_porcentaje: 18,
-                    direcciones: [],
-                    bancos: [],
-                }
-                this.vista.mode = 'edit'
-                return
+        async loadNewData() {
+            this.vista.data = {
+                igv_porcentaje: 18,
+                direcciones: [],
+                bancos: [],
             }
-
+        },
+        async loadExistingData() {
+            const param_id = this.$route.params[this.vista.pathKey]
             const id = this.$route.name == 'vEmpresa' ? this.auth.empresa.id : param_id
 
             this.auth.setLoading(true, 'Cargando datos de empresa...')
             const res = await get(`${urls.empresas}/uno/${id}`)
             this.auth.setLoading(false)
 
-            if (res.code === 0) {
+            if (res.code === 0 && res.data) {
                 this.vista.data = res.data
 
                 if (this.$route.name != 'vEmpresa') {
-                    document.title = `${this.vista.data.razon_social}`
+                    document.title = `${this.vista.data[this.vista.titleKey]}`
                 }
             }
         },

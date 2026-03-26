@@ -63,11 +63,13 @@ const vistas = useVistas()
 const props = defineProps({
     config: { type: Object, required: true },
     pestanas: { type: Array, default: () => [] },
+    loadNewData: { type: Function },
+    loadExistingData: { type: Function },
 })
 
 const emit = defineEmits(['runMethod'])
 
-// --- Inicialización de la vista ---
+//--- Inicialización de la vista ---//
 const viewName = route.name
 
 vistas.updateVista(viewName, {
@@ -76,8 +78,28 @@ vistas.updateVista(viewName, {
 })
 
 const vista = vistas[viewName]
-// const vista1 = computed(() => vistas[viewName])
-// const vista = vista1.value
+
+loadData()
+
+//--- Principal data ---//
+async function loadData() {
+    vista.data = {}
+
+    if (route.params[props.config.pathKey] === 'nuevo') {
+        document.title = `Nuevo`
+        vista.mode = 'edit'
+        props.loadNewData()
+    } else {
+        vista.mode = 'view'
+
+        if (vista.last_path != route.fullPath) {
+            await props.loadExistingData()
+        }
+        if (!vista.data.id) return auth.goBack(router)
+    }
+
+    vista.last_path = route.fullPath
+}
 
 //--- Header actions ---//
 const headerActions = computed(() => {
@@ -131,11 +153,7 @@ function editar() {
 
 function cancelar() {
     if (route.params[props.config.pathKey] === 'nuevo') {
-        if (window.history.state && window.history.state.back) {
-            router.back()
-        } else {
-            router.push({ name: auth.usuario.vista_inicial })
-        }
+        auth.goBack(router)
     }
 
     vista.data = JSON.parse(JSON.stringify(vista.original_data))
@@ -144,7 +162,7 @@ function cancelar() {
 
 function clonar() {
     vista.original_data = JSON.parse(JSON.stringify(vista.data))
-    router.push({ name: viewName, params: { id: 'nuevo' } })
+    router.push({ name: viewName, params: { [vista.pathKey]: 'nuevo' } })
     delete vista.data.id
     vista.mode = 'edit'
 }

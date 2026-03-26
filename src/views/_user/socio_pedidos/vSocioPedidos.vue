@@ -74,7 +74,7 @@ export default {
         nuevo() {
             this.$router.push({
                 name: this.detailViewName,
-                params: { pedido_id: 'nuevo' },
+                params: { [this.vista.detailPath]: 'nuevo' },
             })
         },
         recuperarGuardado() {

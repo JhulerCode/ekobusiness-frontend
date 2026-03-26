@@ -1,5 +1,11 @@
 <template>
-    <VistaDetalleLayout :config="VIEW_CONFIG" :pestanas="availableTabs" @runMethod="runMethod">
+    <VistaDetalleLayout
+        :config="VIEW_CONFIG"
+        :pestanas="availableTabs"
+        :loadNewData="loadNewData"
+        :loadExistingData="loadExistingData"
+        @runMethod="runMethod"
+    >
         <template #principal-datos>
             <JdSelectQuery
                 :label="vista.data.tipo == 1 ? 'Proveedor' : 'Cliente'"
@@ -80,49 +86,34 @@ export default {
             return [{ id: 1, label: 'Contenido', show: true }]
         },
         is_nuevo() {
-            return this.$route.params.traslado_id === 'nuevo'
+            return this.$route.params[this.vista.pathKey] === 'nuevo'
         },
-    },
-    async created() {
-        const exec = setInterval(() => {
-            if (this.vista) {
-                this.loadStockPicking()
-                clearInterval(exec)
-            }
-        }, 100)
     },
     methods: {
         runMethod(method, item) {
             this[method](item)
         },
-        async loadStockPicking() {
+        async loadNewData() {
             const socio_pedido_id = this.$route.params.pedido_id
-            const param_id = this.$route.params.traslado_id
-            this.vista.data = {}
+            const tipo = this.$route.path.includes('compras') ? 1 : 2
 
-            if (param_id === 'nuevo') {
-                const tipo = this.$route.path.includes('compras') ? 1 : 2
-
-                this.vista.data = {
-                    tipo,
-                    fecha: dayjs().format('YYYY-MM-DD'),
-                    socio_pedido: socio_pedido_id,
-                    estado: 1,
-                    transaccion_items: [],
-                }
-
-                if (socio_pedido_id) {
-                    await this.loadSocioPedido(socio_pedido_id)
-                }
-
-                this.vista.mode = 'edit'
-                return
+            this.vista.data = {
+                tipo,
+                fecha: dayjs().format('YYYY-MM-DD'),
+                socio_pedido: socio_pedido_id,
+                estado: 1,
+                transaccion_items: [],
             }
+
+            if (socio_pedido_id) await this.loadSocioPedido(socio_pedido_id)
+        },
+        async loadExistingData() {
+            const param_id = this.$route.params[this.vista.pathKey]
 
             const qry = {
                 incl: ['socio1', 'socio_pedido1', 'transaccion_items'],
                 iccl: {
-                    transaccion_items: { incl: ['articulo1', 'lotes', 'kardexes_all'] },
+                    transaccion_items: { incl: ['articulo1', 'kardexes_all'] },
                 },
             }
 
@@ -131,21 +122,35 @@ export default {
             this.auth.setLoading(false)
 
             if (res.code === 0 && res.data) {
+                //--- TRAER LOTES ---//
+                const lotes_ids = []
+                for (const a of res.data.transaccion_items) {
+                    for (const b of a.kardexes) {
+                        lotes_ids.push(b.lote_id)
+                    }
+                }
+
+                const qry = {
+                    fltr: {
+                        id: { op: 'Es', val: lotes_ids },
+                    },
+                    cols: ['id', 'codigo', 'fv', 'lote_fv'],
+                }
+                this.auth.setLoading(true, 'Cargando...')
+                const lotes_res = await get(`${urls.lotes}?qry=${JSON.stringify(qry)}`)
+                this.auth.setLoading(false)
+
+                const lotes = lotes_res.data
+
                 for (const a of res.data.transaccion_items) {
                     for (const b of a.kardexes) {
                         b.cantidad = Number(b.cantidad)
-                        b.lote1 = a.lotes.find((c) => c.id == b.lote_id)
+                        b.lote1 = lotes.find((c) => c.id == b.lote_id)
                     }
                 }
 
                 this.vista.data = res.data
-                document.title = `Guía ${this.vista.data.guia || ''}`
-            } else {
-                if (window.history.state && window.history.state.back) {
-                    this.$router.back()
-                } else {
-                    this.$router.push({ name: this.auth.usuario.vista_inicial })
-                }
+                document.title = `Traslado ${this.vista.data[this.vista.titleKey] || ''}`
             }
         },
 
@@ -212,35 +217,35 @@ export default {
                     }
                 }
 
-                if (this.vista.data.tipo == 5) {
-                    if (a.articulo1.type != 'combo') {
-                        const kardexesTotal = a.kardexes.reduce(
-                            (sum, a) => sum + (a.cantidad ?? 0),
-                            0,
-                        )
+                // if (this.vista.data.tipo == 5) {
+                //     if (a.articulo1.type != 'combo') {
+                //         const kardexesTotal = a.kardexes.reduce(
+                //             (sum, a) => sum + (a.cantidad ?? 0),
+                //             0,
+                //         )
 
-                        if (kardexesTotal != a.cantidad) {
-                            jmsg('warning', `Cantidades diferentes en ${a.articulo1.nombre}`)
-                            return true
-                        }
-                    } else {
-                        const kardexesTotales = {}
-                        for (const b of a.kardexes) {
-                            if (!kardexesTotales[b.articulo]) {
-                                kardexesTotales[b.articulo] = 0
-                            }
-                            kardexesTotales[b.articulo] += b.cantidad
-                        }
+                //         if (kardexesTotal != a.cantidad) {
+                //             jmsg('warning', `Cantidades diferentes en ${a.articulo1.nombre}`)
+                //             return true
+                //         }
+                //     } else {
+                //         const kardexesTotales = {}
+                //         for (const b of a.kardexes) {
+                //             if (!kardexesTotales[b.articulo]) {
+                //                 kardexesTotales[b.articulo] = 0
+                //             }
+                //             kardexesTotales[b.articulo] += b.cantidad
+                //         }
 
-                        for (const b of a.articulo1.combo_articulos) {
-                            const cantidadComponente = b.cantidad * a.cantidad
-                            if (cantidadComponente != kardexesTotales[b.articulo]) {
-                                jmsg('warning', `Cantidades diferentes en ${b.articulo1.nombre}`)
-                                return true
-                            }
-                        }
-                    }
-                }
+                //         for (const b of a.articulo1.combo_articulos) {
+                //             const cantidadComponente = b.cantidad * a.cantidad
+                //             if (cantidadComponente != kardexesTotales[b.articulo]) {
+                //                 jmsg('warning', `Cantidades diferentes en ${b.articulo1.nombre}`)
+                //                 return true
+                //             }
+                //         }
+                //     }
+                // }
             }
 
             return false
@@ -282,31 +287,35 @@ export default {
             return res.data
         },
         async loadSocioPedido(pedido_id) {
-            const qry = {
-                incl: ['socio1', 'moneda1', 'socio_pedido_items', 'createdBy1'],
-                iccl: {
-                    socio1: {
-                        cols: [
-                            'doc_numero',
-                            'contactos',
-                            'direcciones',
-                            'precio_lista',
-                            'pago_condicion',
-                        ],
+            const vSocioPedido = this.$route.path.includes('compras')
+                ? 'vCompraPedido'
+                : 'vVentaPedido'
+
+            let pedido
+            if (this.vistas[vSocioPedido] && this.vistas[vSocioPedido].data?.id == pedido_id) {
+                pedido = this.vistas[vSocioPedido].data
+            } else {
+                const qry = {
+                    incl: ['socio1', 'moneda1', 'socio_pedido_items', 'createdBy1'],
+                    iccl: {
+                        socio1: {
+                            cols: ['doc_numero', 'contactos', 'direcciones', 'pago_condicion'],
+                        },
+                        socio_pedido_items: { incl: ['articulo1'] },
+                        createdBy1: { cols: ['cargo', 'telefono'] },
                     },
-                    socio_pedido_items: { incl: ['articulo1'] },
-                    createdBy1: { cols: ['cargo', 'telefono'] },
-                },
+                }
+
+                this.auth.setLoading(true, 'Cargando pedido...')
+                const res = await get(
+                    `${urls.socio_pedidos}/uno/${pedido_id}?qry=${JSON.stringify(qry)}`,
+                )
+                this.auth.setLoading(false)
+
+                if (res.code == 0) pedido = res.data
             }
 
-            this.auth.setLoading(true, 'Cargando pedido...')
-            const res = await get(
-                `${urls.socio_pedidos}/uno/${pedido_id}?qry=${JSON.stringify(qry)}`,
-            )
-            this.auth.setLoading(false)
-
-            if (res.code === 0) {
-                const pedido = res.data
+            if (pedido) {
                 this.vista.data.tipo = pedido.tipo == 1 ? 1 : 5
                 this.vista.data.socio = pedido.socio
                 this.vista.data.socio1 = pedido.socio1
@@ -316,10 +325,10 @@ export default {
 
                 // Add items from pedido
                 this.vista.socio_pedido_items = pedido.socio_pedido_items
+            } else {
+                this.auth.goBack(this.$router)
             }
         },
     },
 }
 </script>
-
-<style lang="scss" scoped></style>

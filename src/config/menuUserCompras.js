@@ -94,6 +94,7 @@ export default {
                 { id: 'vCompras:crear', label: 'Crear' },
                 { id: 'vCompras:ver', label: 'Ver' },
                 { id: 'vCompras:editar', label: 'Editar' },
+                { id: 'vCompras:eliminar', label: 'Eliminar' },
             ],
             children: [
                 {

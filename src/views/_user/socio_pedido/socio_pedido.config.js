@@ -33,7 +33,7 @@ export default {
             icon: 'fa-regular fa-truck',
             tipo: '2',
             action: 'entregar',
-            permiso: 'vCompraPedidos:entregarMercaderia',
+            permiso: 'vVentaPedidos:entregarMercaderia',
             ocultar: { tipo: 1 },
         },
     ],

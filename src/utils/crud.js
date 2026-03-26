@@ -29,6 +29,7 @@ const urls = {
     helpdesk_tickets: `${host}/api/helpdesk_tickets`,
     inspecciones: `${host}/api/inspecciones`,
     kardex: `${host}/api/kardex`,
+    lotes: `${host}/api/lotes`,
     maquinas: `${host}/api/maquinas`,
     monedas: `${host}/api/monedas`,
     mrp_boms: `${host}/api/mrp_boms`,

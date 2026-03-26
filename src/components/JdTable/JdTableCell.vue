@@ -31,6 +31,7 @@
             :disabled="item.table_columns?.[`${column.id}_disabled`] || disabled"
             @elegir="column.select.elegir ? column.select.elegir($event, item, column) : null"
             @reload="() => column.select.reload(item, column)"
+            :loaded="true"
         />
 
         <JdSelectQuery

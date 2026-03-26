@@ -85,6 +85,7 @@ export default {
                 { id: 'vVentas:crear', label: 'Crear' },
                 { id: 'vVentas:ver', label: 'Ver' },
                 { id: 'vVentas:editar', label: 'Editar' },
+                { id: 'vVentas:eliminar', label: 'Eliminar' },
                 { id: 'vVentas:controlDespacho', label: 'Control despacho' },
             ],
             children: [

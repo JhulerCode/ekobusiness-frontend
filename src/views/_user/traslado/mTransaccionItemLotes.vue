@@ -117,7 +117,7 @@ export default {
                         mostrar: 'componente1.nombre',
                         reload: this.loadLotes,
                     },
-                    show: this.modal.type == 'old',
+                    show: this.modal.type == 'old' && this.modal.articulo1.type == 'combo',
                 },
                 {
                     id: 'lote_padre',
@@ -262,18 +262,11 @@ export default {
         //--- Auxiliar data ---//
         async loadLotes() {
             const qry = {
-                incl: ['articulo1'],
                 cols: [
-                    // 'fecha',
-                    // 'moneda',
-                    // 'tipo_cambio',
-                    // 'pu',
-                    // 'igv_afectacion',
-                    // 'igv_porcentaje',
+                    'codigo',
                     'fv',
-                    'lote',
                     'stock',
-                    'lote_fv_stock',
+                    // 'lote_fv_stock',
                 ],
                 fltr: {
                     articulo: {
@@ -283,18 +276,18 @@ export default {
                                 ? this.modal.articulo
                                 : this.nuevo.articulo,
                     },
-                    is_lote_padre: { op: 'Es', val: true },
+                    // is_lote_padre: { op: 'Es', val: true },
                 },
                 ordr: [
                     ['createdAt', 'DESC'],
-                    ['lote', 'DESC'],
+                    ['codigo', 'DESC'],
                     ['fv', 'DESC'],
                 ],
             }
 
             this.useAuth.setLoading(true, 'Cargando...')
             this.modal.lotesLoaded = false
-            const res = await get(`${urls.kardex}?qry=${JSON.stringify(qry)}`)
+            const res = await get(`${urls.lotes}?qry=${JSON.stringify(qry)}`)
             this.useAuth.setLoading(false)
             this.modal.lotesLoaded = true
 

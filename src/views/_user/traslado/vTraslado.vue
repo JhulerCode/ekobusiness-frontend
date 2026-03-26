@@ -43,7 +43,6 @@
         </template>
 
         <template #pestanas-body>
-            {{ vista.mode }}
             <vTrasladoLine v-if="vista.pestana == 1" />
         </template>
     </VistaDetalleLayout>

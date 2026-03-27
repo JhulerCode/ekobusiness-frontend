@@ -6,7 +6,7 @@ export default {
         {
             text: 'Nuevo',
             action: 'nuevo',
-            permiso: 'vPreciosCompra:crear',
+            permiso: 'vCompraPrecios:crear',
         },
     ],
 

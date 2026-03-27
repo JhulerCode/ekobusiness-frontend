@@ -21,7 +21,6 @@ import { jqst, jmsg } from '@/utils/swal'
 import dayjs from 'dayjs'
 
 export default {
-    name: 'vCompraPedidos',
     components: {},
     computed: {
         auth: () => useAuth(),

@@ -191,12 +191,7 @@
                     <JdButton text="Calcular" tipo="2" @click="calcularInsumosNecesarios" />
                 </div>
 
-                <JdTable
-                    :columns="columns_insumos"
-
-                    :datos="insumos_necesitados"
-                    class="jd-table"
-                >
+                <JdTable :columns="columns_insumos" :datos="insumos_necesitados" class="jd-table">
                     <template v-slot:colStock="{ item }">
                         <span
                             :class="{
@@ -353,15 +348,15 @@ export default {
             {
                 label: 'Terminar',
                 icon: 'fa-solid fa-check-double',
-                action: 'terminar',
-                permiso: 'vPrograma:terminar',
+                action: 'abrirCerrar',
+                permiso: 'vPrograma:abrirCerrar',
                 ocultar: { estado: 2 },
             },
             {
                 label: 'Abrir',
                 icon: 'fa-solid fa-check-double',
-                action: 'abrir',
-                permiso: 'vPrograma:terminar',
+                action: 'abrirCerrar',
+                permiso: 'vPrograma:abrirCerrar',
                 ocultar: { estado: 1 },
             },
             {
@@ -385,7 +380,6 @@ export default {
                 prop: 'articulo1.nombre',
                 width: '30rem',
                 show: true,
-
             },
             {
                 id: 'cantidad_necesitada',
@@ -719,43 +713,36 @@ export default {
 
             this.useVistas.removeItem('vPrograma', 'produccion_ordenes', item)
         },
-        async terminar(item) {
-            const resQst = await jqst('¿Está seguro de terminar la orden de producción?')
-            if (resQst.isConfirmed == false) return
-
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await patch(
-                `${urls.produccion_ordenes}/terminar`,
-                item,
-                'Orden de producción terminada',
-            )
-            this.useAuth.setLoading(false)
-
-            if (res.code != 0) return
-
-            this.useVistas.updateItem('vPrograma', 'produccion_ordenes', {
-                ...item,
-                estado: 2,
-            })
+        abrir(item) {
+            this.abrirCerrar(item, '1')
         },
-        async abrir(item) {
-            const resQst = await jqst('¿Está seguro de abrir la orden de producción?')
+        cerrar(item) {
+            this.abrirCerrar(item, '2')
+        },
+        async abrirCerrar(item, estado) {
+            const resQst = await jqst(
+                `¿Está seguro de ${estado == 1 ? 'abrir' : 'cerrar'} la orden de producción?`,
+            )
             if (resQst.isConfirmed == false) return
 
-            this.useAuth.setLoading(true, 'Cargando...')
+            const send = { id: item.id, ids: item.id, estado }
+
+            this.auth.setLoading(true, 'Cargando...')
             const res = await patch(
-                `${urls.produccion_ordenes}/abrir`,
-                item,
-                'Orden de producción abierta',
+                `${this.vista.apiUrl}/abrir-cerrar`,
+                send,
+                `Orden de producción ${estado == 1 ? 'abierta' : 'cerrado'}`,
             )
-            this.useAuth.setLoading(false)
+            this.auth.setLoading(false)
 
             if (res.code != 0) return
 
-            this.useVistas.updateItem('vPrograma', 'produccion_ordenes', {
-                ...item,
-                estado: 1,
-            })
+            this.vistas.updateItem(
+                this.vista.name,
+                'tableData',
+                { id: res.data.id, estado, estado1: res.data.estado1 },
+                true,
+            )
         },
         async salidaInsumos(item) {
             this.useAuth.setLoading(true, 'Cargando...')
@@ -878,9 +865,7 @@ export default {
             await this.calcularInsumosNecesarios()
             // throw new Error()
 
-            const fecha_programa = dayjs(this.vista.tableData[0].fecha).format(
-                'DD-MM-YYYY',
-            )
+            const fecha_programa = dayjs(this.vista.tableData[0].fecha).format('DD-MM-YYYY')
             const nombre = `Programa de producción del ${fecha_programa}`
             const workbook = new ExcelJS.Workbook()
             const worksheet = workbook.addWorksheet('Hoja1')

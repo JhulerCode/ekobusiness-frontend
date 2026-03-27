@@ -348,14 +348,14 @@ export default {
             {
                 label: 'Terminar',
                 icon: 'fa-solid fa-check-double',
-                action: 'abrirCerrar',
+                action: 'cerrar',
                 permiso: 'vPrograma:abrirCerrar',
                 ocultar: { estado: 2 },
             },
             {
                 label: 'Abrir',
                 icon: 'fa-solid fa-check-double',
-                action: 'abrirCerrar',
+                action: 'abrir',
                 permiso: 'vPrograma:abrirCerrar',
                 ocultar: { estado: 1 },
             },
@@ -727,22 +727,17 @@ export default {
 
             const send = { id: item.id, ids: item.id, estado }
 
-            this.auth.setLoading(true, 'Cargando...')
+            this.useAuth.setLoading(true, 'Cargando...')
             const res = await patch(
-                `${this.vista.apiUrl}/abrir-cerrar`,
+                `${urls.produccion_ordenes}/abrir-cerrar`,
                 send,
                 `Orden de producción ${estado == 1 ? 'abierta' : 'cerrado'}`,
             )
-            this.auth.setLoading(false)
+            this.useAuth.setLoading(false)
 
             if (res.code != 0) return
 
-            this.vistas.updateItem(
-                this.vista.name,
-                'tableData',
-                { id: res.data.id, estado, estado1: res.data.estado1 },
-                true,
-            )
+            this.useVistas.updateItem('vPrograma', 'tableData', res.data, true)
         },
         async salidaInsumos(item) {
             this.useAuth.setLoading(true, 'Cargando...')

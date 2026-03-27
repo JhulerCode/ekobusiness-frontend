@@ -37,7 +37,7 @@ import dayjs from 'dayjs'
 import { jmsg, jqst } from '@/utils/swal'
 
 export default {
-    name: 'vProduccionHistorial',
+    name: 'vProduccionOrdenes',
     components: {
         mProduccionOrden,
         mProduccionInsumos,
@@ -130,7 +130,7 @@ export default {
                     fecha: dayjs().format('YYYY-MM-DD'),
                     estado: 1,
                 },
-                origin: 'vProduccionHistorial',
+                origin: 'vProduccionOrdenes',
             }
             this.modals.setModal('mProduccionOrden', 'Nueva órden de producción', 1, send, true)
         },
@@ -160,7 +160,7 @@ export default {
                 produccion_orden: res.data,
                 articulos: [{ id: res.data.articulo, ...res.data.articulo_info }],
                 mrp_boms: [{ ...res.data.mrp_bom1 }],
-                origin: 'vProduccionHistorial',
+                origin: 'vProduccionOrdenes',
             }
             this.modals.setModal('mProduccionOrden', 'Ver órden de producción', 3, send, true)
         },
@@ -175,7 +175,7 @@ export default {
                 produccion_orden: res.data,
                 articulos: [{ id: res.data.articulo, ...res.data.articulo_info }],
                 mrp_boms: [{ ...res.data.mrp_bom1 }],
-                origin: 'vProduccionHistorial',
+                origin: 'vProduccionOrdenes',
             }
             this.modals.setModal('mProduccionOrden', 'Editar órden de producción', 2, send, true)
         },

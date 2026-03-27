@@ -212,23 +212,23 @@ export default {
             action: 'productosTerminados',
             permiso: 'vProduccionOrdenes:productosTerminados',
         },
-        {
-            label: 'Ver trazabilidad',
-            icon: 'fa-solid fa-diagram-project',
-            action: 'verTrazabilidad',
-            permiso: 'vProduccionOrdenes:trazabilidad',
-        },
-        {
-            label: 'Control de pesos',
-            icon: 'fa-solid fa-star',
-            action: 'controlPesos',
-            permiso: 'vProduccionOrdenes:controlPesos',
-        },
-        {
-            label: 'Control del PPC',
-            icon: 'fa-solid fa-star',
-            action: 'controlPpc',
-            permiso: 'vProduccionOrdenes:controlPpc',
-        },
+        // {
+        //     label: 'Ver trazabilidad',
+        //     icon: 'fa-solid fa-diagram-project',
+        //     action: 'verTrazabilidad',
+        //     permiso: 'vProduccionOrdenes:trazabilidad',
+        // },
+        // {
+        //     label: 'Control de pesos',
+        //     icon: 'fa-solid fa-star',
+        //     action: 'controlPesos',
+        //     permiso: 'vProduccionOrdenes:controlPesos',
+        // },
+        // {
+        //     label: 'Control del PPC',
+        //     icon: 'fa-solid fa-star',
+        //     action: 'controlPpc',
+        //     permiso: 'vProduccionOrdenes:controlPpc',
+        // },
     ],
 }

@@ -48,9 +48,8 @@
                 label="Producto"
                 :nec="true"
                 v-model="modal.produccion_orden.articulo"
-                :spin="spinArticulos"
-                :lista="modal.articulos"
-                @search="searchArticulos"
+                :search="searchArticulos"
+                :selectedObject="modal.produccion_orden.articulo1"
                 @elegir="setArticulo"
                 :disabled="modal.mode == 3"
                 style="grid-column: 1/4"
@@ -115,11 +114,7 @@
             <JdButton text="Comprobar disponibilidad" tipo="2" @click="loadStock" />
         </div>
 
-        <JdTable
-            :columns="columns1"
-            :datos="insumos_necesitados"
-            class="jd-table"
-        >
+        <JdTable :columns="columns1" :datos="insumos_necesitados" class="jd-table">
             <template v-slot:colStock="{ item }">
                 <span
                     :class="{
@@ -245,29 +240,26 @@ export default {
             this.modal.maquinas = res.data
         },
         async searchArticulos(txtBuscar) {
-            if (!txtBuscar) {
-                this.modal.articulos.length = 0
-                return
-            }
-
             const qry = {
                 fltr: {
                     activo: { op: 'Es', val: true },
-                    nombre: { op: 'Contiene', val: txtBuscar },
                     type: { op: 'Es', val: 'consumable' },
                     produce_ok: { op: 'Es', val: true },
                 },
                 cols: ['nombre', 'linea', 'filtrantes'],
                 ordr: [['nombre', 'ASC']],
+                limt: 25,
             }
 
-            this.spinArticulos = true
+            if (txtBuscar) {
+                qry.fltr.nombre = { op: 'Contiene', val: txtBuscar }
+            }
+
             const res = await get(`${urls.articulos}?qry=${JSON.stringify(qry)}`)
-            this.spinArticulos = false
 
             if (res.code !== 0) return
 
-            this.modal.articulos = JSON.parse(JSON.stringify(res.data))
+            return res.data
         },
         async loadColaboradores() {
             this.modal.colaboradores = []
@@ -434,10 +426,15 @@ export default {
 
             if (res.code != 0) return
 
-            this.useVistas.addItem(this.modal.origin, 'tableData', {
-                ...res.data,
-                receta: this.insumos_necesitados,
-            })
+            this.useVistas.addItem(
+                this.modal.origin,
+                'tableData',
+                {
+                    ...res.data,
+                    receta: this.insumos_necesitados,
+                },
+                'first',
+            )
             this.useModals.show.mProduccionOrden = false
         },
         async modificar() {

@@ -73,7 +73,7 @@ export default {
     }),
     computed: {
         vista() {
-            return this.vistas[this.$route.name] || { data: {} }
+            return this.vistas[this.$route.name]
         },
         columns() {
             return [

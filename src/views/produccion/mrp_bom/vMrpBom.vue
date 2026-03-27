@@ -1,7 +1,7 @@
 <template>
     <VistaLayout :config="VIEW_CONFIG" :setQuery="setQuery" @runMethod="runMethod"> </VistaLayout>
 
-    <mMrpBom v-if="modals.show.mMrpBom" />
+    <mMrpBom v-if="modals.show?.mMrpBom" />
 </template>
 
 <script>

@@ -1,5 +1,4 @@
 export default {
-    title: 'Precios',
     apiPath: 'articulo_suppliers',
 
     headerActions: [

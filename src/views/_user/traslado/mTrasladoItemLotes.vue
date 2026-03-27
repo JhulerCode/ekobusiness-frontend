@@ -227,11 +227,7 @@ export default {
                 qry.fltr.codigo = { op: 'Contiene', val: txt }
             }
 
-            this.useAuth.setLoading(true, 'Cargando...')
-            this.modal.lotesLoaded = false
             const res = await get(`${urls.lotes}?qry=${JSON.stringify(qry)}`)
-            this.useAuth.setLoading(false)
-            this.modal.lotesLoaded = true
 
             if (res.code !== 0) return
 

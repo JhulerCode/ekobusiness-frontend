@@ -67,6 +67,16 @@ export default {
                     label: 'Salida de insumos compartidos',
                 },
             ],
+            children: [
+                {
+                    label: 'Detalle',
+                    goto: 'vProduccionOrden',
+                    path: ':produccion_orden_id',
+                    view: '_user/produccion_orden/vProduccionOrden.vue',
+                    permission: 'vProduccionOrdenes:ver',
+                    viewType: 'detail',
+                },
+            ],
         },
         {
             label: 'Ingreso de productos',

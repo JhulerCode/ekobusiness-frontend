@@ -51,6 +51,7 @@ export default {
         {
             id: 'cantidad',
             title: 'Cantidad',
+            prop: 'cantidad1',
             format: 'decimal',
             toRight: true,
             type: 'number',

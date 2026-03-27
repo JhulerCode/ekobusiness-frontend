@@ -24,6 +24,48 @@
             @elegir="column.onchange ? $emit('onChange', column.onchange, item) : null"
         />
 
+        <JdCheckBox
+            v-else-if="column.type === 'check'"
+            v-model="modelValue"
+            :disabled="disabled"
+            @change="column.onchange ? $emit('onChange', column.onchange, item) : null"
+        />
+
+        <JdTextArea
+            v-else-if="column.type === 'longtext'"
+            v-model="modelValue"
+            :disabled="disabled"
+        />
+
+        <JdInput
+            v-else-if="column.text"
+            v-model="modelValue"
+            :disabled="column.text.disabled ? column.text.disabled(item) : null"
+            :toRight="column.text?.toRight"
+            @change="column.onchange ? $emit('onChange', column.onchange, item) : null"
+            @input="column.oninput ? $emit('onInput', column.oninput, item) : null"
+        />
+
+        <JdInput
+            v-else-if="column.date"
+            v-model="modelValue"
+            type="date"
+            :disabled="column.date.disabled ? column.date.disabled(item) : null"
+            :toRight="column.date?.toRight"
+            @change="column.onchange ? $emit('onChange', column.onchange, item) : null"
+            @input="column.oninput ? $emit('onInput', column.oninput, item) : null"
+        />
+
+        <JdInput
+            v-else-if="column.number"
+            v-model="modelValue"
+            type="number"
+            :disabled="column.number.disabled ? column.number.disabled(item) : null"
+            :toRight="column.number?.toRight"
+            @change="column.onchange ? $emit('onChange', column.onchange, item) : null"
+            @input="column.oninput ? $emit('onInput', column.oninput, item) : null"
+        />
+
         <JdSelect
             v-else-if="column.select"
             v-model="modelValue"
@@ -42,23 +84,10 @@
             v-bind="column.select_query"
             :search="(txt) => column.select_query.search(txt, item, column)"
             :selectedObject="item[column.select_query.selectedObjectProp || column.id + '1']"
-            :disabled="item.table_columns?.[`${column.id}_disabled`] || disabled"
+            :disabled="column.select_query.disabled ? column.select_query.disabled(item) : disabled"
             @elegir="
                 column.select_query.elegir ? column.select_query.elegir($event, item, column) : null
             "
-        />
-
-        <JdCheckBox
-            v-else-if="column.type === 'check'"
-            v-model="modelValue"
-            :disabled="disabled"
-            @change="column.onchange ? $emit('onChange', column.onchange, item) : null"
-        />
-
-        <JdTextArea
-            v-else-if="column.type === 'longtext'"
-            v-model="modelValue"
-            :disabled="disabled"
         />
 
         <!-- {{ column.select?.lista }} -->

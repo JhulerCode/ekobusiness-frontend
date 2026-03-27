@@ -2,7 +2,7 @@
     <VistaLayout :config="VIEW_CONFIG" :setQuery="setQuery" @runMethod="runMethod"> </VistaLayout>
 
     <!-- Modales -->
-    <mInspeccion v-if="modals.show.mInspeccion" />
+    <mInspeccion v-if="modals.show?.mInspeccion" />
 </template>
 
 <script>

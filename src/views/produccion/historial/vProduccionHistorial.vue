@@ -7,16 +7,16 @@
     >
     </VistaLayout>
 
-    <mProduccionOrden v-if="modals.show.mProduccionOrden" />
-    <mProduccionInsumos v-if="modals.show.mProduccionInsumos" />
+    <mProduccionOrden v-if="modals.show?.mProduccionOrden" />
+    <mProduccionInsumos v-if="modals.show?.mProduccionInsumos" />
     <mProduccionProductos
-        v-if="modals.show.mProduccionProductos"
+        v-if="modals.show?.mProduccionProductos"
         @productosCargados="setProduccionProductos"
     />
-    <mFormato v-if="modals.show.mFormato" @created="setFormatoCalidad" />
-    <mProduccionTrazabilidad v-if="modals.show.mProduccionTrazabilidad" />
-    <mProductosFaltantes v-if="modals.show.mProductosFaltantes" />
-    <mProduccionInsumosCompartidos v-if="modals.show.mProduccionInsumosCompartidos" />
+    <mFormato v-if="modals.show?.mFormato" @created="setFormatoCalidad" />
+    <mProduccionTrazabilidad v-if="modals.show?.mProduccionTrazabilidad" />
+    <mProductosFaltantes v-if="modals.show?.mProductosFaltantes" />
+    <mProduccionInsumosCompartidos v-if="modals.show?.mProduccionInsumosCompartidos" />
 </template>
 
 <script>

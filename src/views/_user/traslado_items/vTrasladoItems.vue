@@ -8,7 +8,7 @@
     >
     </VistaLayout>
 
-    <!-- <mFormato v-if="modals.show.mFormato" @created="setTransaccionItemCalidadRevisado" /> -->
+    <!-- <mFormato v-if="modals.show?.mFormato" @created="setTransaccionItemCalidadRevisado" /> -->
 </template>
 
 <script>

@@ -37,7 +37,7 @@ export const useAuth = defineStore('auth', {
             useModals().initVars()
         },
 
-        // ----- LOGIN ----- //
+        //--- LOGIN ----- //
         async fetchInfoEmpresaPublica() {
             this.setLoading(true, 'Cargando información...')
             const res = await get(`${urls.public}/info-empresa`)
@@ -105,7 +105,7 @@ export const useAuth = defineStore('auth', {
             return permisos.flat().some((p) => this.usuario?.permisos?.includes(p))
         },
 
-        // ----- TABLES ----- //
+        //--- TABLES ----- //
         updateQuery(columns, qry) {
             columns
                 .filter((a) => a.op)
@@ -146,7 +146,7 @@ export const useAuth = defineStore('auth', {
             if (res.code != 0) return
         },
         setColumns(tableName, columns) {
-            // ----- RECUPERA LAS COLUMNAS GUARDADAS ----- //
+            //--- RECUPERA LAS COLUMNAS GUARDADAS ----- //
             if (this.tables[tableName]) {
                 for (const a of columns) {
                     const saved = this.tables[tableName].find((b) => b.id === a.id)
@@ -170,7 +170,7 @@ export const useAuth = defineStore('auth', {
             this.tables = tables
         },
 
-        // ----- AVANCES ----- //
+        //--- AVANCES ----- //
         async saveAvances(card, data) {
             this.avances[card] = data
 
@@ -189,7 +189,7 @@ export const useAuth = defineStore('auth', {
             this.avances = avances
         },
 
-        // ----- PREFERENCIAS ----- //
+        //--- PREFERENCIAS ----- //
         setTheme(theme) {
             if (!theme) return
 

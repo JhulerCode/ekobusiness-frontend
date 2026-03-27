@@ -547,7 +547,7 @@ export default {
     border: var(--border);
     border-radius: 0.5rem;
     box-shadow: 0 0 1rem var(--shadow-color);
-    z-index: 2;
+    z-index: 3;
     padding: 0.5rem;
     display: flex;
     flex-direction: column;

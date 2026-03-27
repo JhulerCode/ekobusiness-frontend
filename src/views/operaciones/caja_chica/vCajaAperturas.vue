@@ -2,7 +2,7 @@
     <VistaLayout :config="VIEW_CONFIG" :setQuery="setQuery" @runMethod="runMethod"> </VistaLayout>
 
     <!-- Modales -->
-    <mCajaApertura v-if="modals.show.mCajaApertura" />
+    <mCajaApertura v-if="modals.show?.mCajaApertura" />
 </template>
 
 <script>

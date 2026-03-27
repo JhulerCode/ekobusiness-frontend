@@ -55,8 +55,11 @@
         </JdTable>
     </div>
 
-    <mPedidoItems v-if="modals.show.mPedidoItems" @sendItems="agregarPedidoItems" />
-    <mTrasladoItemLotes v-if="modals.show.mTrasladoItemLotes" @sendItems="updateArticuloKardexes" />
+    <mPedidoItems v-if="modals.show?.mPedidoItems" @sendItems="agregarPedidoItems" />
+    <mTrasladoItemLotes
+        v-if="modals.show?.mTrasladoItemLotes"
+        @sendItems="updateArticuloKardexes"
+    />
 </template>
 
 <script>

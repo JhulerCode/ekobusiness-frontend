@@ -2,7 +2,7 @@
     <VistaLayout :config="VIEW_CONFIG" :setQuery="setQuery" @runMethod="runMethod"> </VistaLayout>
 
     <!-- Modales -->
-    <mAdminSuscripcion v-if="modals.show.mAdminSuscripcion" />
+    <mAdminSuscripcion v-if="modals.show?.mAdminSuscripcion" />
 </template>
 
 <script>

@@ -1,6 +1,7 @@
 export default {
     apiPath: 'produccion_ordenes',
-    // detailPath: 'produccion_orden_id',
+    detailPath: 'produccion_orden_id',
+    detailViewName: 'vProduccionOrden',
 
     headerActions: [
         {
@@ -174,19 +175,6 @@ export default {
 
     tableRowActions: [
         {
-            label: 'Ver',
-            icon: 'fa-solid fa-folder-open',
-            action: 'ver',
-            permiso: 'vProduccionOrdenes:ver',
-        },
-        {
-            label: 'Editar',
-            icon: 'fa-solid fa-pen-to-square',
-            action: 'editar',
-            permiso: 'vProduccionOrdenes:editar',
-            ocultar: { estado: 2 },
-        },
-        {
             label: 'Abrir',
             icon: 'fa-solid fa-check-double',
             action: 'abrir',
@@ -199,18 +187,6 @@ export default {
             action: 'cerrar',
             permiso: 'vProduccionOrdenes:abrirCerrar',
             ocultar: { estado: 2 },
-        },
-        {
-            label: 'Salida de insumos',
-            icon: 'fa-regular fa-circle-down',
-            action: 'salidaInsumos',
-            permiso: 'vProduccionOrdenes:salidaInsumos',
-        },
-        {
-            label: 'Productos terminados',
-            icon: 'fa-solid fa-boxes-stacked',
-            action: 'productosTerminados',
-            permiso: 'vProduccionOrdenes:productosTerminados',
         },
         // {
         //     label: 'Ver trazabilidad',

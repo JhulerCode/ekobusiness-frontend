@@ -42,7 +42,7 @@ export default {
         this.animate()
     },
     methods: {
-        // -------------------------- STARS --------------------------
+        //------------------------ STARS --------------------------
         createStars() {
             this.stars = []
             const count = 300
@@ -83,7 +83,7 @@ export default {
             return `rgba(${r},${g},${b},${alpha})`
         },
 
-        // -------------------------- COMETS --------------------------
+        //------------------------ COMETS --------------------------
         spawnComet() {
             const now = performance.now()
             if (now - this.lastCometTime < 1000 * 3) return
@@ -129,7 +129,7 @@ export default {
             this.comets = this.comets.filter((c) => c.x < this.w && c.y > 0)
         },
 
-        // -------------------------- SKY --------------------------
+        //------------------------ SKY --------------------------
         drawGradientSky() {
             const skyColor = this.useAuth.isDarkMode ? '#181818' : '#f2f2f2'
             const skyColor2 = this.useAuth.isDarkMode ? '#282828' : '#ffffff'
@@ -142,7 +142,7 @@ export default {
             this.ctx.fillRect(0, 0, this.w, this.h)
         },
 
-        // -------------------------- HILLS --------------------------
+        //------------------------ HILLS --------------------------
         drawHills() {
             const hill1Color = this.useAuth.isDarkMode ? '#3A3A3A' : '#BEBEBE'
             const hill2Color = this.useAuth.isDarkMode ? '#2C2C2C' : '#9E9E9E'
@@ -195,7 +195,7 @@ export default {
             ctx.fill()
         },
 
-        // -------------------------- ANIMATION --------------------------
+        //------------------------ ANIMATION --------------------------
         animate() {
             this.ctx.clearRect(0, 0, this.w, this.h)
 

@@ -9,11 +9,11 @@
     >
     </VistaLayout>
 
-    <mProduccionInsumosCompartidos v-if="modals.show.mProduccionInsumosCompartidos" />
-    <mProduccionOrden v-if="modals.show.mProduccionOrden" />
-    <mProduccionInsumos v-if="modals.show.mProduccionInsumos" />
+    <mProduccionInsumosCompartidos v-if="modals.show?.mProduccionInsumosCompartidos" />
+    <mProduccionOrden v-if="modals.show?.mProduccionOrden" />
+    <mProduccionInsumos v-if="modals.show?.mProduccionInsumos" />
     <mProduccionProductos
-        v-if="modals.show.mProduccionProductos"
+        v-if="modals.show?.mProduccionProductos"
         @productosCargados="setProduccionProductos"
     />
 </template>
@@ -28,7 +28,7 @@ import VIEW_CONFIG from './produccion_ordenes.config.js'
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
 import { useModals } from '@/pinia/modals'
-import { urls, get, patch } from '@/utils/crud'
+import { patch } from '@/utils/crud'
 import { jqst, jmsg } from '@/utils/swal'
 import dayjs from 'dayjs'
 
@@ -82,14 +82,10 @@ export default {
 
         //--- Header actions ---//
         nuevo() {
-            const send = {
-                produccion_orden: {
-                    fecha: dayjs().format('YYYY-MM-DD'),
-                    estado: 1,
-                },
-                origin: 'vProduccionOrdenes',
-            }
-            this.modals.setModal('mProduccionOrden', 'Nueva órden de producción', 1, send, true)
+            this.$router.push({
+                name: this.vista.detailViewName,
+                params: { [this.vista.detailPath]: 'nuevo' },
+            })
         },
         salidaInsumosCompartidos() {
             console.log('asd')
@@ -147,65 +143,6 @@ export default {
         },
 
         //--- Row actions ---//
-        async ver(item) {
-            const qry = { incl: ['maquina1', 'articulo1', 'mrp_bom1'] }
-            this.auth.setLoading(true, 'Cargando...')
-            const res = await get(`${this.vista.apiUrl}/uno/${item.id}?qry=${JSON.stringify(qry)}`)
-            this.auth.setLoading(false)
-            if (res.code != 0) return
-
-            const send = {
-                produccion_orden: res.data,
-                articulos: [{ id: res.data.articulo, ...res.data.articulo_info }],
-                mrp_boms: [{ ...res.data.mrp_bom1 }],
-                origin: 'vProduccionOrdenes',
-            }
-            this.modals.setModal('mProduccionOrden', 'Ver órden de producción', 3, send, true)
-        },
-        async editar(item) {
-            const qry = { incl: ['maquina1', 'articulo1', 'mrp_bom1'] }
-            this.auth.setLoading(true, 'Cargando...')
-            const res = await get(`${this.vista.apiUrl}/uno/${item.id}?qry=${JSON.stringify(qry)}`)
-            this.auth.setLoading(false)
-            if (res.code != 0) return
-
-            const send = {
-                produccion_orden: res.data,
-                articulos: [{ id: res.data.articulo, ...res.data.articulo_info }],
-                mrp_boms: [{ ...res.data.mrp_bom1 }],
-                origin: 'vProduccionOrdenes',
-            }
-            this.modals.setModal('mProduccionOrden', 'Editar órden de producción', 2, send, true)
-        },
-        abrir(item) {
-            this.abrirCerrar(item, '1')
-        },
-        cerrar(item) {
-            this.abrirCerrar(item, '2')
-        },
-        async salidaInsumos(item) {
-            const qry1 = {
-                fltr: { mrp_bom: { op: 'Es', val: item.mrp_bom } },
-                cols: ['articulo', 'cantidad', 'orden'],
-                incl: ['articulo1'],
-                ordr: [['orden', 'ASC']],
-            }
-            this.auth.setLoading(true, 'Cargando...')
-            const res1 = await get(`${urls.mrp_bom_lines}?qry=${JSON.stringify(qry1)}`)
-            this.auth.setLoading(false)
-            if (res1.code != 0) return
-
-            const send = {
-                is_receta: true,
-                produccion_orden: { ...item },
-                mrp_bom_lines: res1.data,
-            }
-            this.modals.setModal('mProduccionInsumos', `Salida de insumos`, 1, send, true)
-        },
-        productosTerminados(item) {
-            const send = { produccion_orden: { ...item }, lote_manual: false, direct_approve: true }
-            this.modals.setModal('mProduccionProductos', `Productos terminados`, null, send, true)
-        },
         // async verTrazabilidad(item) {
         //     const qry = { incl: ['articulo1', 'maquina1'] }
         //     this.auth.setLoading(true, 'Cargando...')
@@ -278,6 +215,12 @@ export default {
         //     }
         //     this.modals.setModal('mFormato', formato_id, res1.data ? 2 : 1, send, true)
         // },
+        abrir(item) {
+            this.abrirCerrar(item, '1')
+        },
+        cerrar(item) {
+            this.abrirCerrar(item, '2')
+        },
 
         //--- auxiliar methods ---//
         async abrirCerrar(item, estado) {

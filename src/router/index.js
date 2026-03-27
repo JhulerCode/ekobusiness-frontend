@@ -6,7 +6,7 @@ import menuUser from '@/config/menuUser.js'
 import menuAdmin from '@/config/menuAdmin.js'
 const viewsModules = import.meta.glob('../views/**/*.vue')
 
-// ----- RUTAS HIJAS DE LA CONSOLA (DINÁMICAS) ----- //
+//--- RUTAS HIJAS DE LA CONSOLA (DINÁMICAS) ----- //
 const consolaChildren = []
 
 const traverseRoutes = (items, parentPath = '') => {
@@ -47,7 +47,7 @@ const traverseRoutes = (items, parentPath = '') => {
 traverseRoutes(menuUser)
 traverseRoutes(menuAdmin)
 
-// ----- RUTAS PRINCIPALES ----- //
+//--- RUTAS PRINCIPALES ----- //
 const routes = [
     {
         path: '/signin',

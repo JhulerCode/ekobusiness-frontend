@@ -10,14 +10,14 @@
                 type="date"
                 label="Fecha"
                 :nec="true"
-                v-model="modal.transaccion.fecha"
+                v-model="modal.kardex.fecha"
                 style="grid-column: 1/2"
             />
 
             <JdSelect
                 label="Insumo"
                 :nec="true"
-                v-model="modal.transaccion.articulo"
+                v-model="modal.kardex.articulo"
                 id="articulo"
                 :lista="modal.mrp_bom_lines || []"
                 mostrar="articulo1.nombre"
@@ -29,10 +29,9 @@
             <JdSelectQuery
                 label="Artículo"
                 :nec="true"
-                v-model="modal.transaccion.articulo"
-                :spin="modal.spinArticulos"
-                :lista="modal.articulos"
-                @search="searchArticulos"
+                v-model="modal.kardex.articulo"
+                :selectedObject="modal.kardex.articulo1"
+                :search="searchArticulos"
                 @elegir="loadLotes"
                 style="grid-column: 1/3"
                 v-else
@@ -47,7 +46,7 @@
             <JdSelect
                 label="Lote"
                 :nec="true"
-                v-model="modal.transaccion.lote_padre"
+                v-model="modal.kardex.lote_padre"
                 :lista="modal.lotes || []"
                 mostrar="lote_fv_stock"
                 :loaded="modal.lotesLoaded"
@@ -59,15 +58,15 @@
                 type="number"
                 label="Cantidad"
                 :nec="true"
-                v-model="modal.transaccion.cantidad"
+                v-model="modal.kardex.cantidad"
                 style="grid-column: 1/2"
             />
 
-            <small v-if="modal.is_receta && modal.transaccion.articulo" style="grid-column: 2/3">
+            <small v-if="modal.is_receta && modal.kardex.articulo" style="grid-column: 2/3">
                 Cant. planificada:
                 {{
                     redondear(
-                        modal.mrp_bom_lines.find((a) => a.articulo == modal.transaccion.articulo)
+                        modal.mrp_bom_lines.find((a) => a.articulo == modal.kardex.articulo)
                             ?.cantidad * modal.produccion_orden.cantidad,
                     )
                 }}
@@ -94,7 +93,7 @@
     </JdModal>
 
     <mProduccionInsumosDevolucion
-        v-if="useModals.show.mProduccionInsumosDevolucion"
+        v-if="useModals.show?.mProduccionInsumosDevolucion"
         @devuelto="devuelto"
     />
 </template>
@@ -187,7 +186,7 @@ export default {
                     {
                         icon: 'fa-solid fa-rotate-left',
                         title: 'Devolución',
-                        action: 'devolucion',
+                        action: 'devolver',
                         ocultar: { prop: 'tipo', op: 'Distinto de', val: 2 },
                     },
                 ]
@@ -206,7 +205,7 @@ export default {
             this[method](item)
         },
         initTransaccion() {
-            this.modal.transaccion = {
+            this.modal.kardex = {
                 tipo: 2,
                 fecha: this.modal.produccion_orden.fecha,
                 produccion_orden: this.modal.produccion_orden.id,
@@ -216,6 +215,82 @@ export default {
             this.modal.lotes = []
             this.modal.lotesLoaded = false
         },
+        checkDatos() {
+            const props = ['fecha', 'articulo', 'cantidad', 'lote_padre']
+
+            if (incompleteData(this.modal.kardex, props)) {
+                jmsg('warning', 'Completa los campos requeridos')
+                return true
+            }
+
+            const lote_padre = this.modal.lotes.find((a) => a.id == this.modal.kardex.lote_padre)
+
+            if (lote_padre.stock < this.modal.kardex.cantidad) {
+                jmsg('warning', 'Stock insuficiente')
+                return true
+            }
+
+            return false
+        },
+        async grabar() {
+            if (this.checkDatos()) return
+
+            this.useAuth.setLoading(true, 'Grabando...')
+            const res = await post(urls.kardex, this.modal.kardex)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            this.initTransaccion()
+            this.modal.produccion_insumos.unshift(res.data)
+        },
+        async eliminar(item) {
+            const resQst = await jqst('¿Está seguro de eliminar?')
+            if (resQst.isConfirmed == false) return
+
+            const send = {
+                id: item.id,
+                tipo: item.tipo,
+                lote_padre: item.lote_padre,
+                cantidad: Math.abs(item.cantidad),
+            }
+
+            this.useAuth.setLoading(true, 'Eliminando...')
+            const res = await delet(urls.kardex, send)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            const i = this.modal.produccion_insumos.findIndex((a) => a.id == item.id)
+            this.modal.produccion_insumos.splice(i, 1)
+        },
+        async devolver(item) {
+            const send = {
+                transaccion: {
+                    tipo: 3,
+                    fecha: item.fecha,
+                    produccion_orden: this.modal.produccion_orden.id,
+                    maquina: this.modal.produccion_orden.maquina,
+                    articulo: item.articulo,
+                    lote_padre: item.lote_padre,
+                },
+                articulo: { ...item.articulo1 },
+            }
+
+            this.useModals.setModal('mProduccionInsumosDevolucion', 'Devolución', 1, send, true)
+        },
+
+        //--- auxiliar methods --//
+        selectLote(item) {
+            for (const a of this.modal.lotes) a.selected = false
+
+            item.selected = true
+        },
+        devuelto(item) {
+            this.modal.produccion_insumos.unshift(item)
+        },
+
+        //--- auxiliar data ---//
         async loadProduccionInsumos() {
             this.modal.produccion_insumos = []
 
@@ -237,19 +312,18 @@ export default {
             this.modal.produccion_insumos = res.data
         },
         async searchArticulos(txtBuscar) {
-            if (!txtBuscar) {
-                this.modal.articulos.length = 0
-                return
-            }
-
             const qry = {
                 fltr: {
                     type: { op: 'Es', val: 'consumable' },
                     activo: { op: 'Es', val: true },
-                    nombre: { op: 'Contiene', val: txtBuscar },
                 },
                 cols: ['nombre', 'unidad', 'igv_afectacion', 'has_fv'],
                 ordr: [['nombre', 'ASC']],
+                limt: 25,
+            }
+
+            if (txtBuscar) {
+                qry.fltr.nombre = { op: 'Contiene', val: txtBuscar }
             }
 
             this.modal.spinArticulos = true
@@ -259,13 +333,14 @@ export default {
             if (res.code !== 0) return
 
             this.modal.articulos = JSON.parse(JSON.stringify(res.data))
+            return res.data
         },
         async loadLotes() {
             this.modal.lotes = []
-            this.modal.transaccion.lote_padre = null
+            this.modal.kardex.lote_padre = null
             this.modal.lotesLoaded = false
 
-            if (this.modal.transaccion.articulo == null) return
+            if (this.modal.kardex.articulo == null) return
 
             const qry = {
                 incl: ['articulo1'],
@@ -282,7 +357,7 @@ export default {
                     'lote_fv_stock',
                 ],
                 fltr: {
-                    articulo: { op: 'Es', val: this.modal.transaccion.articulo },
+                    articulo: { op: 'Es', val: this.modal.kardex.articulo },
                     is_lote_padre: { op: 'Es', val: true },
                 },
                 ordr: [['lote', 'DESC']],
@@ -297,82 +372,6 @@ export default {
             if (res.code !== 0) return
 
             this.modal.lotes = JSON.parse(JSON.stringify(res.data))
-        },
-        selectLote(item) {
-            for (const a of this.modal.lotes) a.selected = false
-
-            item.selected = true
-        },
-
-        checkDatos() {
-            const props = ['fecha', 'articulo', 'cantidad', 'lote_padre']
-
-            if (incompleteData(this.modal.transaccion, props)) {
-                jmsg('warning', 'Completa los campos requeridos')
-                return true
-            }
-
-            const lote_padre = this.modal.lotes.find(
-                (a) => a.id == this.modal.transaccion.lote_padre,
-            )
-
-            if (lote_padre.stock < this.modal.transaccion.cantidad) {
-                jmsg('warning', 'Stock insuficiente')
-                return true
-            }
-
-            return false
-        },
-        async grabar() {
-            if (this.checkDatos()) return
-
-            this.useAuth.setLoading(true, 'Grabando...')
-            const res = await post(urls.kardex, this.modal.transaccion)
-            this.useAuth.setLoading(false)
-
-            if (res.code != 0) return
-
-            this.initTransaccion()
-            this.modal.produccion_insumos.unshift(res.data)
-        },
-
-        async eliminar(item) {
-            const resQst = await jqst('¿Está seguro de eliminar?')
-            if (resQst.isConfirmed == false) return
-
-            const send = {
-                id: item.id,
-                tipo: item.tipo,
-                lote_padre: item.lote_padre,
-                cantidad: Math.abs(item.cantidad),
-            }
-
-            this.useAuth.setLoading(true, 'Eliminando...')
-            const res = await delet(urls.kardex, send)
-            this.useAuth.setLoading(false)
-
-            if (res.code != 0) return
-
-            const i = this.modal.produccion_insumos.findIndex((a) => a.id == item.id)
-            this.modal.produccion_insumos.splice(i, 1)
-        },
-        async devolucion(item) {
-            const send = {
-                transaccion: {
-                    tipo: 3,
-                    fecha: item.fecha,
-                    produccion_orden: this.modal.produccion_orden.id,
-                    maquina: this.modal.produccion_orden.maquina,
-                    articulo: item.articulo,
-                    lote_padre: item.lote_padre,
-                },
-                articulo: { ...item.articulo1 },
-            }
-
-            this.useModals.setModal('mProduccionInsumosDevolucion', 'Devolución', 1, send, true)
-        },
-        devuelto(item) {
-            this.modal.produccion_insumos.unshift(item)
         },
     },
 }

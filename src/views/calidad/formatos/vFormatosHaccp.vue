@@ -42,7 +42,7 @@
         </JdTable>
     </div>
 
-    <mFormato v-if="useModals.show.mFormato" />
+    <mFormato v-if="useModals.show?.mFormato" />
 </template>
 
 <script>
@@ -171,7 +171,7 @@ export default {
             this.vista.formato_values = res1.data
         },
 
-        ///// ----- FORMATO VALUES ----- /////
+        /////--- FORMATO VALUES ----- /////
         async loadFormatoValues() {
             const qry = {
                 fltr: { codigo: { op: 'Es', val: this.vista.formato_id } },

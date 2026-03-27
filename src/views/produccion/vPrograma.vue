@@ -206,15 +206,15 @@
         </div>
     </div>
 
-    <mProduccionOrden v-if="useModals.show.mProduccionOrden" />
-    <mProduccionInsumos v-if="useModals.show.mProduccionInsumos" />
+    <mProduccionOrden v-if="useModals.show?.mProduccionOrden" />
+    <mProduccionInsumos v-if="useModals.show?.mProduccionInsumos" />
     <mProduccionProductos
-        v-if="useModals.show.mProduccionProductos"
+        v-if="useModals.show?.mProduccionProductos"
         @productosCargados="setProduccionProductos"
     />
 
-    <mProductosFaltantes v-if="useModals.show.mProductosFaltantes" />
-    <mProduccionInsumosCompartidos v-if="useModals.show.mProduccionInsumosCompartidos" />
+    <mProductosFaltantes v-if="useModals.show?.mProductosFaltantes" />
+    <mProduccionInsumosCompartidos v-if="useModals.show?.mProduccionInsumosCompartidos" />
 </template>
 
 <script>

@@ -1,5 +1,4 @@
 export default {
-    title: 'Proveedores',
     apiPath: 'socios',
 
     headerActions: [

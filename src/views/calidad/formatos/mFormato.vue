@@ -219,7 +219,7 @@ export default {
                 cuarentena_producto: this.modal.cuarentena_producto,
             }
 
-            // ----- ASIGNAR AL VALUE DEL COLUMN QUE LO TRAE DE OTRO LADO ----- //
+            //--- ASIGNAR AL VALUE DEL COLUMN QUE LO TRAE DE OTRO LADO ----- //
             const transaccion_item = this.modal.send.values.find(
                 (a) => a.relacion == 'transaccion_items',
             )
@@ -238,7 +238,7 @@ export default {
             )
             if (cuarentena_producto) cuarentena_producto.value = this.modal.cuarentena_producto
 
-            // ----- ASIGNAR A LOS QUE SE RELACIONAN DESDE AQUÍ ----- //
+            //--- ASIGNAR A LOS QUE SE RELACIONAN DESDE AQUÍ ----- //
             const maquina = this.modal.send.values.find((a) => a.relacion == 'maquinas')
             if (maquina) this.modal.send.maquina = maquina.value
 

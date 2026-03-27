@@ -1,5 +1,4 @@
 export default {
-    title: 'Pedidos',
     apiPath: 'socio_pedidos',
     detailPath: 'pedido_id',
 

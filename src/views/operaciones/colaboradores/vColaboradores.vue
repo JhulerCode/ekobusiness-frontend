@@ -1,7 +1,7 @@
 <template>
     <VistaLayout :config="VIEW_CONFIG" :setQuery="setQuery" @runMethod="runMethod"> </VistaLayout>
 
-    <mColaborador v-if="modals.show.mColaborador" />
+    <mColaborador v-if="modals.show?.mColaborador" />
 </template>
 
 <script>

@@ -78,14 +78,14 @@ vistas.updateVista(viewName, {
 })
 
 const vista = vistas[viewName]
+vista.pestana = 1
 
 loadData()
 
 //--- Principal data ---//
 async function loadData() {
-    vista.data = {}
-
     if (route.params[props.config.pathKey] === 'nuevo') {
+        vista.data = {}
         document.title = `Nuevo`
         vista.mode = 'edit'
         props.loadNewData()

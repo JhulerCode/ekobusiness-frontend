@@ -8,7 +8,7 @@
     >
     </VistaLayout>
 
-    <mSocio v-if="modals.show.mSocio" />
+    <mSocio v-if="modals.show?.mSocio" />
 </template>
 
 <script>

@@ -1,7 +1,7 @@
 <template>
     <VistaLayout :config="VIEW_CONFIG" :setQuery="setQuery" @runMethod="runMethod"> </VistaLayout>
 
-    <mAsistencia v-if="modals.show?.mAsistencia" />
+    <mAsistencia v-if="modals?.show?.mAsistencia" />
 </template>
 
 <script>

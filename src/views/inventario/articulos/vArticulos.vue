@@ -10,8 +10,8 @@
         </template>
     </VistaLayout>
 
-    <mImportarArticulos v-if="modals.show?.mImportarArticulos" />
-    <mLotes v-if="modals.show?.mLotes" />
+    <mImportarArticulos v-if="modals?.show?.mImportarArticulos" />
+    <mLotes v-if="modals?.show?.mLotes" />
 </template>
 
 <script>

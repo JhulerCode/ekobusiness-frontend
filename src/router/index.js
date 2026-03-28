@@ -76,8 +76,8 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
     const auth = useAuth()
 
-    // Actualizar título de la página
-    if (to.meta.title) document.title = to.meta.title
+    // Actualizar título de la página después de que la navegación se confirme
+    // if (to.meta.title) document.title = to.meta.title (se movió a afterEach)
 
     // Verificar si la ruta requiere autenticación
     const requiresAuth = to.matched.some((r) => r.meta.requiresAuth)
@@ -137,6 +137,7 @@ router.beforeEach(async (to, from, next) => {
         }
     }
 
+    if (to.meta.title) document.title = to.meta.title
     next()
 })
 

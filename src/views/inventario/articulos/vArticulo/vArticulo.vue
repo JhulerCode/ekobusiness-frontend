@@ -69,9 +69,9 @@
         </template>
     </VistaDetalleLayout>
 
-    <mLotes v-if="modals.show?.mLotes" />
-    <mAjusteStock v-if="modals.show?.mAjusteStock" />
-    <mUploadFiles v-if="modals.show?.mUploadFiles" />
+    <mLotes v-if="modals?.show?.mLotes" />
+    <mAjusteStock v-if="modals?.show?.mAjusteStock" />
+    <mUploadFiles v-if="modals?.show?.mUploadFiles" />
 </template>
 
 <script>

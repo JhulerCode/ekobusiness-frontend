@@ -3,6 +3,49 @@
         <div class="head">
             <div class="head-left">
                 <strong>Programa de producción</strong>
+            </div>
+
+            <div class="header-right">
+                <JdSelect
+                    :lista="vista.articulo_lineas || []"
+                    v-model="columns[6].val"
+                    :loaded="vista.lineasLoaded"
+                    @reload="loadArticuloLineas"
+                    @elegir="setLinea"
+                    style="width: 12rem"
+                    placeholder="Línea"
+                />
+
+                <!-- <JdSelect
+                :lista="vista.maquinas || []"
+                v-model="columns[1].val"
+                :loaded="vista.maquinasLoaded"
+                @reload="loadMaquinas"
+                @elegir="setMaquina"
+                style="width: 12em"
+                placeholder="Máquina"
+            /> -->
+
+                <JdInput
+                    v-model="columns[0].val"
+                    type="date"
+                    @change="setFecha"
+                    style="width: 10rem"
+                />
+
+                <JdButton
+                    text="Recargar"
+                    tipo="2"
+                    @click="loadProduccionOrdenes"
+                    v-if="useAuth.verifyPermiso('vPrograma:listar')"
+                />
+
+                <JdButton
+                    text="Exportar"
+                    tipo="2"
+                    @click="exportarPrograma"
+                    v-if="useAuth.verifyPermiso('vPrograma:crear')"
+                />
 
                 <JdButton
                     text="Ver productos pedidos"
@@ -13,46 +56,6 @@
             </div>
         </div>
 
-        <div class="buttons">
-            <JdSelect
-                :lista="vista.articulo_lineas || []"
-                v-model="columns[6].val"
-                :loaded="vista.lineasLoaded"
-                @reload="loadArticuloLineas"
-                @elegir="setLinea"
-                style="width: 12rem"
-                placeholder="Línea"
-            />
-
-            <JdSelect
-                :lista="vista.maquinas || []"
-                v-model="columns[1].val"
-                :loaded="vista.maquinasLoaded"
-                @reload="loadMaquinas"
-                @elegir="setMaquina"
-                style="width: 12em"
-                placeholder="Máquina"
-            />
-
-            <JdInput v-model="columns[0].val" type="date" @change="setFecha" style="width: 10rem" />
-
-            <!-- <JdButton text="Buscar" @click="loadProduccionOrdenes" /> -->
-
-            <JdButton
-                text="Exportar"
-                tipo="2"
-                @click="exportarPrograma"
-                v-if="useAuth.verifyPermiso('vPrograma:crear')"
-            />
-
-            <JdButton
-                text="Recargar"
-                tipo="2"
-                @click="loadProduccionOrdenes"
-                v-if="useAuth.verifyPermiso('vPrograma:listar')"
-            />
-        </div>
-        <!-- {{ maquinas_produccion }} -->
         <div class="asdasd">
             <div class="card" v-if="vista.maquinas && vista.maquinas.length == 0">
                 <div class="maquina-head">
@@ -206,21 +209,21 @@
         </div>
     </div>
 
-    <mProduccionOrden v-if="useModals.show?.mProduccionOrden" />
-    <mProduccionInsumos v-if="useModals.show?.mProduccionInsumos" />
-    <mProduccionProductos
-        v-if="useModals.show?.mProduccionProductos"
-        @productosCargados="setProduccionProductos"
-    />
+    <mProduccionOrden v-if="useModals?.show?.mProduccionOrden" />
+    <!-- <mProduccionInsumos v-if="useModals?.show?.mProduccionInsumos" /> -->
+    <!-- <mProduccionProductos
+        v-if="useModals?.show?.mProduccionProductos"
+        @productosCargados="updateProduccionProductos"
+    /> -->
 
-    <mProductosFaltantes v-if="useModals.show?.mProductosFaltantes" />
-    <mProduccionInsumosCompartidos v-if="useModals.show?.mProduccionInsumosCompartidos" />
+    <mProductosFaltantes v-if="useModals?.show?.mProductosFaltantes" />
+    <mProduccionInsumosCompartidos v-if="useModals?.show?.mProduccionInsumosCompartidos" />
 </template>
 
 <script>
 import mProduccionOrden from '@/views/produccion/historial/mProduccionOrden.vue'
-import mProduccionInsumos from '@/views/produccion/historial/mProduccionInsumos.vue'
-import mProduccionProductos from '@/views/produccion/historial/mProduccionProductos.vue'
+// import mProduccionInsumos from '@/views/produccion/historial/mProduccionInsumos.vue'
+// import mProduccionProductos from '@/views/produccion/historial/mProduccionProductos.vue'
 import mProductosFaltantes from '@/views/produccion/mProductosFaltantes.vue'
 import mProduccionInsumosCompartidos from '@/views/produccion/historial/mProduccionInsumosCompartidos.vue'
 
@@ -239,8 +242,8 @@ import { saveAs } from 'file-saver'
 export default {
     components: {
         mProduccionOrden,
-        mProduccionInsumos,
-        mProduccionProductos,
+        // mProduccionInsumos,
+        // mProduccionProductos,
         mProductosFaltantes,
         mProduccionInsumosCompartidos,
     },
@@ -345,32 +348,32 @@ export default {
                 permiso: 'vPrograma:eliminar',
                 ocultar: { estado: 2 },
             },
-            {
-                label: 'Terminar',
-                icon: 'fa-solid fa-check-double',
-                action: 'cerrar',
-                permiso: 'vPrograma:abrirCerrar',
-                ocultar: { estado: 2 },
-            },
-            {
-                label: 'Abrir',
-                icon: 'fa-solid fa-check-double',
-                action: 'abrir',
-                permiso: 'vPrograma:abrirCerrar',
-                ocultar: { estado: 1 },
-            },
-            {
-                label: 'Salida de insumos',
-                icon: 'fa-regular fa-circle-down',
-                action: 'salidaInsumos',
-                permiso: 'vPrograma:salidaInsumos',
-            },
-            {
-                label: 'Productos terminados',
-                icon: 'fa-solid fa-boxes-stacked',
-                action: 'productosTerminados',
-                permiso: 'vPrograma:productosTerminados',
-            },
+            // {
+            //     label: 'Terminar',
+            //     icon: 'fa-solid fa-check-double',
+            //     action: 'cerrar',
+            //     permiso: 'vPrograma:abrirCerrar',
+            //     ocultar: { estado: 2 },
+            // },
+            // {
+            //     label: 'Abrir',
+            //     icon: 'fa-solid fa-check-double',
+            //     action: 'abrir',
+            //     permiso: 'vPrograma:abrirCerrar',
+            //     ocultar: { estado: 1 },
+            // },
+            // {
+            //     label: 'Salida de insumos',
+            //     icon: 'fa-regular fa-circle-down',
+            //     action: 'salidaInsumos',
+            //     permiso: 'vPrograma:salidaInsumos',
+            // },
+            // {
+            //     label: 'Productos terminados',
+            //     icon: 'fa-solid fa-boxes-stacked',
+            //     action: 'productosTerminados',
+            //     permiso: 'vPrograma:productosTerminados',
+            // },
         ],
 
         columns_insumos: [
@@ -540,49 +543,6 @@ export default {
 
             this.loadProduccionOrdenes()
         },
-
-        async loadArticuloLineas() {
-            const qry = {
-                fltr: { activo: { op: 'Es', val: true } },
-                cols: ['nombre'],
-                ordr: [['nombre', 'ASC']],
-            }
-
-            this.vista.articulo_lineas = []
-            this.useAuth.setLoading(true, 'Cargando...')
-            this.vista.lineasLoaded = false
-            const res = await get(`${urls.articulo_lineas}?qry=${JSON.stringify(qry)}`)
-            this.vista.lineasLoaded = true
-            this.useAuth.setLoading(false)
-
-            if (res.code != 0) return
-
-            this.vista.articulo_lineas = res.data
-        },
-        async loadMaquinas() {
-            if (this.columns[6].val == null) {
-                jmsg('warning', 'Seleccione una línea de producción')
-                return
-            }
-
-            const qry = {
-                fltr: { linea: { op: 'Es', val: this.columns[6].val } },
-                cols: ['codigo', 'nombre', 'linea', 'velocidad', 'limpieza_tiempo'],
-                ordr: [['orden', 'ASC']],
-            }
-
-            this.vista.maquinas = []
-            this.useAuth.setLoading(true, 'Cargando...')
-            this.vista.maquinasLoaded = false
-            const res = await get(`${urls.maquinas}?qry=${JSON.stringify(qry)}`)
-            this.vista.maquinasLoaded = true
-            this.useAuth.setLoading(false)
-
-            if (res.code != 0) return
-
-            this.vista.maquinas = res.data
-        },
-
         setQuery() {
             this.vista.qry = {
                 // fltr: { tipo: { op: 'Es', val: this.columns[6].val } },
@@ -634,6 +594,50 @@ export default {
             // this.calcularHoras()
         },
 
+        //--- auxiliar data ---//
+        async loadArticuloLineas() {
+            const qry = {
+                fltr: { activo: { op: 'Es', val: true } },
+                cols: ['nombre'],
+                ordr: [['nombre', 'ASC']],
+            }
+
+            this.vista.articulo_lineas = []
+            this.useAuth.setLoading(true, 'Cargando...')
+            this.vista.lineasLoaded = false
+            const res = await get(`${urls.articulo_lineas}?qry=${JSON.stringify(qry)}`)
+            this.vista.lineasLoaded = true
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            this.vista.articulo_lineas = res.data
+        },
+        async loadMaquinas() {
+            if (this.columns[6].val == null) {
+                jmsg('warning', 'Seleccione una línea de producción')
+                return
+            }
+
+            const qry = {
+                fltr: { linea: { op: 'Es', val: this.columns[6].val } },
+                cols: ['codigo', 'nombre', 'linea', 'velocidad', 'limpieza_tiempo'],
+                ordr: [['orden', 'ASC']],
+            }
+
+            this.vista.maquinas = []
+            this.useAuth.setLoading(true, 'Cargando...')
+            this.vista.maquinasLoaded = false
+            const res = await get(`${urls.maquinas}?qry=${JSON.stringify(qry)}`)
+            this.vista.maquinasLoaded = true
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            this.vista.maquinas = res.data
+        },
+
+        //--- row actions ---
         runMethod(method, item) {
             this[method](item)
         },
@@ -713,81 +717,6 @@ export default {
 
             this.useVistas.removeItem('vPrograma', 'produccion_ordenes', item)
         },
-        abrir(item) {
-            this.abrirCerrar(item, '1')
-        },
-        cerrar(item) {
-            this.abrirCerrar(item, '2')
-        },
-        async abrirCerrar(item, estado) {
-            const resQst = await jqst(
-                `¿Está seguro de ${estado == 1 ? 'abrir' : 'cerrar'} la orden de producción?`,
-            )
-            if (resQst.isConfirmed == false) return
-
-            const send = { id: item.id, ids: item.id, estado }
-
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await patch(
-                `${urls.produccion_ordenes}/abrir-cerrar`,
-                send,
-                `Orden de producción ${estado == 1 ? 'abierta' : 'cerrado'}`,
-            )
-            this.useAuth.setLoading(false)
-
-            if (res.code != 0) return
-
-            this.useVistas.updateItem('vPrograma', 'tableData', res.data, true)
-        },
-        async salidaInsumos(item) {
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.produccion_ordenes}/uno/${item.id}`)
-            this.useAuth.setLoading(false)
-
-            if (res.code != 0) return
-
-            const qry1 = {
-                fltr: {
-                    mrp_bom: { op: 'Es', val: item.mrp_bom },
-                },
-                cols: ['articulo', 'cantidad', 'orden'],
-                incl: ['articulo1'],
-                ordr: [['orden', 'ASC']],
-            }
-
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res1 = await get(`${urls.mrp_bom_lines}?qry=${JSON.stringify(qry1)}`)
-            this.useAuth.setLoading(false)
-
-            if (res1.code != 0) return
-
-            const send = {
-                is_receta: true,
-                produccion_orden: { ...item },
-                mrp_bom_lines: res1.data,
-            }
-
-            this.useModals.setModal('mProduccionInsumos', `Salida de insumos`, 1, send, true)
-        },
-        productosTerminados(item) {
-            const send = {
-                produccion_orden: { ...item },
-                lote_manual: true,
-            }
-
-            this.useModals.setModal(
-                'mProduccionProductos',
-                `Productos terminados`,
-                null,
-                send,
-                true,
-            )
-        },
-        setProduccionProductos(item) {
-            const pr = this.vista.tableData.find((a) => a.id == item.id)
-            pr.productos_terminados = item.productos_terminados
-        },
-
         async setInicio(item) {
             const resQst = await jqst(
                 `¿Está seguro de marcar el inicio de la producción de ${item.articulo1.nombre}?`,
@@ -829,6 +758,7 @@ export default {
             this.vista.tableData[i].fin = send.fin
         },
 
+        //--- header actions ---
         nuevo(maquina) {
             const send = {
                 produccion_orden: {
@@ -989,6 +919,34 @@ export default {
             })
             saveAs(blob, `${nombre}.xlsx`)
         },
+        async verPedidos() {
+            const send = {
+                linea: this.columns[6].val,
+            }
+
+            this.useModals.setModal('mProductosFaltantes', 'Productos pedidos', null, send, true)
+        },
+        salidaInsumosCompartidos(a) {
+            const send = {
+                transaccion: {
+                    tipo: 2,
+                    fecha: this.columns[0].val,
+                    maquina: a.id,
+                },
+                maquinas: this.maquinas_produccion,
+                maquina: a,
+            }
+
+            this.useModals.setModal(
+                'mProduccionInsumosCompartidos',
+                `Salida de insumos`,
+                null,
+                send,
+                true,
+            )
+        },
+
+        //--- auxiliar methods ---//
         async calcularInsumosNecesarios() {
             const qry = {
                 fltr: {
@@ -1019,32 +977,6 @@ export default {
 
             // this.vista.tableData = res.data
         },
-        async verPedidos() {
-            const send = {
-                linea: this.columns[6].val,
-            }
-
-            this.useModals.setModal('mProductosFaltantes', 'Productos pedidos', null, send, true)
-        },
-        salidaInsumosCompartidos(a) {
-            const send = {
-                transaccion: {
-                    tipo: 2,
-                    fecha: this.columns[0].val,
-                    maquina: a.id,
-                },
-                maquinas: this.maquinas_produccion,
-                maquina: a,
-            }
-
-            this.useModals.setModal(
-                'mProduccionInsumosCompartidos',
-                `Salida de insumos`,
-                null,
-                send,
-                true,
-            )
-        },
 
         setProductoTiempo(prod) {
             return (prod.cantidad * prod.articulo_info?.filtrantes) / prod.maquina_info?.velocidad
@@ -1072,13 +1004,118 @@ export default {
 
             return maquina.produccion_ordenes.some((a) => a.estado == 1)
         },
+
+        // productosTerminados(item) {
+        //     const send = {
+        //         produccion_orden: { ...item },
+        //         lote_manual: true,
+        //     }
+
+        //     this.useModals.setModal(
+        //         'mProduccionProductos',
+        //         `Productos terminados`,
+        //         null,
+        //         send,
+        //         true,
+        //     )
+        // },
+        // abrir(item) {
+        //     this.abrirCerrar(item, '1')
+        // },
+        // cerrar(item) {
+        //     this.abrirCerrar(item, '2')
+        // },
+        // async abrirCerrar(item, estado) {
+        //     const resQst = await jqst(
+        //         `¿Está seguro de ${estado == 1 ? 'abrir' : 'cerrar'} la orden de producción?`,
+        //     )
+        //     if (resQst.isConfirmed == false) return
+
+        //     const send = { id: item.id, ids: item.id, estado }
+
+        //     this.useAuth.setLoading(true, 'Cargando...')
+        //     const res = await patch(
+        //         `${urls.produccion_ordenes}/abrir-cerrar`,
+        //         send,
+        //         `Orden de producción ${estado == 1 ? 'abierta' : 'cerrado'}`,
+        //     )
+        //     this.useAuth.setLoading(false)
+
+        //     if (res.code != 0) return
+
+        //     this.useVistas.updateItem('vPrograma', 'tableData', res.data, true)
+        // },
+        // async salidaInsumos(item) {
+        //     this.useAuth.setLoading(true, 'Cargando...')
+        //     const res = await get(`${urls.produccion_ordenes}/uno/${item.id}`)
+        //     this.useAuth.setLoading(false)
+
+        //     if (res.code != 0) return
+
+        //     const qry1 = {
+        //         fltr: {
+        //             mrp_bom: { op: 'Es', val: item.mrp_bom },
+        //         },
+        //         cols: ['articulo', 'cantidad', 'orden'],
+        //         incl: ['articulo1'],
+        //         ordr: [['orden', 'ASC']],
+        //     }
+
+        //     this.useAuth.setLoading(true, 'Cargando...')
+        //     const res1 = await get(`${urls.mrp_bom_lines}?qry=${JSON.stringify(qry1)}`)
+        //     this.useAuth.setLoading(false)
+
+        //     if (res1.code != 0) return
+
+        //     const send = {
+        //         is_receta: true,
+        //         produccion_orden: { ...item },
+        //         mrp_bom_lines: res1.data,
+        //     }
+
+        //     this.useModals.setModal('mProduccionInsumos', `Salida de insumos`, 1, send, true)
+        // },
+
+        // updateProduccionProductos(item) {
+        //     const produccion_orden = this.vista.tableData.find((a) => a.id == item.id)
+        //     produccion_orden.productos_terminados = item.productos_terminados
+        // },
     },
 }
 </script>
 
 <style lang="scss" scoped>
 .vista {
+    padding: 1.5rem 2rem;
     overflow-y: auto;
+
+    > .head {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem 2rem;
+        margin-bottom: 2rem;
+
+        .head-left {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            min-width: 0;
+
+            strong {
+                font-size: 1.4rem;
+            }
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            justify-content: end;
+            gap: 0.25rem;
+            flex-wrap: wrap;
+            min-width: 0;
+        }
+    }
 }
 
 .buttons {

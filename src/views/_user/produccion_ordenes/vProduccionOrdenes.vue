@@ -9,19 +9,15 @@
     >
     </VistaLayout>
 
-    <mProduccionInsumosCompartidos v-if="modals.show?.mProduccionInsumosCompartidos" />
-    <mProduccionOrden v-if="modals.show?.mProduccionOrden" />
-    <mProduccionInsumos v-if="modals.show?.mProduccionInsumos" />
+    <mProduccionInsumosCompartidos v-if="modals?.show?.mProduccionInsumosCompartidos" />
     <mProduccionProductos
-        v-if="modals.show?.mProduccionProductos"
-        @productosCargados="setProduccionProductos"
+        v-if="modals?.show?.mProduccionProductos"
+        @productosCargados="updateProduccionProductos"
     />
 </template>
 
 <script>
 import mProduccionInsumosCompartidos from '@/views/produccion/historial/mProduccionInsumosCompartidos.vue'
-import mProduccionOrden from '@/views/produccion/historial/mProduccionOrden.vue'
-import mProduccionInsumos from '@/views/produccion/historial/mProduccionInsumos.vue'
 import mProduccionProductos from '@/views/produccion/historial/mProduccionProductos.vue'
 
 import VIEW_CONFIG from './produccion_ordenes.config.js'
@@ -35,8 +31,6 @@ import dayjs from 'dayjs'
 export default {
     components: {
         mProduccionInsumosCompartidos,
-        mProduccionOrden,
-        mProduccionInsumos,
         mProduccionProductos,
     },
     computed: {
@@ -77,6 +71,7 @@ export default {
             }
 
             this.auth.updateQuery(this.vista.tableColumns, this.vista.qry)
+            this.auth.applyListingRestriction(this.vista.name, this.vista.qry)
             this.vista.qry.cols.push('articulo', 'mrp_bom')
         },
 
@@ -221,6 +216,14 @@ export default {
         cerrar(item) {
             this.abrirCerrar(item, '2')
         },
+        productosTerminados(item) {
+            const send = {
+                produccion_orden: { ...item },
+                lote_manual: true,
+            }
+
+            this.modals.setModal('mProduccionProductos', `Productos terminados`, null, send, true)
+        },
 
         //--- auxiliar methods ---//
         async abrirCerrar(item, estado) {
@@ -256,9 +259,9 @@ export default {
         },
 
         //--- @ methods ---//
-        setProduccionProductos(item) {
-            const pr = this.vista.tableData.find((a) => a.id == item.id)
-            if (pr) pr.productos_terminados = item.productos_terminados
+        updateProduccionProductos(item) {
+            const produccion_orden = this.vista.tableData.find((a) => a.id == item.id)
+            if (produccion_orden) produccion_orden.productos_terminados = item.productos_terminados
         },
     },
 }

@@ -1,8 +1,8 @@
 <template>
     <VistaLayout :config="VIEW_CONFIG" :setQuery="setQuery" @runMethod="runMethod"> </VistaLayout>
 
-    <mArticuloLinea v-if="modals.show?.mArticuloLinea" />
-    <mUploadFiles v-if="modals.show?.mUploadFiles" />
+    <mArticuloLinea v-if="modals?.show?.mArticuloLinea" />
+    <mUploadFiles v-if="modals?.show?.mUploadFiles" />
 </template>
 
 <script>

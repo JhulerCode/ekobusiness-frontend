@@ -45,6 +45,7 @@ export default {
             view: '_user/produccion_ordenes/vProduccionOrdenes.vue',
             permisos: [
                 { id: 'vProduccionOrdenes:listar', label: 'Listar' },
+                { id: 'vProduccionOrdenes:listar:responsable', label: 'Listar asignados' },
                 { id: 'vProduccionOrdenes:crear', label: 'Crear' },
                 { id: 'vProduccionOrdenes:ver', label: 'Ver' },
                 { id: 'vProduccionOrdenes:editar', label: 'Editar' },
@@ -69,7 +70,7 @@ export default {
             ],
             children: [
                 {
-                    label: 'Detalle',
+                    label: 'Detalle OT',
                     goto: 'vProduccionOrden',
                     path: ':produccion_orden_id',
                     view: '_user/produccion_orden/vProduccionOrden.vue',

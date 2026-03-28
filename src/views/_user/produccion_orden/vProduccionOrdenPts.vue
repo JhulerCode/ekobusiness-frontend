@@ -4,8 +4,7 @@
             <JdButton
                 icon="fa-solid fa-rotate-right"
                 text="Recargar"
-                tipo="2"
-                :small="true"
+                tipo="3"
                 @click="loadProduccionOrdenPts"
             />
         </div>
@@ -67,6 +66,7 @@ export default {
                 {
                     id: 'cantidad',
                     title: 'Cantidad',
+                    toRight: true,
                     input: true,
                     number: {
                         disabled: (item) => !item.is_new,

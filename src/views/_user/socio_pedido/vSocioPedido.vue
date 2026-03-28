@@ -75,7 +75,7 @@
         </template>
     </VistaDetalleLayout>
 
-    <mSocioPedidoPdf v-if="modals.show?.mSocioPedidoPdf" />
+    <mSocioPedidoPdf v-if="modals?.show?.mSocioPedidoPdf" />
 </template>
 
 <script>

@@ -1,7 +1,7 @@
 <template>
     <VistaLayout :config="VIEW_CONFIG" :setQuery="setQuery" @runMethod="runMethod"> </VistaLayout>
 
-    <mTipoCambio v-if="modals.show?.mTipoCambio" />
+    <mTipoCambio v-if="modals?.show?.mTipoCambio" />
 </template>
 
 <script>

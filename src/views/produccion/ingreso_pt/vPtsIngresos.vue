@@ -1,8 +1,8 @@
 <template>
     <VistaLayout :config="VIEW_CONFIG" :setQuery="setQuery" @runMethod="runMethod"> </VistaLayout>
 
-    <mProductosCuarentena v-if="modals.show?.mProductosCuarentena" @liberado="liberarLote" />
-    <mProduccionTrazabilidad v-if="modals.show?.mProduccionTrazabilidad" />
+    <mProductosCuarentena v-if="modals?.show?.mProductosCuarentena" @liberado="liberarLote" />
+    <mProduccionTrazabilidad v-if="modals?.show?.mProduccionTrazabilidad" />
 </template>
 
 <script>

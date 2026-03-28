@@ -10,7 +10,7 @@
     </VistaLayout>
 
     <!-- Modales -->
-    <mFormato v-if="modals.show?.mFormato" @created="setTransaccionDespachoRevisado" />
+    <mFormato v-if="modals?.show?.mFormato" @created="setTransaccionDespachoRevisado" />
 </template>
 
 <script>

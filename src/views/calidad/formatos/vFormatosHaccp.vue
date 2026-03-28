@@ -42,7 +42,7 @@
         </JdTable>
     </div>
 
-    <mFormato v-if="useModals.show?.mFormato" />
+    <mFormato v-if="useModals?.show?.mFormato" />
 </template>
 
 <script>

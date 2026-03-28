@@ -34,7 +34,7 @@ function genId(arr = []) {
 }
 
 function incompleteData(obj, p) {
-    // p = array de propiedades a evaluar
+    // p = array de propiedades a evaluar (soporta anidación con puntos: 'lote1.codigo')
     if (p === undefined) {
         for (let prop in obj) {
             if (obj[prop] === '' || obj[prop] === null || obj[prop] === undefined) {
@@ -43,9 +43,13 @@ function incompleteData(obj, p) {
             }
         }
     } else {
-        for (let a of p) {
-            if (obj[a] === '' || obj[a] === null || obj[a] === undefined) {
-                console.log(a + ': ' + obj[a])
+        for (let path of p) {
+            const value = path.split('.').reduce((acc, part) => {
+                return (acc !== null && acc !== undefined) ? acc[part] : undefined
+            }, obj)
+
+            if (value === '' || value === null || value === undefined) {
+                console.log(path + ': ' + value)
                 return true
             }
         }

@@ -1,14 +1,13 @@
 <template>
     <div class="pedido-items">
         <div class="agregar" v-if="vista.mode != 'view'">
-            <template v-if="vista.data.socio_pedido">
-                <JdButton
-                    icon="fa-solid fa-list-ul"
-                    text="Items del pedido"
-                    tipo="3"
-                    @click="openPedidoItems"
-                />
-            </template>
+            <JdButton
+                icon="fa-solid fa-list-ul"
+                text="Items del pedido"
+                tipo="3"
+                @click="openPedidoItems"
+                v-if="vista.data.socio_pedido"
+            />
 
             <JdButton
                 icon="fa-solid fa-wrench"
@@ -55,9 +54,9 @@
         </JdTable>
     </div>
 
-    <mPedidoItems v-if="modals.show?.mPedidoItems" @sendItems="agregarPedidoItems" />
+    <mPedidoItems v-if="modals?.show?.mPedidoItems" @sendItems="agregarPedidoItems" />
     <mTrasladoItemLotes
-        v-if="modals.show?.mTrasladoItemLotes"
+        v-if="modals?.show?.mTrasladoItemLotes"
         @sendItems="updateArticuloKardexes"
     />
 </template>

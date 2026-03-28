@@ -1,8 +1,8 @@
 <template>
     <VistaLayout :config="VIEW_CONFIG" :setQuery="setQuery" @runMethod="runMethod"> </VistaLayout>
 
-    <mDocumento v-if="modals.show?.mDocumento" />
-    <mPdfViewer v-if="modals.show?.mPdfViewer" />
+    <mDocumento v-if="modals?.show?.mDocumento" />
+    <mPdfViewer v-if="modals?.show?.mPdfViewer" />
 </template>
 
 <script>

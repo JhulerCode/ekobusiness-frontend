@@ -2,7 +2,7 @@
     <VistaLayout :config="VIEW_CONFIG" :setQuery="setQuery" @runMethod="runMethod"> </VistaLayout>
 
     <!-- Modales -->
-    <mPrecioCompra v-if="modals.show?.mPrecioCompra" />
+    <mPrecioCompra v-if="modals?.show?.mPrecioCompra" />
 </template>
 
 <script>

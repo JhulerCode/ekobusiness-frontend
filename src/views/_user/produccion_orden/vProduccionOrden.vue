@@ -126,7 +126,7 @@ import { useVistas } from '@/pinia/vistas'
 import { useModals } from '@/pinia/modals'
 import { useSystem } from '@/pinia/system'
 import { urls, get, post, patch } from '@/utils/crud'
-import { incompleteData, redondear } from '@/utils/mine'
+import { incompleteData } from '@/utils/mine'
 import { jmsg } from '@/utils/swal'
 import dayjs from 'dayjs'
 
@@ -222,6 +222,8 @@ export default {
                     name: this.$route.name,
                     params: { [this.vista.pathKey]: res.data.id },
                 })
+
+                this.vista.data.produccion_orden_insumos = []
             }
 
             this.vista.mode = 'view'
@@ -247,20 +249,24 @@ export default {
 
         //--- auxiliar methods ---//
         async elegirArticulo(a) {
-            if (a == null) {
-                this.vista.data.articulo_info = {}
-                this.vista.data.mrp_bom = null
-                this.vista.mrp_boms = []
-                this.vista.mrp_bom_lines = []
-                return
-            }
-
-            this.vista.data.articulo_info = a
-
-            await this.loadMrpBoms()
-            if (this.vista.mrp_boms.length > 0) {
-                this.vista.data.mrp_bom = this.vista.mrp_boms[0].id
-                await this.loadMrpBomLines()
+            if (this.is_nuevo) {
+                if (a == null) {
+                    this.vista.data.mrp_bom = null
+                    this.vista.mrp_boms = []
+                    this.vista.mrp_bom_lines = []
+                } else {
+                    await this.loadMrpBoms()
+                    if (this.vista.mrp_boms.length > 0) {
+                        this.vista.data.mrp_bom = this.vista.mrp_boms[0].id
+                        await this.loadMrpBomLines()
+                    }
+                }
+            } else {
+                if (a == null) {
+                    this.vista.data.articulo_info = {}
+                } else {
+                    this.vista.data.articulo_info = a
+                }
             }
         },
         elegirMaquina(a) {
@@ -372,7 +378,7 @@ export default {
                     fecha: this.vista.data.fecha,
                     articulo: a.articulo,
                     cantidad: this.vista.data.cantidad
-                        ? redondear(a.cantidad * this.vista.data.cantidad)
+                        ? (a.cantidad * this.vista.data.cantidad).toFixed(2)
                         : null,
                     // produccion_orden: this.vista.data.id,
                     maquina: this.vista.data.maquina,

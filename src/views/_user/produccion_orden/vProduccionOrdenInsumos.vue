@@ -1,12 +1,19 @@
 <template>
     <div class="pedido-items">
-        <div class="mrg-btm1" v-if="!is_nuevo">
+        <div class="agregar" v-if="!is_nuevo">
             <JdButton
                 icon="fa-solid fa-rotate-right"
                 text="Recargar"
-                tipo="2"
-                :small="true"
+                tipo="3"
                 @click="loadProduccionOrdenInsumos"
+            />
+
+            <JdButton
+                icon="fa-solid fa-list-ul"
+                text="Lista de materiales"
+                tipo="3"
+                @click="openMrpBomLines"
+                v-if="vista.data.mrp_bom"
             />
         </div>
 
@@ -21,21 +28,28 @@
             :agregarFila="vista.data.estado == 2 ? null : addLine"
         />
     </div>
+
+    <mMrpBomLines v-if="modals?.show?.mMrpBomLines" @sendItems="agregarFromBomLines" />
 </template>
 
 <script>
+import mMrpBomLines from './mMrpBomLines.vue'
+
 import { useSystem } from '@/pinia/system'
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
+import { useModals } from '@/pinia/modals'
 import { urls, get, post, delet } from '@/utils/crud'
 import { redondear, incompleteData } from '@/utils/mine'
 import { jmsg, jqst } from '@/utils/swal'
 
 export default {
+    components: { mMrpBomLines },
     data: () => ({
         useSystem: useSystem(),
         auth: useAuth(),
         vistas: useVistas(),
+        modals: useModals(),
         redondear,
     }),
     computed: {
@@ -63,6 +77,7 @@ export default {
                     select_query: {
                         search: this.loadArticulos,
                         elegir: this.elegirArticulo,
+                        disabled: (item) => !item.is_new,
                     },
                     show: true,
                 },
@@ -76,12 +91,13 @@ export default {
                 {
                     id: 'cantidad',
                     title: 'Cantidad',
-                    type: 'number',
+                    // type: 'number',
                     input: !this.is_nuevo,
                     toRight: true,
                     onchange: 'setLineEditingTrue',
-                    text: {
+                    number: {
                         toRight: true,
+                        disabled: (item) => !item.is_new,
                     },
                     width: '8rem',
                     show: true,
@@ -95,7 +111,7 @@ export default {
                         mostrar: 'lote_fv_stock',
                         elegir: this.elegirLote,
                         selectedObjectProp: 'lote1',
-                        // disabled: (item) => item.is_new != true,
+                        disabled: (item) => !item.is_new,
                     },
                     width: '22rem',
                     show: !this.is_nuevo,
@@ -257,6 +273,32 @@ export default {
             return false
         },
 
+        //--- auxiliar methods ---/
+        openMrpBomLines() {
+            const send = {
+                mrp_bom: this.vista.data.mrp_bom,
+            }
+            this.modals.setModal('mMrpBomLines', 'Lista de materiales', null, send, true)
+        },
+        agregarFromBomLines(items) {
+            for (const a of items) {
+                this.vista.data.produccion_orden_insumos.push({
+                    id: crypto.randomUUID(),
+                    tipo: 2,
+                    fecha: this.vista.data.fecha,
+                    articulo: a.articulo,
+                    articulo1: a.articulo1,
+                    cantidad: (a.cantidad * this.vista.data.cantidad).toFixed(2),
+                    produccion_orden: this.vista.data.id,
+                    maquina: this.vista.data.maquina,
+
+                    is_editing: true,
+                    is_new: true,
+                    tipo1: { id: 2, nombre: 'PRODUCCIÓN SALIDA' },
+                })
+            }
+        },
+
         //--- Auxiliar data ---//
         async loadArticulos(txtBuscar) {
             const qry = {
@@ -305,3 +347,11 @@ export default {
     },
 }
 </script>
+
+<style lang="scss" scoped>
+.agregar {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+</style>

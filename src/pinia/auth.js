@@ -117,6 +117,22 @@ export const useAuth = defineStore('auth', {
 
             qry.cols = columns.filter((a) => a.show).map((b) => b.id)
         },
+        applyListingRestriction(viewName, qry) {
+            // Si el usuario tiene el permiso de listar global, no aplicamos restricciones
+            if (this.verifyPermiso(`${viewName}:listar`)) return
+
+            // Buscamos permisos con el patrón "vista:listar:columna"
+            // Por ejemplo: "vProduccionOrdenes:listar:responsable"
+            const prefix = `${viewName}:listar:`
+            const restrictedPermiso = this.usuario?.permisos?.find((p) => p.startsWith(prefix))
+
+            if (restrictedPermiso) {
+                const column = restrictedPermiso.split(':').pop()
+                if (column) {
+                    qry.fltr[column] = { op: 'Es', val: this.usuario.colaborador }
+                }
+            }
+        },
         async saveTableColumns(tableName, columns) {
             if (!tableName) return
 

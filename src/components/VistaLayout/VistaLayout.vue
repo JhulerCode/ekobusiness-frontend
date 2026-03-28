@@ -66,9 +66,9 @@
     </div>
 
     <!-- Modales vista -->
-    <mConfigCols v-if="modals.show?.mConfigCols" />
-    <mConfigFiltros v-if="modals.show?.mConfigFiltros" />
-    <mEditar v-if="modals.show?.mEditar" @updated="updatedBulk" />
+    <mConfigCols v-if="modals?.show?.mConfigCols" />
+    <mConfigFiltros v-if="modals?.show?.mConfigFiltros" />
+    <mEditar v-if="modals?.show?.mEditar" @updated="updatedBulk" />
 </template>
 
 <script setup>

@@ -4,7 +4,6 @@
             :columns="columns"
             :datos="modal.articulos || []"
             :rowSelectable="true"
-
             :reload="loadPedidoItems"
             maxHeight="30rem"
         />
@@ -36,7 +35,6 @@ export default {
                 prop: 'articulo1.nombre',
                 width: '25rem',
                 show: true,
-
                 sort: true,
             },
             {

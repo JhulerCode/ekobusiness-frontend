@@ -1,7 +1,7 @@
 <template>
     <VistaLayout :config="VIEW_CONFIG" :setQuery="setQuery" @runMethod="runMethod"> </VistaLayout>
 
-    <mProductosCuarentena v-if="modals?.show?.mProductosCuarentena" @liberado="liberarLote" />
+    <mProductosCuarentena v-if="modals?.show?.mProductosCuarentena" />
     <mProduccionTrazabilidad v-if="modals?.show?.mProduccionTrazabilidad" />
 </template>
 
@@ -47,20 +47,25 @@ export default {
         },
         setQuery() {
             this.vista.qry = {
-                fltr: { tipo: { op: 'Es', val: 4 } },
-                incl: ['articulo1', 'produccion_orden1', 'maquina1'],
+                fltr: {
+                    tipo: { op: 'Es', val: 4 },
+                    pt_cuarentena: { op: 'Es', val: false },
+                },
+                incl: ['articulo1', 'lote1', 'produccion_orden1', 'maquina1'],
+                iccl: {
+                    produccion_orden1: {
+                        incl: ['linea1', 'responsable1'],
+                    },
+                },
                 ordr: [
                     ['fecha', 'DESC'],
                     ['createdAt', 'DESC'],
                 ],
-                iccl: {
-                    produccion_orden1: { incl: ['linea1'] },
-                },
                 page: this.vista.table_page,
             }
 
             this.auth.updateQuery(this.vista.tableColumns, this.vista.qry)
-            this.vista.qry.cols.push('produccion_orden')
+            this.vista.qry.cols.push('tipo', 'produccion_orden')
         },
 
         //--- Header actions ---//

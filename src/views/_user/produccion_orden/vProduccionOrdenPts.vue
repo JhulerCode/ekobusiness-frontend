@@ -26,8 +26,8 @@
 import { useSystem } from '@/pinia/system'
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
-import { urls, get, post, delet } from '@/utils/crud'
-import { redondear, incompleteData, obtenerNumeroJuliano } from '@/utils/mine'
+import { urls, get, post, patch, delet } from '@/utils/crud'
+import { redondear, incompleteData, obtenerNumeroJuliano, deepCopy } from '@/utils/mine'
 import { jmsg, jqst } from '@/utils/swal'
 
 export default {
@@ -48,7 +48,7 @@ export default {
                     title: 'Lote',
                     input: true,
                     text: {
-                        disabled: (item) => !item.is_new,
+                        disabled: (item) => item._state === 'view',
                     },
                     width: '20rem',
                     show: true,
@@ -58,7 +58,7 @@ export default {
                     title: 'F. Vencimiento',
                     input: true,
                     date: {
-                        disabled: (item) => !item.is_new,
+                        disabled: (item) => item._state === 'view',
                     },
                     width: '15rem',
                     show: true,
@@ -69,10 +69,19 @@ export default {
                     toRight: true,
                     input: true,
                     number: {
-                        disabled: (item) => !item.is_new,
+                        disabled: (item) => item._state === 'view',
                         toRight: true,
                     },
                     width: '8rem',
+                    show: true,
+                },
+                {
+                    id: 'pt_cuarentena',
+                    title: 'Estado',
+                    prop: 'pt_cuarentena1.nombre',
+                    format: 'estado',
+                    color: 'pt_cuarentena1.color',
+                    width: '9rem',
                     show: true,
                 },
             ]
@@ -85,12 +94,25 @@ export default {
                     icon: 'fa-solid fa-trash-can',
                     title: 'Eliminar',
                     action: 'removeLine',
+                    ocultar: { _state: 'edit' },
+                },
+                {
+                    icon: 'fa-solid fa-xmark',
+                    title: 'Cancelar',
+                    action: 'cancelEditLine',
+                    ocultar: { _state: ['new', 'view'] },
                 },
                 {
                     icon: 'fa-solid fa-floppy-disk',
-                    title: 'GUardar',
+                    title: 'Guardar',
                     action: 'saveLine',
-                    ocultar: { is_editing: false },
+                    ocultar: { _state: 'view' },
+                },
+                {
+                    icon: 'fa-solid fa-pen-to-square',
+                    title: 'Editar',
+                    action: 'editLine',
+                    ocultar: { _state: ['new', 'edit'] },
                 },
             ]
         },
@@ -104,6 +126,8 @@ export default {
                 }
             }, 100)
         }
+
+        this.useSystem.load(['kardex_operaciones', 'pt_cuarentena_estados'])
     },
     methods: {
         runMethod(method, item) {
@@ -117,7 +141,7 @@ export default {
                     produccion_orden: { op: 'Es', val: this.$route.params[this.vista.pathKey] },
                     tipo: { op: 'Es', val: 4 },
                 },
-                cols: ['tipo', 'fecha', 'articulo', 'lote_id', 'cantidad'],
+                cols: ['tipo', 'fecha', 'articulo', 'lote_id', 'cantidad', 'pt_cuarentena'],
                 incl: ['articulo1', 'lote1'],
             }
 
@@ -129,10 +153,15 @@ export default {
 
             this.vista.data.produccion_orden_pts = res.data.map((a) => ({
                 ...a,
-                is_editing: false,
+                _state: 'view',
             }))
         },
         async addLine() {
+            const tipo1 = this.useSystem.data.kardex_operaciones.find((a) => a.id == 2)
+            const pt_cuarentena1 = this.useSystem.data.pt_cuarentena_estados.find(
+                (a) => a.id == this.auth.empresa.produccion_pt_cuarentena,
+            )
+
             this.vista.data.produccion_orden_pts.push({
                 id: crypto.randomUUID(),
                 tipo: 4,
@@ -140,19 +169,20 @@ export default {
                 produccion_orden: this.vista.data.id,
                 maquina: this.vista.data.maquina,
                 articulo: this.vista.data.articulo,
+                pt_cuarentena: this.auth.empresa.produccion_pt_cuarentena,
 
-                is_editing: true,
-                is_new: true,
-                tipo1: { id: 2, nombre: 'PRODUCCIÓN SALIDA' },
+                _state: 'new',
+                tipo1,
                 lote1: {
                     id: crypto.randomUUID(),
                     articulo: this.vista.data.articulo,
-                    codigo: this.setLote(),
+                    codigo: this.elegirLote(),
                 },
+                pt_cuarentena1,
             })
         },
         async removeLine(fila) {
-            if (!fila.is_new) {
+            if (fila._state !== 'new') {
                 const resQst = await jqst('¿Está seguro de eliminar?')
                 if (resQst.isConfirmed == false) return
 
@@ -175,36 +205,59 @@ export default {
         },
         async saveLine(fila) {
             if (this.checkDatos(fila)) return
-            // console.log(fila)
-            this.auth.setLoading(true, 'Cargando...')
+            this.auth.setLoading(true, 'Guardando...')
 
-            const send = { ...fila, lote_id: fila.lote1.id }
             let res
-            // if (fila.is_new) {
-            res = await post(urls.kardex, send)
-            // } else {
-            //     res = await patch(urls.kardex, send)
-            // }
+            if (fila._state === 'new') {
+                res = await post(urls.kardex, fila)
+            } else {
+                const send = {
+                    id: fila.id,
+                    tipo: fila.tipo,
+                    cantidad: fila.cantidad,
+                    lote_id: fila.lote1.id,
+                    lote1: fila.lote1,
+                }
+                res = await patch(urls.kardex, send)
+            }
 
             this.auth.setLoading(false)
 
             if (res.code != 0) return
 
             const i = this.vista.data.produccion_orden_pts.findIndex((a) => a.id == fila.id)
-            this.vista.data.produccion_orden_pts[i].is_editing = false
-            this.vista.data.produccion_orden_pts[i].is_new = false
+            this.vista.data.produccion_orden_pts[i]._state = 'view'
+            if (this.vista.data.produccion_orden_pts[i]._backup) {
+                delete this.vista.data.produccion_orden_pts[i]._backup
+            }
+        },
+        editLine(fila) {
+            const i = this.vista.data.produccion_orden_pts.findIndex((a) => a.id == fila.id)
+            this.vista.data.produccion_orden_pts[i]._backup = deepCopy(fila)
+            this.vista.data.produccion_orden_pts[i]._state = 'edit'
+        },
+        cancelEditLine(fila) {
+            const i = this.vista.data.produccion_orden_pts.findIndex((a) => a.id == fila.id)
+            if (this.vista.data.produccion_orden_pts[i]._backup) {
+                Object.assign(
+                    this.vista.data.produccion_orden_pts[i],
+                    this.vista.data.produccion_orden_pts[i]._backup,
+                )
+                delete this.vista.data.produccion_orden_pts[i]._backup
+            }
+            this.vista.data.produccion_orden_pts[i]._state = 'view'
         },
 
         //--- methods ---//
-        // setEditingTrue(fila) {
-        //     const i = this.vista.data.produccion_orden_pts.findIndex((a) => a.id == fila.id)
-        //     this.vista.data.produccion_orden_pts[i].is_editing = true
-        // },
-        setLote() {
+        elegirLote() {
             return `${obtenerNumeroJuliano(this.vista.data.fecha)}-${Math.floor(Math.random() * 90 + 10)}`
         },
         checkDatos(fila) {
-            const props = ['articulo', 'cantidad']
+            const props = ['articulo', 'lote1.codigo', 'cantidad']
+
+            if (this.vista.data.articulo1.has_fv) {
+                props.push('lote1.fv')
+            }
 
             if (incompleteData(fila, props)) {
                 jmsg('warning', 'Ingrese los datos necesarios')

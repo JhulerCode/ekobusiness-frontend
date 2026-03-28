@@ -105,12 +105,12 @@ export default {
                 show: true,
             },
             {
-                id: 'producto_estado',
+                id: 'pt_cuarentena',
                 title: 'Estado',
-                prop: 'producto_estado1.nombre',
+                prop: 'pt_cuarentena1.nombre',
                 format: 'estado',
-                color: 'producto_estado1.color',
-                width: '8rem',
+                color: 'pt_cuarentena1.color',
+                width: '9rem',
                 show: true,
             },
         ],
@@ -149,6 +149,7 @@ export default {
                 produccion_orden: this.modal.produccion_orden.id,
                 maquina: this.modal.produccion_orden.maquina,
                 articulo: this.modal.produccion_orden.articulo,
+                pt_cuarentena: this.useAuth.empresa.produccion_pt_cuarentena,
 
                 lote1: {
                     id: crypto.randomUUID(),
@@ -168,7 +169,7 @@ export default {
                     tipo: { op: 'Es', val: 4 },
                     produccion_orden: { op: 'Es', val: this.modal.produccion_orden.id },
                 },
-                cols: ['tipo', 'cantidad', 'lote_id', 'is_lote_padre', 'producto_estado'],
+                cols: ['tipo', 'cantidad', 'lote_id', 'pt_cuarentena'],
                 incl: ['lote1'],
             }
 
@@ -212,15 +213,8 @@ export default {
 
             return false
         },
-        shapeDatos() {
-            if (this.modal.direct_approve) {
-                this.modal.transaccion_item.is_lote_padre = true
-                this.modal.transaccion_item.stock = this.modal.transaccion_item.cantidad
-            }
-        },
         async grabar() {
             if (this.checkDatos()) return
-            this.shapeDatos()
 
             const send = {
                 ...this.modal.transaccion_item,

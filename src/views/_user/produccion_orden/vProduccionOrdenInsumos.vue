@@ -39,8 +39,8 @@ import { useSystem } from '@/pinia/system'
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
 import { useModals } from '@/pinia/modals'
-import { urls, get, post, delet } from '@/utils/crud'
-import { redondear, incompleteData } from '@/utils/mine'
+import { urls, get, post, patch, delet } from '@/utils/crud'
+import { redondear, incompleteData, deepCopy } from '@/utils/mine'
 import { jmsg, jqst } from '@/utils/swal'
 
 export default {
@@ -72,12 +72,12 @@ export default {
                     id: 'articulo',
                     title: 'Artículo',
                     width: '30rem',
-                    input: !this.is_nuevo,
+                    input: true,
                     prop: 'articulo1.nombre',
                     select_query: {
                         search: this.loadArticulos,
                         elegir: this.elegirArticulo,
-                        disabled: (item) => !item.is_new,
+                        disabled: (item) => item._state === 'view',
                     },
                     show: true,
                 },
@@ -92,12 +92,11 @@ export default {
                     id: 'cantidad',
                     title: 'Cantidad',
                     // type: 'number',
-                    input: !this.is_nuevo,
+                    input: true,
                     toRight: true,
-                    onchange: 'setLineEditingTrue',
                     number: {
                         toRight: true,
-                        disabled: (item) => !item.is_new,
+                        disabled: (item) => item._state === 'view',
                     },
                     width: '8rem',
                     show: true,
@@ -111,7 +110,7 @@ export default {
                         mostrar: 'lote_fv_stock',
                         elegir: this.elegirLote,
                         selectedObjectProp: 'lote1',
-                        disabled: (item) => !item.is_new,
+                        disabled: (item) => item._state === 'view',
                     },
                     width: '22rem',
                     show: !this.is_nuevo,
@@ -133,18 +132,25 @@ export default {
                     icon: 'fa-solid fa-trash-can',
                     title: 'Eliminar',
                     action: 'removeLine',
+                    ocultar: { _state: 'edit' },
                 },
-                // {
-                //     icon: 'fa-solid fa-rotate-left',
-                //     title: 'Devolución',
-                //     action: 'devolver',
-                //     ocultar: { is_editing: true, tipo: 3 },
-                // },
+                {
+                    icon: 'fa-solid fa-xmark',
+                    title: 'Cancelar',
+                    action: 'cancelEditLine',
+                    ocultar: { _state: ['new', 'view'] },
+                },
                 {
                     icon: 'fa-solid fa-floppy-disk',
-                    title: 'GUardar',
+                    title: 'Guardar',
                     action: 'saveLine',
-                    ocultar: { is_editing: false },
+                    ocultar: { _state: 'view' },
+                },
+                {
+                    icon: 'fa-solid fa-pen-to-square',
+                    title: 'Editar',
+                    action: 'editLine',
+                    ocultar: { _state: ['new', 'edit'] },
                 },
             ]
         },
@@ -183,7 +189,7 @@ export default {
 
             this.vista.data.produccion_orden_insumos = res.data.map((a) => ({
                 ...a,
-                is_editing: false,
+                _state: 'view',
             }))
         },
         async addLine() {
@@ -194,13 +200,12 @@ export default {
                 produccion_orden: this.vista.data.id,
                 maquina: this.vista.data.maquina,
 
-                is_editing: true,
-                is_new: true,
+                _state: 'new',
                 tipo1: { id: 2, nombre: 'PRODUCCIÓN SALIDA' },
             })
         },
         async removeLine(fila) {
-            if (!fila.is_new) {
+            if (fila._state !== 'new') {
                 const resQst = await jqst('¿Está seguro de eliminar?')
                 if (resQst.isConfirmed == false) return
 
@@ -223,38 +228,61 @@ export default {
         },
         async saveLine(fila) {
             if (this.checkDatos(fila)) return
-            // console.log(fila)
-            this.auth.setLoading(true, 'Cargando...')
+            this.auth.setLoading(true, 'Guardando...')
 
             let res
-            // if (fila.is_new) {
-            res = await post(urls.kardex, fila)
-            // } else {
-            //     res = await patch(urls.kardex, fila)
-            // }
+            if (fila._state === 'new') {
+                res = await post(urls.kardex, fila)
+            } else {
+                const send = {
+                    id: fila.id,
+                    tipo: fila.tipo,
+                    articulo: fila.articulo,
+                    cantidad: fila.cantidad,
+                    lote_id: fila.lote1.id,
+                    lote1: fila.lote1,
+                }
+                res = await patch(urls.kardex, send)
+            }
 
             this.auth.setLoading(false)
 
             if (res.code != 0) return
 
             const i = this.vista.data.produccion_orden_insumos.findIndex((a) => a.id == fila.id)
-            this.vista.data.produccion_orden_insumos[i].is_editing = false
-            this.vista.data.produccion_orden_insumos[i].is_new = false
+            this.vista.data.produccion_orden_insumos[i]._state = 'view'
+            if (this.vista.data.produccion_orden_insumos[i]._backup) {
+                delete this.vista.data.produccion_orden_insumos[i]._backup
+            }
+        },
+        editLine(fila) {
+            const i = this.vista.data.produccion_orden_insumos.findIndex((a) => a.id == fila.id)
+            this.vista.data.produccion_orden_insumos[i]._backup = deepCopy(fila)
+            this.vista.data.produccion_orden_insumos[i]._state = 'edit'
+        },
+        cancelEditLine(fila) {
+            const i = this.vista.data.produccion_orden_insumos.findIndex((a) => a.id == fila.id)
+            if (this.vista.data.produccion_orden_insumos[i]._backup) {
+                Object.assign(
+                    this.vista.data.produccion_orden_insumos[i],
+                    this.vista.data.produccion_orden_insumos[i]._backup,
+                )
+                delete this.vista.data.produccion_orden_insumos[i]._backup
+            }
+            this.vista.data.produccion_orden_insumos[i]._state = 'view'
         },
 
         //--- methods ---//
-        setLineEditingTrue(fila) {
-            const i = this.vista.data.produccion_orden_insumos.findIndex((a) => a.id == fila.id)
-            this.vista.data.produccion_orden_insumos[i].is_editing = true
-        },
         elegirArticulo(data, fila) {
             const i = this.vista.data.produccion_orden_insumos.findIndex((a) => a.id == fila.id)
-            this.vista.data.produccion_orden_insumos[i].is_editing = true
             this.vista.data.produccion_orden_insumos[i].articulo1 = data
+
+            this.vista.data.produccion_orden_insumos[i].lote_id = null
+            this.vista.data.produccion_orden_insumos[i].lote1 = null
         },
         elegirLote(data, fila) {
             const i = this.vista.data.produccion_orden_insumos.findIndex((a) => a.id == fila.id)
-            this.vista.data.produccion_orden_insumos[i].is_editing = true
+            this.vista.data.produccion_orden_insumos[i].lote_id = data.id
             this.vista.data.produccion_orden_insumos[i].lote1 = data
         },
         checkDatos(fila) {
@@ -292,8 +320,7 @@ export default {
                     produccion_orden: this.vista.data.id,
                     maquina: this.vista.data.maquina,
 
-                    is_editing: true,
-                    is_new: true,
+                    _state: 'new',
                     tipo1: { id: 2, nombre: 'PRODUCCIÓN SALIDA' },
                 })
             }

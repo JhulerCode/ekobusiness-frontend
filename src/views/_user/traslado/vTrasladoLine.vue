@@ -43,7 +43,7 @@
                     <ul>
                         <li v-for="(a, i) in item.kardexes" :key="i">
                             <div>
-                                {{ a.lote1?.lote_fv }}
+                                {{ a.lote1.codigo }} {{ a.lote1.fv ? ' | ' + a.lote1.fv : '' }}
                                 {{ i == item.kardexes.length - 1 ? '' : ',' }}
                             </div>
                             <div>({{ a.cantidad }})</div>

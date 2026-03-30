@@ -12,7 +12,6 @@ import JdTable from '@/components/JdTable/JdTable.vue'
 import VistaLayout from '@/components/VistaLayout/VistaLayout.vue'
 import VistaDetalleLayout from '@/components/VistaDetalleLayout.vue'
 import {
-    JdButton,
     JdInputPassword,
     JdSwitch,
     JdTextArea,
@@ -29,6 +28,7 @@ import JdSelectQuery from '@/components/inputs/JdSelectQuery.vue'
 import JdCheckBox from '@/components/inputs/JdCheckBox.vue'
 import JdInputFile from '@/components/inputs/JdInputFile.vue'
 import JdInputImage from '@/components/inputs/JdInputImage.vue'
+import JdButton from '@/components/inputs/JdButton.vue'
 
 createApp(App)
     .use(router)

@@ -4,6 +4,7 @@ export default {
     pathKey: 'articulo_id',
     permisoEditar: ['vArticulos:editar'],
     permisoClonar: ['vArticulos:clonar'],
+    permisoEliminar: ['vArticulos:eliminar'],
 
     headerActions: [
         {

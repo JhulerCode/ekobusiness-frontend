@@ -181,6 +181,7 @@ export default {
 
         //--- Header actions ---//
         async guardar() {
+            console.log('ASD')
             if (this.checkDatos()) return
             this.shapeDatos()
 

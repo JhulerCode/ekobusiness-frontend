@@ -4,7 +4,10 @@
             <div class="header-left" style="flex-wrap: nowrap">
                 <strong style="white-space: nowrap">{{ resolvedTitle }}</strong>
 
-                <slot name="header-left"></slot>
+                <JdButtonsOverflow
+                    :actions="headerLeftActions"
+                    @actionSelected="handleHeaderLeftAction"
+                />
             </div>
 
             <div class="header-right">
@@ -50,7 +53,8 @@ import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
-import { urls } from '@/utils/crud'
+import { urls, delet } from '@/utils/crud'
+import { jqst } from '@/utils/swal'
 import { buttonVerifyPermission } from '@/utils/mine'
 
 import JdButtonsOverflow from './VistaLayout/JdButtonsOverflow.vue'
@@ -93,6 +97,7 @@ async function loadData() {
         vista.mode = 'view'
 
         if (vista.last_path != route.fullPath) {
+            vista.data = {}
             await props.loadExistingData()
         }
         if (!vista.data.id) return auth.goBack(router)
@@ -101,34 +106,35 @@ async function loadData() {
     vista.last_path = route.fullPath
 }
 
-//--- Header actions ---//
-const headerActions = computed(() => {
-    // if (!vista.data.id) return []
-
+//--- Left header actions ---//
+const headerLeftActions = computed(() => {
     const isEdit = vista?.mode === 'edit'
 
-    let configHeaderActions = []
-    if (props.config.headerActions) {
-        configHeaderActions = props.config.headerActions.map((a) => ({
-            ...a,
-            show: !isEdit && buttonVerifyPermission(vista.data, a),
-        }))
-    }
-
     return [
-        ...configHeaderActions,
         {
-            text: 'Clonar',
-            action: 'clonar',
-            tipo: '2',
-            icon: 'fa-solid fa-copy',
-            show: !isEdit && auth.verifyPermiso(props.config.permisoClonar),
+            text: 'Nuevo',
+            action: 'nuevo',
+            show: !isEdit,
         },
         {
             text: 'Editar',
-            action: 'editar',
+            tipo: '2',
             icon: 'fa-solid fa-pen-to-square',
+            action: 'editar',
             show: !isEdit && auth.verifyPermiso(props.config.permisoEditar),
+        },
+        {
+            text: 'Clonar',
+            tipo: '2',
+            icon: 'fa-solid fa-copy',
+            action: 'clonar',
+            show: !isEdit && auth.verifyPermiso(props.config.permisoClonar),
+        },
+        {
+            text: 'Guardar',
+            icon: 'fa-solid fa-floppy-disk',
+            action: 'guardar',
+            show: isEdit,
         },
         {
             text: 'Cancelar',
@@ -138,13 +144,28 @@ const headerActions = computed(() => {
             show: isEdit,
         },
         {
-            text: 'Guardar',
-            action: 'guardar',
-            icon: 'fa-solid fa-floppy-disk',
-            show: isEdit,
+            text: 'Eliminar',
+            tipo: '2',
+            icon: 'fa-solid fa-trash',
+            action: 'eliminar',
+            show: !isEdit && auth.verifyPermiso(props.config.permisoEliminar),
+        },
+        {
+            text: 'Recargar',
+            icon: 'fa-solid fa-rotate-right',
+            tipo: '2',
+            action: 'recargar',
+            show: !isEdit && route.params[props.config.pathKey] !== 'nuevo',
         },
     ]
 })
+
+function nuevo() {
+    vista.original_data = JSON.parse(JSON.stringify(vista.data))
+    router.push({ name: viewName, params: { [vista.pathKey]: 'nuevo' } })
+    vista.data = {}
+    vista.mode = 'edit'
+}
 
 function editar() {
     vista.original_data = JSON.parse(JSON.stringify(vista.data))
@@ -167,11 +188,30 @@ function clonar() {
     vista.mode = 'edit'
 }
 
-const handleHeaderAction = (action, item) => {
+async function eliminar() {
+    const resQst = await jqst('¿Está seguro de eliminar?')
+    if (resQst.isConfirmed == false) return
+
+    auth.setLoading(true, 'Eliminando...')
+    const res = await delet(vista?.apiUrl, vista.data)
+    auth.setLoading(false)
+
+    if (res.code === 0) auth.goBack(router)
+}
+
+function recargar() {
+    props.loadExistingData()
+    if (!vista.data.id) auth.goBack(router)
+}
+
+const handleHeaderLeftAction = (action, item) => {
     const localActions = {
+        nuevo,
         editar,
         cancelar,
         clonar,
+        eliminar,
+        recargar,
     }
 
     if (localActions[action]) {
@@ -179,6 +219,27 @@ const handleHeaderAction = (action, item) => {
         return
     }
 
+    emit('runMethod', action, item)
+}
+
+//--- Header actions ---//
+const headerActions = computed(() => {
+    // if (!vista.data.id) return []
+
+    const isEdit = vista?.mode === 'edit'
+
+    let configHeaderActions = []
+    if (props.config.headerActions) {
+        configHeaderActions = props.config.headerActions.map((a) => ({
+            ...a,
+            show: !isEdit && buttonVerifyPermission(vista.data, a),
+        }))
+    }
+
+    return configHeaderActions
+})
+
+const handleHeaderAction = (action, item) => {
     emit('runMethod', action, item)
 }
 
@@ -205,29 +266,48 @@ const handleTabClick = (tabId) => {
 }
 
 .header {
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem 2rem;
     padding: 1rem 2rem;
     background-color: var(--bg-color);
     border-bottom: var(--border);
+
+    @media (min-width: 1024px) {
+        grid-template-columns: 1fr 1fr;
+    }
 
     .header-left {
         display: flex;
         align-items: center;
         gap: 0.5rem;
+        min-width: 0;
 
         strong {
             font-size: 1.4rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            min-width: 0;
+            flex-shrink: 1;
+        }
+
+        /* El componente JdButtonsOverflow se muestra normalmente */
+        & > :last-child {
+            flex-shrink: 0;
         }
     }
 
     .header-right {
-        flex: 1;
-        min-width: 0;
         display: flex;
         align-items: center;
-        justify-content: end;
+        justify-content: start;
         gap: 1rem;
+        min-width: 0;
+
+        @media (min-width: 1024px) {
+            justify-content: end;
+        }
     }
 }
 

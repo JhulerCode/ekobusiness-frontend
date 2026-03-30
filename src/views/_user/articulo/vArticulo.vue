@@ -82,8 +82,8 @@ import vArticuloInventario from './vArticuloInventario.vue'
 import vArticuloProduccion from './vArticuloProduccion.vue'
 import vArticuloComponentes from './vArticuloComponentes.vue'
 
-import mLotes from '@/views/inventario/articulos/mLotes.vue'
-import mAjusteStock from '@/views/inventario/articulos/mAjusteStock.vue'
+import mLotes from '../articulos/mLotes.vue'
+import mAjusteStock from '../articulos/mAjusteStock.vue'
 import mUploadFiles from '@/components/mUploadFiles.vue'
 
 import VIEW_CONFIG from './articulo.config.js'

@@ -1,6 +1,4 @@
 export default {
-    name: 'vAdminSuscripciones',
-    title: 'Suscripciones',
     apiPath: 'suscripciones',
 
     headerActions: [

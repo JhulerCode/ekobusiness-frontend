@@ -8,7 +8,7 @@ export default {
             label: 'Proveedores',
             goto: 'vProveedores',
             path: 'proveedores',
-            view: '_user/socios/vSocios.vue',
+            view: 'socios/vSocios.vue',
             permisos: [
                 { id: 'vProveedores:listar', label: 'Listar' },
                 { id: 'vProveedores:crear', label: 'Crear' },

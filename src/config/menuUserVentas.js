@@ -8,7 +8,7 @@ export default {
             label: 'Clientes',
             goto: 'vClientes',
             path: 'clientes',
-            view: '_user/socios/vSocios.vue',
+            view: 'socios/vSocios.vue',
             permisos: [
                 { id: 'vClientes:listar', label: 'Listar' },
                 { id: 'vClientes:crear', label: 'Crear' },

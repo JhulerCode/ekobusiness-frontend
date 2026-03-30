@@ -49,21 +49,19 @@
 </template>
 
 <script>
-import VIEW_CONFIG from './empresa.config.js'
-
 import vEmpresaGeneral from './vEmpresaGeneral.vue'
 import vEmpresaSocial from './vEmpresaSocial.vue'
 import vEmpresaDirecciones from './vEmpresaDirecciones.vue'
 import vEmpresaBancos from './vEmpresaBancos.vue'
 import vEmpresaModulos from './vEmpresaModulos.vue'
 
+import VIEW_CONFIG from './empresa.config.js'
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
 import { urls, get, post, patch } from '@/utils/crud'
 import { incompleteData } from '@/utils/mine.js'
 
 export default {
-    name: 'vEmpresa',
     components: {
         vEmpresaGeneral,
         vEmpresaSocial,
@@ -98,6 +96,9 @@ export default {
             return this.$route.params[this.vista.pathKey] === 'nuevo'
         },
     },
+    created() {
+        console.log(this.$route.name)
+    },
     methods: {
         runMethod(method, item) {
             this[method](item)
@@ -116,6 +117,8 @@ export default {
             this.auth.setLoading(true, 'Cargando datos de empresa...')
             const res = await get(`${urls.empresas}/uno/${id}`)
             this.auth.setLoading(false)
+
+            console.log('ASD', res.data)
 
             if (res.code === 0 && res.data) {
                 this.vista.data = res.data

@@ -90,7 +90,6 @@ import { incompleteData } from '@/utils/mine'
 import { jmsg } from '@/utils/swal'
 
 export default {
-    name: 'mAdminSuscripcion',
     data: () => ({
         useAuth: useAuth(),
         useModals: useModals(),

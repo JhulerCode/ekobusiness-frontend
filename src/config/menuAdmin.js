@@ -9,7 +9,7 @@ export default [
                 label: 'Empresas',
                 goto: 'vAdminEmpresas',
                 path: 'empresas',
-                view: '_admin/empresas/vAdminEmpresas.vue',
+                view: '_user/empresas/vEmpresas.vue',
                 permisos: [
                     { id: 'vAdminEmpresas:listar', label: 'Listar' },
                     { id: 'vAdminEmpresas:ver', label: 'Ver' },
@@ -22,7 +22,7 @@ export default [
                         label: 'Detalle Empresa',
                         goto: 'vAdminEmpresa',
                         path: ':empresa_id',
-                        view: 'configuracion/empresa/vEmpresa.vue',
+                        view: '_user/empresa/vEmpresa.vue',
                         showInMenu: false,
                         permission: ['vAdminEmpresas:ver', 'vAdminEmpresas:crear'],
                         viewType: 'detail',
@@ -33,7 +33,7 @@ export default [
                 label: 'Suscripciones',
                 goto: 'vAdminSuscripciones',
                 path: 'suscripciones',
-                view: '_admin/suscripciones/vAdminSuscripciones.vue',
+                view: '_admin/suscripciones/vSuscripciones.vue',
                 permisos: [
                     { id: 'vAdminSuscripciones:listar', label: 'Listar' },
                     { id: 'vAdminSuscripciones:crear', label: 'Crear' },

@@ -2,13 +2,13 @@
     <VistaLayout :config="VIEW_CONFIG" :setQuery="setQuery" @runMethod="runMethod"> </VistaLayout>
 
     <!-- Modales -->
-    <mAdminSuscripcion v-if="modals?.show?.mAdminSuscripcion" />
+    <mSuscripcion v-if="modals?.show?.mSuscripcion" />
 </template>
 
 <script>
-import mAdminSuscripcion from './mAdminSuscripcion.vue'
+import mSuscripcion from './mSuscripcion.vue'
 
-import VIEW_CONFIG from './adminSuscripciones.config.js'
+import VIEW_CONFIG from './suscripciones.config.js'
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
 import { useModals } from '@/pinia/modals'
@@ -16,16 +16,15 @@ import { get } from '@/utils/crud'
 import dayjs from 'dayjs'
 
 export default {
-    name: 'vAdminSuscripciones',
     components: {
-        mAdminSuscripcion,
+        mSuscripcion,
     },
     computed: {
         auth: () => useAuth(),
         vistas: () => useVistas(),
         modals: () => useModals(),
         vista() {
-            return this.vistas[VIEW_CONFIG.name]
+            return this.vistas[this.$route.name]
         },
     },
     data: () => ({
@@ -56,7 +55,7 @@ export default {
                     fecha_vencimiento: dayjs().add(1, 'month').format('YYYY-MM-DD'),
                 },
             }
-            this.modals.setModal('mAdminSuscripcion', 'Nueva Suscripción Global', 1, send, true)
+            this.modals.setModal('mSuscripcion', 'Nueva Suscripción Global', 1, send, true)
         },
 
         //--- Row actions ---//
@@ -75,7 +74,7 @@ export default {
                 suscripcion: { ...res.data },
             }
 
-            this.modals.setModal('mAdminSuscripcion', 'Editar Suscripción Global', 2, send, true)
+            this.modals.setModal('mSuscripcion', 'Editar Suscripción Global', 2, send, true)
         },
     },
 }

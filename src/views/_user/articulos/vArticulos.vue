@@ -15,8 +15,8 @@
 </template>
 
 <script>
-import mImportarArticulos from '@/views/inventario/articulos/mImportarArticulos.vue'
-import mLotes from '@/views/inventario/articulos/mLotes.vue'
+import mImportarArticulos from './mImportarArticulos.vue'
+import mLotes from './mLotes.vue'
 
 import VIEW_CONFIG from './articulos.config.js'
 import { useAuth } from '@/pinia/auth'

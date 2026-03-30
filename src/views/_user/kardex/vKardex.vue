@@ -16,7 +16,6 @@ import { useModals } from '@/pinia/modals'
 import { jmsg } from '@/utils/swal'
 
 export default {
-    name: 'vKardex',
     data: () => ({
         VIEW_CONFIG,
         articulo_id: null,

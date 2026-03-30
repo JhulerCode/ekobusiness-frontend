@@ -71,7 +71,6 @@ const emit = defineEmits(['runMethod'])
 
 //--- Inicialización de la vista ---//
 const viewName = route.name
-
 vistas.updateVista(viewName, {
     ...JSON.parse(JSON.stringify(props.config)),
     apiUrl: urls[props.config.apiPath],

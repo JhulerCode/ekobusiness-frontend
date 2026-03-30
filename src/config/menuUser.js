@@ -195,7 +195,8 @@ export default [
                 label: 'Mi empresa',
                 goto: 'vEmpresa',
                 path: 'empresa',
-                view: 'configuracion/empresa/vEmpresa.vue',
+                view: '_user/empresa/vEmpresa.vue',
+                viewType: 'detail',
                 permisos: [
                     { id: 'vEmpresa:ver', label: 'Ver' },
                     { id: 'vEmpresa:editar', label: 'Editar' },
@@ -205,7 +206,7 @@ export default [
                 label: 'Suscripciones',
                 goto: 'vSuscripciones',
                 path: 'suscripciones',
-                view: 'configuracion/suscripciones/vSuscripciones.vue',
+                view: '_user/suscripciones/vSuscripciones.vue',
                 permisos: [{ id: 'vSuscripciones:listar', label: 'Listar' }],
             },
         ],

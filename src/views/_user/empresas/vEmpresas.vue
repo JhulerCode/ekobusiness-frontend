@@ -3,13 +3,14 @@
 </template>
 
 <script>
-import VIEW_CONFIG from './suscripciones.config.js'
+import VIEW_CONFIG from './Empresas.config.js'
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
 import { useModals } from '@/pinia/modals'
 
 export default {
-    name: 'vSuscripciones',
+    name: 'vAdminEmpresas',
+    components: {},
     computed: {
         auth: () => useAuth(),
         vistas: () => useVistas(),
@@ -28,11 +29,19 @@ export default {
         setQuery() {
             this.vista.qry = {
                 fltr: {},
-                incl: ['moneda1', 'empresa1'],
-                ordr: [['createdAt', 'DESC']],
+                incl: [],
+                ordr: [['razon_social', 'ASC']],
                 page: this.vista.table_page,
             }
             this.auth.updateQuery(this.vista.tableColumns, this.vista.qry)
+        },
+
+        //--- Header actions ---//
+        nuevo() {
+            this.$router.push({
+                name: this.vista.detailViewName,
+                params: { [this.vista.detailPath]: 'nuevo' },
+            })
         },
     },
 }

@@ -106,18 +106,10 @@ export default {
             })
         },
         // async recuperarGuardado() {
-        //     const send = { transaccion: this.auth.avances.mCompra }
-        //     if (this.auth.avances.mCompra.socio_pedido) {
-        //         this.auth.setLoading(true, 'Cargando...')
-        //         const res = await get(
-        //             `${urls.socio_pedidos}/uno/${this.auth.avances.mCompra.socio_pedido}`,
-        //         )
-        //         this.auth.setLoading(false)
-        //         if (res.code != 0) return
-        //         send.socio_pedido_items = res.data.socio_pedido_items
-        //         send.pedidos = [{ id: res.data.id, codigo: res.data.codigo }]
-        //     }
-        //     this.modals.setModal('mTransaccion', 'Nueva compra', 1, send, true)
+        //     this.$router.push({
+        //         name: this.detailViewName,
+        //         params: { [this.vista.detailPath]: 'avance' },
+        //     })
         // },
 
         //--- Row actions ---//

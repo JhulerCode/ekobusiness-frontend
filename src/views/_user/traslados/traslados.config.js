@@ -13,13 +13,12 @@ export default {
                 'vVentaPedidos:entregarMercaderia',
             ],
         },
-        {
-            text: 'Recuperar',
-            action: 'recuperarGuardado',
-            permiso: 'vCompras:crear',
-            tipo: '2',
-            showIfAvance: 'mCompra',
-        },
+        // {
+        //     text: 'Recuperar',
+        //     action: 'recuperarGuardado',
+        //     permiso: ['vCompras:crear', 'vVentas:crear'],
+        //     tipo: '2',
+        // },
     ],
 
     tableColumns: [

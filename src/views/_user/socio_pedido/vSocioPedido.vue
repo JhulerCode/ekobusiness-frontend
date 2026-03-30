@@ -3,6 +3,7 @@
         :config="VIEW_CONFIG"
         :pestanas="availableTabs"
         :loadNewData="loadNewData"
+        :loadAvanceData="loadAvanceData"
         :loadExistingData="loadExistingData"
         @runMethod="runMethod"
     >
@@ -159,7 +160,59 @@ export default {
                 entrega_tipo: 'envio',
                 entrega_direccion_datos: {},
             }
+        },
+        async loadAvanceData() {
+            const objectName = this.$route.path.includes('compras')
+                ? 'mCompraPedido'
+                : 'mVentaPedido'
 
+            const dataGuardada = this.auth.usuario.avances[objectName]
+
+            if (!dataGuardada) return this.auth.goBack(this.$router)
+
+            this.$router.replace({
+                name: this.$route.name,
+                params: {
+                    [this.vista.pathKey]: 'nuevo',
+                },
+            })
+
+            //--- Cargamos socio ---//
+            if (dataGuardada.socio) {
+                this.auth.setLoading(true, 'Cargando socio...')
+                const qrySocio = {
+                    fltr: {
+                        id: { op: 'Es', val: dataGuardada.socio },
+                    },
+                    cols: ['nombres', 'contactos', 'direcciones', 'pago_condicion'],
+                }
+                const resSocio = await get(`${urls.socios}?qry=${JSON.stringify(qrySocio)}`)
+                this.auth.setLoading(false)
+
+                if (resSocio.code === 0 && resSocio.data.length > 0) {
+                    dataGuardada.socio1 = resSocio.data[0]
+                }
+            }
+
+            //--- Cargamos moneda ---//
+            if (dataGuardada.moneda) {
+                this.auth.setLoading(true, 'Cargando moneda...')
+                const qryMoneda = {
+                    fltr: {
+                        id: { op: 'Es', val: dataGuardada.moneda },
+                    },
+                    cols: ['id', 'nombre', 'simbolo'],
+                }
+                const resMoneda = await get(`${urls.monedas}?qry=${JSON.stringify(qryMoneda)}`)
+                this.auth.setLoading(false)
+
+                if (resMoneda.code === 0 && resMoneda.data.length > 0) {
+                    dataGuardada.moneda1 = resMoneda.data[0]
+                }
+            }
+
+            this.vista.data = dataGuardada
+            // console.log(this.vista.data)
             this.setSocio(this.vista.data.socio1)
         },
         async loadExistingData() {
@@ -187,7 +240,7 @@ export default {
             }
         },
 
-        //--- Header actions ---//
+        //--- Header left actions ---//
         async guardar() {
             if (this.checkDatos()) return
             this.shapeDatos()
@@ -212,6 +265,17 @@ export default {
 
             this.vista.mode = 'view'
         },
+        guardarAvance() {
+            const objectName = this.$route.path.includes('compras')
+                ? 'mCompraPedido'
+                : 'mVentaPedido'
+
+            this.auth.saveAvances(objectName, this.vista.data)
+
+            this.auth.goBack(this.$router)
+        },
+
+        //--- header actions ---//
         async generarPdf() {
             const send = {
                 socio_pedido: this.vista.data,
@@ -346,8 +410,7 @@ export default {
                     tipo: { op: 'Es', val: this.vista.data.tipo },
                     activo: { op: 'Es', val: true },
                 },
-                cols: ['nombres', 'contactos', 'direcciones', 'precio_lista', 'pago_condicion'],
-                incl: ['precio_lista1'],
+                cols: ['nombres', 'contactos', 'direcciones', 'pago_condicion'],
                 ordr: [['nombres', 'ASC']],
                 limt: 25,
             }

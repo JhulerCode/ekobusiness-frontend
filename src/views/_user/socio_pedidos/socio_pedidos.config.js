@@ -6,14 +6,13 @@ export default {
         {
             text: 'Nuevo',
             action: 'nuevo',
-            permiso: 'vCompraPedidos:crear',
+            permiso: ['vCompraPedidos:crear', 'vVentaPedidos:crear'],
         },
         {
             text: 'Recuperar',
             action: 'recuperarGuardado',
-            permiso: 'vCompraPedidos:crear',
+            permiso: ['vCompraPedidos:crear', 'vVentaPedidos:crear'],
             tipo: '2',
-            showIfAvance: 'mCompraPedido',
         },
     ],
 

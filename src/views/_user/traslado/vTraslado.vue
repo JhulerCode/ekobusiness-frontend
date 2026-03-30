@@ -116,6 +116,46 @@ export default {
 
             if (socio_pedido_id) await this.loadSocioPedido(socio_pedido_id)
         },
+        // async loadAvanceData() {
+        //     const objectName = this.$route.path.includes('compras') ? 'mCompra' : 'mVenta'
+
+        //     const dataGuardada = this.auth.usuario.avances[objectName]
+
+        //     if (!dataGuardada) return this.auth.goBack(this.$router)
+
+        //     this.$router.replace({
+        //         name: this.$route.name,
+        //         params: {
+        //             [this.vista.pathKey]: 'nuevo',
+        //         },
+        //     })
+
+        //     this.vista.data = dataGuardada
+        //     // console.log(this.vista.data)
+        //     //--- Cargamos socio ---//
+        //     if (dataGuardada.socio_pedido) {
+        //         await this.loadSocioPedido(dataGuardada.socio_pedido)
+        //         return
+        //     }
+
+        //     if (dataGuardada.socio) {
+        //         if (dataGuardada.socio) {
+        //             this.auth.setLoading(true, 'Cargando socio...')
+        //             const qrySocio = {
+        //                 fltr: {
+        //                     id: { op: 'Es', val: dataGuardada.socio },
+        //                 },
+        //                 cols: ['nombres', 'contactos', 'direcciones', 'pago_condicion'],
+        //             }
+        //             const resSocio = await get(`${urls.socios}?qry=${JSON.stringify(qrySocio)}`)
+        //             this.auth.setLoading(false)
+
+        //             if (resSocio.code === 0 && resSocio.data.length > 0) {
+        //                 dataGuardada.socio1 = resSocio.data[0]
+        //             }
+        //         }
+        //     }
+        // },
         async loadExistingData() {
             const param_id = this.$route.params[this.vista.pathKey]
 

@@ -68,6 +68,7 @@ const props = defineProps({
     config: { type: Object, required: true },
     pestanas: { type: Array, default: () => [] },
     loadNewData: { type: Function },
+    loadAvanceData: { type: Function },
     loadExistingData: { type: Function },
 })
 
@@ -93,6 +94,11 @@ async function loadData() {
         document.title = `Nuevo`
         vista.mode = 'edit'
         props.loadNewData()
+    } else if (route.params[props.config.pathKey] === 'avance') {
+        vista.data = {}
+        document.title = `Nuevo`
+        vista.mode = 'edit'
+        props.loadAvanceData()
     } else {
         vista.mode = 'view'
 
@@ -144,6 +150,13 @@ const headerLeftActions = computed(() => {
             show: isEdit,
         },
         {
+            text: 'Guardar avance',
+            action: 'guardarAvance',
+            icon: 'fa-solid fa-floppy-disk',
+            tipo: '2',
+            show: isEdit && route.params[props.config.pathKey] === 'nuevo',
+        },
+        {
             text: 'Eliminar',
             tipo: '2',
             icon: 'fa-solid fa-trash',
@@ -173,12 +186,17 @@ function editar() {
 }
 
 function cancelar() {
-    if (route.params[props.config.pathKey] === 'nuevo') {
+    if (
+        route.params[props.config.pathKey] === 'nuevo' ||
+        route.params[props.config.pathKey] === 'avance'
+    ) {
         auth.goBack(router)
     }
 
-    vista.data = JSON.parse(JSON.stringify(vista.original_data))
-    vista.mode = 'view'
+    if (vista.original_data) {
+        vista.data = JSON.parse(JSON.stringify(vista.original_data))
+        vista.mode = 'view'
+    }
 }
 
 function clonar() {

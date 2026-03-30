@@ -77,8 +77,12 @@ export default {
             })
         },
         recuperarGuardado() {
-            const send = { socio_pedido: this.auth.avances.mCompraPedido }
-            this.modals.setModal('mSocioPedido', 'Nuevo pedido de compra', 1, send, true)
+            this.$router.push({
+                name: this.detailViewName,
+                params: { [this.vista.detailPath]: 'avance' },
+            })
+            // const send = { socio_pedido: this.auth.avances.mCompraPedido }
+            // this.modals.setModal('mSocioPedido', 'Nuevo pedido de compra', 1, send, true)
         },
 
         //--- Bulk actions ---//

@@ -49,14 +49,14 @@ export default {
                     children: [
                         {
                             label: 'Entregas',
-                            goto: 'vVentaPedidoTraslados',
+                            goto: 'vVentaPedidoEntregas',
                             path: 'entregas',
                             view: '_user/traslados/vTraslados.vue',
                             permission: 'vVentaPedidos:entregarMercaderia',
                             children: [
                                 {
                                     label: 'Detalle',
-                                    goto: 'vVentaPedidoTraslado',
+                                    goto: 'vVentaPedidoEntrega',
                                     path: ':traslado_id',
                                     view: '_user/traslado/vTraslado.vue',
                                     permission: 'vVentaPedidos:entregarMercaderia',

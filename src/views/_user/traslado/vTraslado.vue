@@ -95,7 +95,16 @@ export default {
         },
         async loadNewData() {
             const socio_pedido_id = this.$route.params.pedido_id
-            const tipo = this.$route.path.includes('compras') ? 1 : 2
+            let tipo
+            if (this.$route.name == 'vCompraPedidoEntrega') {
+                tipo = 'abastacer_maquila'
+            }
+            if (this.$route.name == 'vCompraPedidoRecepcion') {
+                tipo = 1
+            }
+            if (this.$route.name == 'vVentaPedidoEntrega') {
+                tipo = 5
+            }
 
             this.vista.data = {
                 tipo,
@@ -319,7 +328,6 @@ export default {
             }
 
             if (pedido) {
-                this.vista.data.tipo = pedido.tipo == 1 ? 1 : 5
                 this.vista.data.socio = pedido.socio
                 this.vista.data.socio1 = pedido.socio1
                 this.vista.data.socio_pedido1 = { id: pedido.id, codigo: pedido.codigo }

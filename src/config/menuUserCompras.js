@@ -58,14 +58,31 @@ export default {
                     children: [
                         {
                             label: 'Recepciones',
-                            goto: 'vCompraPedidoTraslados',
+                            goto: 'vCompraPedidoRecepciones',
                             path: 'recepciones',
                             view: '_user/traslados/vTraslados.vue',
                             permission: 'vCompraPedidos:ingresarMercaderia',
                             children: [
                                 {
                                     label: 'Detalle',
-                                    goto: 'vCompraPedidoTraslado',
+                                    goto: 'vCompraPedidoRecepcion',
+                                    path: ':traslado_id',
+                                    view: '_user/traslado/vTraslado.vue',
+                                    permission: 'vCompraPedidos:ingresarMercaderia',
+                                    viewType: 'detail',
+                                },
+                            ],
+                        },
+                        {
+                            label: 'Entregas',
+                            goto: 'vCompraPedidoEntregas',
+                            path: 'entregas',
+                            view: '_user/traslados/vTraslados.vue',
+                            permission: 'vCompraPedidos:ingresarMercaderia',
+                            children: [
+                                {
+                                    label: 'Detalle',
+                                    goto: 'vCompraPedidoEntrega',
                                     path: ':traslado_id',
                                     view: '_user/traslado/vTraslado.vue',
                                     permission: 'vCompraPedidos:ingresarMercaderia',

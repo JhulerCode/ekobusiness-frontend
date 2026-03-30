@@ -6,7 +6,7 @@
                 text="Items del pedido"
                 tipo="3"
                 @click="openPedidoItems"
-                v-if="vista.data.socio_pedido"
+                v-if="vista.data.socio_pedido && vista.data.tipo != 'abastacer_maquila'"
             />
 
             <JdButton
@@ -14,7 +14,7 @@
                 text="Auto colocar lotes"
                 tipo="3"
                 @click="setLotesAutomatic"
-                v-if="vista.data.tipo == 5"
+                v-if="vista.data.tipo != 1 && vista.data.transaccion_items.length > 0"
             />
         </div>
 
@@ -43,7 +43,7 @@
                     <ul>
                         <li v-for="(a, i) in item.kardexes" :key="i">
                             <div>
-                                {{ a.lote1.codigo }} {{ a.lote1.fv ? ' | ' + a.lote1.fv : '' }}
+                                {{ a.lote1?.codigo }} {{ a.lote1?.fv ? ' | ' + a.lote1.fv : '' }}
                                 {{ i == item.kardexes.length - 1 ? '' : ',' }}
                             </div>
                             <div>({{ a.cantidad }})</div>
@@ -142,12 +142,18 @@ export default {
         agregarFila() {
             if (this.vista.mode == 'view') return null
             if (!this.vista.data.socio) return null
-            if (this.vista.data.socio_pedido) return null
+            if (this.vista.data.socio_pedido && this.vista.data.tipo != 'abastacer_maquila') {
+                return null
+            }
             return this.addLine
         },
     },
     created() {
-        if (this.$route.params.pedido_id && this.$route.params.pedido_id != 'nuevo') {
+        if (
+            this.$route.params.pedido_id &&
+            this.$route.params.pedido_id != 'nuevo' &&
+            this.$route.name != 'vCompraPedidoEntrega'
+        ) {
             const exec = setInterval(() => {
                 if (this.vista.socio_pedido_items) {
                     this.agregarPedidoItems(this.vista.socio_pedido_items)
@@ -234,7 +240,7 @@ export default {
             ]
         },
         setKardexesOnUpdateCantidad(line) {
-            if (this.vista.data.tipo == 5) {
+            if (this.vista.data.tipo == 5 || this.vista.data.tipo == 'abastacer_maquila') {
                 line.kardexes = []
                 return
             }
@@ -394,7 +400,7 @@ export default {
                 articulo: item.articulo,
                 articulo1: { ...item.articulo1 },
                 cantidad: item.cantidad,
-                kardexes: JSON.parse(JSON.stringify(item.kardexes)) || [],
+                kardexes: JSON.parse(JSON.stringify(item.kardexes || [])),
             }
 
             this.modals.setModal('mTrasladoItemLotes', 'Asignar lotes', null, send, true)

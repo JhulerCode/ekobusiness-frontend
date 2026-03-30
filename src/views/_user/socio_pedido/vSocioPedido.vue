@@ -66,6 +66,12 @@
                 :selectedObject="vista.data.moneda1"
                 :disabled="vista.mode == 'view'"
             />
+
+            <JdCheckBox
+                label="Maquila"
+                v-model="vista.data.is_maquila"
+                :disabled="vista.mode == 'view'"
+            />
         </template>
 
         <template #pestanas-body>
@@ -231,22 +237,39 @@ export default {
         entregar() {
             this.openStockMove(2)
         },
-        async openStockMove() {
-            const cantidad_traslados = await this.loadTrasladosCantidad()
-
-            if (cantidad_traslados == 0) {
-                this.$router.push({
-                    name: this.$route.path.includes('compras')
-                        ? 'vCompraPedidoTraslado'
-                        : 'vVentaPedidoTraslado',
-                    params: { traslado_id: 'nuevo' },
-                })
+        async openStockMove(tipo) {
+            if (this.$route.path.includes('compras')) {
+                if (tipo == 2) {
+                    const cantidad_traslados = await this.loadTrasladosCantidad('abastacer_maquila')
+                    if (cantidad_traslados == 0) {
+                        this.$router.push({
+                            name: 'vCompraPedidoEntrega',
+                            params: { traslado_id: 'nuevo' },
+                        })
+                    } else {
+                        this.$router.push({ name: 'vCompraPedidoEntregas' })
+                    }
+                } else {
+                    const cantidad_traslados = await this.loadTrasladosCantidad('1')
+                    if (cantidad_traslados == 0) {
+                        this.$router.push({
+                            name: 'vCompraPedidoRecepcion',
+                            params: { traslado_id: 'nuevo' },
+                        })
+                    } else {
+                        this.$router.push({ name: 'vCompraPedidoRecepciones' })
+                    }
+                }
             } else {
-                this.$router.push({
-                    name: this.$route.path.includes('compras')
-                        ? 'vCompraPedidoTraslados'
-                        : 'vVentaPedidoTraslados',
-                })
+                const cantidad_traslados = await this.loadTrasladosCantidad('5')
+                if (cantidad_traslados == 0) {
+                    this.$router.push({
+                        name: 'vVentaPedidoEntrega',
+                        params: { traslado_id: 'nuevo' },
+                    })
+                } else {
+                    this.$router.push({ name: 'vVentaPedidoEntregas' })
+                }
             }
         },
 
@@ -359,14 +382,17 @@ export default {
 
             return res.data
         },
-        async loadTrasladosCantidad() {
+        async loadTrasladosCantidad(tipo) {
             const qry = {
                 fltr: {
                     socio_pedido: { op: 'Es', val: this.vista.data.id },
+                    tipo: { op: 'Es', val: tipo },
                 },
             }
 
+            this.auth.setLoading(true, 'Cargando...')
             const res = await get(`${urls.transacciones}?qry=${JSON.stringify(qry)}`)
+            this.auth.setLoading(false)
 
             if (res.code != 0) return
 

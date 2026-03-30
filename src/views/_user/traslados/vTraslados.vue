@@ -40,12 +40,22 @@ export default {
         },
         detailViewName() {
             if (this.$route.params.pedido_id) {
-                return this.$route.path.includes('compras')
-                    ? 'vCompraPedidoTraslado'
-                    : 'vVentaPedidoTraslado'
+                if (this.$route.name == 'vCompraPedidoEntregas') {
+                    return 'vCompraPedidoEntrega'
+                }
+                if (this.$route.name == 'vCompraPedidoRecepciones') {
+                    return 'vCompraPedidoRecepcion'
+                }
+                if (this.$route.name == 'vVentaPedidoEntregas') {
+                    return 'vVentaPedidoTraslado'
+                }
             }
+
             return this.$route.path.includes('compras') ? 'vCompraTraslado' : 'vVentaTraslado'
         },
+    },
+    created() {
+        this.socio_pedido()
     },
     methods: {
         runMethod(method, item) {
@@ -63,7 +73,7 @@ export default {
                 this.vista.tableColumns[i].val1 = dayjs().format('YYYY-MM-DD')
             }
         },
-        setQuery() {
+        async setQuery() {
             this.vista.qry = {
                 fltr: {},
                 incl: ['socio1', 'moneda1', 'socio_pedido1'],
@@ -72,13 +82,16 @@ export default {
 
             if (this.$route.params.pedido_id) {
                 this.vista.qry.fltr.socio_pedido = { op: 'Es', val: this.$route.params.pedido_id }
-            }
 
-            if (this.$route.path.includes('compras')) {
-                this.vista.qry.fltr.tipo = { op: 'Es', val: 1 }
-            }
-            if (this.$route.path.includes('ventas')) {
-                this.vista.qry.fltr.tipo = { op: 'Es', val: 5 }
+                if (this.$route.name == 'vCompraPedidoEntregas') {
+                    this.vista.qry.fltr.tipo = { op: 'Es', val: 'abastacer_maquila' }
+                }
+                if (this.$route.name == 'vCompraPedidoRecepciones') {
+                    this.vista.qry.fltr.tipo = { op: 'Es', val: 1 }
+                }
+                if (this.$route.name == 'vVentaPedidoEntregas') {
+                    this.vista.qry.fltr.tipo = { op: 'Es', val: 5 }
+                }
             }
 
             this.auth.updateQuery(this.vista.tableColumns, this.vista.qry)
@@ -180,6 +193,21 @@ export default {
                     },
                 }
                 this.modals.setModal('mFormato', formato_id, 2, send, true)
+            }
+        },
+
+        //--- auxiliar data ---//
+        async socio_pedido() {
+            this.vista.compra_pedido = this.vistas['vCompraPedido']?.data
+
+            if (!this.vista.compra_pedido) {
+                this.auth.setLoading(true, 'Cargando...')
+                const res = await get(`${urls.socio_pedidos}/uno/${this.$route.params.pedido_id}`)
+                this.auth.setLoading(false)
+
+                if (res.code != 0) return
+
+                this.vista.compra_pedido = res.data
             }
         },
 

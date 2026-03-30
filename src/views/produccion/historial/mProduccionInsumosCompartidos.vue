@@ -10,18 +10,17 @@
                 :disabled="modal.transaccion.maquina != null"
             />
 
-            <JdSelect
+            <JdSelectQuery
                 label="Máquina"
-                :nec="true"
                 v-model="modal.transaccion.maquina"
-                :lista="modal.maquinas || []"
-                style="grid-column: 2/3"
-                :disabled="true"
-                v-if="modal.transaccion.maquina"
+                :search="loadMaquinas"
+                style="grid-column: 1/3"
             />
+            <!-- :disabled="true" -->
+            <!-- v-if="modal.transaccion.maquina" -->
 
-            <template v-if="ot_abierto">
-                <template v-if="modal.transaccion.maquina">
+            <!-- <template v-if="ot_abierto"> -->
+            <!-- <template v-if="modal.transaccion.maquina">
                     <JdSelect
                         label="Insumo"
                         :nec="true"
@@ -31,49 +30,53 @@
                         @elegir="loadLotes"
                         style="grid-column: 1/3"
                     />
-                </template>
+                </template> -->
 
-                <template v-else>
-                    <JdSelectQuery
-                        label="Artículo"
-                        :nec="true"
-                        v-model="modal.transaccion.articulo"
-                        :spin="modal.spinArticulos"
-                        :lista="modal.articulos"
-                        @search="searchArticulos"
-                        @elegir="loadLotes"
-                        style="grid-column: 1/3"
-                    />
-                </template>
+            <JdSelectQuery
+                label="Artículo"
+                :nec="true"
+                v-model="modal.transaccion.articulo"
+                :search="searchArticulos"
+                @elegir="loadLotes"
+                style="grid-column: 1/4"
+            />
 
-                <JdSelect
-                    label="Lote"
-                    :nec="true"
-                    v-model="modal.transaccion.lote_padre"
-                    :lista="modal.lotes || []"
-                    mostrar="lote_fv_stock"
-                    :loaded="modal.lotesLoaded"
-                    @reload="loadLotes"
-                    style="grid-column: 1/3"
-                />
+            <JdSelect
+                label="Lote"
+                :nec="true"
+                v-model="modal.transaccion.lote_id"
+                :lista="modal.lotes || []"
+                mostrar="lote_fv_stock"
+                :loaded="modal.lotesLoaded"
+                @reload="loadLotes"
+                style="grid-column: 1/3"
+            />
 
-                <JdInput
-                    type="number"
-                    label="Cantidad"
-                    :nec="true"
-                    v-model="modal.transaccion.cantidad"
-                    style="grid-column: 1/2"
-                />
+            <JdInput
+                type="number"
+                label="Cantidad"
+                :nec="true"
+                v-model="modal.transaccion.cantidad"
+                style="grid-column: 1/2"
+            />
 
-                <JdTextArea
-                    label="Observación"
-                    v-model="modal.transaccion.observacion"
-                    style="grid-column: 1/3"
-                />
+            <JdTextArea
+                label="Observación"
+                v-model="modal.transaccion.observacion"
+                style="grid-column: 1/3"
+            />
 
-                <JdButton text="Grabar" tipo="2" @click="grabar" style="grid-column: 3/4" />
-            </template>
+            <JdButton text="Grabar" tipo="2" @click="grabar" style="grid-column: 3/4" />
+            <!-- </template> -->
         </div>
+
+        <JdButton
+            icon="fa-solid fa-rotate-right"
+            text="Recargar"
+            tipo="3"
+            @click="loadProduccionInsumos"
+            class="mrg-btm1"
+        />
 
         <JdTable
             :columns="columns"
@@ -83,14 +86,8 @@
             rowOptionsMode="buttons"
             :reload="loadProduccionInsumos"
             colActWidth="4.5rem"
-            class="mrg-top1"
             @rowOptionSelected="runMethod"
-        >
-            <template v-slot:cPu="{ item }">
-                {{ item.lote_padre1?.pu }}
-            </template>
-        </JdTable>
-        <!-- </div> -->
+        />
     </JdModal>
 
     <mProduccionInsumosDevolucion
@@ -173,18 +170,9 @@ export default {
                 sort: true,
             },
             {
-                id: 'lote',
+                id: 'lote_id',
                 title: 'Lote',
-                prop: 'lote_padre1.lote',
-                width: '7rem',
-                show: true,
-
-                sort: true,
-            },
-            {
-                id: 'fv',
-                title: 'Fecha vencimiento',
-                prop: 'lote_padre1.fv',
+                prop: 'lote1.codigo_fv',
                 width: '7rem',
                 show: true,
 
@@ -208,30 +196,30 @@ export default {
         ],
     }),
     computed: {
-        ot_abierto() {
-            if (this.modal.maquina) {
-                return this.modal.maquina.produccion_ordenes.some((a) => a.estado == 1)
-            } else {
-                return true
-            }
-        },
+        // ot_abierto() {
+        //     if (this.modal.maquina) {
+        //         return this.modal.maquina.produccion_ordenes.some((a) => a.estado == 1)
+        //     } else {
+        //         return true
+        //     }
+        // },
         rowActions() {
-            if (this.ot_abierto) {
-                return [
-                    {
-                        icon: 'fa-solid fa-trash',
-                        title: 'Eliminar',
-                        action: 'eliminar',
-                    },
-                    {
-                        icon: 'fa-solid fa-rotate-left',
-                        title: 'Devolución',
-                        action: 'devolucion',
-                        ocultar: { prop: 'tipo', op: 'Distinto de', val: 2 },
-                    },
-                ]
-            }
-            return []
+            // if (this.ot_abierto) {
+            return [
+                {
+                    icon: 'fa-solid fa-trash',
+                    title: 'Eliminar',
+                    action: 'eliminar',
+                },
+                {
+                    icon: 'fa-solid fa-rotate-left',
+                    title: 'Devolución',
+                    action: 'devolucion',
+                    ocultar: { prop: 'tipo', op: 'Distinto de', val: 2 },
+                },
+            ]
+            // }
+            // return []
         },
     },
     async created() {
@@ -260,12 +248,14 @@ export default {
             this.modal.transaccion = {
                 tipo: 2,
                 fecha: this.modal.transaccion.fecha,
-                maquina: this.modal.transaccion.maquina,
+                // maquina: this.modal.transaccion.maquina,
             }
 
             this.modal.lotes = []
             this.modal.lotesLoaded = false
         },
+
+        //--- principal data ---//
         setQuery() {
             this.modal.produccion_insumos = []
 
@@ -275,7 +265,7 @@ export default {
                     tipo: { op: 'Es', val: [2, 3] },
                     produccion_orden: { op: 'Es', val: null },
                 },
-                incl: ['lote_padre1', 'articulo1', 'maquina1'],
+                incl: ['lote1', 'articulo1', 'maquina1'],
             }
 
             this.useAuth.updateQuery(this.columns, this.modal.qry)
@@ -286,7 +276,7 @@ export default {
                 this.modal.qry.fltr.maquina = { op: 'Es', val: this.modal.transaccion.maquina }
             }
 
-            this.modal.qry.cols.push('tipo', 'lote_padre')
+            this.modal.qry.cols.push('tipo')
         },
         async loadProduccionInsumos() {
             this.setQuery()
@@ -299,88 +289,21 @@ export default {
 
             this.modal.produccion_insumos = res.data
         },
-        async searchArticulos(txtBuscar) {
-            if (!txtBuscar) {
-                this.modal.articulos.length = 0
-                return
-            }
 
-            const qry = {
-                fltr: {
-                    type: { op: 'Es', val: 'consumable' },
-                    activo: { op: 'Es', val: true },
-                    nombre: { op: 'Contiene', val: txtBuscar },
-                },
-                cols: ['nombre', 'unidad', 'igv_afectacion', 'has_fv'],
-                ordr: [['nombre', 'ASC']],
-            }
-
-            this.modal.spinArticulos = true
-            const res = await get(`${urls.articulos}?qry=${JSON.stringify(qry)}`)
-            this.modal.spinArticulos = false
-
-            if (res.code !== 0) return
-
-            this.modal.articulos = JSON.parse(JSON.stringify(res.data))
-        },
-
-        async loadLotes() {
-            this.modal.lotes = []
-            this.modal.transaccion.lote_padre = null
-            this.modal.lotesLoaded = false
-
-            if (this.modal.transaccion.articulo == null) return
-
-            const qry = {
-                incl: ['articulo1'],
-                cols: [
-                    'fecha',
-                    'moneda',
-                    'tipo_cambio',
-                    'pu',
-                    'igv_afectacion',
-                    'igv_porcentaje',
-                    'fv',
-                    'lote',
-                    'stock',
-                    'lote_fv_stock',
-                ],
-                fltr: {
-                    articulo: { op: 'Es', val: this.modal.transaccion.articulo },
-                    is_lote_padre: { op: 'Es', val: true },
-                },
-                ordr: [['lote', 'DESC']],
-            }
-
-            this.useAuth.setLoading(true, 'Cargando...')
-            this.modal.lotesLoaded = false
-            const res = await get(`${urls.kardex}?qry=${JSON.stringify(qry)}`)
-            this.modal.lotesLoaded = true
-            this.useAuth.setLoading(false)
-
-            if (res.code !== 0) return
-
-            this.modal.lotes = JSON.parse(JSON.stringify(res.data))
-        },
-        selectLote(item) {
-            for (const a of this.modal.lotes) a.selected = false
-
-            item.selected = true
-        },
-
+        //--- methods ---//
         checkDatos() {
-            const props = ['fecha', 'articulo', 'cantidad', 'lote_padre']
+            const props = ['tipo', 'fecha', 'articulo', 'lote_id', 'cantidad']
 
             if (incompleteData(this.modal.transaccion, props)) {
                 jmsg('warning', 'Completa los campos requeridos')
                 return true
             }
 
-            const lote_padre = this.modal.lotes.find(
-                (a) => a.id == this.modal.transaccion.lote_padre,
+            const lote_elegido = this.modal.lotes.find(
+                (a) => a.id == this.modal.transaccion.lote_id,
             )
 
-            if (lote_padre.stock < this.modal.transaccion.cantidad) {
+            if (lote_elegido.stock < this.modal.transaccion.cantidad) {
                 jmsg('warning', 'Stock insuficiente')
                 return true
             }
@@ -400,6 +323,7 @@ export default {
             this.modal.produccion_insumos.unshift(res.data)
         },
 
+        //---row actions ---//
         async eliminar(item) {
             const resQst = await jqst('¿Está seguro de eliminar?')
             if (resQst.isConfirmed == false) return
@@ -407,7 +331,7 @@ export default {
             const send = {
                 id: item.id,
                 tipo: item.tipo,
-                lote_padre: item.lote_padre,
+                lote_id: item.lote_id,
                 cantidad: Math.abs(item.cantidad),
             }
 
@@ -427,32 +351,87 @@ export default {
                     fecha: item.fecha,
                     maquina: item.maquina,
                     articulo: item.articulo,
-                    lote_padre: item.lote_padre,
+                    lote_id: item.lote_id,
                 },
                 articulo: { ...item.articulo1 },
             }
 
             this.useModals.setModal('mProduccionInsumosDevolucion', 'Devolución', 1, send, true)
         },
-        devuelto(item) {
-            this.modal.produccion_insumos.unshift(item)
-        },
 
-        async loadMaquinas() {
+        //--- auxiliar data ---//
+        async searchArticulos(txtBuscar) {
             const qry = {
-                fltr: { tipo: { op: 'Es', val: 1 } },
-                cols: ['codigo', 'nombre', 'linea', 'velocidad', 'limpieza_tiempo'],
+                fltr: {
+                    type: { op: 'Es', val: 'consumable' },
+                    activo: { op: 'Es', val: true },
+                },
+                cols: ['nombre', 'unidad', 'igv_afectacion', 'has_fv'],
                 ordr: [['nombre', 'ASC']],
+                limt: 25,
             }
 
-            this.modal.maquinas = []
+            if (txtBuscar) {
+                qry.fltr.nombre = { op: 'Contiene', val: txtBuscar }
+            }
+
+            this.modal.spinArticulos = true
+            const res = await get(`${urls.articulos}?qry=${JSON.stringify(qry)}`)
+            this.modal.spinArticulos = false
+
+            if (res.code !== 0) return
+
+            return res.data
+        },
+        async loadLotes() {
+            this.modal.lotes = []
+            this.modal.transaccion.lote_id = null
+
+            if (this.modal.transaccion.articulo == null) return
+
+            const qry = {
+                cols: ['codigo', 'fv', 'stock', 'lote_fv', 'lote_fv_stock'],
+                fltr: {
+                    articulo: { op: 'Es', val: this.modal.transaccion.articulo },
+                },
+                ordr: [
+                    ['codigo', 'DESC'],
+                    ['fv', 'DESC'],
+                ],
+            }
+
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.maquinas}?qry=${JSON.stringify(qry)}`)
+            this.modal.lotesLoaded = false
+            const res = await get(`${urls.lotes}?qry=${JSON.stringify(qry)}`)
             this.useAuth.setLoading(false)
+            this.modal.lotesLoaded = true
+
+            if (res.code !== 0) return
+
+            this.modal.lotes = JSON.parse(JSON.stringify(res.data))
+        },
+        async loadMaquinas(txt) {
+            const qry = {
+                fltr: { tipo: { op: 'Es', val: 1 } },
+                cols: ['codigo', 'nombre'],
+                ordr: [['nombre', 'ASC']],
+                limt: 25,
+            }
+
+            if (txt) {
+                qry.fltr.nombre = { op: 'Contiene', val: txt }
+            }
+
+            const res = await get(`${urls.maquinas}?qry=${JSON.stringify(qry)}`)
 
             if (res.code != 0) return
 
-            this.modal.maquinas = res.data
+            return res.data
+        },
+
+        //--- @methods ---//
+        devuelto(item) {
+            this.modal.produccion_insumos.unshift(item)
         },
     },
 }
@@ -460,7 +439,7 @@ export default {
 
 <style lang="scss" scoped>
 .container-agregar {
-    // margin-bottom: 2rem;
+    margin-bottom: 1rem;
     display: grid;
     grid-template-columns: repeat(3, 15rem);
     gap: 0.5rem 1rem;

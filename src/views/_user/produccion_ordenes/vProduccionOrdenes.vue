@@ -216,6 +216,12 @@ export default {
         cerrar(item) {
             this.abrirCerrar(item, '2')
         },
+        iniciar(item) {
+            this.setInicioFin(item, 1)
+        },
+        terminar(item) {
+            this.setInicioFin(item, 2)
+        },
         productosTerminados(item) {
             const send = {
                 produccion_orden: { ...item },
@@ -241,6 +247,30 @@ export default {
                 `Orden de producción ${estado == 1 ? 'abierta' : 'cerrado'}`,
             )
             this.auth.setLoading(false)
+
+            if (res.code != 0) return
+
+            this.vistas.updateItem(this.vista.name, 'tableData', res.data, true)
+        },
+        async setInicioFin(item, estado) {
+            const resQst = await jqst(
+                `¿Está seguro de marcar el ${estado == 1 ? 'inicio' : 'fin'} de la producción de ${item.articulo1.nombre}?`,
+            )
+            if (resQst.isConfirmed == false) return
+
+            const send = {
+                id: item.id,
+                inicio: estado == 1 ? dayjs() : null,
+                fin: estado == 2 ? dayjs() : null,
+            }
+
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await patch(
+                `${this.vista.apiUrl}/inicio-fin`,
+                send,
+                `${estado == 1 ? 'Inicio' : 'Final'} registrado`,
+            )
+            this.useAuth.setLoading(false)
 
             if (res.code != 0) return
 

@@ -10,15 +10,10 @@
     </VistaLayout>
 
     <mProduccionInsumosCompartidos v-if="modals?.show?.mProduccionInsumosCompartidos" />
-    <mProduccionProductos
-        v-if="modals?.show?.mProduccionProductos"
-        @productosCargados="updateProduccionProductos"
-    />
 </template>
 
 <script>
-import mProduccionInsumosCompartidos from '@/views/produccion/historial/mProduccionInsumosCompartidos.vue'
-import mProduccionProductos from '@/views/produccion/historial/mProduccionProductos.vue'
+import mProduccionInsumosCompartidos from './mProduccionInsumosCompartidos.vue'
 
 import VIEW_CONFIG from './produccion_ordenes.config.js'
 import { useAuth } from '@/pinia/auth'
@@ -31,7 +26,6 @@ import dayjs from 'dayjs'
 export default {
     components: {
         mProduccionInsumosCompartidos,
-        mProduccionProductos,
     },
     computed: {
         auth: () => useAuth(),
@@ -138,21 +132,6 @@ export default {
         },
 
         //--- Row actions ---//
-        // async verTrazabilidad(item) {
-        //     const qry = { incl: ['articulo1', 'maquina1'] }
-        //     this.auth.setLoading(true, 'Cargando...')
-        //     const res = await get(`${this.vista.apiUrl}/uno/${item.id}?qry=${JSON.stringify(qry)}`)
-        //     this.auth.setLoading(false)
-        //     if (res.code != 0) return
-        //     if (res.data == null) return jmsg('warning', 'La órden de producción no existe')
-
-        //     const send = {
-        //         produccion_orden: res.data,
-        //         articulos: [{ id: res.data.articulo, ...res.data.articulo1 }],
-        //         maquinas: [{ id: res.data.maquina, ...res.data.maquina1 }],
-        //     }
-        //     this.modals.setModal('mProduccionTrazabilidad', 'Trazabilidad', null, send, true)
-        // },
         // async controlPesos(item) {
         //     let formato_id = 'RE-BPM-06'
         //     if (item.linea == 2) formato_id = 'RE-BPM-08'
@@ -216,20 +195,6 @@ export default {
         cerrar(item) {
             this.abrirCerrar(item, '2')
         },
-        // iniciar(item) {
-        //     this.setInicioFin(item, 1)
-        // },
-        // terminar(item) {
-        //     this.setInicioFin(item, 2)
-        // },
-        productosTerminados(item) {
-            const send = {
-                produccion_orden: { ...item },
-                lote_manual: true,
-            }
-
-            this.modals.setModal('mProduccionProductos', `Productos terminados`, null, send, true)
-        },
 
         //--- auxiliar methods ---//
         async abrirCerrar(item, estado) {
@@ -252,30 +217,6 @@ export default {
 
             this.vistas.updateItem(this.vista.name, 'tableData', res.data, true)
         },
-        // async setInicioFin(item, estado) {
-        //     const resQst = await jqst(
-        //         `¿Está seguro de marcar el ${estado == 1 ? 'inicio' : 'fin'} de la producción de ${item.articulo1.nombre}?`,
-        //     )
-        //     if (resQst.isConfirmed == false) return
-
-        //     const send = {
-        //         id: item.id,
-        //         inicio: estado == 1 ? dayjs() : null,
-        //         fin: estado == 2 ? dayjs() : null,
-        //     }
-
-        //     this.useAuth.setLoading(true, 'Cargando...')
-        //     const res = await patch(
-        //         `${this.vista.apiUrl}/inicio-fin`,
-        //         send,
-        //         `${estado == 1 ? 'Inicio' : 'Final'} registrado`,
-        //     )
-        //     this.useAuth.setLoading(false)
-
-        //     if (res.code != 0) return
-
-        //     this.vistas.updateItem(this.vista.name, 'tableData', res.data, true)
-        // },
         setFormatoCalidad(item) {
             const produccion_orden = this.vista.tableData.find((a) => a.id == item.produccion_orden)
             if (!produccion_orden) return

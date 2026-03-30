@@ -79,6 +79,7 @@ export default {
 
         //--- Row actions ---//
         verKardex(item) {
+            this.vistas.vArticulo.data = { id: item.id, nombre: item.nombre }
             this.$router.push(`/consola/inventario/articulos/${item.id}/kardex`)
         },
         verLotes(item) {

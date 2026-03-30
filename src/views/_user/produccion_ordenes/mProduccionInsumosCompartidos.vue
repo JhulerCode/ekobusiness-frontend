@@ -7,7 +7,6 @@
                 :nec="true"
                 v-model="modal.transaccion.fecha"
                 style="grid-column: 1/2"
-                :disabled="modal.transaccion.maquina != null"
             />
 
             <JdSelectQuery
@@ -16,21 +15,6 @@
                 :search="loadMaquinas"
                 style="grid-column: 1/3"
             />
-            <!-- :disabled="true" -->
-            <!-- v-if="modal.transaccion.maquina" -->
-
-            <!-- <template v-if="ot_abierto"> -->
-            <!-- <template v-if="modal.transaccion.maquina">
-                    <JdSelect
-                        label="Insumo"
-                        :nec="true"
-                        v-model="modal.transaccion.articulo"
-                        id="articulo"
-                        :lista="articulos_compartidos"
-                        @elegir="loadLotes"
-                        style="grid-column: 1/3"
-                    />
-                </template> -->
 
             <JdSelectQuery
                 label="Artículo"
@@ -67,7 +51,6 @@
             />
 
             <JdButton text="Grabar" tipo="2" @click="grabar" style="grid-column: 3/4" />
-            <!-- </template> -->
         </div>
 
         <JdButton
@@ -81,7 +64,6 @@
         <JdTable
             :columns="columns"
             :datos="modal.produccion_insumos || []"
-            width="61rem"
             :rowOptions="rowActions"
             rowOptionsMode="buttons"
             :reload="loadProduccionInsumos"
@@ -97,7 +79,7 @@
 </template>
 
 <script>
-import mProduccionInsumosDevolucion from '@/views/produccion/historial/mProduccionInsumosDevolucion.vue'
+import mProduccionInsumosDevolucion from './mProduccionInsumosDevolucion.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
@@ -121,90 +103,77 @@ export default {
         dayjs,
 
         modal: {},
-
-        articulos_compartidos: [
-            { articulo: 'da249f8d-c28e-4eda-a3f9-3ea9659b2f1a', nombre: 'GOMA PURYCOL 1990 GA' },
-            {
-                articulo: '7068389c-14b4-4a81-a91a-475086719b47',
-                nombre: 'HILO 100% ALGODÓN ESPECIAL',
-            },
-            { articulo: '5daf8437-e0fe-4c6c-95ef-664288365036', nombre: 'PAPEL FILTRO' },
-        ],
-
-        columns: [
-            {
-                id: 'fecha',
-                title: 'Fecha',
-                prop: 'fecha1',
-                width: '7rem',
-                show: true,
-
-                sort: true,
-            },
-            {
-                id: 'articulo',
-                title: 'Artículo',
-                prop: 'articulo1.nombre',
-                width: '20rem',
-                show: true,
-
-                sort: true,
-            },
-            {
-                id: 'articulo_unidad',
-                title: 'Unidad',
-                prop: 'articulo1.unidad',
-                width: '5rem',
-                show: true,
-
-                sort: true,
-            },
-            {
-                id: 'cantidad',
-                title: 'Cantidad',
-                format: 'decimal',
-                toRight: true,
-                width: '8rem',
-                show: true,
-
-                sort: true,
-            },
-            {
-                id: 'lote_id',
-                title: 'Lote',
-                prop: 'lote1.codigo_fv',
-                width: '7rem',
-                show: true,
-
-                sort: true,
-            },
-            {
-                id: 'maquina',
-                title: 'Máquina',
-                prop: 'maquina1.nombre',
-                width: '8rem',
-                show: true,
-
-                sort: true,
-            },
-            {
-                id: 'observacion',
-                title: 'Observacion',
-                width: '8rem',
-                show: true,
-            },
-        ],
     }),
     computed: {
-        // ot_abierto() {
-        //     if (this.modal.maquina) {
-        //         return this.modal.maquina.produccion_ordenes.some((a) => a.estado == 1)
-        //     } else {
-        //         return true
-        //     }
-        // },
+        columns() {
+            return [
+                {
+                    id: 'fecha',
+                    title: 'Fecha',
+                    prop: 'fecha1',
+                    width: '7rem',
+                    show: true,
+                    sort: true,
+                },
+                {
+                    id: 'tipo',
+                    title: 'Operación',
+                    prop: 'tipo1.nombre',
+                    width: '12rem',
+                    show: true,
+                    sort: true,
+                },
+                {
+                    id: 'articulo',
+                    title: 'Artículo',
+                    prop: 'articulo1.nombre',
+                    width: '20rem',
+                    show: true,
+                    sort: true,
+                },
+                {
+                    id: 'articulo_unidad',
+                    title: 'Unidad',
+                    prop: 'articulo1.unidad',
+                    width: '5rem',
+                    show: true,
+                    sort: true,
+                },
+                {
+                    id: 'cantidad',
+                    title: 'Cantidad',
+                    prop: 'cantidad1',
+                    format: 'decimal',
+                    toRight: true,
+                    width: '8rem',
+                    show: true,
+                    sort: true,
+                },
+                {
+                    id: 'lote_id',
+                    title: 'Lote',
+                    prop: 'lote1.codigo_fv',
+                    width: '7rem',
+                    show: true,
+                    sort: true,
+                },
+                {
+                    id: 'maquina',
+                    title: 'Máquina',
+                    prop: 'maquina1.nombre',
+                    width: '8rem',
+                    show: true,
+                    sort: true,
+                },
+                {
+                    id: 'observacion',
+                    title: 'Observacion',
+                    width: '8rem',
+                    show: true,
+                },
+            ]
+        },
         rowActions() {
-            // if (this.ot_abierto) {
             return [
                 {
                     icon: 'fa-solid fa-trash',
@@ -215,11 +184,9 @@ export default {
                     icon: 'fa-solid fa-rotate-left',
                     title: 'Devolución',
                     action: 'devolucion',
-                    ocultar: { prop: 'tipo', op: 'Distinto de', val: 2 },
+                    ocultar: { tipo: { op: '!=', val: 2 } },
                 },
             ]
-            // }
-            // return []
         },
     },
     async created() {

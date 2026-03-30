@@ -12,7 +12,7 @@ export default {
         {
             text: 'Salida de insumos',
             action: 'salidaInsumosCompartidos',
-            permiso: 'vProduccionOrdenes:salidaInsumos',
+            permiso: 'vProduccionOrdenes:salidaInsumosCompartidos',
             tipo: '2',
         },
     ],

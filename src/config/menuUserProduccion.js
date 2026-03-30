@@ -21,21 +21,14 @@ export default {
             label: 'Programa',
             goto: 'vPrograma',
             path: 'programa',
-            view: 'produccion/vPrograma.vue',
+            view: '_user/produccion_programa/vPrograma.vue',
             permisos: [
                 { id: 'vPrograma:listar', label: 'Listar' },
                 { id: 'vPrograma:crear', label: 'Crear' },
                 { id: 'vPrograma:ver', label: 'Ver' },
                 { id: 'vPrograma:editar', label: 'Editar' },
                 { id: 'vPrograma:eliminar', label: 'Eliminar' },
-                // { id: 'vPrograma:abrirCerrar', label: 'Abrir y cerrar' },
-                // { id: 'vPrograma:salidaInsumos', label: 'Salida insumos' },
-                // { id: 'vPrograma:productosTerminados', label: 'Productos terminados' },
                 { id: 'vPrograma:verProductosPedidos', label: 'Ver productos pedidos' },
-                {
-                    id: 'vPrograma:salidaInsumosCompartidos',
-                    label: 'Salida de insumos compartidos',
-                },
             ],
         },
         {
@@ -57,7 +50,6 @@ export default {
                     id: 'vProduccionOrdenes:productosTerminados',
                     label: 'Productos terminados',
                 },
-                // { id: 'vProduccionOrdenes:trazabilidad', label: 'Ver trazabilidad' },
                 // { id: 'vProduccionOrdenes:controlPesos', label: 'Control de pesos' },
                 // { id: 'vProduccionOrdenes:controlPpc', label: 'Control del PPC' },
                 {

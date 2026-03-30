@@ -43,7 +43,7 @@ export default {
     },
     methods: {
         checkDatos() {
-            const props = ['fecha', 'articulo', 'cantidad', 'lote_padre']
+            const props = ['fecha', 'articulo', 'cantidad', 'lote_id']
 
             if (incompleteData(this.modal.transaccion, props)) {
                 jmsg('warning', 'Completa los campos requeridos')

@@ -106,11 +106,6 @@ export default {
         async loadPedidoItems() {
             const qry = {
                 incl: ['articulo1'],
-                iccl: {
-                    articulo1: {
-                        cols: ['combo_articulos'],
-                    },
-                },
                 cols: { exclude: [] },
                 fltr: {
                     socio_pedido: { op: 'Es', val: this.modal.socio_pedido },

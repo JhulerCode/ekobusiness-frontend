@@ -25,6 +25,8 @@
             </div>
         </div>
 
+        {{ modal.articulo1 }}
+
         <JdTable
             :columns="columns"
             :datos="modal.kardexes || []"

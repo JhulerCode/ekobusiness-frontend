@@ -43,10 +43,10 @@
                     <ul>
                         <li v-for="(a, i) in item.kardexes" :key="i">
                             <div>
-                                {{ a.lote1?.codigo }} {{ a.lote1?.fv ? ' | ' + a.lote1.fv : '' }}
+                                {{ a.lote1?.codigo }}
+                                {{ a.lote1?.fv ? ' | ' + a.lote1.fv : '' }} ({{ a.cantidad }})
                                 {{ i == item.kardexes.length - 1 ? '' : ',' }}
                             </div>
-                            <div>({{ a.cantidad }})</div>
                         </li>
                     </ul>
                 </div>
@@ -121,10 +121,10 @@ export default {
                     show: true,
                 },
                 {
-                    id: 'lote_padre',
+                    id: 'lotes',
                     title: 'Lote | Fv',
                     slot: 'cLotes',
-                    width: '30rem',
+                    width: '50rem',
                     show: true,
                 },
             ]
@@ -188,7 +188,7 @@ export default {
                 nombre: articulo.nombre,
                 unidad: articulo.unidad,
                 has_fv: articulo.has_fv,
-                combo_articulos: articulo.combo_articulos,
+                combo_componentes: articulo.combo_componentes,
             }
         },
         async agregarPedidoItems(items) {
@@ -269,40 +269,61 @@ export default {
 
             if (falta == true) return jmsg('warning', 'Ingresa todas las cantidades')
 
-            const to_look_for_ids = []
+            //--- Traemos componentes de combos ---//
+            const combos_ids = []
             for (const a of this.vista.data.transaccion_items) {
                 if (a.articulo1.type == 'combo') {
-                    for (const b of a.articulo1.combo_articulos) {
-                        to_look_for_ids.push(b.articulo)
+                    combos_ids.push(a.articulo)
+                }
+            }
+
+            if (combos_ids.length > 0) {
+                const combo_componentes = await this.loadComboComponentes(combos_ids)
+
+                for (const a of this.vista.data.transaccion_items) {
+                    if (a.articulo1.type == 'combo') {
+                        a.articulo1.combo_componentes = combo_componentes.filter(
+                            (b) => b.articulo_principal == a.articulo,
+                        )
+                    }
+                }
+            }
+            console.log(this.vista.data.transaccion_items)
+
+            //--- Traemos lotes de articulos --//
+            const articulos_ids = []
+            for (const a of this.vista.data.transaccion_items) {
+                if (a.articulo1.type == 'combo') {
+                    for (const b of a.articulo1.combo_componentes) {
+                        articulos_ids.push(b.articulo)
                     }
                 } else {
-                    to_look_for_ids.push(a.articulo)
+                    articulos_ids.push(a.articulo)
                 }
             }
 
             const qry = {
                 incl: ['articulo1'],
-                cols: ['articulo', 'fv', 'lote', 'stock', 'lote_fv_stock'],
+                cols: ['articulo', 'fv', 'codigo', 'stock', 'lote_fv', 'lote_fv_stock'],
                 fltr: {
-                    articulo: { op: 'Es', val: to_look_for_ids },
-                    is_lote_padre: { op: 'Es', val: true },
+                    articulo: { op: 'Es', val: articulos_ids },
                     stock: { op: '>', val: 0 },
                 },
                 ordr: [
                     ['createdAt', 'ASC'],
-                    ['lote', 'ASC'],
+                    ['codigo', 'ASC'],
                     ['fv', 'ASC'],
                 ],
             }
 
             this.auth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.kardex}?qry=${JSON.stringify(qry)}`)
+            const res = await get(`${urls.lotes}?qry=${JSON.stringify(qry)}`)
             this.auth.setLoading(false)
 
             if (res.code !== 0) return
 
+            //--- Agrupamos lotes por articulo --//
             const lotesMap = {}
-
             for (const a of res.data) {
                 if (!lotesMap[a.articulo]) {
                     lotesMap[a.articulo] = []
@@ -311,22 +332,23 @@ export default {
                 lotesMap[a.articulo].push(a)
             }
 
+            //--- Asignamos lotes a transaccion_items --//
             for (const a of this.vista.data.transaccion_items) {
                 a.kardexes = []
 
                 if (a.articulo1.type == 'combo') {
-                    for (const c of a.articulo1.combo_articulos) {
-                        const kardexes = lotesMap[c.articulo] ?? []
+                    for (const b of a.articulo1.combo_componentes) {
+                        const lotes = lotesMap[b.articulo] ?? []
 
-                        for (const lote of kardexes) {
+                        for (const lote of lotes) {
                             const kardexes_componente = a.kardexes.filter(
-                                (d) => d.articulo == c.articulo,
+                                (d) => d.articulo == b.articulo,
                             )
                             const total = kardexes_componente.reduce(
                                 (sum, s) => sum + (s.cantidad ?? 0),
                                 0,
                             )
-                            const falta = c.cantidad * a.cantidad - total
+                            const falta = b.cantidad * a.cantidad - total
                             if (falta == 0) break
 
                             const send = {
@@ -334,11 +356,8 @@ export default {
 
                                 articulo: lote.articulo,
                                 cantidad: a.cantidad - total,
-                                lote_padre: lote.id,
-                                lote_padre1: {
-                                    lote_fv_stock: lote.lote_fv_stock,
-                                    stock: lote.stock,
-                                },
+                                lote: lote.id,
+                                lote1: lote,
                             }
 
                             if (falta <= lote.stock) {
@@ -351,9 +370,9 @@ export default {
                         }
                     }
                 } else {
-                    const kardexes = lotesMap[a.articulo] ?? []
+                    const lotes = lotesMap[a.articulo] ?? []
 
-                    for (const lote of kardexes) {
+                    for (const lote of lotes) {
                         const total = a.kardexes.reduce((sum, s) => sum + (s.cantidad ?? 0), 0)
                         const falta = a.cantidad - total
                         if (falta == 0) break
@@ -363,11 +382,8 @@ export default {
 
                             articulo: lote.articulo,
                             cantidad: a.cantidad - total,
-                            lote_padre: lote.id,
-                            lote_padre1: {
-                                lote_fv_stock: lote.lote_fv_stock,
-                                stock: lote.stock,
-                            },
+                            lote: lote.id,
+                            lote1: lote,
                         }
 
                         if (falta <= lote.stock) {
@@ -412,7 +428,7 @@ export default {
                 fltr: {
                     activo: { op: 'Es', val: true },
                 },
-                cols: ['nombre', 'unidad', 'igv_afectacion', 'has_fv'],
+                cols: ['type', 'nombre', 'unidad', 'has_fv', 'igv_afectacion'],
                 ordr: [['nombre', 'ASC']],
                 limt: 25,
             }
@@ -433,6 +449,27 @@ export default {
             if (res.code !== 0) return []
             return res.data
         },
+        async loadComboComponentes(ids) {
+            const qry = {
+                cols: ['articulo_principal', 'articulo', 'orden', 'cantidad'],
+                incl: ['articulo1'],
+                fltr: {
+                    articulo_principal: {
+                        op: 'Es',
+                        val: ids,
+                    },
+                },
+                ordr: [['orden', 'ASC']],
+            }
+
+            this.auth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.combo_componentes}?qry=${JSON.stringify(qry)}`)
+            this.auth.setLoading(false)
+
+            if (res.code !== 0) return
+
+            return res.data
+        },
     },
 }
 </script>
@@ -445,18 +482,20 @@ export default {
 }
 
 .container-kardexes {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1.75rem auto;
+    gap: 1rem;
 
     ul {
         display: flex;
+        gap: 0.5rem;
+
         * {
             font-size: 0.9rem;
         }
 
         li {
             display: flex;
-            gap: 0.5rem;
-            margin-left: 1rem;
         }
     }
 }

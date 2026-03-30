@@ -79,7 +79,7 @@ export default {
         {
             id: 'inicio',
             title: 'Hora inicio',
-            format: 'datetime',
+            prop: 'inicio1',
             width: '11rem',
             show: true,
             filtrable: false,
@@ -87,7 +87,7 @@ export default {
         {
             id: 'fin',
             title: 'Hora fin',
-            format: 'datetime',
+            prop: 'fin1',
             width: '11rem',
             show: true,
             filtrable: false,
@@ -172,18 +172,18 @@ export default {
             ocultar: { estado: 1 },
         },
         {
-            label: 'Terminar',
+            label: 'Cerrar',
             icon: 'fa-solid fa-check-double',
             action: 'cerrar',
             permiso: 'vProduccionOrdenes:abrirCerrar',
             ocultar: { estado: 2 },
         },
-        {
-            label: 'Productos terminados',
-            icon: 'fa-solid fa-boxes-stacked',
-            action: 'productosTerminados',
-            permiso: 'vProduccionOrdenes:productosTerminados',
-        },
+        // {
+        //     label: 'Productos terminados',
+        //     icon: 'fa-solid fa-boxes-stacked',
+        //     action: 'productosTerminados',
+        //     permiso: 'vProduccionOrdenes:productosTerminados',
+        // },
         // {
         //     label: 'Ver trazabilidad',
         //     icon: 'fa-solid fa-diagram-project',

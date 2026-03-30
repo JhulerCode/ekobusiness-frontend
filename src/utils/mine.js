@@ -45,7 +45,7 @@ function incompleteData(obj, p) {
     } else {
         for (let path of p) {
             const value = path.split('.').reduce((acc, part) => {
-                return (acc !== null && acc !== undefined) ? acc[part] : undefined
+                return acc !== null && acc !== undefined ? acc[part] : undefined
             }, obj)
 
             if (value === '' || value === null || value === undefined) {
@@ -317,11 +317,11 @@ const buttonVerifyPermission = (item, option) => {
     if (option.ocultar) {
         for (const prop in option.ocultar) {
             const cond = option.ocultar[prop]
-            const val = item[prop]
-            if (val === undefined) continue
+            const val = item ? item[prop] : undefined
+
             if (Array.isArray(cond)) {
                 if (cond.includes(val)) return false
-            } else if (typeof cond === 'object' && cond.op) {
+            } else if (typeof cond === 'object' && cond.op !== undefined) {
                 if (comparar(val, cond.op, cond.val)) return false
             } else if (cond == val) return false
         }
@@ -343,10 +343,14 @@ const comparar = (a, op, b) => {
             return a >= b
         case '<=':
             return a <= b
-        case '==':
+        case '=':
             return a == b
+        case '===':
+            return a === b
         case '!=':
             return a != b
+        case '!==':
+            return a !== b
         default:
             return false
     }

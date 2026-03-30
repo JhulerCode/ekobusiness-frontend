@@ -78,7 +78,8 @@ vistas.updateVista(viewName, {
 })
 
 const vista = vistas[viewName]
-vista.pestana = 1
+const firstVisibleTab = props.pestanas.find((t) => t.show)
+vista.pestana = firstVisibleTab ? firstVisibleTab.id : (props.pestanas[0]?.id ?? 1)
 
 loadData()
 

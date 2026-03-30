@@ -25,7 +25,7 @@
             rowOptionsMode="buttons"
             @rowOptionSelected="runMethod"
             @onChange="runMethod"
-            :agregarFila="vista.data.estado == 2 ? null : addLine"
+            :agregarFila="agregarFila"
         />
     </div>
 
@@ -154,16 +154,23 @@ export default {
                 },
             ]
         },
+        agregarFila() {
+            if (this.vista.data.estado == 2) return null
+            if (!this.auth.verifyPermiso('vProduccionOrdenes:salidaInsumos')) return null
+            return this.addLine
+        },
     },
     created() {
-        if (this.vista.last_path != this.$route.fullPath) {
-            const sit = setInterval(() => {
-                if (this.vista.data?.id) {
-                    clearInterval(sit)
-                    this.loadProduccionOrdenInsumos()
-                }
-            }, 100)
-        }
+        const currentId = this.$route.params[this.vista.pathKey]
+        if (currentId === 'nuevo') return
+        if (this.vista._loaded_insumos_for === currentId) return
+        const sit = setInterval(() => {
+            if (this.vista.data?.id) {
+                clearInterval(sit)
+                this.loadProduccionOrdenInsumos()
+                this.vista._loaded_insumos_for = currentId
+            }
+        }, 100)
     },
     methods: {
         runMethod(method, item) {

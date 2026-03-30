@@ -92,6 +92,22 @@
                 style="grid-column: 1/3"
             />
 
+            <JdInput
+                label="Inicio"
+                v-model="vista.data.inicio1"
+                :disabled="true"
+                style="grid-column: 4/5"
+                v-if="vista.data.inicio"
+            />
+
+            <JdInput
+                label="Fin"
+                v-model="vista.data.fin1"
+                :disabled="true"
+                style="grid-column: 4/5"
+                v-if="vista.data.fin"
+            />
+
             <div v-if="vista.data.maquina" style="grid-column: 4/5">
                 <p>
                     <small> Velocidad producción: </small>
@@ -127,7 +143,7 @@ import { useModals } from '@/pinia/modals'
 import { useSystem } from '@/pinia/system'
 import { urls, get, post, patch } from '@/utils/crud'
 import { incompleteData } from '@/utils/mine'
-import { jmsg } from '@/utils/swal'
+import { jmsg, jqst } from '@/utils/swal'
 import dayjs from 'dayjs'
 
 export default {
@@ -148,8 +164,18 @@ export default {
         },
         availableTabs() {
             return [
-                { id: 1, label: 'Insumos', show: true },
-                { id: 2, label: 'Productos terminados', show: !this.is_nuevo },
+                {
+                    id: 1,
+                    label: 'Insumos',
+                    show: this.auth.verifyPermiso('vProduccionOrdenes:salidaInsumos'),
+                },
+                {
+                    id: 2,
+                    label: 'Productos terminados',
+                    show:
+                        !this.is_nuevo &&
+                        this.auth.verifyPermiso('vProduccionOrdenes:productosTerminados'),
+                },
             ]
         },
         is_nuevo() {
@@ -228,6 +254,12 @@ export default {
 
             this.vista.mode = 'view'
         },
+        iniciar() {
+            this.setInicioFin(1)
+        },
+        terminar() {
+            this.setInicioFin(2)
+        },
 
         //--- Methods --//
         checkDatos() {
@@ -245,6 +277,36 @@ export default {
             this.vista.data.produccion_orden_insumos.forEach((a) => {
                 a.cantidad = (a.cantidad_receta * this.vista.data.cantidad).toFixed(2)
             })
+        },
+        async setInicioFin(estado) {
+            const resQst = await jqst(
+                `¿Está seguro de marcar el ${estado == 1 ? 'inicio' : 'fin'}?`,
+            )
+            if (resQst.isConfirmed == false) return
+
+            const send = {
+                id: this.vista.data.id,
+                inicio: estado == 1 ? dayjs() : null,
+                fin: estado == 2 ? dayjs() : null,
+            }
+
+            this.auth.setLoading(true, 'Cargando...')
+            const res = await patch(
+                `${this.vista.apiUrl}/inicio-fin`,
+                send,
+                `${estado == 1 ? 'Inicio' : 'Final'} registrado`,
+            )
+            this.auth.setLoading(false)
+
+            if (res.code != 0) return
+
+            if (estado == 1) {
+                this.vista.data.inicio = res.data.inicio
+                this.vista.data.inicio1 = res.data.inicio1
+            } else {
+                this.vista.data.fin = res.data.fin
+                this.vista.data.fin1 = res.data.fin1
+            }
         },
 
         //--- auxiliar methods ---//

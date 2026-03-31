@@ -42,7 +42,7 @@
             <JdSelect
                 label="Lote"
                 :nec="true"
-                v-model="modal.transaccion.lote_padre"
+                v-model="modal.transaccion.lote_id"
                 :lista="modal.lotes || []"
                 mostrar="lote_fv_stock"
                 :loaded="modal.lotesLoaded"
@@ -177,35 +177,25 @@ export default {
         },
         async loadLotes() {
             this.modal.lotes = []
-            this.modal.transaccion.lote_padre = null
-            this.modal.lotesLoaded = false
+            this.modal.transaccion.lote_id = null
 
             if (this.modal.transaccion.articulo == null) return
 
             const qry = {
                 incl: ['articulo1'],
-                cols: [
-                    'fecha',
-                    'moneda',
-                    'tipo_cambio',
-                    'pu',
-                    'igv_afectacion',
-                    'igv_porcentaje',
-                    'fv',
-                    'lote',
-                    'stock',
-                    'lote_fv_stock',
-                ],
+                cols: ['codigo', 'fv', 'stock', 'lote_fv', 'lote_fv_stock'],
                 fltr: {
                     articulo: { op: 'Es', val: this.modal.transaccion.articulo },
-                    is_lote_padre: { op: 'Es', val: true },
                 },
-                ordr: [['lote', 'DESC']],
+                ordr: [
+                    ['codigo', 'DESC'],
+                    ['fv', 'DESC'],
+                ],
             }
 
             this.useAuth.setLoading(true, 'Cargando...')
             this.modal.lotesLoaded = false
-            const res = await get(`${urls.kardex}?qry=${JSON.stringify(qry)}`)
+            const res = await get(`${urls.lotes}?qry=${JSON.stringify(qry)}`)
             this.modal.lotesLoaded = true
             this.useAuth.setLoading(false)
 
@@ -227,7 +217,7 @@ export default {
 
                 if (this.modal.articulo1.has_fv) props.push('fv')
             } else {
-                props.push('lote_padre')
+                props.push('lote_id')
             }
 
             if (incompleteData(this.modal.transaccion, props)) {
@@ -245,7 +235,7 @@ export default {
 
                 this.modal.transaccion.is_lote_padre = true
                 this.modal.transaccion.stock = this.modal.transaccion.cantidad
-                delete this.modal.transaccion.lote_padre
+                delete this.modal.transaccion.lote_id
             } else {
                 delete this.modal.transaccion.pu
                 delete this.modal.transaccion.igv_afectacion

@@ -71,11 +71,12 @@ export default {
 
             this.auth.updateQuery(this.vista.tableColumns, this.vista.qry)
             this.vista.qry.cols.push(
-                'tipo_cambio',
-                'igv_afectacion',
-                'igv_porcentaje',
-                'lote_padre',
-                'is_lote_padre',
+                // 'tipo_cambio',
+                // 'igv_afectacion',
+                // 'igv_porcentaje',
+                // 'lote_padre',
+                // 'is_lote_padre',
+                'lote_id',
                 'stock',
             )
         },

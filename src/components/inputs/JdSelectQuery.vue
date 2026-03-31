@@ -32,12 +32,14 @@
                 </div>
 
                 <div class="actions" v-if="!disabled">
+                    <i class="fa-solid fa-arrows-rotate" v-if="isVisible" title="Recargar datos" @click.stop="reload()"></i>
                     <i class="fa-solid fa-xmark hidden" v-if="hasValue" @click.stop="setNull()"></i>
 
                     <i
                         :class="`${isVisible ? 'fa-solid fa-caret-up' : 'fa-solid fa-caret-down'}`"
                     ></i>
                 </div>
+
             </div>
 
             <div
@@ -144,6 +146,15 @@ export default {
         internalLista: [],
         internalSpin: false,
     }),
+    watch: {
+        computedLista() {
+            if (this.isVisible) {
+                this.$nextTick(() => {
+                    this.updatePosition()
+                })
+            }
+        }
+    },
     methods: {
         handleClickOutside(event) {
             const el = this.$refs['lista-box']
@@ -178,19 +189,44 @@ export default {
             const el = this.$refs['lista-box']
 
             if (el) {
+                // Forzamos el recálculo basado en el tamaño real renderizado
                 const listHeight = el.offsetHeight
                 const windowHeight = window.innerHeight
 
+                // Usamos un pequeño margen para no quedar excesivamente pegado al borde de la pantalla
+                const margin = 10
+                
                 // Decide si poner arriba o abajo
-                const spaceBelow = windowHeight - rect.bottom
-                const spaceAbove = rect.top
+                const spaceBelow = windowHeight - rect.bottom - margin
+                const spaceAbove = rect.top - margin
 
-                if (spaceBelow < listHeight && spaceAbove > spaceBelow) {
-                    // Poner arriba
-                    el.style.top = `${rect.top - listHeight}px`
-                } else {
+                if (listHeight <= spaceBelow) {
                     // Poner abajo
                     el.style.top = `${rect.bottom}px`
+                    el.style.bottom = 'auto'
+                    el.classList.add('lista-below')
+                    el.classList.remove('lista-above')
+                } else if (listHeight <= spaceAbove) {
+                    // Poner arriba
+                    el.style.top = 'auto'
+                    el.style.bottom = `${windowHeight - rect.top}px`
+                    el.classList.add('lista-above')
+                    el.classList.remove('lista-below')
+                } else {
+                    // Si no cabe en ninguno, poner donde haya más espacio, limitando altura
+                    if (spaceBelow >= spaceAbove) {
+                        el.style.top = `${rect.bottom}px`
+                        el.style.bottom = 'auto'
+                        el.style.maxHeight = `${spaceBelow}px`
+                        el.classList.add('lista-below')
+                        el.classList.remove('lista-above')
+                    } else {
+                        el.style.top = 'auto'
+                        el.style.bottom = `${windowHeight - rect.top}px`
+                        el.style.maxHeight = `${spaceAbove}px`
+                        el.classList.add('lista-above')
+                        el.classList.remove('lista-below')
+                    }
                 }
 
                 el.style.left = `${rect.left}px`
@@ -220,6 +256,10 @@ export default {
             this.inputModel = null
 
             this.$emit('elegir', null)
+        },
+        reload() {
+            // Ya no limpiamos el buscador: this.txtBuscar = ''
+            this.execSearch(this.txtBuscar)
         },
         getNestedProp(obj, prop) {
             const result = prop.split('.').reduce((acc, part) => acc?.[part], obj)
@@ -348,7 +388,13 @@ export default {
             z-index: 1000;
             position: fixed;
             background-color: var(--bg-color);
-            box-shadow: 0 0.5rem 0.7rem var(--shadow-color);
+
+            &.lista-below {
+                box-shadow: 0 0.5rem 0.7rem var(--shadow-color);
+            }
+            &.lista-above {
+                box-shadow: 0 -0.5rem 0.7rem var(--shadow-color);
+            }
 
             .notes {
                 padding: 0.4rem 0.5rem;

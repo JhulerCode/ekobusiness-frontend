@@ -53,7 +53,7 @@ export default {
         async setQuery() {
             this.vista.qry = {
                 fltr: {},
-                incl: ['lote_padre1', 'transaccion1', 'maquina1', 'articulo1'],
+                incl: ['lote1', 'transaccion1', 'maquina1', 'articulo1'],
                 iccl: {
                     transaccion1: {
                         incl: ['socio1'],
@@ -70,15 +70,7 @@ export default {
             }
 
             this.auth.updateQuery(this.vista.tableColumns, this.vista.qry)
-            this.vista.qry.cols.push(
-                // 'tipo_cambio',
-                // 'igv_afectacion',
-                // 'igv_porcentaje',
-                // 'lote_padre',
-                // 'is_lote_padre',
-                'lote_id',
-                'stock',
-            )
+            // this.vista.qry.cols.push('lote_id')
         },
 
         //--- Row actions ---//

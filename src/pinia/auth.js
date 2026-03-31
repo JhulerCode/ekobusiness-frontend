@@ -9,10 +9,11 @@ import menuAdmin from '@/config/menuAdmin.js'
 export const useAuth = defineStore('auth', {
     state: () => ({
         token: null,
+        refreshPromise: null,
         usuario: {},
         empresa: {},
         empresa_publica: null,
-        app_version: '2.0.1',
+        app_version: '2.0.2',
 
         menu: menuConfig,
 
@@ -46,6 +47,37 @@ export const useAuth = defineStore('auth', {
             if (res.code == 0) {
                 this.empresa_publica = res.data
             }
+        },
+
+        async refreshAccessToken() {
+            if (this.refreshPromise) return this.refreshPromise
+
+            this.refreshPromise = (async () => {
+                try {
+                    const response = await fetch(`${urls.signin}/refresh`, {
+                        method: 'POST',
+                        credentials: 'include',
+                        headers: {
+                            'x-app-version': this.app_version,
+                            'x-empresa': this.empresa.subdominio,
+                        },
+                    })
+                    const res = await response.json()
+
+                    if (res.code === 0) {
+                        this.token = res.token
+                        return true
+                    }
+                } catch (error) {
+                    console.error('Error refreshing token', error)
+                } finally {
+                    this.refreshPromise = null
+                }
+                this.clearAuth()
+                return false
+            })()
+
+            return this.refreshPromise
         },
 
         async login() {

@@ -57,13 +57,14 @@ async function get(url) {
         response = await fetch(url, {
             method: 'GET',
             headers: setHeaders(),
+            credentials: 'include',
         })
     } catch (error) {
         jmsg('error', error)
         return { code: -2 }
     }
 
-    return await process(response, false)
+    return await process(response, false, get, url)
 }
 
 async function post(url, item, ms) {
@@ -74,6 +75,7 @@ async function post(url, item, ms) {
             method: 'POST',
             headers: setHeaders(item),
             body: setBody(item),
+            credentials: 'include',
         })
     } catch (error) {
         jmsg('error', error)
@@ -84,7 +86,7 @@ async function post(url, item, ms) {
         ms = 'Creado con éxito'
     }
 
-    return await process(response, ms)
+    return await process(response, ms, post, url, item)
 }
 
 async function patch(url, item, ms) {
@@ -95,6 +97,7 @@ async function patch(url, item, ms) {
             method: 'PATCH',
             headers: setHeaders(item),
             body: setBody(item),
+            credentials: 'include',
         })
     } catch (error) {
         jmsg('error', error)
@@ -105,7 +108,7 @@ async function patch(url, item, ms) {
         ms = 'Actualizado con éxito'
     }
 
-    return await process(response, ms)
+    return await process(response, ms, patch, url, item)
 }
 
 async function delet(url, item, ms) {
@@ -116,6 +119,7 @@ async function delet(url, item, ms) {
             method: 'DELETE',
             headers: setHeaders(item),
             body: setBody(item),
+            credentials: 'include',
         })
     } catch (error) {
         jmsg('error', error)
@@ -126,7 +130,7 @@ async function delet(url, item, ms) {
         ms = 'Eliminado con éxito'
     }
 
-    return await process(response, ms)
+    return await process(response, ms, delet, url, item)
 }
 
 function setHeaders(item) {
@@ -169,19 +173,27 @@ function setBody(item) {
     return formData
 }
 
-async function process(response, ms) {
+async function process(response, ms, fn, url, item) {
     const contentType = response.headers.get('Content-Type')
 
     if (contentType && contentType.includes('application/json')) {
         const res = await response.json()
 
         if ([401, 403, 404, 426].includes(response.status)) {
-            jmsg('error', res.msg)
-
             if (response.status == 401) {
-                useModals().setModal('mLogin', 'Sesión terminada', null, null)
+                // Intenta refrescar el token
+                const refreshed = await useAuth().refreshAccessToken()
+                if (refreshed) {
+                    // Reintenta la petición
+                    return await fn(url, item, ms)
+                } else {
+                    jmsg('error', 'Sesión expirada')
+                    useModals().setModal('mLogin', 'Sesión terminada', null, null)
+                    return { code: 401 }
+                }
             }
 
+            jmsg('error', res.msg)
             return { code: response.status }
         }
 

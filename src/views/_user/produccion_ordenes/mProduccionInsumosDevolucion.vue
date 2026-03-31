@@ -8,7 +8,7 @@
             {{ modal.articulo.nombre }}
         </p>
 
-        <div class="container-datos">
+        <div class="container-datos1">
             <JdInput type="date" :nec="true" label="Fecha" v-model="modal.transaccion.fecha" />
 
             <JdInput
@@ -69,7 +69,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.container-datos {
+.container-datos1 {
     display: grid;
     grid-template-columns: 15rem 15rem;
     gap: 0.5rem 1rem;

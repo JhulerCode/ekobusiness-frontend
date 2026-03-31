@@ -30,10 +30,15 @@
     </div>
 
     <mMrpBomLines v-if="modals?.show?.mMrpBomLines" @sendItems="agregarFromBomLines" />
+    <mProduccionInsumosDevolucion
+        v-if="modals?.show?.mProduccionInsumosDevolucion"
+        @devuelto="devuelto"
+    />
 </template>
 
 <script>
 import mMrpBomLines from './mMrpBomLines.vue'
+import mProduccionInsumosDevolucion from '../produccion_ordenes/mProduccionInsumosDevolucion.vue'
 
 import { useSystem } from '@/pinia/system'
 import { useAuth } from '@/pinia/auth'
@@ -44,7 +49,7 @@ import { redondear, incompleteData, deepCopy } from '@/utils/mine'
 import { jmsg, jqst } from '@/utils/swal'
 
 export default {
-    components: { mMrpBomLines },
+    components: { mMrpBomLines, mProduccionInsumosDevolucion },
     data: () => ({
         useSystem: useSystem(),
         auth: useAuth(),
@@ -146,11 +151,17 @@ export default {
                     action: 'saveLine',
                     ocultar: { _state: 'view' },
                 },
+                // {
+                //     icon: 'fa-solid fa-pen-to-square',
+                //     title: 'Editar',
+                //     action: 'editLine',
+                //     ocultar: { _state: ['new', 'edit'] },
+                // },
                 {
-                    icon: 'fa-solid fa-pen-to-square',
-                    title: 'Editar',
-                    action: 'editLine',
-                    ocultar: { _state: ['new', 'edit'] },
+                    icon: 'fa-solid fa-rotate-left',
+                    title: 'Devolución',
+                    action: 'devolucion',
+                    ocultar: { tipo: 3, _state: 'new' },
                 },
             ]
         },
@@ -278,6 +289,20 @@ export default {
             }
             this.vista.data.produccion_orden_insumos[i]._state = 'view'
         },
+        async devolucion(item) {
+            const send = {
+                transaccion: {
+                    tipo: 3,
+                    fecha: item.fecha,
+                    maquina: item.maquina,
+                    articulo: item.articulo,
+                    lote_id: item.lote_id,
+                },
+                articulo: { ...item.articulo1 },
+            }
+
+            this.modals.setModal('mProduccionInsumosDevolucion', 'Devolución', 1, send, true)
+        },
 
         //--- methods ---//
         elegirArticulo(data, fila) {
@@ -331,6 +356,9 @@ export default {
                     tipo1: { id: 2, nombre: 'PRODUCCIÓN SALIDA' },
                 })
             }
+        },
+        devuelto(item) {
+            this.vista.data.produccion_orden_insumos.unshift({ ...item, _state: 'view' })
         },
 
         //--- Auxiliar data ---//

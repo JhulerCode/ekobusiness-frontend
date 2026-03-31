@@ -105,6 +105,12 @@ export default {
             if (this.$route.name == 'vVentaPedidoEntrega') {
                 tipo = 5
             }
+            if (this.$route.name == 'vCompraTraslado') {
+                tipo = 1
+            }
+            if (this.$route.name == 'vVentaTraslado') {
+                tipo = 5
+            }
 
             this.vista.data = {
                 tipo,

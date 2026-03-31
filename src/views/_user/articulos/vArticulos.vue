@@ -79,6 +79,8 @@ export default {
 
         //--- Row actions ---//
         verKardex(item) {
+            if (!this.vistas.vArticulo) this.vistas.initVista('vArticulo', 'detail')
+            this.vistas.vArticulo.titleKey = 'nombre'
             this.vistas.vArticulo.data = { id: item.id, nombre: item.nombre }
             this.$router.push(`/consola/inventario/articulos/${item.id}/kardex`)
         },

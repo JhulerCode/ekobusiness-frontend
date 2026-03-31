@@ -5,7 +5,7 @@ export default {
         {
             text: 'Nuevo',
             action: 'nuevo',
-            permiso: 'vProveedores:crear',
+            permiso: ['vProveedores:crear', 'vClientes:crear'],
         },
     ],
 

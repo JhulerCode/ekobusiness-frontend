@@ -47,7 +47,7 @@ export default {
                     return 'vCompraPedidoRecepcion'
                 }
                 if (this.$route.name == 'vVentaPedidoEntregas') {
-                    return 'vVentaPedidoTraslado'
+                    return 'vVentaPedidoEntrega'
                 }
             }
 

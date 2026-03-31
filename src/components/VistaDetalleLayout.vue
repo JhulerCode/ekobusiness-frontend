@@ -120,7 +120,7 @@ const headerLeftActions = computed(() => {
         {
             text: 'Nuevo',
             action: 'nuevo',
-            show: !isEdit,
+            show: !isEdit && auth.verifyPermiso(props.config.permisoCrear),
         },
         {
             text: 'Editar',
@@ -154,7 +154,10 @@ const headerLeftActions = computed(() => {
             action: 'guardarAvance',
             icon: 'fa-solid fa-floppy-disk',
             tipo: '2',
-            show: isEdit && route.params[props.config.pathKey] === 'nuevo',
+            show:
+                isEdit &&
+                auth.verifyPermiso(props.config.permisoGuardarAvance) &&
+                route.params[props.config.pathKey] === 'nuevo',
         },
         {
             text: 'Eliminar',

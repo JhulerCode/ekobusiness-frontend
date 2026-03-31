@@ -4,6 +4,7 @@ export default {
     pathKey: 'pedido_id',
     permisoEditar: ['vCompraPedidos:editar', 'vVentaPedidos:editar'],
     permisoClonar: ['vCompraPedidos:clonar', 'vVentaPedidos:clonar'],
+    permisoGuardarAvance: ['vCompraPedidos:crear', 'vVentaPedidos:crear'],
 
     headerActions: [
         {

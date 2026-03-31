@@ -288,7 +288,6 @@ export default {
                     }
                 }
             }
-            console.log(this.vista.data.transaccion_items)
 
             //--- Traemos lotes de articulos --//
             const articulos_ids = []
@@ -356,7 +355,7 @@ export default {
 
                                 articulo: lote.articulo,
                                 cantidad: a.cantidad - total,
-                                lote: lote.id,
+                                lote_id: lote.id,
                                 lote1: lote,
                             }
 
@@ -382,7 +381,7 @@ export default {
 
                             articulo: lote.articulo,
                             cantidad: a.cantidad - total,
-                            lote: lote.id,
+                            lote_id: lote.id,
                             lote1: lote,
                         }
 

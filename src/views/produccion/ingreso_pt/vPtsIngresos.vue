@@ -2,26 +2,21 @@
     <VistaLayout :config="VIEW_CONFIG" :setQuery="setQuery" @runMethod="runMethod"> </VistaLayout>
 
     <mProductosCuarentena v-if="modals?.show?.mProductosCuarentena" />
-    <mProduccionTrazabilidad v-if="modals?.show?.mProduccionTrazabilidad" />
 </template>
 
 <script>
 import mProductosCuarentena from '@/views/produccion/ingreso_pt/mProductosCuarentena.vue'
-import mProduccionTrazabilidad from '@/views/produccion/historial/mProduccionTrazabilidad.vue'
 
 import VIEW_CONFIG from './pts_ingresos.config.js'
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
 import { useModals } from '@/pinia/modals'
-import { urls, get } from '@/utils/crud'
 import dayjs from 'dayjs'
-import { jmsg } from '@/utils/swal'
 
 export default {
     name: 'vPtsIngresos',
     components: {
         mProductosCuarentena,
-        mProduccionTrazabilidad,
     },
     computed: {
         auth: () => useAuth(),
@@ -74,24 +69,6 @@ export default {
                 transaccion: {},
             }
             this.modals.setModal('mProductosCuarentena', `Cuarentena`, null, send, true)
-        },
-
-        //--- Row actions ---//
-        async verTrazabilidad(item) {
-            console.log('ASD')
-            this.auth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.produccion_ordenes}/uno/${item.produccion_orden}`)
-            this.auth.setLoading(false)
-
-            if (res.code != 0) return
-            if (res.data == null) return jmsg('warning', 'La órden de producción no existe')
-
-            const send = {
-                produccion_orden: res.data,
-                articulos: [{ id: res.data.articulo, ...res.data.articulo1 }],
-                maquinas: [{ id: res.data.maquina, ...res.data.maquina1 }],
-            }
-            this.modals.setModal('mProduccionTrazabilidad', 'Trazabilidad', null, send, true)
         },
     },
 }

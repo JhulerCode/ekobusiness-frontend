@@ -220,14 +220,20 @@ export default {
         },
         ajusteStock() {
             const send = {
-                transaccion: { fecha: dayjs().format('YYYY-MM-DD'), articulo: this.vista.data.id },
+                transaccion: {
+                    fecha: dayjs().format('YYYY-MM-DD'),
+                    articulo: this.vista.data.id,
+                    lote1: {
+                        id: crypto.randomUUID(),
+                    },
+                    is_nuevo_lote: false,
+                },
                 articulo1: {
                     igv_afectacion: this.vista.data.igv_afectacion,
                     has_fv: this.vista.data.has_fv,
                 },
                 articulos: [{ id: this.vista.data.id, nombre: this.vista.data.nombre }],
                 articulo_tipo: 1,
-                is_nuevo_lote: false,
             }
             this.modals.setModal('mAjusteStock', 'Ajuste de stock', null, send, true)
         },

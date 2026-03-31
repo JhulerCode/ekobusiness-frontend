@@ -18,12 +18,12 @@
                     useSystem.data.kardex_operaciones?.filter((a) => a.id == 6 || a.id == 7) || []
                 "
                 style="grid-column: 1/3"
-                @elegir="modal.is_nuevo_lote = false"
+                @elegir="modal.transaccion.is_nuevo_lote = false"
             />
 
             <JdCheckBox
                 label="Nuevo lote"
-                v-model="modal.is_nuevo_lote"
+                v-model="modal.transaccion.is_nuevo_lote"
                 v-if="modal.transaccion.tipo == 6"
             />
 
@@ -39,23 +39,22 @@
                 :disabled="true"
             />
 
-            <JdSelect
+            <JdSelectQuery
                 label="Lote"
                 :nec="true"
                 v-model="modal.transaccion.lote_id"
-                :lista="modal.lotes || []"
                 mostrar="lote_fv_stock"
-                :loaded="modal.lotesLoaded"
-                @reload="loadLotes"
+                :search="loadLotes"
+                @elegir="selectLote"
                 style="grid-column: 1/4"
-                v-if="modal.is_nuevo_lote == false"
+                v-if="modal.transaccion.is_nuevo_lote == false"
             />
 
             <template v-else>
                 <JdInput
                     label="Lote"
                     :nec="true"
-                    v-model="modal.transaccion.lote"
+                    v-model="modal.transaccion.lote1.codigo"
                     style="grid-column: 1/3"
                 />
 
@@ -63,26 +62,36 @@
                     label="F. venc."
                     :nec="true"
                     type="date"
-                    v-model="modal.transaccion.fv"
+                    v-model="modal.transaccion.lote1.fv"
                     style="grid-column: 3/5"
                     v-if="modal.articulo1.has_fv"
                 />
 
-                <JdSelect
+                <JdSelectQuery
                     label="Moneda"
                     :nec="true"
-                    v-model="modal.transaccion.moneda"
-                    :lista="modal.monedas || []"
-                    :loaded="modal.monedasLoaded"
-                    @reload="loadMonedas"
+                    v-model="modal.transaccion.lote1.moneda"
+                    :search="loadMonedas"
                     style="grid-column: 1/3"
+                />
+
+                <JdInput
+                    type="number"
+                    label="Tipo de cambio"
+                    :nec="true"
+                    v-model="modal.transaccion.lote1.tipo_cambio"
+                    style="grid-column: 3/5"
+                    v-if="
+                        modal.transaccion.lote1.moneda &&
+                        modal.transaccion.lote1.moneda != useAuth.empresa.moneda
+                    "
                 />
 
                 <JdInput
                     type="number"
                     label="Valor unitario"
                     :nec="true"
-                    v-model="modal.transaccion.pu"
+                    v-model="modal.transaccion.lote1.vu"
                     style="grid-column: 3/5"
                 />
             </template>
@@ -115,8 +124,6 @@ import { urls, get, post } from '@/utils/crud'
 import { redondear, incompleteData } from '@/utils/mine'
 import { jmsg } from '@/utils/swal'
 
-import dayjs from 'dayjs'
-
 export default {
     data: () => ({
         useAuth: useAuth(),
@@ -134,88 +141,19 @@ export default {
         this.modal = this.useModals.mAjusteStock
 
         this.useSystem.load(['kardex_operaciones'])
-        this.loadMonedas()
-        this.loadLotes()
     },
     methods: {
-        initTransaccion() {
-            this.modal.transaccion = {
-                fecha: dayjs().format('YYYY-MM-DD'),
-            }
-
-            this.modal.lotes = []
-            this.modal.lotesLoaded = false
-        },
-        async searchArticulos(txtBuscar) {
-            if (!txtBuscar) {
-                this.modal.articulos.length = 0
-                return
-            }
-
-            const qry = {
-                fltr: {
-                    tipo: { op: 'Es', val: this.modal.articulo_tipo },
-                    activo: { op: 'Es', val: true },
-                    nombre: { op: 'Contiene', val: txtBuscar },
-                },
-                cols: ['nombre', 'unidad', 'igv_afectacion', 'has_fv'],
-                ordr: [['nombre', 'ASC']],
-            }
-
-            this.modal.spinArticulos = true
-            const res = await get(`${urls.articulos}?qry=${JSON.stringify(qry)}`)
-            this.modal.spinArticulos = false
-
-            if (res.code !== 0) return
-
-            this.modal.articulos = JSON.parse(JSON.stringify(res.data))
-        },
-        setArticulo(item) {
-            this.modal.articulo1 = item
-
-            this.loadLotes()
-        },
-        async loadLotes() {
-            this.modal.lotes = []
-            this.modal.transaccion.lote_id = null
-
-            if (this.modal.transaccion.articulo == null) return
-
-            const qry = {
-                incl: ['articulo1'],
-                cols: ['codigo', 'fv', 'stock', 'lote_fv', 'lote_fv_stock'],
-                fltr: {
-                    articulo: { op: 'Es', val: this.modal.transaccion.articulo },
-                },
-                ordr: [
-                    ['codigo', 'DESC'],
-                    ['fv', 'DESC'],
-                ],
-            }
-
-            this.useAuth.setLoading(true, 'Cargando...')
-            this.modal.lotesLoaded = false
-            const res = await get(`${urls.lotes}?qry=${JSON.stringify(qry)}`)
-            this.modal.lotesLoaded = true
-            this.useAuth.setLoading(false)
-
-            if (res.code !== 0) return
-
-            this.modal.lotes = JSON.parse(JSON.stringify(res.data))
-        },
-        selectLote(item) {
-            for (const a of this.lotes) a.selected = false
-
-            item.selected = true
-        },
-
         checkDatos() {
             const props = ['fecha', 'tipo', 'articulo', 'cantidad', 'observacion']
 
-            if (this.modal.is_nuevo_lote) {
-                props.push('moneda', 'pu', 'lote')
+            if (this.modal.transaccion.is_nuevo_lote) {
+                props.push('lote1.moneda', 'lote1.vu', 'lote1.codigo')
 
-                if (this.modal.articulo1.has_fv) props.push('fv')
+                if (this.modal.articulo1.has_fv) props.push('lote1.fv')
+
+                if (this.modal.transaccion.lote1.moneda != this.useAuth.empresa.moneda) {
+                    props.push('lote1.tipo_cambio')
+                }
             } else {
                 props.push('lote_id')
             }
@@ -228,34 +166,16 @@ export default {
             return false
         },
         shapeDatos() {
-            if (this.modal.is_nuevo_lote) {
-                this.modal.transaccion.igv_afectacion = this.modal.articulo1.igv_afectacion
-                this.modal.transaccion.igv_porcentaje = this.useAuth.empresa.igv_porcentaje
-                this.modal.transaccion.tipo_cambio = this.modal.transaccion.moneda == 1 ? 1 : 3.5
+            if (this.modal.transaccion.is_nuevo_lote) {
+                if (this.modal.transaccion.lote1.moneda == this.useAuth.empresa.moneda) {
+                    this.modal.transaccion.lote1.tipo_cambio = 1
+                }
+                this.modal.transaccion.lote1.igv_afectacion = this.modal.articulo1.igv_afectacion
+                this.modal.transaccion.lote1.igv_porcentaje = this.useAuth.empresa.igv_porcentaje
 
-                this.modal.transaccion.is_lote_padre = true
-                this.modal.transaccion.stock = this.modal.transaccion.cantidad
-                delete this.modal.transaccion.lote_id
-            } else {
-                delete this.modal.transaccion.pu
-                delete this.modal.transaccion.igv_afectacion
-                delete this.modal.transaccion.igv_porcentaje
-                delete this.modal.transaccion.moneda
-                delete this.modal.transaccion.tipo_cambio
-
-                delete this.modal.transaccion.lote
-                delete this.modal.transaccion.fv
-
-                delete this.modal.transaccion.is_lote_padre
-                delete this.modal.transaccion.stock
+                this.modal.transaccion.lote1.articulo = this.modal.transaccion.articulo
             }
         },
-        // async grabar1() {
-        //     if (this.checkDatos()) return
-        //     this.shapeDatos()
-
-        //     console.log(this.modal.transaccion)
-        // },
         async grabar() {
             if (this.checkDatos()) return
             this.shapeDatos()
@@ -266,11 +186,40 @@ export default {
 
             if (res.code != 0) return
 
-            this.initTransaccion()
+            // this.initTransaccion()
             this.useModals.show.mAjusteStock = false
         },
 
-        async loadMonedas() {
+        //--- methods ---//
+        setArticulo(item) {
+            this.modal.articulo1 = item
+        },
+        selectLote(item) {
+            this.modal.transaccion.lote1 = item
+        },
+
+        //--- auxiliar data ---//
+        async searchArticulos(txt) {
+            const qry = {
+                fltr: {
+                    tipo: { op: 'Es', val: this.modal.articulo_tipo },
+                    activo: { op: 'Es', val: true },
+                },
+                cols: ['nombre', 'unidad', 'igv_afectacion', 'has_fv'],
+                ordr: [['nombre', 'ASC']],
+            }
+
+            if (txt) {
+                qry.fltr.nombre = { op: 'Contiene', val: txt }
+            }
+
+            const res = await get(`${urls.articulos}?qry=${JSON.stringify(qry)}`)
+
+            if (res.code !== 0) return
+
+            return res.data
+        },
+        async loadMonedas(txt) {
             const qry = {
                 fltr: {},
                 cols: ['id', 'nombre', 'simbolo', 'estandar'],
@@ -278,17 +227,45 @@ export default {
                     ['estandar', 'DESC'],
                     ['nombre', 'ASC'],
                 ],
+                limt: 25,
             }
 
-            this.useAuth.setLoading(true, 'Cargando...')
-            this.modal.monedasLoaded = false
+            if (txt) {
+                qry.fltr.nombre = { op: 'Contiene', val: txt }
+            }
+
             const res = await get(`${urls.monedas}?qry=${JSON.stringify(qry)}`)
-            this.modal.monedasLoaded = true
-            this.useAuth.setLoading(false)
 
             if (res.code != 0) return
 
-            this.modal.monedas = res.data
+            return res.data
+        },
+        async loadLotes(txt) {
+            // this.modal.lotes = []
+            // this.modal.transaccion.lote_id = null
+
+            // if (this.modal.transaccion.articulo == null) return
+
+            const qry = {
+                cols: ['codigo', 'fv', 'stock', 'lote_fv', 'lote_fv_stock'],
+                fltr: {
+                    articulo: { op: 'Es', val: this.modal.transaccion.articulo },
+                },
+                ordr: [
+                    ['codigo', 'DESC'],
+                    ['fv', 'DESC'],
+                ],
+            }
+
+            if (txt) {
+                qry.fltr.codigo = { op: 'Contiene', val: txt }
+            }
+
+            const res = await get(`${urls.lotes}?qry=${JSON.stringify(qry)}`)
+
+            if (res.code !== 0) return
+
+            return res.data
         },
     },
 }

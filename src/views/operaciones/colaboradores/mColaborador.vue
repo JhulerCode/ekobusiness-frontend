@@ -205,6 +205,13 @@ export default {
             },
         ],
     }),
+    watch: {
+        'modal.colaborador.vista_inicial'(newVal) {
+            if (this.modal.colaborador.has_signin && !this.getViewsWithAtLeastOnePermission().includes(newVal)) {
+                jmsg('warning', 'La vista inicial seleccionada no tiene permisos asignados')
+            }
+        }
+    },
     created() {
         this.modal = this.modals.mColaborador
 
@@ -232,7 +239,33 @@ export default {
                 return true
             }
 
+            if (this.modal.colaborador.has_signin) {
+                const viewsWithPerms = this.getViewsWithAtLeastOnePermission()
+                if (!viewsWithPerms.includes(this.modal.colaborador.vista_inicial)) {
+                    jmsg('warning', 'La vista inicial debe tener al menos un permiso seleccionado')
+                    return true
+                }
+            }
+
             return false
+        },
+        getViewsWithAtLeastOnePermission() {
+            const views = []
+            for (const a of this.auth.menu) {
+                if (a.children) {
+                    for (const b of a.children) {
+                        if (b.permisos) {
+                            for (const c of b.permisos) {
+                                if (c.val) {
+                                    views.push(b.goto)
+                                    break
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return views
         },
         shapeDatos() {
             this.modal.colaborador.permisos = this.recolectarPermisosSeleccionados()

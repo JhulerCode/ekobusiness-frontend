@@ -53,7 +53,7 @@
             </template>
         </JdTable>
     </div>
-    <pre>{{ vista.data.transaccion_items[0] ?? '' }}</pre>
+    <!-- <pre>{{ vista.data.transaccion_items[0] ?? '' }}</pre> -->
     <mPedidoItems v-if="modals?.show?.mPedidoItems" @sendItems="agregarPedidoItems" />
     <mTrasladoItemLotes
         v-if="modals?.show?.mTrasladoItemLotes"
@@ -389,7 +389,8 @@ export default {
                                 articulo1: lote.articulo1,
                                 cantidad: a.cantidad - total,
                                 lote_id: lote.id,
-                                lote1: { id: lote.id, lote_fv_stock: lote.lote_fv_stock },
+                                // lote1: { id: lote.id, lote_fv_stock: lote.lote_fv_stock },
+                                lote1: lote,
                             }
 
                             if (falta <= lote.stock) {
@@ -414,7 +415,8 @@ export default {
                             articulo1: { ...lote.articulo1 },
                             cantidad: a.cantidad - total,
                             lote_id: lote.id,
-                            lote1: { id: lote.id, lote_fv_stock: lote.lote_fv_stock },
+                            // lote1: { id: lote.id, lote_fv_stock: lote.lote_fv_stock },
+                            lote1: lote,
                         }
 
                         if (falta <= lote.stock) {

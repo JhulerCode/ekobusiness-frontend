@@ -13,7 +13,7 @@ export const useAuth = defineStore('auth', {
         usuario: {},
         empresa: {},
         empresa_publica: null,
-        app_version: '2.0.3',
+        app_version: '2.0.4',
 
         menu: menuConfig,
 

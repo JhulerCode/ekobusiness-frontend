@@ -257,7 +257,7 @@ export default {
                     line.kardexes = []
                 } else {
                     line.kardexes = this.setKardexesHoy({
-                        id: line.articulo1,
+                        id: line.articulo1.id,
                         igv_afectacion: line.igv_afectacion,
                         cantidad: line.cantidad,
                         vu: line.vu,

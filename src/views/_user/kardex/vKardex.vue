@@ -5,11 +5,17 @@
         :checkFiltros="checkFiltros"
         :setQuery="setQuery"
     >
+        <template #header-right>
+            <div class="flex items-center gap-2">
+                <small>Stock:</small> <span>{{ stock }}</span>
+            </div>
+        </template>
     </VistaLayout>
 </template>
 
 <script>
 import VIEW_CONFIG from './kardex.config.js'
+import { useSystem } from '@/pinia/system.js'
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
 import { useModals } from '@/pinia/modals'
@@ -21,11 +27,21 @@ export default {
         articulo_id: null,
     }),
     computed: {
+        system: () => useSystem(),
         auth: () => useAuth(),
         vistas: () => useVistas(),
         modals: () => useModals(),
         vista() {
             return this.vistas[this.$route.name]
+        },
+        stock() {
+            if (!this.vista.tableData) return 0
+
+            let suma = 0
+            for (const a of this.vista.tableData) {
+                suma += Number(a.cantidad1 || 0)
+            }
+            return suma
         },
     },
     created() {

@@ -36,6 +36,8 @@
 
             <!-- Paginación y Configuración -->
             <div class="header-right">
+                <slot name="header-right"></slot>
+
                 <JdPaginacion :view="vista" @reload="loadTableData" />
 
                 <JdButton
@@ -45,8 +47,6 @@
                     title="Columnas"
                     @click="openConfigCols"
                 />
-
-                <slot name="header-right"></slot>
             </div>
         </header>
 

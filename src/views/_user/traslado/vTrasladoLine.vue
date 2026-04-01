@@ -53,7 +53,7 @@
             </template>
         </JdTable>
     </div>
-
+    <pre>{{ vista.data.transaccion_items[0] ?? '' }}</pre>
     <mPedidoItems v-if="modals?.show?.mPedidoItems" @sendItems="agregarPedidoItems" />
     <mTrasladoItemLotes
         v-if="modals?.show?.mTrasladoItemLotes"
@@ -178,18 +178,6 @@ export default {
             const i = this.vista.data.transaccion_items.findIndex((a) => a.id == item.id)
             this.vista.data.transaccion_items.splice(i, 1)
         },
-        async elegirArticulo(articulo, item) {
-            if (!articulo) return
-
-            item.articulo = articulo.id
-            item.articulo1 = {
-                id: articulo.id,
-                type: articulo.type,
-                nombre: articulo.nombre,
-                unidad: articulo.unidad,
-                has_fv: articulo.has_fv,
-            }
-        },
         async agregarPedidoItems(items) {
             const faltantes = items.filter((a) => a.cantidad > a.entregado)
             for (const a of faltantes) {
@@ -214,37 +202,73 @@ export default {
                     },
                     kardexes: this.setKardexesHoy({
                         id: a.articulo1.id,
-                        igv_afectacion: a.articulo1.igv_afectacion,
                         cantidad: a.cantidad,
                         vu: a.pu,
+                        igv_afectacion: a.articulo1.igv_afectacion,
                     }),
+                    vu_pedido: a.pu,
                 }
 
                 this.vista.data.transaccion_items.push(send)
             }
         },
+        async elegirArticulo(articulo, item) {
+            if (!articulo) {
+                item.articulo1 = {}
+                return
+            }
+
+            item.articulo = articulo.id
+            item.articulo1 = {
+                id: articulo.id,
+                type: articulo.type,
+                nombre: articulo.nombre,
+                unidad: articulo.unidad,
+                has_fv: articulo.has_fv,
+                igv_afectacion: articulo.igv_afectacion,
+            }
+        },
 
         //--- Lotes ---//
         setKardexesHoy(item) {
-            if (this.vista.data.tipo != 1) return []
-            console.log(item)
-            return [
-                {
-                    id: crypto.randomUUID(),
-                    articulo: item.id,
-                    lote1: {
+            if (this.vista.data.tipo == 5) return []
+
+            if (this.vista.data.tipo == 1) {
+                let moneda = 'PEN'
+                if (this.vista.socio_pedido) {
+                    moneda = this.vista.socio_pedido.moneda
+                }
+
+                let tipo_cambio = 1
+                if (this.vista.socio_pedido) {
+                    if (this.vista.socio_pedido.moneda != this.auth.empresa.moneda)
+                        tipo_cambio = 3.5
+                }
+
+                let vu = 1
+                if (this.vista.socio_pedido) {
+                    vu = item.vu
+                }
+
+                const kdx = [
+                    {
                         id: crypto.randomUUID(),
-                        codigo: `${obtenerNumeroJuliano(this.vista.data.fecha)}-${Math.floor(Math.random() * 90 + 10)}`,
-                        moneda: this.vista.socio_pedido.moneda,
-                        tipo_cambio:
-                            this.vista.socio_pedido.moneda == this.auth.empresa.moneda ? 1 : 3.5,
-                        vu: item.vu,
-                        igv_afectacion: item.igv_afectacion,
-                        igv_porcentaje: this.auth.empresa.igv_porcentaje,
+                        articulo: item.id,
+                        lote1: {
+                            id: crypto.randomUUID(),
+                            codigo: `${obtenerNumeroJuliano(this.vista.data.fecha)}-${Math.floor(Math.random() * 90 + 10)}`,
+                            moneda,
+                            tipo_cambio,
+                            vu,
+                            igv_afectacion: item.igv_afectacion,
+                            igv_porcentaje: this.auth.empresa.igv_porcentaje,
+                        },
+                        cantidad: item.cantidad,
                     },
-                    cantidad: item.cantidad,
-                },
-            ]
+                ]
+
+                return kdx
+            }
         },
         setKardexesOnUpdateCantidad(line) {
             if (this.vista.data.tipo == 5) {
@@ -257,10 +281,10 @@ export default {
                     line.kardexes = []
                 } else {
                     line.kardexes = this.setKardexesHoy({
-                        id: line.articulo1.id,
-                        igv_afectacion: line.igv_afectacion,
+                        id: line.articulo,
                         cantidad: line.cantidad,
-                        vu: line.vu,
+                        vu: line.vu_pedido,
+                        igv_afectacion: line.articulo1.igv_afectacion,
                     })
                 }
             }
@@ -386,12 +410,11 @@ export default {
                         if (falta == 0) break
 
                         const send = {
-                            articulo1: { ...lote.articulo1 },
-
                             articulo: lote.articulo,
+                            articulo1: { ...lote.articulo1 },
                             cantidad: a.cantidad - total,
                             lote_id: lote.id,
-                            lote1: lote,
+                            lote1: { id: lote.id, lote_fv_stock: lote.lote_fv_stock },
                         }
 
                         if (falta <= lote.stock) {

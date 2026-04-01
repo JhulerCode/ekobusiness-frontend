@@ -184,9 +184,16 @@ export default {
                     id: crypto.randomUUID(),
                     articulo: this.vista.data.articulo,
                     codigo: this.elegirLote(),
+                    moneda: this.auth.empresa.moneda,
+                    tipo_cambio: 1,
+                    vu: 1,
+                    igv_afectacion: this.vista.data.articulo1.igv_afectacion,
+                    igv_porcentaje: this.auth.empresa.igv_porcentaje,
                 },
                 pt_cuarentena1,
             })
+
+            console.log(this.vista.data.produccion_orden_pts)
         },
         async removeLine(fila) {
             if (fila._state !== 'new') {

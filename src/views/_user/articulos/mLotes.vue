@@ -18,6 +18,14 @@
             </div>
         </div>
 
+        <JdButton
+            icon="fa-solid fa-rotate-right"
+            text="Recargar"
+            tipo="3"
+            @click="loadLotes"
+            class="mrg-btm1"
+        />
+
         <JdTable
             :columns="columns"
             :datos="modal.lotes || []"
@@ -51,7 +59,7 @@ export default {
 
         columns: [
             {
-                id: 'lote',
+                id: 'codigo',
                 title: 'Lote',
                 width: '8rem',
                 show: true,
@@ -92,32 +100,20 @@ export default {
         async loadLotes() {
             const qry = {
                 incl: ['articulo1'],
-                cols: [
-                    'fecha',
-                    'moneda',
-                    'tipo_cambio',
-                    'pu',
-                    'igv_afectacion',
-                    'igv_porcentaje',
-                    'fv',
-                    'lote',
-                    'stock',
-                    'lote_fv_stock',
-                ],
+                cols: ['fv', 'codigo', 'stock', 'vu'],
                 fltr: {
                     articulo: { op: 'Es', val: this.modal.articulo.id },
-                    is_lote_padre: { op: 'Es', val: true },
                 },
                 ordr: [
                     ['createdAt', 'DESC'],
+                    ['codigo', 'DESC'],
                     ['fv', 'DESC'],
-                    ['lote', 'DESC'],
                 ],
             }
 
             this.modal.lotes = []
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.kardex}?qry=${JSON.stringify(qry)}`)
+            const res = await get(`${urls.lotes}?qry=${JSON.stringify(qry)}`)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
@@ -131,7 +127,7 @@ export default {
 
             for (const a of this.modal.lotes) {
                 this.modal.stock += Number(a.stock)
-                this.modal.valor += Number(a.stock) * a.pu
+                this.modal.valor += Number(a.stock) * a.vu
             }
         },
     },
@@ -143,7 +139,7 @@ export default {
     display: flex;
     justify-content: space-between;
     gap: 2rem;
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
 
     div {
         display: flex;

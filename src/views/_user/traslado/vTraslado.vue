@@ -349,9 +349,9 @@ export default {
                 ? 'vCompraPedido'
                 : 'vVentaPedido'
 
-            let pedido
+            this.vista.socio_pedido = {}
             if (this.vistas[vSocioPedido] && this.vistas[vSocioPedido].data?.id == pedido_id) {
-                pedido = this.vistas[vSocioPedido].data
+                this.vista.socio_pedido = this.vistas[vSocioPedido].data
             } else {
                 const qry = {
                     incl: ['socio1', 'moneda1', 'socio_pedido_items', 'createdBy1'],
@@ -370,18 +370,16 @@ export default {
                 )
                 this.auth.setLoading(false)
 
-                if (res.code == 0) pedido = res.data
+                if (res.code == 0) this.vista.socio_pedido = res.data
             }
 
-            if (pedido) {
-                this.vista.data.socio = pedido.socio
-                this.vista.data.socio1 = pedido.socio1
-                this.vista.data.socio_pedido1 = { id: pedido.id, codigo: pedido.codigo }
-                this.vista.data.moneda = pedido.moneda
-                this.vista.data.pago_condicion = pedido.pago_condicion
-
-                // Add items from pedido
-                this.vista.socio_pedido_items = pedido.socio_pedido_items
+            if (this.vista.socio_pedido) {
+                this.vista.data.socio = this.vista.socio_pedido.socio
+                this.vista.data.socio1 = this.vista.socio_pedido.socio1
+                this.vista.data.socio_pedido1 = {
+                    id: this.vista.socio_pedido.id,
+                    codigo: this.vista.socio_pedido.codigo,
+                }
             } else {
                 this.auth.goBack(this.$router)
             }

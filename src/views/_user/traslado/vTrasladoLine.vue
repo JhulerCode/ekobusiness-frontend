@@ -18,6 +18,8 @@
             />
         </div>
 
+        <pre>{{ vista.data.transaccion_items[0] ?? '' }}</pre>
+
         <JdTable
             :columns="columns"
             :datos="vista.data.transaccion_items || []"
@@ -155,8 +157,8 @@ export default {
             this.$route.name != 'vCompraPedidoEntrega'
         ) {
             const exec = setInterval(() => {
-                if (this.vista.socio_pedido_items) {
-                    this.agregarPedidoItems(this.vista.socio_pedido_items)
+                if (this.vista.socio_pedido.socio_pedido_items) {
+                    this.agregarPedidoItems(this.vista.socio_pedido.socio_pedido_items)
                     clearInterval(exec)
                 }
             }, 100)
@@ -188,7 +190,6 @@ export default {
                 nombre: articulo.nombre,
                 unidad: articulo.unidad,
                 has_fv: articulo.has_fv,
-                combo_componentes: articulo.combo_componentes,
             }
         },
         async agregarPedidoItems(items) {
@@ -213,7 +214,12 @@ export default {
                         ...a.articulo1,
                         has_fv: a.has_fv,
                     },
-                    kardexes: this.setKardexesHoy(a),
+                    kardexes: this.setKardexesHoy({
+                        id: a.articulo1.id,
+                        igv_afectacion: a.articulo1.igv_afectacion,
+                        cantidad: a.cantidad,
+                        vu: a.pu,
+                    }),
                 }
 
                 this.vista.data.transaccion_items.push(send)
@@ -227,10 +233,13 @@ export default {
             return [
                 {
                     id: crypto.randomUUID(),
-                    articulo: item.articulo,
+                    articulo: item.id,
                     lote1: {
                         id: crypto.randomUUID(),
                         codigo: `${obtenerNumeroJuliano(this.vista.data.fecha)}-${Math.floor(Math.random() * 90 + 10)}`,
+                        moneda: this.vista.socio_pedido.moneda,
+                        tipo_cambio:
+                            this.vista.socio_pedido.moneda == this.auth.empresa.moneda ? 1 : 3.5,
                         vu: item.vu,
                         igv_afectacion: item.igv_afectacion,
                         igv_porcentaje: this.auth.empresa.igv_porcentaje,
@@ -240,7 +249,7 @@ export default {
             ]
         },
         setKardexesOnUpdateCantidad(line) {
-            if (this.vista.data.tipo == 5 || this.vista.data.tipo == 'abastacer_maquila') {
+            if (this.vista.data.tipo == 5) {
                 line.kardexes = []
                 return
             }
@@ -250,8 +259,10 @@ export default {
                     line.kardexes = []
                 } else {
                     line.kardexes = this.setKardexesHoy({
-                        ...line.articulo1,
+                        id: line.articulo1,
+                        igv_afectacion: line.igv_afectacion,
                         cantidad: line.cantidad,
+                        vu: line.vu,
                     })
                 }
             }
@@ -351,12 +362,12 @@ export default {
                             if (falta == 0) break
 
                             const send = {
-                                articulo1: { ...lote.articulo1 },
-
+                                componente: b.id,
                                 articulo: lote.articulo,
+                                articulo1: lote.articulo1,
                                 cantidad: a.cantidad - total,
                                 lote_id: lote.id,
-                                lote1: lote,
+                                lote1: { id: lote.id, lote_fv_stock: lote.lote_fv_stock },
                             }
 
                             if (falta <= lote.stock) {
@@ -400,7 +411,7 @@ export default {
         //--- Methods ---//
         async openPedidoItems() {
             const send = {
-                articulos: this.vista.socio_pedido_items,
+                articulos: this.vista.socio_pedido.socio_pedido_items,
                 socio_pedido: this.vista.data.socio_pedido,
             }
 

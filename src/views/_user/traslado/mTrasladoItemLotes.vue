@@ -5,7 +5,8 @@
         @button-click="(action) => this[action]()"
     >
         <div class="container-agregar">
-            <JdInput label="Artículo" v-model="modal.articulo1.nombre" :disabled="true" />
+            <!-- <JdInput label="Artículo" v-model="modal.articulo1.nombre" :disabled="true" /> -->
+            <span>{{ modal.articulo1.nombre }}</span>
 
             <div class="resumen">
                 <p>
@@ -157,7 +158,9 @@ export default {
             if (this.modal.type == 'new') {
                 this.modal.kardexes.push({
                     id: crypto.randomUUID(),
-                    codigo: `${obtenerNumeroJuliano(this.modal.fecha)}-${Math.floor(Math.random() * 90 + 10)}`,
+                    lote1: {
+                        codigo: `${obtenerNumeroJuliano(this.modal.fecha)}-${Math.floor(Math.random() * 90 + 10)}`,
+                    },
                     articulo: this.modal.articulo,
                 })
             } else {
@@ -178,6 +181,7 @@ export default {
         setComponente(data, item) {
             const i = this.modal.kardexes.findIndex((a) => a.id == item.id)
             this.modal.kardexes[i].articulo = data.articulo1.id
+            this.modal.kardexes[i].articulo1 = data.articulo1
         },
         sendItems() {
             if (this.modal.type == 'old') {

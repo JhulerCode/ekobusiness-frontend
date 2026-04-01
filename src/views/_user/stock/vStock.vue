@@ -54,10 +54,10 @@ export default {
                 incl: ['categoria1', 'kardexes'],
                 iccl: {
                     kardexes: {
-                        incl: ['lote_padre2'],
+                        incl: ['lote2'],
                     },
                 },
-                sqls: ['articulo_movimientos_cantidad', 'articulo_movimientos_valorizado'],
+                sqls: ['articulo_movimientos_cantidad'],
                 fltr: {},
                 grop: ['id'],
                 ordr: [['nombre', 'ASC']],

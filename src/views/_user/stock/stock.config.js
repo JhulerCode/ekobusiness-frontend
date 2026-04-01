@@ -42,7 +42,7 @@ export default {
             orden: 4,
         },
         {
-            id: 'cantidad',
+            id: 'articulo_movimientos_cantidad',
             title: 'Stock',
             format: 'decimal',
             toRight: true,

@@ -223,17 +223,17 @@ export default {
         //--- Lotes ---//
         setKardexesHoy(item) {
             if (this.vista.data.tipo != 1) return []
-
+            console.log(item)
             return [
                 {
                     id: crypto.randomUUID(),
+                    articulo: item.articulo,
                     lote1: {
                         id: crypto.randomUUID(),
                         codigo: `${obtenerNumeroJuliano(this.vista.data.fecha)}-${Math.floor(Math.random() * 90 + 10)}`,
                         vu: item.vu,
                         igv_afectacion: item.igv_afectacion,
-                        igv_porcentaje:
-                            item.igv_afectacion == '10' ? this.auth.empresa.igv_porcentaje : 0,
+                        igv_porcentaje: this.auth.empresa.igv_porcentaje,
                     },
                     cantidad: item.cantidad,
                 },

@@ -212,7 +212,7 @@ export default {
         //--- Header actions ---//
         async guardar() {
             if (this.checkDatos()) return
-
+            // console.log(this.vista.data)
             this.auth.setLoading(true, 'Guardando...')
             let res
             if (this.is_nuevo) {

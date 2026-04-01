@@ -18,7 +18,7 @@ import { useVistas } from '@/pinia/vistas'
 import { useModals } from '@/pinia/modals'
 import { patch } from '@/utils/crud'
 import { jqst, jmsg } from '@/utils/swal'
-import dayjs from 'dayjs'
+// import dayjs from 'dayjs'
 
 export default {
     components: {},
@@ -41,13 +41,16 @@ export default {
             this[method](item)
         },
         initFiltros() {
-            const i = this.vista.tableColumns.findIndex((a) => a.id == 'fecha')
+            const i = this.vista.tableColumns.findIndex((a) => a.id == 'estado')
             const existeUnFiltro = this.vista.tableColumns.some((a) => a.val)
 
             if (!existeUnFiltro) {
-                this.vista.tableColumns[i].op = 'Está dentro de'
-                this.vista.tableColumns[i].val = dayjs().startOf('month').format('YYYY-MM-DD')
-                this.vista.tableColumns[i].val1 = dayjs().format('YYYY-MM-DD')
+                // this.vista.tableColumns[i].op = 'Está dentro de'
+                // this.vista.tableColumns[i].val = dayjs().startOf('month').format('YYYY-MM-DD')
+                // this.vista.tableColumns[i].val1 = dayjs().format('YYYY-MM-DD')
+                this.vista.tableColumns[i].op = 'Es'
+                this.vista.tableColumns[i].val = '1'
+                this.vista.tableColumns[i].valLabel = 'ABIERTO'
             }
         },
         setQuery() {

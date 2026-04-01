@@ -57,7 +57,7 @@ export default {
                         incl: ['lote2'],
                     },
                 },
-                sqls: ['articulo_movimientos_cantidad'],
+                sqls: ['articulo_movimientos_cantidad', 'articulo_movimientos_valorizado'],
                 fltr: {},
                 grop: ['id'],
                 ordr: [['nombre', 'ASC']],

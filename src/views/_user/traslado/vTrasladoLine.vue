@@ -18,8 +18,6 @@
             />
         </div>
 
-        <pre>{{ vista.data.transaccion_items[0] ?? '' }}</pre>
-
         <JdTable
             :columns="columns"
             :datos="vista.data.transaccion_items || []"

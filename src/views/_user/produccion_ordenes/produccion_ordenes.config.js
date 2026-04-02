@@ -27,13 +27,14 @@ export default {
             show: true,
         },
         {
-            id: 'articulo',
+            id: 'articulo1.nombre',
             title: 'Producto',
             prop: 'articulo1.nombre',
             type: 'related',
             relatedUrl: 'articulos',
             width: '25rem',
             show: true,
+            seek: true,
         },
         {
             id: 'cantidad',

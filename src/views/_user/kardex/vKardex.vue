@@ -68,7 +68,7 @@ export default {
         },
         async setQuery() {
             this.vista.qry = {
-                fltr: {},
+                fltr: { pt_cuarentena: { op: 'Es', val: false } },
                 incl: ['lote1', 'transaccion1', 'maquina1', 'articulo1'],
                 iccl: {
                     transaccion1: {

@@ -134,5 +134,28 @@ export default {
                 { id: 'vCompraItems:inspeccion', label: 'Inspeccionar' },
             ],
         },
+        {
+            label: 'Facturas de proveedor',
+            goto: 'vComprobantes',
+            path: 'facturas-proveedor',
+            view: '_user/comprobantes/vComprobantes.vue',
+            permisos: [
+                { id: 'vComprobantes:listar', label: 'Listar' },
+                { id: 'vComprobantes:crear', label: 'Crear' },
+                { id: 'vComprobantes:ver', label: 'Ver' },
+                { id: 'vComprobantes:editar', label: 'Editar' },
+                { id: 'vComprobantes:eliminar', label: 'Eliminar' },
+            ],
+            children: [
+                {
+                    label: 'Detalle',
+                    goto: 'vComprobante',
+                    path: ':comprobante_id',
+                    view: '_user/comprobante/vComprobante.vue',
+                    permission: 'vComprobantes:ver',
+                    viewType: 'detail',
+                },
+            ],
+        },
     ],
 }

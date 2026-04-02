@@ -304,7 +304,8 @@ export default {
         async openStockMove(tipo) {
             if (this.$route.path.includes('compras')) {
                 if (tipo == 2) {
-                    const cantidad_traslados = await this.loadTrasladosCantidad('abastacer_maquila')
+                    const cantidad_traslados =
+                        await this.loadTrasladosPreviosCantidad('abastacer_maquila')
                     if (cantidad_traslados == 0) {
                         this.$router.push({
                             name: 'vCompraPedidoEntrega',
@@ -314,7 +315,7 @@ export default {
                         this.$router.push({ name: 'vCompraPedidoEntregas' })
                     }
                 } else {
-                    const cantidad_traslados = await this.loadTrasladosCantidad('1')
+                    const cantidad_traslados = await this.loadTrasladosPreviosCantidad('1')
                     if (cantidad_traslados == 0) {
                         this.$router.push({
                             name: 'vCompraPedidoRecepcion',
@@ -325,7 +326,7 @@ export default {
                     }
                 }
             } else {
-                const cantidad_traslados = await this.loadTrasladosCantidad('5')
+                const cantidad_traslados = await this.loadTrasladosPreviosCantidad('5')
                 if (cantidad_traslados == 0) {
                     this.$router.push({
                         name: 'vVentaPedidoEntrega',
@@ -445,7 +446,7 @@ export default {
 
             return res.data
         },
-        async loadTrasladosCantidad(tipo) {
+        async loadTrasladosPreviosCantidad(tipo) {
             const qry = {
                 fltr: {
                     socio_pedido: { op: 'Es', val: this.vista.data.id },

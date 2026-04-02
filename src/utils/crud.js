@@ -23,6 +23,7 @@ const urls = {
     caja_movimientos: `${host}/api/caja_movimientos`,
     colaboradores: `${host}/api/colaboradores`,
     combo_componentes: `${host}/api/combo_componentes`,
+    comprobantes: `${host}/api/comprobantes`,
     documentos: `${host}/api/documentos`,
     formatos: `${host}/api/formatos`,
     formato_values: `${host}/api/formato_values`,

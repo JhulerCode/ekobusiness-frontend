@@ -121,6 +121,25 @@ export default {
                     view: '_user/traslado/vTraslado.vue',
                     permission: ['vCompras:ver'],
                     viewType: 'detail',
+                    children: [
+                        {
+                            label: 'Facturas de proveedor',
+                            goto: 'vCompraTrasladoComprobantes',
+                            path: 'comprobantes',
+                            view: '_user/comprobantes/vComprobantes.vue',
+                            permission: 'vCompras:ver',
+                            children: [
+                                {
+                                    label: 'Detalle',
+                                    goto: 'vCompraTrasladoComprobante',
+                                    path: ':comprobante_id',
+                                    view: '_user/comprobante/vComprobante.vue',
+                                    permission: 'vCompras:ver',
+                                    viewType: 'detail',
+                                },
+                            ],
+                        },
+                    ],
                 },
             ],
         },
@@ -136,15 +155,15 @@ export default {
         },
         {
             label: 'Facturas de proveedor',
-            goto: 'vComprobantes',
+            goto: 'vCompraComprobantes',
             path: 'facturas-proveedor',
             view: '_user/comprobantes/vComprobantes.vue',
             permisos: [
-                { id: 'vComprobantes:listar', label: 'Listar' },
-                { id: 'vComprobantes:crear', label: 'Crear' },
-                { id: 'vComprobantes:ver', label: 'Ver' },
-                { id: 'vComprobantes:editar', label: 'Editar' },
-                { id: 'vComprobantes:eliminar', label: 'Eliminar' },
+                { id: 'vCompraComprobantes:listar', label: 'Listar' },
+                { id: 'vCompraComprobantes:crear', label: 'Crear' },
+                { id: 'vCompraComprobantes:ver', label: 'Ver' },
+                { id: 'vCompraComprobantes:editar', label: 'Editar' },
+                { id: 'vCompraComprobantes:eliminar', label: 'Eliminar' },
             ],
             children: [
                 {

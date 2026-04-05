@@ -52,7 +52,7 @@
         </template>
 
         <template #pestanas-body>
-            <vComprobanteItems v-if="vista.pestana == 5" />
+            <vComprobanteItems v-if="vista.pestana == 1" />
         </template>
     </VistaDetalleLayout>
 </template>
@@ -81,6 +81,9 @@ export default {
         availableTabs() {
             return [{ id: 1, label: 'Contenido', show: true }]
         },
+        is_nuevo() {
+            return this.$route.params[this.vista.pathKey] === 'nuevo'
+        },
     },
     async created() {
         await this.system.load([
@@ -99,6 +102,8 @@ export default {
                 fecha_emision: new Date().toISOString().split('T')[0],
                 comprobante_items: [],
             }
+
+            if (this.$route.params.traslado_id) await this.loadTraslado()
         },
         async loadExistingData() {
             const param_id = this.$route.params[this.vista.pathKey]
@@ -113,8 +118,84 @@ export default {
 
             if (res.code === 0 && res.data) {
                 this.vista.data = res.data
-                document.title = `Comprobante ${this.vista.data[this.vista.titleKey]}`
+                document.title = `Comprobante ${this.vista.data[this.vista.title_key || this.vista.titleKey]}`
                 // this.setSocio(this.vista.data.socio1)
+
+                if (this.$route.params.traslado_id) await this.loadTraslado()
+            }
+        },
+        async loadTraslado(data = null) {
+            const traslado_id = this.$route.params.traslado_id
+            const vTraslado = this.$route.path.includes('compras')
+                ? 'vCompraTraslado'
+                : 'vVentaTraslado'
+
+            this.vista.traslado = {}
+
+            if (data) {
+                this.vista.traslado = data
+            } else {
+                const qry = {
+                    incl: ['socio1', 'moneda1', 'transaccion_items'],
+                    iccl: {
+                        transaccion_items: { incl: ['articulo1'] },
+                    },
+                }
+                this.auth.setLoading(true, 'Cargando traslado...')
+                const res = await get(
+                    `${urls.transacciones}/uno/${traslado_id}?qry=${JSON.stringify(qry)}`,
+                )
+                this.auth.setLoading(false)
+                if (res.code === 0) this.vista.traslado = res.data
+            }
+
+            if (this.vista.traslado?.id) {
+                this.vistas.initVista(vTraslado, 'detail')
+                this.vistas.updateVista(vTraslado, {
+                    titleKey: 'guia',
+                    pathKey: 'traslado_id',
+                    data: this.vista.traslado,
+                    loaded: true,
+                })
+
+                if (this.is_nuevo) {
+                    this.vista.data.socio = this.vista.traslado.socio
+                    this.vista.data.socio1 = this.vista.traslado.socio1
+                    this.vista.data.moneda = this.vista.traslado.moneda
+                    this.vista.data.moneda1 = this.vista.traslado.moneda1
+                    this.vista.data.traslado_id = this.vista.traslado.id
+
+                    const igv_porcentaje = this.auth.empresa.igv_porcentaje
+
+                    this.vista.data.comprobante_items = this.vista.traslado.transaccion_items.map(
+                        (ti) => {
+                            const item = {
+                                id: crypto.randomUUID(),
+                                articulo: ti.articulo,
+                                articulo1: {
+                                    id: ti.articulo1?.id,
+                                    nombre: ti.articulo1?.nombre,
+                                },
+                                unidad: ti.articulo1?.unidad,
+                                cantidad: Number(ti.cantidad),
+                                pu: Number(ti.pu || 0),
+                                igv_afectacion: ti.articulo1?.igv_afectacion,
+                                igv_porcentaje:
+                                    ti.articulo1?.igv_afectacion == '10' ? igv_porcentaje : 0,
+                                transaccion_item: ti.id,
+                            }
+
+                            item.mtoValorVenta = item.cantidad * item.pu
+                            item.igv =
+                                item.igv_afectacion == '10'
+                                    ? item.mtoValorVenta * (item.igv_porcentaje / 100)
+                                    : 0
+                            item.total = item.mtoValorVenta + item.igv
+
+                            return item
+                        },
+                    )
+                }
             }
         },
         //--- Auxiliar data ---//

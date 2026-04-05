@@ -5,5 +5,13 @@ export default {
     permisoEditar: ['no'],
     permisoClonar: ['no'],
 
-    headerActions: [],
+    headerActions: [
+        // {
+        //     text: 'Facturas proveedor',
+        //     action: 'facturar',
+        //     permiso: ['vCompraComprobantes:crear'],
+        //     tipo: '2',
+        //     ocultar: { tipo: 5 },
+        // },
+    ],
 }

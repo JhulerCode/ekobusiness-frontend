@@ -55,7 +55,7 @@ export default {
         },
     },
     created() {
-        this.socio_pedido()
+        this.loadSocioPedido()
     },
     methods: {
         runMethod(method, item) {
@@ -92,6 +92,13 @@ export default {
                 if (this.$route.name == 'vVentaPedidoEntregas') {
                     this.vista.qry.fltr.tipo = { op: 'Es', val: 5 }
                 }
+            }
+
+            if (this.$route.path.includes('compras')) {
+                this.vista.qry.fltr.tipo = { op: 'Es', val: 1 }
+            }
+            if (this.$route.path.includes('ventas')) {
+                this.vista.qry.fltr.tipo = { op: 'Es', val: 5 }
             }
 
             this.auth.updateQuery(this.vista.tableColumns, this.vista.qry)
@@ -189,18 +196,30 @@ export default {
         },
 
         //--- auxiliar data ---//
-        async socio_pedido() {
-            this.vista.compra_pedido = this.vistas['vCompraPedido']?.data
+        async loadSocioPedido() {
+            const pedido_id = this.$route.params.pedido_id
+            if (!pedido_id) return
 
-            if (!this.vista.compra_pedido) {
-                this.auth.setLoading(true, 'Cargando...')
-                const res = await get(`${urls.socio_pedidos}/uno/${this.$route.params.pedido_id}`)
-                this.auth.setLoading(false)
+            const vSocioPedido = this.$route.path.includes('compras')
+                ? 'vCompraPedido'
+                : 'vVentaPedido'
 
-                if (res.code != 0) return
+            // Solo cargamos si no existe o si es un pedido diferente al que está en el store
+            if (this.vistas[vSocioPedido]?.data?.id === pedido_id) return
 
-                this.vista.compra_pedido = res.data
-            }
+            this.auth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.socio_pedidos}/uno/${pedido_id}`)
+            this.auth.setLoading(false)
+
+            if (res.code != 0) return
+
+            this.vistas.initVista(vSocioPedido, 'detail')
+            this.vistas.updateVista(vSocioPedido, {
+                titleKey: 'codigo',
+                pathKey: 'pedido_id',
+                data: res.data,
+                loaded: true,
+            })
         },
 
         // @actions

@@ -92,13 +92,13 @@ export default {
                 if (this.$route.name == 'vVentaPedidoEntregas') {
                     this.vista.qry.fltr.tipo = { op: 'Es', val: 5 }
                 }
-            }
-
-            if (this.$route.path.includes('compras')) {
-                this.vista.qry.fltr.tipo = { op: 'Es', val: 1 }
-            }
-            if (this.$route.path.includes('ventas')) {
-                this.vista.qry.fltr.tipo = { op: 'Es', val: 5 }
+            } else {
+                if (this.$route.path.includes('compras')) {
+                    this.vista.qry.fltr.tipo = { op: 'Es', val: 1 }
+                }
+                if (this.$route.path.includes('ventas')) {
+                    this.vista.qry.fltr.tipo = { op: 'Es', val: [5, 'abastacer_maquila'] }
+                }
             }
 
             this.auth.updateQuery(this.vista.tableColumns, this.vista.qry)

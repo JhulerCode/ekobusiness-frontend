@@ -57,7 +57,7 @@
 <script>
 import vTrasladoLine from './vTrasladoLine.vue'
 
-import VIEW_CONFIG from './stock_picking.config.js'
+import VIEW_CONFIG from './traslado.config.js'
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
 import { useModals } from '@/pinia/modals'
@@ -235,13 +235,16 @@ export default {
             this.vista.mode = 'view'
         },
         async facturar() {
-            this.$router.push({
-                name: 'vCompraTrasladoComprobante',
-                params: {
-                    traslado_id: this.$route.params.traslado_id,
-                    comprobante_id: 'nuevo',
-                },
-            })
+            const cantidad_comprobantes = await this.loadComprobantesPreviosCantidad()
+
+            if (cantidad_comprobantes == 0) {
+                this.$router.push({
+                    name: 'vCompraTrasladoComprobante',
+                    params: { comprobante_id: 'nuevo' },
+                })
+            } else {
+                this.$router.push({ name: 'vCompraTrasladoComprobantes' })
+            }
         },
 
         //--- Methods --//
@@ -409,16 +412,15 @@ export default {
                 this.auth.goBack(this.$router)
             }
         },
-        async loadComprobantesPreviosCantidad(tipo) {
+        async loadComprobantesPreviosCantidad() {
             const qry = {
                 fltr: {
-                    traslado: { op: 'Es', val: this.vista.data.id },
-                    tipo: { op: 'Es', val: tipo },
+                    traslado_id: { op: 'Es', val: this.vista.data.id },
                 },
             }
 
             this.auth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.transacciones}?qry=${JSON.stringify(qry)}`)
+            const res = await get(`${urls.comprobantes}?qry=${JSON.stringify(qry)}`)
             this.auth.setLoading(false)
 
             if (res.code != 0) return

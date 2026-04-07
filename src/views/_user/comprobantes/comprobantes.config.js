@@ -54,14 +54,14 @@ export default {
             show: true,
             orden: 4,
         },
-        {
-            id: 'estado',
-            title: 'Estado',
-            prop: 'estado',
-            type: 'text',
-            width: '10rem',
-            show: true,
-            orden: 5,
-        },
+        // {
+        //     id: 'estado',
+        //     title: 'Estado',
+        //     prop: 'estado',
+        //     type: 'text',
+        //     width: '10rem',
+        //     show: true,
+        //     orden: 5,
+        // },
     ],
 }

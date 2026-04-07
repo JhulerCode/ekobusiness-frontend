@@ -14,7 +14,7 @@
                 mostrar="nombres"
                 v-model="vista.data.socio"
                 :selectedObject="vista.data.socio1"
-                :disabled="vista.mode == 'view'"
+                :disabled="true"
                 style="grid-column: 1/3"
             />
 
@@ -49,10 +49,19 @@
                     :disabled="vista.mode == 'view'"
                 />
             </div>
+
+            <JdSelect
+                label="Condición de pago"
+                :nec="true"
+                :lista="system.data.pago_condiciones || []"
+                v-model="vista.data.pago_condicion"
+                :disabled="vista.mode == 'view'"
+                style="grid-column: 1/3"
+            />
         </template>
 
         <template #pestanas-body>
-            <vComprobanteItems v-if="vista.pestana == 1" />
+            <vComprobanteItems v-if="vista.pestana == 1" ref="vComprobanteItems" />
         </template>
     </VistaDetalleLayout>
 </template>
@@ -64,7 +73,9 @@ import VIEW_CONFIG from '../comprobante/comprobante.config.js'
 import { useSystem } from '@/pinia/system'
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
-import { urls, get } from '@/utils/crud'
+import { urls, get, post, patch } from '@/utils/crud'
+import { incompleteData } from '@/utils/mine'
+import { jmsg } from '@/utils/swal'
 
 export default {
     components: { vComprobanteItems },
@@ -86,12 +97,7 @@ export default {
         },
     },
     async created() {
-        await this.system.load([
-            'pago_condiciones',
-            'pago_metodos',
-            'comprobante_tipos',
-            'igv_afectaciones',
-        ])
+        await this.system.load(['pago_condiciones'])
     },
     methods: {
         runMethod(method, item) {
@@ -99,6 +105,7 @@ export default {
         },
         async loadNewData() {
             this.vista.data = {
+                es_interno: true,
                 fecha_emision: new Date().toISOString().split('T')[0],
                 comprobante_items: [],
             }
@@ -124,80 +131,92 @@ export default {
                 if (this.$route.params.traslado_id) await this.loadTraslado()
             }
         },
-        async loadTraslado(data = null) {
-            const traslado_id = this.$route.params.traslado_id
-            const vTraslado = this.$route.path.includes('compras')
-                ? 'vCompraTraslado'
-                : 'vVentaTraslado'
 
-            this.vista.traslado = {}
+        //--- Header actions ---//
+        async guardar() {
+            if (this.checkDatos()) return
+            this.shapeDatos()
 
-            if (data) {
-                this.vista.traslado = data
+            this.auth.setLoading(true, 'Guardando...')
+            let res
+            if (this.is_nuevo) {
+                res = await post(this.vista.apiUrl, this.vista.data)
             } else {
-                const qry = {
-                    incl: ['socio1', 'moneda1', 'transaccion_items'],
-                    iccl: {
-                        transaccion_items: { incl: ['articulo1'] },
-                    },
-                }
-                this.auth.setLoading(true, 'Cargando traslado...')
-                const res = await get(
-                    `${urls.transacciones}/uno/${traslado_id}?qry=${JSON.stringify(qry)}`,
-                )
-                this.auth.setLoading(false)
-                if (res.code === 0) this.vista.traslado = res.data
+                res = await patch(this.vista.apiUrl, this.vista.data)
             }
+            this.auth.setLoading(false)
 
-            if (this.vista.traslado?.id) {
-                this.vistas.initVista(vTraslado, 'detail')
-                this.vistas.updateVista(vTraslado, {
-                    titleKey: 'guia',
-                    pathKey: 'traslado_id',
-                    data: this.vista.traslado,
-                    loaded: true,
+            if (res.code != 0) return
+
+            if (this.is_nuevo) {
+                this.$router.push({
+                    name: this.$route.name,
+                    params: { [this.vista.pathKey]: res.data.id },
                 })
+            }
 
-                if (this.is_nuevo) {
-                    this.vista.data.socio = this.vista.traslado.socio
-                    this.vista.data.socio1 = this.vista.traslado.socio1
-                    this.vista.data.moneda = this.vista.traslado.moneda
-                    this.vista.data.moneda1 = this.vista.traslado.moneda1
-                    this.vista.data.traslado_id = this.vista.traslado.id
+            this.vista.mode = 'view'
+        },
 
-                    const igv_porcentaje = this.auth.empresa.igv_porcentaje
+        //--- Methods --//
+        checkDatos() {
+            const props = [
+                'socio',
+                'pago_condicion',
+                'moneda',
+                'fecha_emision',
+                'serie',
+                'correlativo',
+            ]
 
-                    this.vista.data.comprobante_items = this.vista.traslado.transaccion_items.map(
-                        (ti) => {
-                            const item = {
-                                id: crypto.randomUUID(),
-                                articulo: ti.articulo,
-                                articulo1: {
-                                    id: ti.articulo1?.id,
-                                    nombre: ti.articulo1?.nombre,
-                                },
-                                unidad: ti.articulo1?.unidad,
-                                cantidad: Number(ti.cantidad),
-                                pu: Number(ti.pu || 0),
-                                igv_afectacion: ti.articulo1?.igv_afectacion,
-                                igv_porcentaje:
-                                    ti.articulo1?.igv_afectacion == '10' ? igv_porcentaje : 0,
-                                transaccion_item: ti.id,
-                            }
+            if (incompleteData(this.vista.data, props)) {
+                jmsg('warning', 'Ingrese los datos necesarios')
+                return true
+            }
 
-                            item.mtoValorVenta = item.cantidad * item.pu
-                            item.igv =
-                                item.igv_afectacion == '10'
-                                    ? item.mtoValorVenta * (item.igv_porcentaje / 100)
-                                    : 0
-                            item.total = item.mtoValorVenta + item.igv
+            if (this.vista.data.comprobante_items.length == 0) {
+                jmsg('warning', 'Agregue al menos un articulo')
+                return true
+            }
 
-                            return item
-                        },
-                    )
+            for (const a of this.vista.data.comprobante_items) {
+                const props1 = ['articulo', 'cantidad']
+
+                if (incompleteData(a, props1)) {
+                    jmsg('warning', 'Ingrese los datos necesarios de los articulos')
+                    return true
+                }
+
+                if (!a.kardexes || a.kardexes.length == 0) {
+                    jmsg('warning', `Agregue al menos un lote en ${a.articulo1.nombre}`)
+                    return true
+                }
+
+                if (this.vista.data.tipo == 1) {
+                    for (const b of a.kardexes) {
+                        if (!b.lote1.codigo) {
+                            jmsg('warning', `Falta codigo de lote en ${a.articulo1.nombre}`)
+                            return true
+                        }
+
+                        if (a.articulo1.has_fv && !b.lote1.fv) {
+                            jmsg('warning', `Falta fecha de vencimiento en ${a.articulo1.nombre}`)
+                            return true
+                        }
+                    }
                 }
             }
+
+            return false
         },
+        shapeDatos() {
+            this.vista.data.gravado = this.vista.mtoOperGravadas
+            this.vista.data.exonerado = this.vista.mtoOperExoneradas
+            this.vista.data.inafecto = this.vista.mtoOperInafectas
+            this.vista.data.igv = this.vista.mtoIGV
+            this.vista.data.monto = this.vista.mtoImpVenta
+        },
+
         //--- Auxiliar data ---//
         async loadSocios(txtBuscar) {
             const qry = {
@@ -239,6 +258,70 @@ export default {
             if (res.code != 0) return
 
             return res.data
+        },
+        async loadTraslado() {
+            const traslado_id = this.$route.params.traslado_id
+            const vTraslado = this.$route.path.includes('compras')
+                ? 'vCompraTraslado'
+                : 'vVentaTraslado'
+
+            this.vista.traslado = {}
+
+            if (this.vistas[vTraslado]?.data?.id == traslado_id) {
+                this.vista.traslado = this.vistas[vTraslado].data
+            } else {
+                const qry = {
+                    incl: ['socio1', 'moneda1', 'transaccion_items'],
+                    iccl: {
+                        transaccion_items: { incl: ['articulo1', 'kardexes_all'] },
+                    },
+                }
+                this.auth.setLoading(true, 'Cargando traslado...')
+                const res = await get(
+                    `${urls.transacciones}/uno/${traslado_id}?qry=${JSON.stringify(qry)}`,
+                )
+                this.auth.setLoading(false)
+                if (res.code !== 0 || !res.data) return
+                this.vista.traslado = res.data
+
+                this.vistas.initVista(vTraslado, 'detail')
+                this.vistas.updateVista(vTraslado, {
+                    titleKey: 'guia',
+                    pathKey: 'traslado_id',
+                    data: this.vista.traslado,
+                    loaded: true,
+                })
+            }
+
+            if (this.is_nuevo) {
+                this.vista.data.socio = this.vista.traslado.socio
+                this.vista.data.socio1 = this.vista.traslado.socio1
+                this.vista.data.moneda = this.vista.traslado.moneda
+                this.vista.data.moneda1 = this.vista.traslado.moneda1
+                this.vista.data.traslado_id = this.vista.traslado.id
+
+                //--- CREAR ITEMS DEL COMPROBANTE ---//
+                this.vista.data.comprobante_items = this.vista.traslado.transaccion_items.map(
+                    (ti) => {
+                        const item = {
+                            id: crypto.randomUUID(),
+                            articulo: ti.articulo,
+                            descripcion: ti.articulo1.nombre,
+                            unidad: ti.articulo1?.unidad,
+                            cantidad: Number(ti.cantidad),
+
+                            igv_afectacion: ti.articulo1.igv_afectacion,
+                            igv_porcentaje: this.auth.empresa.igv_porcentaje,
+                            transaccion_item: ti.id,
+                            kardexes: ti.kardexes,
+                        }
+
+                        return item
+                    },
+                )
+
+                this.$refs.vComprobanteItems.sumarItems()
+            }
         },
     },
 }

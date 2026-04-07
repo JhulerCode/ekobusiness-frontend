@@ -1,9 +1,5 @@
 <template>
     <div class="comprobante-items">
-        <div class="actions mb-3" v-if="vista.mode != 'view'">
-            <JdButton icon="fa-solid fa-sync" text="Cargar Recepciones" tipo="3" />
-        </div>
-
         <JdTable
             :columns="columns"
             :datos="vista.data.comprobante_items"
@@ -64,7 +60,7 @@ export default {
         columns() {
             return [
                 {
-                    id: 'articulo',
+                    id: 'descripcion',
                     title: 'Artículo',
                     width: '30rem',
                     show: true,
@@ -85,14 +81,7 @@ export default {
                     oninput: 'sumarUno',
                 },
                 {
-                    id: 'entregado',
-                    title: 'Entregado',
-                    type: 'number',
-                    width: '6rem',
-                    show: this.vista.mode == 'view',
-                },
-                {
-                    id: 'pu',
+                    id: 'vu',
                     title: 'Valor unitario',
                     type: 'number',
                     input: true,
@@ -138,14 +127,25 @@ export default {
             ]
         },
         rowActions() {
-            return []
+            if (this.vista.mode == 'view') return []
+            return [
+                {
+                    icon: 'fa-solid fa-trash-can',
+                    title: 'Eliminar',
+                    action: 'removeLine',
+                },
+            ]
         },
     },
     async created() {
         await this.system.load(['igv_afectaciones'])
-        if (this.vista.data?.comprobante_items?.length > 0) {
-            this.sumarItems()
-        }
+
+        // const exec = setInterval(() => {
+        //     if (this.vista.data?.comprobante_items) {
+        //         this.sumarItems()
+        //         clearInterval(exec)
+        //     }
+        // }, 100)
     },
     methods: {
         runMethod(method, item) {
@@ -153,16 +153,15 @@ export default {
         },
 
         elegirIgv(igv, item) {
-            item.igv_porcentaje = item.igv_afectacion == '10' ? this.auth.empresa.igv_porcentaje : 0
             this.calcularUno(item)
             this.calcularTotales()
         },
         calcularUno(item) {
-            const pu = parseFloat(item.pu) || 0
+            const vu = parseFloat(item.vu) || 0
             const cantidad = parseFloat(item.cantidad) || 0
             const igv_porcentaje = parseFloat(item.igv_porcentaje) || 0
 
-            item.mtoValorVenta = cantidad * pu
+            item.mtoValorVenta = cantidad * vu
             item.igv = item.igv_afectacion == '10' ? item.mtoValorVenta * (igv_porcentaje / 100) : 0
             item.total = item.mtoValorVenta + item.igv
         },
@@ -197,6 +196,11 @@ export default {
         sumarUno(item) {
             this.calcularUno(item)
             this.calcularTotales()
+        },
+
+        async removeLine(item) {
+            const i = this.vista.data.comprobante_items.findIndex((a) => a.id == item.id)
+            this.vista.data.comprobante_items.splice(i, 1)
         },
     },
 }

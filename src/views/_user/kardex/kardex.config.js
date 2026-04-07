@@ -55,14 +55,14 @@ export default {
             width: '8rem',
             show: true,
         },
-        {
-            id: 'lote1.pu',
-            title: 'Precio unitario',
-            toRight: true,
-            filtrable: false,
-            width: '8rem',
-            show: true,
-        },
+        // {
+        //     id: 'lote1.pu',
+        //     title: 'Precio unitario',
+        //     toRight: true,
+        //     filtrable: false,
+        //     width: '8rem',
+        //     show: true,
+        // },
         {
             id: 'cantidad',
             title: 'Cantidad',

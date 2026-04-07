@@ -221,6 +221,56 @@ export default {
             this.calcularUno(item)
             this.calcularTotales()
         },
+        calcularUno(item) {
+            const pu = parseFloat(item.pu) || 0
+            const cantidad = parseFloat(item.cantidad) || 0
+            const igv_porcentaje = parseFloat(item.igv_porcentaje) || 0
+
+            item.mtoValorVenta = cantidad * pu
+            item.igv = item.igv_afectacion == '10' ? item.mtoValorVenta * (igv_porcentaje / 100) : 0
+            item.total = item.mtoValorVenta + item.igv
+        },
+        calcularTotales() {
+            let mtoOperGravadas = 0
+            let mtoOperExoneradas = 0
+            let mtoOperInafectas = 0
+            let mtoIGV = 0
+
+            for (const a of this.vista.data.socio_pedido_items) {
+                if (a.igv_afectacion == '10') {
+                    mtoOperGravadas += a.mtoValorVenta
+                    mtoIGV += a.igv
+                } else if (a.igv_afectacion == '20') {
+                    mtoOperExoneradas += a.mtoValorVenta
+                } else if (a.igv_afectacion == '30') {
+                    mtoOperInafectas += a.mtoValorVenta
+                }
+            }
+
+            this.vista.mtoOperGravadas = mtoOperGravadas
+            this.vista.mtoOperExoneradas = mtoOperExoneradas
+            this.vista.mtoOperInafectas = mtoOperInafectas
+            this.vista.mtoIGV = mtoIGV
+            this.vista.valorVenta = mtoOperGravadas + mtoOperExoneradas + mtoOperInafectas
+            this.vista.mtoImpVenta = this.vista.valorVenta + mtoIGV
+        },
+        sumarItems() {
+            for (const a of this.vista.data.socio_pedido_items) this.calcularUno(a)
+            this.calcularTotales()
+        },
+        sumarUno(item) {
+            this.calcularUno(item)
+            this.calcularTotales()
+        },
+        descargarPlantilla() {
+            const columns = [
+                { title: 'EAN' },
+                { title: 'Nombre' },
+                { title: 'Cantidad' },
+                { title: 'Valor unitario' },
+            ]
+            downloadExcel(columns, [], 'plantilla_pedidos.xlsx')
+        },
         importar(event) {
             this.auth.setLoading(true, 'Cargando archivo...')
             const file = event.target.files[0]
@@ -279,56 +329,6 @@ export default {
                 this.sumarItems()
             }
             reader.readAsArrayBuffer(file)
-        },
-        calcularUno(item) {
-            const pu = parseFloat(item.pu) || 0
-            const cantidad = parseFloat(item.cantidad) || 0
-            const igv_porcentaje = parseFloat(item.igv_porcentaje) || 0
-
-            item.mtoValorVenta = cantidad * pu
-            item.igv = item.igv_afectacion == '10' ? item.mtoValorVenta * (igv_porcentaje / 100) : 0
-            item.total = item.mtoValorVenta + item.igv
-        },
-        calcularTotales() {
-            let mtoOperGravadas = 0
-            let mtoOperExoneradas = 0
-            let mtoOperInafectas = 0
-            let mtoIGV = 0
-
-            for (const a of this.vista.data.socio_pedido_items) {
-                if (a.igv_afectacion == '10') {
-                    mtoOperGravadas += a.mtoValorVenta
-                    mtoIGV += a.igv
-                } else if (a.igv_afectacion == '20') {
-                    mtoOperExoneradas += a.mtoValorVenta
-                } else if (a.igv_afectacion == '30') {
-                    mtoOperInafectas += a.mtoValorVenta
-                }
-            }
-
-            this.vista.mtoOperGravadas = mtoOperGravadas
-            this.vista.mtoOperExoneradas = mtoOperExoneradas
-            this.vista.mtoOperInafectas = mtoOperInafectas
-            this.vista.mtoIGV = mtoIGV
-            this.vista.valorVenta = mtoOperGravadas + mtoOperExoneradas + mtoOperInafectas
-            this.vista.mtoImpVenta = this.vista.valorVenta + mtoIGV
-        },
-        sumarItems() {
-            for (const a of this.vista.data.socio_pedido_items) this.calcularUno(a)
-            this.calcularTotales()
-        },
-        sumarUno(item) {
-            this.calcularUno(item)
-            this.calcularTotales()
-        },
-        descargarPlantilla() {
-            const columns = [
-                { title: 'EAN' },
-                { title: 'Nombre' },
-                { title: 'Cantidad' },
-                { title: 'Valor unitario' },
-            ]
-            downloadExcel(columns, [], 'plantilla_pedidos.xlsx')
         },
 
         //--- Auxiliar data ---//

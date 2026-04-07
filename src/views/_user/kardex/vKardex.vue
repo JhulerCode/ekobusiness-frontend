@@ -19,6 +19,7 @@ import { useSystem } from '@/pinia/system.js'
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
 import { useModals } from '@/pinia/modals'
+import { redondear } from '@/utils/mine'
 import { jmsg } from '@/utils/swal'
 
 export default {
@@ -41,7 +42,7 @@ export default {
             for (const a of this.vista.tableData) {
                 suma += Number(a.cantidad1 || 0)
             }
-            return suma
+            return redondear(suma)
         },
     },
     created() {

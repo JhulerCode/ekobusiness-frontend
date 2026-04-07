@@ -16,6 +16,7 @@
                 v-model="vista.data.pago_metodo"
                 :disabled="vista.mode == 'view'"
                 style="grid-column: 1/4"
+                v-if="vista.data.tipo == 2"
             />
 
             <JdInput
@@ -23,6 +24,7 @@
                 v-model="vista.data.pago_id"
                 :disabled="vista.mode == 'view'"
                 style="grid-column: 1/3"
+                v-if="vista.data.tipo == 2"
             />
         </div>
 
@@ -33,6 +35,7 @@
                 v-model="vista.data.comprobante_tipo"
                 :disabled="vista.mode == 'view'"
                 style="grid-column: 1/4"
+                v-if="vista.data.tipo == 2"
             />
 
             <template v-if="vista.data.tipo == 2 && vista.data.comprobante_tipo == '01'">

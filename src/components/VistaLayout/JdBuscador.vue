@@ -136,7 +136,8 @@ const isValidSearch = computed(() => {
 })
 
 const seekableColumns = computed(() => {
-    return (props.columns || []).filter((c) => c.seek && !c.op)
+    // return (props.columns || []).filter((c) => c.seek && !c.op)
+    return (props.columns || []).filter((c) => c.seek)
 })
 
 const focusInput = () => {

@@ -44,11 +44,19 @@ export default {
         setQuery() {
             this.vista.qry = {
                 fltr: {},
+                sqls: [],
                 incl: ['socio_pedido1', 'articulo1'],
                 iccl: {
                     socio_pedido1: { incl: ['socio1'] },
                 },
                 page: this.vista.table_page,
+            }
+
+            const col_pedido_item_entregado = this.vista.tableColumns.find(
+                (a) => a.id == 'pedido_item_entregado',
+            )
+            if (col_pedido_item_entregado.show == true) {
+                this.vista.qry.sqls.push('pedido_item_entregado')
             }
 
             if (this.$route.path.includes('compras')) {

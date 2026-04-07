@@ -120,42 +120,42 @@ export default {
         // },
 
         //--- Row actions ---//
-        async ver(item) {
-            const qry = {
-                incl: ['socio1', 'moneda1', 'socio_pedido1', 'transaccion_items'],
-                iccl: { transaccion_items: { incl: ['articulo1'] } },
-            }
-            this.auth.setLoading(true, 'Cargando...')
-            const res = await get(`${this.vista.apiUrl}/uno/${item.id}?qry=${JSON.stringify(qry)}`)
-            this.auth.setLoading(false)
-            if (res.code != 0) return
-            const send = {
-                transaccion: res.data,
-                socio: { ...res.data.socio1 },
-                socios: [{ ...res.data.socio1 }],
-                monedas: [{ ...res.data.moneda1 }],
-                pedidos: res.data.socio_pedido ? [{ ...res.data.socio_pedido1 }] : [],
-            }
-            this.modals.setModal('mTransaccion', 'Ver compra', 3, send, true)
-        },
-        async editar(item) {
-            const qry = {
-                incl: ['socio1', 'moneda1', 'socio_pedido1', 'transaccion_items'],
-                iccl: { transaccion_items: { incl: ['articulo1'] } },
-            }
-            this.auth.setLoading(true, 'Cargando...')
-            const res = await get(`${this.vista.apiUrl}/uno/${item.id}?qry=${JSON.stringify(qry)}`)
-            this.auth.setLoading(false)
-            if (res.code != 0) return
-            const send = {
-                transaccion: res.data,
-                socio: { ...res.data.socio1 },
-                socios: [{ ...res.data.socio1 }],
-                monedas: [{ ...res.data.moneda1 }],
-                pedidos: res.data.socio_pedido ? [{ ...res.data.socio_pedido1 }] : [],
-            }
-            this.modals.setModal('mTransaccion', 'Editar compra', 2, send, true)
-        },
+        // async ver(item) {
+        //     const qry = {
+        //         incl: ['socio1', 'moneda1', 'socio_pedido1', 'transaccion_items'],
+        //         iccl: { transaccion_items: { incl: ['articulo1'] } },
+        //     }
+        //     this.auth.setLoading(true, 'Cargando...')
+        //     const res = await get(`${this.vista.apiUrl}/uno/${item.id}?qry=${JSON.stringify(qry)}`)
+        //     this.auth.setLoading(false)
+        //     if (res.code != 0) return
+        //     const send = {
+        //         transaccion: res.data,
+        //         socio: { ...res.data.socio1 },
+        //         socios: [{ ...res.data.socio1 }],
+        //         monedas: [{ ...res.data.moneda1 }],
+        //         pedidos: res.data.socio_pedido ? [{ ...res.data.socio_pedido1 }] : [],
+        //     }
+        //     this.modals.setModal('mTransaccion', 'Ver compra', 3, send, true)
+        // },
+        // async editar(item) {
+        //     const qry = {
+        //         incl: ['socio1', 'moneda1', 'socio_pedido1', 'transaccion_items'],
+        //         iccl: { transaccion_items: { incl: ['articulo1'] } },
+        //     }
+        //     this.auth.setLoading(true, 'Cargando...')
+        //     const res = await get(`${this.vista.apiUrl}/uno/${item.id}?qry=${JSON.stringify(qry)}`)
+        //     this.auth.setLoading(false)
+        //     if (res.code != 0) return
+        //     const send = {
+        //         transaccion: res.data,
+        //         socio: { ...res.data.socio1 },
+        //         socios: [{ ...res.data.socio1 }],
+        //         monedas: [{ ...res.data.moneda1 }],
+        //         pedidos: res.data.socio_pedido ? [{ ...res.data.socio_pedido1 }] : [],
+        //     }
+        //     this.modals.setModal('mTransaccion', 'Editar compra', 2, send, true)
+        // },
         async controlDespacho(item) {
             const formato_id = 'RE-BPM-24'
             this.auth.setLoading(true, 'Cargando...')

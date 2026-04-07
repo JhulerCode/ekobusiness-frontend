@@ -13,7 +13,7 @@
                 text="Lista de materiales"
                 tipo="3"
                 @click="openMrpBomLines"
-                v-if="vista.data.mrp_bom"
+                v-if="vista.data.mrp_bom && vista.data.estado == 1"
             />
         </div>
 

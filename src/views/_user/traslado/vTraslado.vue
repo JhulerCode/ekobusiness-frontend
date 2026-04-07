@@ -49,7 +49,7 @@
         </template>
 
         <template #pestanas-body>
-            <vTrasladoLine v-if="vista.pestana == 1" />
+            <vTrasladoLine v-if="vista.pestana == 1" ref="vTrasladoLine"/>
         </template>
     </VistaDetalleLayout>
 </template>
@@ -407,6 +407,10 @@ export default {
                 this.vista.data.socio_pedido1 = {
                     id: this.vista.socio_pedido.id,
                     codigo: this.vista.socio_pedido.codigo,
+                }
+
+                if (this.is_nuevo) {
+                    this.$refs.vTrasladoLine.agregarPedidoItems(this.vista.socio_pedido.socio_pedido_items)
                 }
             } else {
                 this.auth.goBack(this.$router)

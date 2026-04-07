@@ -50,6 +50,10 @@ export default {
                     id: 'vProduccionOrdenes:productosTerminados',
                     label: 'Productos terminados',
                 },
+                {
+                    id: 'vProduccionOrdenes:productosTerminadosAprobados',
+                    label: 'Productos terminados aprobados',
+                },
                 // { id: 'vProduccionOrdenes:controlPesos', label: 'Control de pesos' },
                 // { id: 'vProduccionOrdenes:controlPpc', label: 'Control del PPC' },
                 {
@@ -83,6 +87,16 @@ export default {
                 { id: 'vPtsIngresos:ingresarPts', label: 'Ingresar productos terminados' },
                 { id: 'vPtsIngresos:liberar_lote', label: 'Liberar lote' },
                 { id: 'vPtsIngresos:trazabilidad', label: 'Ver trazabilidad' },
+            ],
+            children: [
+                {
+                    label: 'Detalle OT',
+                    goto: 'vPtsProduccionOrden',
+                    path: ':produccion_orden_id',
+                    view: '_user/produccion_orden/vProduccionOrden.vue',
+                    permission: 'vProduccionOrdenes:ver',
+                    viewType: 'detail',
+                },
             ],
         },
         {

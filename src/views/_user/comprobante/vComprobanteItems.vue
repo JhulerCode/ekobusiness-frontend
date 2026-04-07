@@ -2,7 +2,7 @@
     <div class="comprobante-items">
         <JdTable
             :columns="columns"
-            :datos="vista.data.comprobante_items"
+            :datos="vista.data.comprobante_items || []"
             :rowOptions="rowActions"
             rowOptionsMode="buttons"
             @rowOptionSelected="runMethod"

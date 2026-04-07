@@ -260,6 +260,12 @@ export default {
         terminar() {
             this.setInicioFin(2)
         },
+        abrir() {
+            this.abrirCerrar('1')
+        },
+        cerrar() {
+            this.abrirCerrar('2')
+        },
 
         //--- Methods --//
         checkDatos() {
@@ -307,6 +313,28 @@ export default {
                 this.vista.data.fin = res.data.fin
                 this.vista.data.fin1 = res.data.fin1
             }
+        },
+        async abrirCerrar(estado) {
+            const resQst = await jqst(
+                `¿Está seguro de ${estado == 1 ? 'abrir' : 'cerrar'} la orden de producción?`,
+            )
+            if (resQst.isConfirmed == false) return
+
+            const send = { id: this.vista.data.id, ids: this.vista.data.id, estado }
+
+            this.auth.setLoading(true, 'Cargando...')
+            const res = await patch(
+                `${this.vista.apiUrl}/abrir-cerrar`,
+                send,
+                `Orden de producción ${estado == 1 ? 'abierta' : 'cerrado'}`,
+            )
+            this.auth.setLoading(false)
+
+            if (res.code != 0) return
+
+            // this.vistas.updateItem(this.vista.name, 'tableData', res.data, true)
+            this.vista.data.estado = res.data.estado
+            this.vista.data.estado1 = res.data.estado1
         },
 
         //--- auxiliar methods ---//

@@ -1,7 +1,8 @@
 export default {
-    name: 'vPtsIngresos',
-    title: 'Ingreso de productos',
     apiPath: 'kardex',
+    detailPath: 'produccion_orden_id',
+    detailViewName: 'vPtsProduccionOrden',
+    detailKey: 'produccion_orden',
 
     headerActions: [
         {
@@ -92,12 +93,5 @@ export default {
         },
     ],
 
-    tableRowActions: [
-        {
-            label: 'Ver trazabilidad',
-            icon: 'fa-solid fa-diagram-project',
-            action: 'verTrazabilidad',
-            permiso: 'vPtsIngresos:trazabilidad',
-        },
-    ],
+    tableRowActions: [],
 }

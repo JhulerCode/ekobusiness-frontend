@@ -66,11 +66,12 @@ export default {
             orden: 6,
         },
         {
-            id: 'entregado',
+            id: 'pedido_item_entregado',
             title: 'Entregado',
             type: 'number',
             format: 'decimal',
             toRight: true,
+            filtrable: false,
             width: '8rem',
             show: true,
             orden: 7,

@@ -23,7 +23,7 @@ export default {
         vistas: () => useVistas(),
         modals: () => useModals(),
         vista() {
-            return this.vistas[VIEW_CONFIG.name]
+            return this.vistas[this.$route.name]
         },
     },
     data: () => ({

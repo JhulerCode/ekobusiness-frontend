@@ -149,18 +149,18 @@ export default {
         },
     },
     created() {
-        if (
-            this.$route.params.pedido_id &&
-            this.$route.params.pedido_id != 'nuevo' &&
-            this.$route.name != 'vCompraPedidoEntrega'
-        ) {
-            const exec = setInterval(() => {
-                if (this.vista.socio_pedido.socio_pedido_items) {
-                    this.agregarPedidoItems(this.vista.socio_pedido.socio_pedido_items)
-                    clearInterval(exec)
-                }
-            }, 100)
-        }
+        // if (
+        //     this.$route.params.pedido_id &&
+        //     this.$route.params.pedido_id != 'nuevo' &&
+        //     this.$route.name != 'vCompraPedidoEntrega'
+        // ) {
+        //     const exec = setInterval(() => {
+        //         if (this.vista.socio_pedido.socio_pedido_items) {
+        //             this.agregarPedidoItems(this.vista.socio_pedido.socio_pedido_items)
+        //             clearInterval(exec)
+        //         }
+        //     }, 100)
+        // }
     },
     methods: {
         runMethod(method, item) {

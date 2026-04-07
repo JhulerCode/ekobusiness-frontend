@@ -2,7 +2,7 @@
     <div class="vista">
         <header class="header">
             <div class="header-left" style="flex-wrap: nowrap">
-                <strong style="white-space: nowrap">{{ title }}</strong>
+                <!-- <strong style="white-space: nowrap">{{ title }}</strong> -->
 
                 <JdButtonsOverflow
                     v-if="headerActions"
@@ -182,10 +182,11 @@ function openConfigFiltros() {
 const headerActions = computed(() => {
     let configHeaderActions = []
     if (props.config.headerActions) {
-        configHeaderActions = props.config.headerActions.map((a) => ({
-            ...a,
-            show: a.permiso ? auth.verifyPermiso(a.permiso) : true,
-        }))
+        configHeaderActions = props.config.headerActions.map((a) => {
+            const show = !a.ocultar && (!a.permiso || auth.verifyPermiso(a.permiso))
+
+            return { ...a, show }
+        })
     }
 
     return [
@@ -320,9 +321,9 @@ function handleRowAction(action, item) {
 }
 
 // --- Methods de apoyo ---
-const title = computed(() => {
-    return route.meta.title
-})
+// const title = computed(() => {
+//     return route.meta.title
+// })
 
 const selectedCount = computed(() => {
     return (vista?.tableData || []).filter((a) => a.selected).length
@@ -339,9 +340,11 @@ function updatedBulk(item) {
 
 function verRow(item) {
     const detailViewName = props.detailViewName || vista.detailViewName
-    if (!detailViewName) return
-    // if (!auth.verifyPermiso(`${viewName}:ver`)) return
-    router.push({ name: detailViewName, params: { [vista.detailPath]: item.id } })
+    const param_id = item[props.config.detailKey] || item.id
+
+    if (!detailViewName || !param_id) return
+
+    router.push({ name: detailViewName, params: { [vista.detailPath]: param_id } })
 }
 </script>
 

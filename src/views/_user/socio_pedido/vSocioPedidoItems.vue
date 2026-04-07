@@ -104,8 +104,9 @@ export default {
                     oninput: 'sumarUno',
                 },
                 {
-                    id: 'entregado',
+                    id: 'pedido_item_entregado',
                     title: 'Entregado',
+                    toRight: true,
                     type: 'number',
                     width: '6rem',
                     show: this.vista.mode == 'view',
@@ -172,12 +173,12 @@ export default {
         //     const colEntregado = this.columns.find((c) => c.id == 'entregado')
         //     if (colEntregado) colEntregado.show = true
         // }
-        const exec = setInterval(() => {
-            if (this.vista.data?.socio_pedido_items) {
-                this.sumarItems()
-                clearInterval(exec)
-            }
-        }, 100)
+        // const exec = setInterval(() => {
+        //     if (this.vista.data?.socio_pedido_items) {
+        //         this.sumarItems()
+        //         clearInterval(exec)
+        //     }
+        // }, 100)
     },
     methods: {
         runMethod(method, item) {

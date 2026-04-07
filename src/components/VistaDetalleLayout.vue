@@ -2,7 +2,7 @@
     <div class="vista-detalle" v-if="vista">
         <header class="header">
             <div class="header-left" style="flex-wrap: nowrap">
-                <strong style="white-space: nowrap">{{ resolvedTitle }}</strong>
+                <!-- <strong style="white-space: nowrap">{{ resolvedTitle }}</strong> -->
 
                 <JdButtonsOverflow
                     :actions="headerLeftActions"
@@ -245,15 +245,14 @@ const handleHeaderLeftAction = (action, item) => {
 
 //--- Header actions ---//
 const headerActions = computed(() => {
-    // if (!vista.data.id) return []
-
-    const isEdit = vista?.mode === 'edit'
+    if (!vista.data.id) return []
+    if (vista?.mode === 'edit') return []
 
     let configHeaderActions = []
     if (props.config.headerActions) {
         configHeaderActions = props.config.headerActions.map((a) => ({
             ...a,
-            show: !isEdit && buttonVerifyPermission(vista.data, a),
+            show: buttonVerifyPermission(vista.data, a),
         }))
     }
 
@@ -265,12 +264,12 @@ const handleHeaderAction = (action, item) => {
 }
 
 // --- Methods de apoyo ---
-const resolvedTitle = computed(() => {
-    const id = route?.params[props.config.pathKey]
-    if (id === 'nuevo') return 'Nuevo'
-    if (id) return vista?.data?.[props.config?.titleKey ?? 'nombre']
-    return props.config?.title
-})
+// const resolvedTitle = computed(() => {
+//     const id = route?.params[props.config.pathKey]
+//     if (id === 'nuevo') return 'Nuevo'
+//     if (id) return vista?.data?.[props.config?.titleKey ?? 'nombre']
+//     return props.config?.title
+// })
 
 const handleTabClick = (tabId) => {
     vista.pestana = tabId

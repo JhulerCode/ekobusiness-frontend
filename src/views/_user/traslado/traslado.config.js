@@ -6,12 +6,13 @@ export default {
     permisoClonar: ['no'],
 
     headerActions: [
-        // {
-        //     text: 'Facturas proveedor',
-        //     action: 'facturar',
-        //     permiso: ['vCompraComprobantes:crear'],
-        //     tipo: '2',
-        //     ocultar: { tipo: 5 },
-        // },
+        {
+            text: 'Facturas proveedor',
+            icon: 'fa-solid fa-file-invoice',
+            tipo: '2',
+            action: 'facturar',
+            permiso: ['vCompraComprobantes:crear'],
+            ocultar: { tipo: 5, socio_pedido: { op: '!=', val: null } },
+        },
     ],
 }

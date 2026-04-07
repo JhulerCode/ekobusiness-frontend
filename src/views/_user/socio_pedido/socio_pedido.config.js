@@ -45,5 +45,11 @@ export default {
             permiso: 'vVentaPedidos:entregarMercaderia',
             ocultar: { tipo: 1 },
         },
+        {
+            text: 'Facturas proveedor',
+            action: 'facturar',
+            permiso: ['vCompraComprobantes:crear'],
+            tipo: '2',
+        },
     ],
 }

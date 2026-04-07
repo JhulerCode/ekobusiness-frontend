@@ -44,7 +44,7 @@ export default {
                 { id: 'vCompraPedidos:eliminar', label: 'Eliminar' },
                 { id: 'vCompraPedidos:abrirCerrar', label: 'Abrir y cerrar' },
                 { id: 'vCompraPedidos:generarPdf', label: 'Generar PDF' },
-                { id: 'vCompraPedidos:recalcularEntregados', label: 'Recalcular entregados' },
+                // { id: 'vCompraPedidos:recalcularEntregados', label: 'Recalcular entregados' },
                 { id: 'vCompraPedidos:ingresarMercaderia', label: 'Ingresar mercadería' },
             ],
             children: [
@@ -90,6 +90,23 @@ export default {
                                 },
                             ],
                         },
+                        {
+                            label: 'Facturas proveedor',
+                            goto: 'vCompraPedidoComprobantes',
+                            path: 'comprobantes',
+                            view: '_user/comprobantes/vComprobantes.vue',
+                            permission: 'vCompraComprobantes:ver',
+                            children: [
+                                {
+                                    label: 'Detalle',
+                                    goto: 'vCompraPedidoComprobante',
+                                    path: ':comprobante_id',
+                                    view: '_user/comprobante/vComprobante.vue',
+                                    permission: 'vCompraComprobantes:ver',
+                                    viewType: 'detail',
+                                },
+                            ],
+                        },
                     ],
                 },
             ],
@@ -127,14 +144,14 @@ export default {
                             goto: 'vCompraTrasladoComprobantes',
                             path: 'comprobantes',
                             view: '_user/comprobantes/vComprobantes.vue',
-                            permission: 'vCompras:ver',
+                            permission: 'vCompraComprobantes:ver',
                             children: [
                                 {
                                     label: 'Detalle',
                                     goto: 'vCompraTrasladoComprobante',
                                     path: ':comprobante_id',
                                     view: '_user/comprobante/vComprobante.vue',
-                                    permission: 'vCompras:ver',
+                                    permission: 'vCompraComprobantes:ver',
                                     viewType: 'detail',
                                 },
                             ],
@@ -156,7 +173,7 @@ export default {
         {
             label: 'Facturas de proveedor',
             goto: 'vCompraComprobantes',
-            path: 'facturas-proveedor',
+            path: 'comprobantes',
             view: '_user/comprobantes/vComprobantes.vue',
             permisos: [
                 { id: 'vCompraComprobantes:listar', label: 'Listar' },
@@ -168,10 +185,10 @@ export default {
             children: [
                 {
                     label: 'Detalle',
-                    goto: 'vComprobante',
+                    goto: 'vCompraComprobante',
                     path: ':comprobante_id',
                     view: '_user/comprobante/vComprobante.vue',
-                    permission: 'vComprobantes:ver',
+                    permission: 'vCompraComprobantes:ver',
                     viewType: 'detail',
                 },
             ],

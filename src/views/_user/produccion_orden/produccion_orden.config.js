@@ -7,7 +7,7 @@ export default {
 
     headerActions: [
         {
-            label: 'Inicar',
+            text: 'Inicar',
             icon: 'fa-solid fa-play',
             tipo: '2',
             action: 'iniciar',
@@ -15,12 +15,28 @@ export default {
             ocultar: { estado: 2, inicio: { op: '!=', val: null } },
         },
         {
-            label: 'Terminar',
+            text: 'Terminar',
             icon: 'fa-solid fa-stop',
             tipo: '2',
             action: 'terminar',
             permiso: 'vProduccionOrdenes:iniciarTerminar',
             ocultar: { estado: 2, inicio: { op: '=', val: null }, fin: { op: '!=', val: null } },
+        },
+        {
+            text: 'Abrir',
+            icon: 'fa-solid fa-check-double',
+            tipo: '2',
+            action: 'abrir',
+            permiso: 'vProduccionOrdenes:abrirCerrar',
+            ocultar: { estado: 1 },
+        },
+        {
+            text: 'Cerrar',
+            icon: 'fa-solid fa-check-double',
+            tipo: '2',
+            action: 'cerrar',
+            permiso: 'vProduccionOrdenes:abrirCerrar',
+            ocultar: { estado: 2 },
         },
     ],
 }

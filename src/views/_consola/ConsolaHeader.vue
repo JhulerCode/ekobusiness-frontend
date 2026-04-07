@@ -248,7 +248,10 @@ header {
 
                         &.active {
                             color: var(--text-color);
+
                             * {
+                                font-size: 1rem !important;
+                                font-weight: bold !important;
                                 color: var(--text-color) !important;
                             }
                         }

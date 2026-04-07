@@ -113,6 +113,7 @@ export default {
                     title: 'Editar',
                     action: 'editLine',
                     ocultar: { _state: ['new', 'edit'] },
+                    permiso: 'vProduccionOrdenes:productosTerminadosAprobados',
                 },
             ]
         },

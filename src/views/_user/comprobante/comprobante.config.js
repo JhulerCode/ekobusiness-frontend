@@ -7,11 +7,11 @@ export default {
     permisoGuardarAvance: ['no'],
 
     headerActions: [
-        {
-            text: 'Exportar en PDF',
-            icon: 'fa-regular fa-file-pdf',
-            tipo: '2',
-            action: 'generarPdf',
-        },
+        // {
+        //     text: 'Exportar en PDF',
+        //     icon: 'fa-regular fa-file-pdf',
+        //     tipo: '2',
+        //     action: 'generarPdf',
+        // },
     ],
 }

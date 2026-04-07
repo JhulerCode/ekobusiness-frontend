@@ -76,7 +76,7 @@
         </template>
 
         <template #pestanas-body>
-            <vSocioPedidoItems v-if="vista.pestana == 1" />
+            <vSocioPedidoItems v-if="vista.pestana == 1" ref="vSocioPedidoItems" />
             <vSocioPedidoLogistica v-if="vista.pestana == 2" />
             <vSocioPedidoFinanzas v-if="vista.pestana == 3" />
         </template>
@@ -99,7 +99,7 @@ import { useModals } from '@/pinia/modals'
 import { useSystem } from '@/pinia/system'
 import { urls, get, post, patch } from '@/utils/crud'
 import { getItemFromArray, redondear, incompleteData, genId } from '@/utils/mine'
-import { jmsg, jqst } from '@/utils/swal'
+import { jmsg } from '@/utils/swal'
 import dayjs from 'dayjs'
 
 export default {
@@ -224,7 +224,7 @@ export default {
                     socio1: {
                         cols: ['doc_numero', 'contactos', 'direcciones', 'pago_condicion'],
                     },
-                    socio_pedido_items: { incl: ['articulo1'] },
+                    socio_pedido_items: { incl: ['articulo1'], sqls: ['pedido_item_entregado'] },
                     createdBy1: { cols: ['cargo', 'telefono'] },
                 },
             }
@@ -237,6 +237,10 @@ export default {
                 this.vista.data = res.data
                 document.title = `Pedido ${this.vista.data[this.vista.titleKey]}`
                 this.setSocio(this.vista.data.socio1)
+
+                this.$nextTick(() => {
+                    this.$refs.vSocioPedidoItems.sumarItems()
+                })
             }
         },
 
@@ -283,58 +287,40 @@ export default {
 
             this.modals.setModal('mSocioPedidoPdf', 'Orden de compra', null, send, true)
         },
-        async recalcularEntregados() {
-            const resQst = await jqst('¿Está seguro de recalcular los entregados del pedido?')
-            if (resQst.isConfirmed == false) return
-            this.auth.setLoading(true, 'Cargando...')
-            const res = await post(
-                `${urls.socio_pedido_items}/recalcular-entregados`,
-                { socio_pedido: this.vista.data.id },
-                'Entregados recalculados',
-            )
-            this.auth.setLoading(false)
-            if (res.code != 0) return
-        },
+        // async recalcularEntregados() {
+        //     const resQst = await jqst('¿Está seguro de recalcular los entregados del pedido?')
+        //     if (resQst.isConfirmed == false) return
+        //     this.auth.setLoading(true, 'Cargando...')
+        //     const res = await post(
+        //         `${urls.socio_pedido_items}/recalcular-entregados`,
+        //         { socio_pedido: this.vista.data.id },
+        //         'Entregados recalculados',
+        //     )
+        //     this.auth.setLoading(false)
+        //     if (res.code != 0) return
+        // },
         ingresar() {
             this.openStockMove(1)
         },
         entregar() {
             this.openStockMove(2)
         },
-        async openStockMove(tipo) {
-            if (this.$route.path.includes('compras')) {
-                if (tipo == 2) {
-                    const cantidad_traslados =
-                        await this.loadTrasladosPreviosCantidad('abastacer_maquila')
-                    if (cantidad_traslados == 0) {
-                        this.$router.push({
-                            name: 'vCompraPedidoEntrega',
-                            params: { traslado_id: 'nuevo' },
-                        })
-                    } else {
-                        this.$router.push({ name: 'vCompraPedidoEntregas' })
-                    }
-                } else {
-                    const cantidad_traslados = await this.loadTrasladosPreviosCantidad('1')
-                    if (cantidad_traslados == 0) {
-                        this.$router.push({
-                            name: 'vCompraPedidoRecepcion',
-                            params: { traslado_id: 'nuevo' },
-                        })
-                    } else {
-                        this.$router.push({ name: 'vCompraPedidoRecepciones' })
-                    }
-                }
+        async facturar() {
+            const cantidad_traslados = await this.loadTrasladosPreviosCantidad(1)
+            if (cantidad_traslados == 0) {
+                jmsg('warning', 'No se puede registrar facturas sin traslados previos')
+                return
+            }
+
+            const cantidad_comprobantes = await this.loadComprobantesPreviosCantidad()
+
+            if (cantidad_comprobantes == 0) {
+                this.$router.push({
+                    name: 'vCompraPedidoComprobante',
+                    params: { comprobante_id: 'nuevo' },
+                })
             } else {
-                const cantidad_traslados = await this.loadTrasladosPreviosCantidad('5')
-                if (cantidad_traslados == 0) {
-                    this.$router.push({
-                        name: 'vVentaPedidoEntrega',
-                        params: { traslado_id: 'nuevo' },
-                    })
-                } else {
-                    this.$router.push({ name: 'vVentaPedidoEntregas' })
-                }
+                this.$router.push({ name: 'vCompraPedidoComprobantes' })
             }
         },
 
@@ -403,6 +389,42 @@ export default {
 
             this.vista.data.monto = this.vista.mtoImpVenta.toFixed(2)
         },
+        async openStockMove(tipo) {
+            if (this.$route.path.includes('compras')) {
+                if (tipo == 2) {
+                    const cantidad_traslados =
+                        await this.loadTrasladosPreviosCantidad('abastacer_maquila')
+                    if (cantidad_traslados == 0) {
+                        this.$router.push({
+                            name: 'vCompraPedidoEntrega',
+                            params: { traslado_id: 'nuevo' },
+                        })
+                    } else {
+                        this.$router.push({ name: 'vCompraPedidoEntregas' })
+                    }
+                } else {
+                    const cantidad_traslados = await this.loadTrasladosPreviosCantidad('1')
+                    if (cantidad_traslados == 0) {
+                        this.$router.push({
+                            name: 'vCompraPedidoRecepcion',
+                            params: { traslado_id: 'nuevo' },
+                        })
+                    } else {
+                        this.$router.push({ name: 'vCompraPedidoRecepciones' })
+                    }
+                }
+            } else {
+                const cantidad_traslados = await this.loadTrasladosPreviosCantidad('5')
+                if (cantidad_traslados == 0) {
+                    this.$router.push({
+                        name: 'vVentaPedidoEntrega',
+                        params: { traslado_id: 'nuevo' },
+                    })
+                } else {
+                    this.$router.push({ name: 'vVentaPedidoEntregas' })
+                }
+            }
+        },
 
         //--- Auxiliar data ---//
         async loadSocios(txtBuscar) {
@@ -456,6 +478,21 @@ export default {
 
             this.auth.setLoading(true, 'Cargando...')
             const res = await get(`${urls.transacciones}?qry=${JSON.stringify(qry)}`)
+            this.auth.setLoading(false)
+
+            if (res.code != 0) return
+
+            return res.data.length
+        },
+        async loadComprobantesPreviosCantidad() {
+            const qry = {
+                fltr: {
+                    pedido_id: { op: 'Es', val: this.vista.data.id },
+                },
+            }
+
+            this.auth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.comprobantes}?qry=${JSON.stringify(qry)}`)
             this.auth.setLoading(false)
 
             if (res.code != 0) return

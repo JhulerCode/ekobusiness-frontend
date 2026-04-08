@@ -2,7 +2,19 @@
     <div class="vista">
         <div class="head">
             <div class="head-left">
-                <strong>Programa de producción</strong>
+                <JdButton
+                    text="Exportar"
+                    tipo="2"
+                    @click="exportarPrograma"
+                    v-if="useAuth.verifyPermiso('vPrograma:crear')"
+                />
+
+                <JdButton
+                    text="Ver productos pedidos"
+                    tipo="2"
+                    @click="verPedidos"
+                    v-if="useAuth.verifyPermiso('vPrograma:verProductosPedidos')"
+                />
             </div>
 
             <div class="header-right">
@@ -24,24 +36,11 @@
                 />
 
                 <JdButton
-                    text="Recargar"
+                    title="Recargar"
+                    icon="fa-solid fa-rotate"
                     tipo="2"
                     @click="loadProduccionOrdenes"
                     v-if="useAuth.verifyPermiso('vPrograma:listar')"
-                />
-
-                <JdButton
-                    text="Exportar"
-                    tipo="2"
-                    @click="exportarPrograma"
-                    v-if="useAuth.verifyPermiso('vPrograma:crear')"
-                />
-
-                <JdButton
-                    text="Ver productos pedidos"
-                    tipo="2"
-                    @click="verPedidos"
-                    v-if="useAuth.verifyPermiso('vPrograma:verProductosPedidos')"
                 />
             </div>
         </div>

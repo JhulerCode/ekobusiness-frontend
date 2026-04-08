@@ -24,11 +24,18 @@
                 />
 
                 <JdBuscador
-                    v-else
+                    v-if="showBuscador && selectedCount == 0"
                     :tableName="viewName"
                     :columns="vista?.tableColumns || []"
                     @reload="loadTableData"
                     @open-filters="openConfigFiltros"
+                />
+
+                <JdInput
+                    icon="fa-solid fa-magnifying-glass"
+                    v-model="busquedaSimple"
+                    type="search"
+                    v-if="showBuscadorSimple && selectedCount == 0"
                 />
 
                 <slot name="header-center"></slot>
@@ -38,7 +45,7 @@
             <div class="header-right">
                 <slot name="header-right"></slot>
 
-                <JdPaginacion :view="vista" @reload="loadTableData" />
+                <JdPaginacion :view="vista" @reload="loadTableData" v-if="showPaginacion" />
 
                 <JdButton
                     v-if="showConfigCols"
@@ -56,7 +63,7 @@
             <JdTable
                 :name="viewName"
                 :columns="vista?.tableColumns || []"
-                :datos="vista?.tableData || []"
+                :datos="tableDataFiltrados || []"
                 :rowSelectable="props.rowSelectable"
                 :rowOptions="rowActions"
                 @rowOptionSelected="handleRowAction"
@@ -72,7 +79,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
@@ -95,13 +102,38 @@ const auth = useAuth()
 const modals = useModals()
 const vistas = useVistas()
 
+const busquedaSimple = ref('')
+
+const tableDataFiltrados = computed(() => {
+    const data = vista?.tableData || []
+    const query = busquedaSimple.value.toLowerCase()
+
+    if (!query) return data
+
+    const seekCols = vista.tableColumns.filter((col) => col.seek)
+
+    return data.filter((row) => {
+        return seekCols.some((col) => {
+            const field = col.prop || col.id
+            if (!field) return false
+            const val = field.split('.').reduce((acc, part) => acc?.[part], row)
+            return String(val || '')
+                .toLowerCase()
+                .includes(query)
+        })
+    })
+})
+
 const props = defineProps({
     config: { type: Object, required: true },
     initFiltros: { type: Function },
     checkFiltros: { type: Function },
-    setQuery: { type: Function, required: true },
+    setQuery: { type: Function },
     loadDataPers: { type: Function },
     // askToInicialLoad: { type: Boolean, default: true },
+    showBuscadorSimple: { type: Boolean, default: false },
+    showBuscador: { type: Boolean, default: true },
+    showPaginacion: { type: Boolean, default: true },
     showConfigCols: { type: Boolean, default: true },
     rowSelectable: { type: Boolean, default: false },
     detailViewName: { type: String },
@@ -138,6 +170,7 @@ if (vista.last_path != route.fullPath) {
 async function loadTableData(init_page) {
     if (props.loadDataPers) {
         props.loadDataPers()
+        busquedaSimple.value = ''
         return
     }
 
@@ -146,6 +179,8 @@ async function loadTableData(init_page) {
     props.setQuery()
 
     vista.tableData = []
+    busquedaSimple.value = ''
+
     auth.setLoading(true, 'Cargando...')
     const res = await get(`${urls[vista.apiPath]}?qry=${JSON.stringify(vista.qry)}`)
     auth.setLoading(false)
@@ -203,7 +238,7 @@ const headerActions = computed(() => {
 function downloadActualTablePage() {
     downloadExcel(
         vista.tableColumns.filter((a) => a.show),
-        vista.tableData || [],
+        tableDataFiltrados.value || [],
     )
 }
 
@@ -328,7 +363,7 @@ function handleRowAction(action, item) {
 // })
 
 const selectedCount = computed(() => {
-    return (vista?.tableData || []).filter((a) => a.selected).length
+    return tableDataFiltrados.value.filter((a) => a.selected).length
 })
 
 function updatedBulk(item) {

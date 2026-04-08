@@ -1,5 +1,4 @@
 export default {
-    name: 'vStock',
     apiPath: 'kardex',
 
     headerActions: [],

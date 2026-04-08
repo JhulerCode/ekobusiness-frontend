@@ -13,14 +13,6 @@ export default {
             tipo: '2',
             action: 'generarPdf',
         },
-        // {
-        //     text: 'Recalcular entregados',
-        //     icon: 'fa-solid fa-calculator',
-        //     tipo: '2',
-        //     action: 'recalcularEntregados',
-        //     permiso: 'vCompraPedidos:recalcularEntregados',
-        //     ocultar: { estado: 2 },
-        // },
         {
             text: 'Entrega',
             icon: 'fa-regular fa-truck',

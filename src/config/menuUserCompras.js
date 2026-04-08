@@ -44,7 +44,6 @@ export default {
                 { id: 'vCompraPedidos:eliminar', label: 'Eliminar' },
                 { id: 'vCompraPedidos:abrirCerrar', label: 'Abrir y cerrar' },
                 { id: 'vCompraPedidos:generarPdf', label: 'Generar PDF' },
-                // { id: 'vCompraPedidos:recalcularEntregados', label: 'Recalcular entregados' },
                 { id: 'vCompraPedidos:ingresarMercaderia', label: 'Ingresar mercadería' },
             ],
             children: [

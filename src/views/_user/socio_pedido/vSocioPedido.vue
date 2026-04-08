@@ -290,18 +290,6 @@ export default {
 
             this.modals.setModal('mSocioPedidoPdf', 'Orden de compra', null, send, true)
         },
-        // async recalcularEntregados() {
-        //     const resQst = await jqst('¿Está seguro de recalcular los entregados del pedido?')
-        //     if (resQst.isConfirmed == false) return
-        //     this.auth.setLoading(true, 'Cargando...')
-        //     const res = await post(
-        //         `${urls.socio_pedido_items}/recalcular-entregados`,
-        //         { socio_pedido: this.vista.data.id },
-        //         'Entregados recalculados',
-        //     )
-        //     this.auth.setLoading(false)
-        //     if (res.code != 0) return
-        // },
         ingresar() {
             this.openStockMove(1)
         },

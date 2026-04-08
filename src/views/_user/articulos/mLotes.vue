@@ -8,12 +8,12 @@
             <div>
                 <p>
                     <small>Stock:</small>
-                    {{ redondear(modal.stock) }}
+                    {{ redondear(modal.stock_general) }}
                 </p>
 
                 <p>
                     <small>Valor:</small>
-                    {{ redondear(modal.valor) }}
+                    {{ redondear(modal.valor_general) }}
                 </p>
             </div>
         </div>
@@ -26,12 +26,7 @@
             class="mrg-btm1"
         />
 
-        <JdTable
-            :columns="columns"
-            :datos="modal.lotes || []"
-            :reload="loadLotes"
-            maxHeight="73vh"
-        />
+        <JdTable :columns="columns" :datos="modal.lotes || []" maxHeight="73vh" />
     </JdModal>
 </template>
 
@@ -63,8 +58,6 @@ export default {
                 title: 'Lote',
                 width: '8rem',
                 show: true,
-
-                sort: true,
             },
             {
                 id: 'fv',
@@ -72,17 +65,13 @@ export default {
                 prop: 'fv1',
                 width: '8rem',
                 show: true,
-
-                sort: true,
             },
             {
-                id: 'stock',
+                id: 'lote_stock',
                 title: 'Stock',
                 width: '8rem',
                 format: 'decimal',
                 show: true,
-
-                sort: true,
             },
         ],
     }),
@@ -91,19 +80,16 @@ export default {
 
         await this.loadLotes()
     },
-    computed: {
-        stock() {
-            return this.$refs['TableKardex']?.datosFiltrados
-        },
-    },
     methods: {
         async loadLotes() {
             const qry = {
-                incl: ['articulo1'],
-                cols: ['fv', 'codigo', 'stock', 'vu'],
+                incl: ['articulo1', 'kardexes_for_sqls'],
+                cols: ['fv', 'codigo', 'vu'],
+                sqls: ['lote_stock'],
                 fltr: {
                     articulo: { op: 'Es', val: this.modal.articulo.id },
                 },
+                grop: ['id'],
                 ordr: [
                     ['createdAt', 'DESC'],
                     ['codigo', 'DESC'],
@@ -122,12 +108,12 @@ export default {
             this.calculateStock()
         },
         calculateStock() {
-            this.modal.stock = 0
-            this.modal.valor = 0
+            this.modal.stock_general = 0
+            this.modal.valor_general = 0
 
             for (const a of this.modal.lotes) {
-                this.modal.stock += Number(a.stock)
-                this.modal.valor += Number(a.stock) * a.vu
+                this.modal.stock_general += Number(a.lote_stock)
+                this.modal.valor_general += Number(a.lote_stock) * a.vu
             }
         },
     },

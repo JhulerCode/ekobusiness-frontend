@@ -128,7 +128,7 @@ export default {
             const qry = {
                 incl: ['socio1', 'socio_pedido1', 'transaccion_items'],
                 iccl: {
-                    transaccion_items: { incl: ['articulo1', 'kardexes_all'] },
+                    transaccion_items: { incl: ['articulo1', 'kardexes1'] },
                 },
             }
 

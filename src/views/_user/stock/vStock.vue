@@ -50,13 +50,16 @@ export default {
         },
         setQuery() {
             this.vista.qry = {
-                incl: ['categoria1', 'kardexes'],
+                incl: ['categoria1', 'kardexes_for_sqls'],
                 iccl: {
                     kardexes: {
                         incl: ['lote2'],
                     },
                 },
-                sqls: ['articulo_movimientos_cantidad', 'articulo_movimientos_valorizado'],
+                sqls: [
+                    'articulo_movimientos_cantidad',
+                    // 'articulo_movimientos_valorizado'
+                ],
                 fltr: {},
                 grop: ['id'],
                 ordr: [['nombre', 'ASC']],

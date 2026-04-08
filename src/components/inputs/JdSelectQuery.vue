@@ -32,14 +32,18 @@
                 </div>
 
                 <div class="actions" v-if="!disabled">
-                    <i class="fa-solid fa-arrows-rotate" v-if="isVisible" title="Recargar datos" @click.stop="reload()"></i>
+                    <i
+                        class="fa-solid fa-arrows-rotate"
+                        v-if="isVisible"
+                        title="Recargar datos"
+                        @click.stop="reload()"
+                    ></i>
                     <i class="fa-solid fa-xmark hidden" v-if="hasValue" @click.stop="setNull()"></i>
 
                     <i
                         :class="`${isVisible ? 'fa-solid fa-caret-up' : 'fa-solid fa-caret-down'}`"
                     ></i>
                 </div>
-
             </div>
 
             <div
@@ -153,7 +157,7 @@ export default {
                     this.updatePosition()
                 })
             }
-        }
+        },
     },
     methods: {
         handleClickOutside(event) {
@@ -195,7 +199,7 @@ export default {
 
                 // Usamos un pequeño margen para no quedar excesivamente pegado al borde de la pantalla
                 const margin = 10
-                
+
                 // Decide si poner arriba o abajo
                 const spaceBelow = windowHeight - rect.bottom - margin
                 const spaceAbove = rect.top - margin

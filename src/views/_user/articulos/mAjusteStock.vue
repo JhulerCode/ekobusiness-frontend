@@ -43,7 +43,7 @@
                 label="Lote"
                 :nec="true"
                 v-model="modal.transaccion.lote_id"
-                mostrar="lote_fv_stock"
+                mostrar="codigo_fv_stock"
                 :search="loadLotes"
                 @elegir="selectLote"
                 style="grid-column: 1/4"
@@ -163,6 +163,13 @@ export default {
                 return true
             }
 
+            if (this.modal.transaccion.tipo == 7) {
+                if (this.modal.transaccion.cantidad > this.modal.transaccion.lote1.lote_stock) {
+                    jmsg('warning', 'Cantidad mayor al stock')
+                    return true
+                }
+            }
+
             return false
         },
         shapeDatos() {
@@ -241,17 +248,16 @@ export default {
             return res.data
         },
         async loadLotes(txt) {
-            // this.modal.lotes = []
-            // this.modal.transaccion.lote_id = null
-
-            // if (this.modal.transaccion.articulo == null) return
-
             const qry = {
-                cols: ['codigo', 'fv', 'stock', 'lote_fv', 'lote_fv_stock'],
+                incl: ['kardexes_for_sqls'],
+                cols: ['codigo', 'fv', 'codigo_fv_stock'],
+                sqls: ['lote_stock'],
                 fltr: {
                     articulo: { op: 'Es', val: this.modal.transaccion.articulo },
                 },
+                grop: ['id'],
                 ordr: [
+                    ['createdAt', 'DESC'],
                     ['codigo', 'DESC'],
                     ['fv', 'DESC'],
                 ],

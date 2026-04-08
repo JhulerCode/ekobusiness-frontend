@@ -225,6 +225,8 @@ export default {
                 has_fv: articulo.has_fv,
                 igv_afectacion: articulo.igv_afectacion,
             }
+
+            item.kardexes = []
         },
 
         //--- Lotes ---//
@@ -333,12 +335,13 @@ export default {
             }
 
             const qry = {
-                incl: ['articulo1'],
-                cols: ['articulo', 'fv', 'codigo', 'stock', 'lote_fv', 'lote_fv_stock'],
+                incl: ['articulo1', 'kardexes_for_sqls'],
+                cols: ['articulo', 'codigo', 'fv', 'codigo_fv_stock'],
+                sqls: ['lote_stock'],
                 fltr: {
                     articulo: { op: 'Es', val: articulos_ids },
-                    stock: { op: '>', val: 0 },
                 },
+                grop: ['id'],
                 ordr: [
                     ['createdAt', 'ASC'],
                     ['codigo', 'ASC'],
@@ -354,7 +357,7 @@ export default {
 
             //--- Agrupamos lotes por articulo --//
             const lotesMap = {}
-            for (const a of res.data) {
+            for (const a of res.data.filter((a) => a.lote_stock > 0)) {
                 if (!lotesMap[a.articulo]) {
                     lotesMap[a.articulo] = []
                 }
@@ -387,14 +390,13 @@ export default {
                                 articulo1: lote.articulo1,
                                 cantidad: a.cantidad - total,
                                 lote_id: lote.id,
-                                // lote1: { id: lote.id, lote_fv_stock: lote.lote_fv_stock },
                                 lote1: lote,
                             }
 
-                            if (falta <= lote.stock) {
+                            if (falta <= lote.lote_stock) {
                                 send.cantidad = falta
                             } else {
-                                send.cantidad = Number(lote.stock)
+                                send.cantidad = Number(lote.lote_stock)
                             }
 
                             a.kardexes.push(send)
@@ -413,14 +415,13 @@ export default {
                             articulo1: { ...lote.articulo1 },
                             cantidad: a.cantidad - total,
                             lote_id: lote.id,
-                            // lote1: { id: lote.id, lote_fv_stock: lote.lote_fv_stock },
                             lote1: lote,
                         }
 
-                        if (falta <= lote.stock) {
+                        if (falta <= lote.lote_stock) {
                             send.cantidad = falta
                         } else {
-                            send.cantidad = Number(lote.stock)
+                            send.cantidad = Number(lote.lote_stock)
                         }
 
                         a.kardexes.push(send)

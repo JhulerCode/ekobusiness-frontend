@@ -30,7 +30,7 @@
                 :nec="true"
                 v-model="modal.transaccion.lote_id"
                 :lista="modal.lotes || []"
-                mostrar="lote_fv_stock"
+                mostrar="codigo_fv_stock"
                 :loaded="modal.lotesLoaded"
                 @reload="loadLotes"
                 style="grid-column: 1/3"
@@ -152,8 +152,8 @@ export default {
                 {
                     id: 'lote_id',
                     title: 'Lote',
-                    prop: 'lote1.codigo_fv',
-                    width: '7rem',
+                    prop: 'lote1.lote_fv',
+                    width: '10rem',
                     show: true,
                     sort: true,
                 },
@@ -270,7 +270,7 @@ export default {
                 (a) => a.id == this.modal.transaccion.lote_id,
             )
 
-            if (lote_elegido.stock < this.modal.transaccion.cantidad) {
+            if (lote_elegido.lote_stock < this.modal.transaccion.cantidad) {
                 jmsg('warning', 'Stock insuficiente')
                 return true
             }
@@ -357,11 +357,15 @@ export default {
             if (this.modal.transaccion.articulo == null) return
 
             const qry = {
-                cols: ['codigo', 'fv', 'stock', 'lote_fv', 'lote_fv_stock'],
+                incl: ['kardexes_for_sqls'],
+                cols: ['codigo', 'fv', 'stock', 'codigo_fv_stock'],
+                sqls: ['lote_stock'],
                 fltr: {
                     articulo: { op: 'Es', val: this.modal.transaccion.articulo },
                 },
+                grop: ['id'],
                 ordr: [
+                    ['createdAt', 'DESC'],
                     ['codigo', 'DESC'],
                     ['fv', 'DESC'],
                 ],

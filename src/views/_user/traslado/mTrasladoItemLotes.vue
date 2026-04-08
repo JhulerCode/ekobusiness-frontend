@@ -97,9 +97,9 @@ export default {
                     input: true,
                     select_query: {
                         search: this.loadLotes,
-                        mostrar: 'lote_fv_stock',
+                        mostrar: 'codigo_fv_stock',
                         selectedObjectProp: 'lote1',
-                        elegir: this.setLote1,
+                        elegir: this.elegirLote,
                     },
                     show: this.modal.type == 'old',
                 },
@@ -174,8 +174,14 @@ export default {
             const i = this.modal.kardexes.findIndex((a) => a.id == item.id)
             this.modal.kardexes.splice(i, 1)
         },
-        setLote1(data, item) {
+        elegirLote(data, item) {
             const i = this.modal.kardexes.findIndex((a) => a.id == item.id)
+
+            if (!data) {
+                this.modal.kardexes[i].lote1 = null
+                return
+            }
+
             this.modal.kardexes[i].lote1 = data
         },
         setComponente(data, item) {
@@ -184,18 +190,27 @@ export default {
             this.modal.kardexes[i].articulo1 = data.articulo1
         },
         sendItems() {
-            if (this.modal.type == 'old') {
-                const items_fallados = this.modal.kardexes.some((a) => a.lote1.stock < a.cantidad)
-                if (items_fallados) return jmsg('warning', 'Stock insuficiente en uno o más lotes')
-            }
+            let fila = 1
+            for (const a of this.modal.kardexes) {
+                if (this.modal.type == 'old') {
+                    if (!a.lote1)
+                        return jmsg('warning', `Falta seleccionar lote en la fila ${fila}`)
 
-            if (this.modal.type == 'new') {
-                for (const a of this.modal.kardexes) {
-                    if (!a.lote1.codigo) return jmsg('warning', 'Falta codigo de lote')
-                    if (this.modal.articulo1.has_fv && !a.lote1.fv) {
-                        return jmsg('warning', 'Falta fecha de vencimiento')
+                    if (a.lote1.lote_stock < a.cantidad) {
+                        return jmsg('warning', `Stock insuficiente en la fila ${fila}`)
                     }
                 }
+
+                if (this.modal.type == 'new') {
+                    if (!a.lote1.codigo)
+                        return jmsg('warning', `Falta codigo de lote en la fila ${fila}`)
+
+                    if (this.modal.articulo1.has_fv && !a.lote1.fv) {
+                        return jmsg('warning', `Falta fecha de vencimiento en la fila ${fila}`)
+                    }
+                }
+
+                fila++
             }
 
             if (this.totalRequerido != this.totalCantidad) {
@@ -213,10 +228,13 @@ export default {
         //--- Auxiliar data ---//
         async loadLotes(txt, item) {
             const qry = {
-                cols: ['codigo', 'fv', 'stock', 'lote_fv_stock', 'lote_fv'],
+                incl: ['kardexes_for_sqls'],
+                cols: ['codigo', 'fv', 'codigo_fv_stock'],
+                sqls: ['lote_stock'],
                 fltr: {
                     articulo: { op: 'Es', val: item.articulo },
                 },
+                grop: ['id'],
                 ordr: [
                     ['createdAt', 'DESC'],
                     ['codigo', 'DESC'],

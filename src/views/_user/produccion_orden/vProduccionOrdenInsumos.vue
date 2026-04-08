@@ -112,9 +112,9 @@ export default {
                     input: true,
                     select_query: {
                         search: this.loadLotes,
-                        mostrar: 'lote_fv_stock',
-                        elegir: this.elegirLote,
+                        mostrar: (item) => (item._state === 'view' ? 'lote_fv' : 'codigo_fv_stock'),
                         selectedObjectProp: 'lote1',
+                        elegir: this.elegirLote,
                         disabled: (item) => item._state === 'view',
                     },
                     width: '22rem',
@@ -325,7 +325,7 @@ export default {
                 return true
             }
 
-            if (!fila.lote1 || fila.lote1.stock < fila.cantidad) {
+            if (!fila.lote1 || fila.lote1.lote_stock < fila.cantidad) {
                 jmsg('warning', 'Cantidad mayor al stock')
                 return true
             }
@@ -384,10 +384,13 @@ export default {
         },
         async loadLotes(txt, item) {
             const qry = {
-                cols: ['codigo', 'fv', 'stock', 'lote_fv_stock', 'lote_fv'],
+                incl: ['kardexes_for_sqls'],
+                cols: ['codigo', 'fv', 'codigo_fv_stock'],
+                sqls: ['lote_stock'],
                 fltr: {
                     articulo: { op: 'Es', val: item.articulo },
                 },
+                grop: ['id'],
                 ordr: [
                     ['createdAt', 'DESC'],
                     ['codigo', 'DESC'],

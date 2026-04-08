@@ -85,6 +85,7 @@
             :search="(txt) => column.select_query.search(txt, item, column)"
             :selectedObject="item[column.select_query.selectedObjectProp || column.id + '1']"
             :disabled="column.select_query.disabled ? column.select_query.disabled(item) : disabled"
+            :mostrar="setMostrar(item, column)"
             @elegir="
                 column.select_query.elegir ? column.select_query.elegir($event, item, column) : null
             "
@@ -163,6 +164,16 @@ const valueColor = computed(() => {
     if (!prop) return ''
     return prop.split('.').reduce((acc, part) => acc?.[part], props.item) || ''
 })
+
+function setMostrar(item, column) {
+    if (column.select_query) {
+        if (typeof column.select_query.mostrar === 'function') {
+            return column.select_query.mostrar(item, column)
+        }
+        return column.select_query.mostrar
+    }
+    return null
+}
 </script>
 
 <style lang="scss" scoped>

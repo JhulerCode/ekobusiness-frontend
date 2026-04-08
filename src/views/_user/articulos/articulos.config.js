@@ -47,7 +47,7 @@ export default {
             orden: 3,
         },
         {
-            id: 'stock',
+            id: 'articulo_stock',
             title: 'Stock',
             filtrable: false,
             format: 'decimal',
@@ -55,6 +55,17 @@ export default {
             width: '7rem',
             show: true,
             orden: 4,
+        },
+        {
+            id: 'stock_nivel',
+            title: 'Nivel de stock',
+            prop: 'stock_nivel1.nombre',
+            format: 'estado',
+            color: 'stock_nivel1.color',
+            width: '8rem',
+            show: true,
+            filtrable: false,
+            orden: 5,
         },
         {
             id: 'activo',

@@ -1,13 +1,18 @@
 <template>
     <JdModal modal="mProductosFaltantes">
+        <JdButton icon="fa-solid fa-rotate" tipo="2" @click="loadPedidos" class="mrg-btm1" />
+
         <JdTable :columns="columns" :datos="modal.articulos || []" :reload="loadPedidos">
             <template v-slot:cCantidad="{ item }">
-                {{ redondear(item.cantidad - item.entregado, 0) }}
+                {{ redondear(item.cantidad - item.pedido_item_entregado, 0) }}
             </template>
 
             <template v-slot:cFaltante="{ item }">
-                <span class="negativo" v-if="item.stock < item.cantidad - item.entregado">
-                    {{ redondear(item.cantidad - item.entregado - item.stock, 0) }}
+                <span
+                    class="negativo"
+                    v-if="item.stock < item.cantidad - item.pedido_item_entregado"
+                >
+                    {{ redondear(item.cantidad - item.pedido_item_entregado - item.stock, 0) }}
                 </span>
             </template>
         </JdTable>
@@ -50,7 +55,7 @@ export default {
                 sort: true,
             },
             {
-                id: 'entregado',
+                id: 'pedido_item_entregado',
                 title: 'Entregado',
                 format: 'number',
                 toRight: true,
@@ -68,7 +73,7 @@ export default {
                 sort: true,
             },
             {
-                id: 'stock',
+                id: 'articulo_stock',
                 title: 'Stock',
                 format: 'number',
                 toRight: true,

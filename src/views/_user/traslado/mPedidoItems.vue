@@ -62,7 +62,7 @@ export default {
                 sort: false,
             },
             {
-                id: 'entregado',
+                id: 'pedido_item_entregado',
                 title: 'Entregado',
                 format: 'decimal',
                 toRight: true,

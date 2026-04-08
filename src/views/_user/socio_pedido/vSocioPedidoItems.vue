@@ -168,18 +168,7 @@ export default {
             ]
         },
     },
-    created() {
-        // if (this.vista.mode == 'view') {
-        //     const colEntregado = this.columns.find((c) => c.id == 'entregado')
-        //     if (colEntregado) colEntregado.show = true
-        // }
-        // const exec = setInterval(() => {
-        //     if (this.vista.data?.socio_pedido_items) {
-        //         this.sumarItems()
-        //         clearInterval(exec)
-        //     }
-        // }, 100)
-    },
+    created() {},
     methods: {
         runMethod(method, item) {
             this[method](item)

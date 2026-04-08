@@ -179,14 +179,12 @@ export default {
             this.vista.data.transaccion_items.splice(i, 1)
         },
         async agregarPedidoItems(items) {
-            const faltantes = items.filter((a) => a.cantidad > a.entregado)
-            for (const a of faltantes) {
+            for (const a of items) {
                 const i = this.vista.data.transaccion_items.findIndex(
                     (b) => b.articulo == a.articulo,
                 )
 
                 if (i !== -1) {
-                    // jmsg('warning', 'El artículo ya está agregado')
                     continue
                 }
 
@@ -434,7 +432,9 @@ export default {
         //--- Methods ---//
         async openPedidoItems() {
             const send = {
-                articulos: this.vista.socio_pedido.socio_pedido_items,
+                articulos: this.vista.socio_pedido.socio_pedido_items.filter(
+                    (a) => a.pedido_item_entregado < a.cantidad,
+                ),
                 socio_pedido: this.vista.data.socio_pedido,
             }
 

@@ -49,7 +49,7 @@
         </template>
 
         <template #pestanas-body>
-            <vTrasladoLine v-if="vista.pestana == 1" ref="vTrasladoLine"/>
+            <vTrasladoLine v-if="vista.pestana == 1" ref="vTrasladoLine" />
         </template>
     </VistaDetalleLayout>
 </template>
@@ -122,46 +122,6 @@ export default {
 
             if (socio_pedido_id) await this.loadSocioPedido()
         },
-        // async loadAvanceData() {
-        //     const objectName = this.$route.path.includes('compras') ? 'mCompra' : 'mVenta'
-
-        //     const dataGuardada = this.auth.usuario.avances[objectName]
-
-        //     if (!dataGuardada) return this.auth.goBack(this.$router)
-
-        //     this.$router.replace({
-        //         name: this.$route.name,
-        //         params: {
-        //             [this.vista.pathKey]: 'nuevo',
-        //         },
-        //     })
-
-        //     this.vista.data = dataGuardada
-        //     // console.log(this.vista.data)
-        //     //--- Cargamos socio ---//
-        //     if (dataGuardada.socio_pedido) {
-        //         await this.loadSocioPedido(dataGuardada.socio_pedido)
-        //         return
-        //     }
-
-        //     if (dataGuardada.socio) {
-        //         if (dataGuardada.socio) {
-        //             this.auth.setLoading(true, 'Cargando socio...')
-        //             const qrySocio = {
-        //                 fltr: {
-        //                     id: { op: 'Es', val: dataGuardada.socio },
-        //                 },
-        //                 cols: ['nombres', 'contactos', 'direcciones', 'pago_condicion'],
-        //             }
-        //             const resSocio = await get(`${urls.socios}?qry=${JSON.stringify(qrySocio)}`)
-        //             this.auth.setLoading(false)
-
-        //             if (resSocio.code === 0 && resSocio.data.length > 0) {
-        //                 dataGuardada.socio1 = resSocio.data[0]
-        //             }
-        //         }
-        //     }
-        // },
         async loadExistingData() {
             const param_id = this.$route.params[this.vista.pathKey]
 
@@ -357,17 +317,14 @@ export default {
 
             return res.data
         },
-        async loadSocioPedido(data = null) {
+        async loadSocioPedido() {
             const pedido_id = this.$route.params.pedido_id
-            const vSocioPedido = this.$route.path.includes('compras')
-                ? 'vCompraPedido'
-                : 'vVentaPedido'
+            const vPedido = this.$route.path.includes('compras') ? 'vCompraPedido' : 'vVentaPedido'
 
             this.vista.socio_pedido = {}
-            if (data) {
-                this.vista.socio_pedido = data
-            } else if (this.vistas[vSocioPedido]?.data?.id == pedido_id) {
-                this.vista.socio_pedido = this.vistas[vSocioPedido].data
+
+            if (this.vistas[vPedido]?.data?.id == pedido_id) {
+                this.vista.socio_pedido = this.vistas[vPedido].data
             } else {
                 const qry = {
                     incl: ['socio1', 'moneda1', 'socio_pedido_items', 'createdBy1'],
@@ -375,7 +332,10 @@ export default {
                         socio1: {
                             cols: ['doc_numero', 'contactos', 'direcciones', 'pago_condicion'],
                         },
-                        socio_pedido_items: { incl: ['articulo1'] },
+                        socio_pedido_items: {
+                            incl: ['articulo1'],
+                            sqls: ['pedido_item_entregado'],
+                        },
                         createdBy1: { cols: ['cargo', 'telefono'] },
                     },
                 }
@@ -386,34 +346,36 @@ export default {
                 )
                 this.auth.setLoading(false)
 
-                if (res.code == 0) this.vista.socio_pedido = res.data
-            }
+                if (res.code !== 0 || !res.data) return this.auth.goBack(this.$router)
 
-            if (this.vista.socio_pedido?.id) {
-                // breadcrumbs fix
-                this.vistas.initVista(vSocioPedido, 'detail')
-                this.vistas.updateVista(vSocioPedido, {
+                this.vista.socio_pedido = res.data
+
+                this.vistas.initVista(vPedido, 'detail')
+                this.vistas.updateVista(vPedido, {
                     titleKey: 'codigo',
                     pathKey: 'pedido_id',
                     data: this.vista.socio_pedido,
                     loaded: true,
                 })
+            }
 
-                if (this.is_nuevo) {
-                    this.vista.data.socio = this.vista.socio_pedido.socio
-                    this.vista.data.socio1 = this.vista.socio_pedido.socio1
-                }
+            if (this.is_nuevo) {
+                this.vista.data.socio = this.vista.socio_pedido.socio
+                this.vista.data.socio1 = this.vista.socio_pedido.socio1
 
-                this.vista.data.socio_pedido1 = {
-                    id: this.vista.socio_pedido.id,
-                    codigo: this.vista.socio_pedido.codigo,
-                }
+                //--- CREAR ITEMS DEL COMPROBANTE ---//
+                const por_trasladar = this.vista.socio_pedido.socio_pedido_items
+                    .filter((a) => Number(a.pedido_item_entregado) < a.cantidad)
+                    .map((a) => ({ ...a, cantidad: a.cantidad - a.pedido_item_entregado }))
 
-                if (this.is_nuevo) {
-                    this.$refs.vTrasladoLine.agregarPedidoItems(this.vista.socio_pedido.socio_pedido_items)
-                }
-            } else {
-                this.auth.goBack(this.$router)
+                this.$nextTick(() => {
+                    this.$refs.vTrasladoLine.agregarPedidoItems(por_trasladar)
+                })
+            }
+
+            this.vista.data.socio_pedido1 = {
+                id: this.vista.socio_pedido.id,
+                codigo: this.vista.socio_pedido.codigo,
             }
         },
         async loadComprobantesPreviosCantidad() {

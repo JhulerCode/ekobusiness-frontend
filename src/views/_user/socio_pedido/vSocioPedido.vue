@@ -224,7 +224,10 @@ export default {
                     socio1: {
                         cols: ['doc_numero', 'contactos', 'direcciones', 'pago_condicion'],
                     },
-                    socio_pedido_items: { incl: ['articulo1'], sqls: ['pedido_item_entregado'] },
+                    socio_pedido_items: {
+                        incl: ['articulo1'],
+                        sqls: ['pedido_item_entregado'],
+                    },
                     createdBy1: { cols: ['cargo', 'telefono'] },
                 },
             }

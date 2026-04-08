@@ -314,8 +314,6 @@ export default {
                     return item
                 })
 
-                console.log(this.vista.data.comprobante_items)
-
                 this.$nextTick(() => {
                     this.$refs.vComprobanteItems.sumarItems()
                 })

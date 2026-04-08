@@ -33,6 +33,8 @@ export default {
                     },
                 ],
 
+                tableRowActions: [],
+
                 tableColumns: [
                     {
                         id: 'fecha_emision',

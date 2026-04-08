@@ -285,6 +285,8 @@ function handleBulkAction(action, item) {
 
 //--- Row actions ---//
 const rowActions = computed(() => {
+    if (!vista?.tableRowActions) return []
+
     return [
         {
             label: 'Eliminar',

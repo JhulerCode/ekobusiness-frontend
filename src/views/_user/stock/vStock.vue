@@ -4,7 +4,6 @@
         :initFiltros="initFiltros"
         :setQuery="setQuery"
         :loadDataPers="loadTableData"
-        @runMethod="runMethod"
     >
     </VistaLayout>
 </template>

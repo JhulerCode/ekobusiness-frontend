@@ -99,13 +99,13 @@ export default {
                 },
             ],
         },
-        {
-            label: 'Despachos detalle',
-            goto: 'vVentaItems',
-            path: 'despachos-items',
-            view: '_user/traslado_items/vTrasladoItems.vue',
-            permisos: [{ id: 'vVentaItems:listar', label: 'Listar' }],
-        },
+        // {
+        //     label: 'Despachos detalle',
+        //     goto: 'vVentaItems',
+        //     path: 'despachos-items',
+        //     view: '_user/traslado_items/vTrasladoItems.vue',
+        //     permisos: [{ id: 'vVentaItems:listar', label: 'Listar' }],
+        // },
         {
             label: 'Soporte al cliente',
             goto: 'vHelpdeskTickets',

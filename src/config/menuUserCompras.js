@@ -160,16 +160,16 @@ export default {
                 },
             ],
         },
-        {
-            label: 'Recepciones detalle',
-            goto: 'vCompraItems',
-            path: 'recepciones-items',
-            view: '_user/traslado_items/vTrasladoItems.vue',
-            permisos: [
-                { id: 'vCompraItems:listar', label: 'Listar' },
-                { id: 'vCompraItems:inspeccion', label: 'Inspeccionar' },
-            ],
-        },
+        // {
+        //     label: 'Recepciones detalle',
+        //     goto: 'vCompraItems',
+        //     path: 'recepciones-items',
+        //     view: '_user/traslado_items/vTrasladoItems.vue',
+        //     permisos: [
+        //         { id: 'vCompraItems:listar', label: 'Listar' },
+        //         { id: 'vCompraItems:inspeccion', label: 'Inspeccionar' },
+        //     ],
+        // },
         {
             label: 'Facturas de proveedor',
             goto: 'vCompraComprobantes',

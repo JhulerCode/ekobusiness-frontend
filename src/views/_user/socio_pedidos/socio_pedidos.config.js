@@ -184,21 +184,14 @@ export default {
             icon: 'fa-solid fa-hand-holding-dollar',
             action: 'confirmarPago',
             permiso: 'vVentaPedidos:confirmarPago',
-            ocultar: { tipo: 1, pagado: true, pago_condicion: ['2', '3'] },
+            ocultar: { tipo: 1, pago_condicion: ['2', '3'], pagado: true },
         },
         {
             label: 'Marcar como listo',
             icon: 'fa-solid fa-check-double',
             action: 'confirmarListo',
             permiso: 'vVentaPedidos:confirmarListo',
-            ocultar: { tipo: 1, listo: true, pagado: false, pago_condicion: ['2', '3'] },
-        },
-        {
-            label: 'Marcar como listo',
-            icon: 'fa-solid fa-check-double',
-            action: 'confirmarListo',
-            permiso: 'vVentaPedidos:confirmarListo',
-            ocultar: { tipo: 1, listo: true, pago_condicion: 1 },
+            ocultar: { tipo: 1, listo: true },
         },
         {
             label: 'Confirmar entrega',

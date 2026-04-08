@@ -225,7 +225,7 @@ export default {
             this.auth.setLoading(true, 'Cargando...')
             const res = await get(`${urls.kardex}/consumo?qry=${JSON.stringify(this.vista.qry)}`)
             this.auth.setLoading(false)
-            this.vista.loaded = true
+            this.vista.last_path = this.$route.fullPath
 
             if (res.code === 0) {
                 this.vista.tableData = res.data

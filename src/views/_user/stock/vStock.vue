@@ -57,7 +57,7 @@ export default {
                     },
                 },
                 sqls: [
-                    'articulo_movimientos_cantidad',
+                    'articulo_stock',
                     // 'articulo_movimientos_valorizado'
                 ],
                 fltr: {},
@@ -77,7 +77,7 @@ export default {
             this.auth.setLoading(true, 'Cargando...')
             const res = await get(`${urls.kardex}/inventario?qry=${JSON.stringify(this.vista.qry)}`)
             this.auth.setLoading(false)
-            this.vista.loaded = true
+            this.vista.last_path = this.$route.fullPath
 
             if (res.code === 0) {
                 this.vista.tableData = res.data

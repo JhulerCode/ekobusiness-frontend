@@ -41,7 +41,7 @@ export default {
             orden: 4,
         },
         {
-            id: 'articulo_movimientos_cantidad',
+            id: 'articulo_stock',
             title: 'Stock',
             format: 'decimal',
             toRight: true,

@@ -60,13 +60,17 @@ export default {
             }
 
             this.auth.updateQuery(this.vista.tableColumns, this.vista.qry)
-            // this.vista.qry.cols.push('fotos')
-            const col_articulo_stock = this.vista.tableColumns.find((c) => c.id == 'articulo_stock')
-            if (col_articulo_stock.show == true) this.vista.qry.sqls.push('articulo_stock')
 
+            const col_articulo_stock = this.vista.tableColumns.find((c) => c.id == 'articulo_stock')
             const col_stock_nivel = this.vista.tableColumns.find((c) => c.id == 'stock_nivel')
-            if (col_stock_nivel.show == true) {
+
+            if (col_articulo_stock.show == true || col_stock_nivel.show == true) {
+                this.vista.qry.incl.push('kardexes_for_sqls')
                 this.vista.qry.sqls.push('articulo_stock')
+                this.vista.qry.grop = ['id']
+            }
+
+            if (col_stock_nivel.show == true) {
                 this.vista.qry.cols.push('stock_minimo', 'stock_nivel')
             }
         },

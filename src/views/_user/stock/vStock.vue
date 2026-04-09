@@ -56,14 +56,11 @@ export default {
                         incl: ['lote2'],
                     },
                 },
-                sqls: [
-                    'articulo_stock',
-                    // 'articulo_movimientos_valorizado'
-                ],
+                sqls: ['articulo_stock', 'articulo_stock_valor'],
                 fltr: {},
                 grop: ['id'],
                 ordr: [['nombre', 'ASC']],
-                // page: this.vista.table_page,
+                page: this.vista.table_page,
             }
 
             this.auth.updateQuery(this.vista.tableColumns, this.vista.qry)

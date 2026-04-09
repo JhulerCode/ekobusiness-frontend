@@ -84,7 +84,7 @@ export default {
         async loadLotes() {
             const qry = {
                 incl: ['articulo1', 'kardexes_for_sqls'],
-                cols: ['fv', 'codigo', 'vu'],
+                cols: ['fv', 'codigo', 'vu', 'tipo_cambio'],
                 sqls: ['lote_stock'],
                 fltr: {
                     articulo: { op: 'Es', val: this.modal.articulo.id },
@@ -113,7 +113,7 @@ export default {
 
             for (const a of this.modal.lotes) {
                 this.modal.stock_general += Number(a.lote_stock)
-                this.modal.valor_general += Number(a.lote_stock) * a.vu
+                this.modal.valor_general += Number(a.lote_stock) * a.vu * a.tipo_cambio
             }
         },
     },

@@ -51,7 +51,7 @@ export default {
             orden: 5,
         },
         {
-            id: 'articulo_movimientos_valorizado',
+            id: 'articulo_stock_valor',
             title: 'Valor',
             format: 'decimal',
             toRight: true,

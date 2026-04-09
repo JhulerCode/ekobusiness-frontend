@@ -114,14 +114,16 @@
             <JdButton text="Comprobar disponibilidad" tipo="2" @click="loadStock" />
         </div>
 
+        {{ modal.produccion_orden.mrp_bom }}
+
         <JdTable :columns="columns1" :datos="insumos_necesitados" class="jd-table">
             <template v-slot:colStock="{ item }">
                 <span
                     :class="{
-                        falta: item.stock < item.cantidad_necesitada,
+                        falta: item.articulo_stock < item.cantidad_necesitada,
                     }"
                 >
-                    {{ redondear(item.stock) }}
+                    {{ redondear(item.articulo_stock) }}
                 </span>
             </template>
         </JdTable>
@@ -309,7 +311,7 @@ export default {
             const qry = {
                 fltr: {
                     mrp_bom: { op: 'Es', val: this.modal.produccion_orden.mrp_bom },
-                    tipo: { op: 'Es', val: 'fabricar' },
+                    // tipo: { op: 'Es', val: 'fabricar' },
                 },
                 cols: ['articulo', 'cantidad', 'orden'],
                 incl: ['articulo1'],
@@ -326,10 +328,12 @@ export default {
         },
         async loadStock() {
             const qry = {
+                incl: ['kardexes_for_sqls'],
+                sqls: ['articulo_stock'],
                 fltr: {
                     id: { op: 'Es', val: this.modal.mrp_bom_lines.map((a) => a.articulo) },
                 },
-                sqls: ['articulo_stock'],
+                grop: ['id'],
             }
 
             this.useAuth.setLoading(true, 'Cargando...')
@@ -343,7 +347,7 @@ export default {
 
                 return {
                     ...line,
-                    stock: articulo?.stock || 0,
+                    articulo_stock: articulo?.articulo_stock || 0,
                 }
             })
             // this.modal.mrp_boms = res.data

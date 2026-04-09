@@ -766,7 +766,7 @@ export default {
         async calcularInsumosNecesarios() {
             const qry = {
                 fltr: {
-                    articulos: {
+                    mrp_bom: {
                         op: 'Es',
                         val: this.vista.tableData.map((a) => a.mrp_bom),
                     },

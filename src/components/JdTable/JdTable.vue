@@ -39,8 +39,8 @@
                     @update:allSelected="allSelected = $event"
                     @sort="sortData"
                     @resize="onColumnResize"
-                    @resizeEnd="onColumnResizeEnd"
                 />
+                <!-- @resizeEnd="onColumnResizeEnd" -->
 
                 <tbody>
                     <TableRow
@@ -59,7 +59,12 @@
                             resizable: columnsResizable,
                             inputsDisabled,
                         }"
-                        @select="(item, index) => { selectRow(item, index); rowFocusable && focusContainer() }"
+                        @select="
+                            (item, index) => {
+                                selectRow(item, index)
+                                rowFocusable && focusContainer()
+                            }
+                        "
                         @toggleOptions="toogleRowOptions"
                         @action="selectOptionRaw"
                         @dragStart="draggedRowIndex = $event"
@@ -138,7 +143,14 @@ const props = defineProps({
     rowFocusable: { type: Boolean, default: false },
 })
 
-const emit = defineEmits(['rowSelected', 'rowOptionSelected', 'onReorder', 'onChange', 'onInput', 'rowDblclick'])
+const emit = defineEmits([
+    'rowSelected',
+    'rowOptionSelected',
+    'onReorder',
+    'onChange',
+    'onInput',
+    'rowDblclick',
+])
 
 const auth = useAuth()
 const container = ref(null)
@@ -180,9 +192,9 @@ const onColumnResize = ({ column, width }) => {
     column.width = `${width}px`
 }
 
-const onColumnResizeEnd = () => {
-    auth.saveTableColumns(props.name, props.columns)
-}
+// const onColumnResizeEnd = () => {
+//     auth.saveTableColumns(props.name, props.columns)
+// }
 
 const handleDrop = (targetItem) => {
     if (draggedRowIndex.value === null || draggedRowIndex.value.id === targetItem.id) return

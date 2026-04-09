@@ -71,7 +71,7 @@ export default {
                     title: 'Tipo',
                     prop: 'tipo1.nombre',
                     width: '13rem',
-                    show: true,
+                    show: !this.is_nuevo,
                 },
                 {
                     id: 'articulo',
@@ -82,7 +82,7 @@ export default {
                     select_query: {
                         search: this.loadArticulos,
                         elegir: this.elegirArticulo,
-                        disabled: (item) => item._state === 'view',
+                        disabled: (item) => item._state === 'view' || this.is_nuevo,
                     },
                     show: true,
                 },
@@ -104,7 +104,7 @@ export default {
                         disabled: (item) => item._state === 'view',
                     },
                     width: '8rem',
-                    show: true,
+                    show: !this.is_nuevo,
                 },
                 {
                     id: 'lote_id',
@@ -130,6 +130,7 @@ export default {
             ]
         },
         rowActions() {
+            if (this.is_nuevo) return []
             if (this.vista.data.estado == 2) return []
 
             return [
@@ -166,6 +167,7 @@ export default {
             ]
         },
         agregarFila() {
+            if (this.is_nuevo) return null
             if (this.vista.data.estado == 2) return null
             if (!this.auth.verifyPermiso('vProduccionOrdenes:salidaInsumos')) return null
             return this.addLine

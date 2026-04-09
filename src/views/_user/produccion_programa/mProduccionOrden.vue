@@ -77,6 +77,16 @@
                 style="grid-column: 1/4"
             />
 
+            <div>
+                <JdButton
+                    title="Recargar insumos y stock"
+                    icon="fa-solid fa-rotate-right"
+                    tipo="2"
+                    :small="true"
+                    @click="loadMrpBomLines"
+                />
+            </div>
+
             <JdInput
                 type="number"
                 label="Prioridad"
@@ -110,20 +120,14 @@
             />
         </div>
 
-        <div class="mrg-btm1">
-            <JdButton text="Comprobar disponibilidad" tipo="2" @click="loadStock" />
-        </div>
-
-        {{ modal.produccion_orden.mrp_bom }}
-
         <JdTable :columns="columns1" :datos="insumos_necesitados" class="jd-table">
             <template v-slot:colStock="{ item }">
                 <span
                     :class="{
-                        falta: item.articulo_stock < item.cantidad_necesitada,
+                        falta: item.mrp_bom_line_articulo_stock < item.cantidad_necesitada,
                     }"
                 >
-                    {{ redondear(item.articulo_stock) }}
+                    {{ redondear(item.mrp_bom_line_articulo_stock) }}
                 </span>
             </template>
         </JdTable>
@@ -311,10 +315,11 @@ export default {
             const qry = {
                 fltr: {
                     mrp_bom: { op: 'Es', val: this.modal.produccion_orden.mrp_bom },
-                    // tipo: { op: 'Es', val: 'fabricar' },
+                    'mrp_bom1.tipo': { op: 'Es', val: 'fabricar' },
                 },
                 cols: ['articulo', 'cantidad', 'orden'],
-                incl: ['articulo1'],
+                incl: ['articulo1', 'mrp_bom1'],
+                sqls: ['mrp_bom_line_articulo_stock'],
                 ordr: [['orden', 'ASC']],
             }
 
@@ -325,32 +330,6 @@ export default {
             if (res.code != 0) return
 
             this.modal.mrp_bom_lines = res.data
-        },
-        async loadStock() {
-            const qry = {
-                incl: ['kardexes_for_sqls'],
-                sqls: ['articulo_stock'],
-                fltr: {
-                    id: { op: 'Es', val: this.modal.mrp_bom_lines.map((a) => a.articulo) },
-                },
-                grop: ['id'],
-            }
-
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.articulos}?qry=${JSON.stringify(qry)}`)
-            this.useAuth.setLoading(false)
-
-            if (res.code != 0) return
-
-            this.modal.mrp_bom_lines = this.modal.mrp_bom_lines.map((line) => {
-                const articulo = res.data.find((a) => a.id == line.articulo)
-
-                return {
-                    ...line,
-                    articulo_stock: articulo?.articulo_stock || 0,
-                }
-            })
-            // this.modal.mrp_boms = res.data
         },
 
         async setArticulo(a) {

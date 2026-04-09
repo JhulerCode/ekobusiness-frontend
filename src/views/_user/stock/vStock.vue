@@ -68,15 +68,25 @@ export default {
         async loadTableData(init_page) {
             if (this.checkFiltros()) return
             if (init_page) this.vista.table_page = 1
+
+            if (!this.vista.dwal) this.vista.tableData = []
             this.setQuery()
 
-            this.vista.tableData = []
+            if (this.vista.dwal == true) this.vista.qry.dwal = true
+
             this.auth.setLoading(true, 'Cargando...')
             const res = await get(`${urls.kardex}/inventario?qry=${JSON.stringify(this.vista.qry)}`)
             this.auth.setLoading(false)
-            this.vista.last_path = this.$route.fullPath
 
+            this.vista.last_path = this.$route.fullPath
             if (res.code === 0) {
+                if (this.vista.dwal == true) {
+                    this.vista.dwal = false
+                    this.vista.qry.dwal = false
+                    this.vista.all_data_res = res
+                    return
+                }
+
                 this.vista.tableData = res.data
                 this.vista.table_meta = res.meta
             }

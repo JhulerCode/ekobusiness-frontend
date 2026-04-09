@@ -169,7 +169,7 @@ if (vista.last_path != route.fullPath) {
 //--- Principal data ---//
 async function loadTableData(init_page) {
     if (props.loadDataPers) {
-        props.loadDataPers()
+        await props.loadDataPers()
         busquedaSimple.value = ''
         return
     }
@@ -178,8 +178,10 @@ async function loadTableData(init_page) {
     if (init_page) vista.table_page = 1
     props.setQuery()
 
-    vista.tableData = []
+    if (!vista.dwal) vista.tableData = []
     busquedaSimple.value = ''
+
+    if (vista.dwal == true) vista.qry.dwal = true
 
     auth.setLoading(true, 'Cargando...')
     const res = await get(`${urls[vista.apiPath]}?qry=${JSON.stringify(vista.qry)}`)
@@ -187,6 +189,13 @@ async function loadTableData(init_page) {
 
     vista.last_path = route.fullPath
     if (res.code === 0) {
+        if (vista.dwal == true) {
+            vista.dwal = false
+            vista.qry.dwal = false
+            vista.all_data_res = res
+            return
+        }
+
         vista.tableData = res.data
         vista.table_meta = res.meta
     }
@@ -232,6 +241,12 @@ const headerActions = computed(() => {
             action: 'downloadActualTablePage',
             tipo: '2',
         },
+        {
+            icon: 'fa-solid fa-download',
+            text: 'Exportar todo',
+            action: 'downloadAllData',
+            tipo: '2',
+        },
     ]
 })
 
@@ -242,9 +257,24 @@ function downloadActualTablePage() {
     )
 }
 
+async function downloadAllData() {
+    vista.dwal = true
+    await loadTableData()
+
+    if (vista.all_data_res.code != 0) return
+
+    downloadExcel(
+        vista.tableColumns.filter((a) => a.show),
+        vista.all_data_res.data || [],
+    )
+
+    vista.all_data_res = null
+}
+
 const handleHeaderAction = (action, item) => {
     const localActions = {
         downloadActualTablePage,
+        downloadAllData,
     }
 
     if (localActions[action]) {

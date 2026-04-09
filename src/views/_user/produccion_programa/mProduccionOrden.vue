@@ -315,10 +315,9 @@ export default {
             const qry = {
                 fltr: {
                     mrp_bom: { op: 'Es', val: this.modal.produccion_orden.mrp_bom },
-                    'mrp_bom1.tipo': { op: 'Es', val: 'fabricar' },
                 },
                 cols: ['articulo', 'cantidad', 'orden'],
-                incl: ['articulo1', 'mrp_bom1'],
+                incl: ['articulo1'],
                 sqls: ['mrp_bom_line_articulo_stock'],
                 ordr: [['orden', 'ASC']],
             }

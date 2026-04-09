@@ -143,10 +143,10 @@
                 <template v-slot:colStock="{ item }">
                     <span
                         :class="{
-                            falta: item.stock < item.cantidad_necesitada,
+                            falta: item.mrp_bom_line_articulo_stock < item.cantidad_necesitada,
                         }"
                     >
-                        {{ redondear(item.stock) }}
+                        {{ redondear(item.mrp_bom_line_articulo_stock) }}
                     </span>
                 </template>
             </JdTable>
@@ -353,7 +353,7 @@ export default {
                             articulo: r.articulo,
                             articulo1: r.articulo1,
                             cantidad_necesitada: 0,
-                            stock: r.stock,
+                            mrp_bom_line_articulo_stock: r.mrp_bom_line_articulo_stock,
                         }
                     }
 
@@ -766,13 +766,11 @@ export default {
         async calcularInsumosNecesarios() {
             const qry = {
                 fltr: {
-                    mrp_bom: {
-                        op: 'Es',
-                        val: this.vista.tableData.map((a) => a.mrp_bom),
-                    },
+                    mrp_bom: { op: 'Es', val: this.vista.tableData.map((a) => a.mrp_bom) },
                 },
-                incl: ['articulo1'],
                 cols: ['mrp_bom', 'articulo', 'cantidad', 'orden'],
+                incl: ['articulo1'],
+                sqls: ['mrp_bom_line_articulo_stock'],
             }
 
             this.useAuth.setLoading(true, 'Cargando...')

@@ -36,6 +36,20 @@
                 :disabled="vista.mode == 'view'"
             />
 
+            <div
+                v-if="vista.data.moneda && auth.empresa.moneda != vista.data.moneda"
+                class="tipo-cambio"
+            >
+                <small> T.C. {{ vista.data.tipo_cambio }} </small>
+                <JdButton
+                    icon="fa-solid fa-rotate"
+                    tipo="2"
+                    title="Cargar tipo de cambio"
+                    :small="true"
+                    @click="loadTipoCambio"
+                />
+            </div>
+
             <div style="grid-column: 4/5" class="serie-correlativo">
                 <JdInput
                     v-model="vista.data.serie"
@@ -170,6 +184,14 @@ export default {
 
             if (incompleteData(this.vista.data, props)) {
                 jmsg('warning', 'Ingrese los datos necesarios')
+                return true
+            }
+
+            if (
+                this.auth.empresa.moneda != this.vista.data.moneda &&
+                !this.vista.data.tipo_cambio
+            ) {
+                jmsg('warning', 'No se ha establecido el tipo de cambio')
                 return true
             }
 
@@ -357,8 +379,6 @@ export default {
                 this.vista.data.traslado_id = this.vista.traslado.id
                 this.vista.data.socio = this.vista.traslado.socio
                 this.vista.data.socio1 = this.vista.traslado.socio1
-                this.vista.data.moneda = this.vista.traslado.moneda
-                this.vista.data.moneda1 = this.vista.traslado.moneda1
 
                 //--- CREAR ITEMS DEL COMPROBANTE ---//
                 let i = 0
@@ -387,11 +407,34 @@ export default {
                 })
             }
         },
+        async loadTipoCambio() {
+            const qry = {
+                fltr: {
+                    fecha: { op: 'Es', val: this.vista.data.fecha_emision },
+                    moneda: { op: 'Es', val: this.vista.data.moneda },
+                },
+                cols: ['compra', 'venta'],
+            }
+
+            this.auth.setLoading(true, 'Cargando tipo de cambio...')
+            const res = await get(`${urls.tipo_cambios}?qry=${JSON.stringify(qry)}`)
+            this.auth.setLoading(false)
+
+            if (res.code != 0) return
+
+            this.vista.data.tipo_cambio = res.data[0] ? res.data[0].compra : null
+        },
     },
 }
 </script>
 
 <style lang="scss" scoped>
+.tipo-cambio {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
 .serie-correlativo {
     display: flex;
     gap: 1rem;

@@ -1,14 +1,6 @@
 <template>
     <div class="jd-table" :style="{ height, maxHeight, width }">
-        <div
-            ref="container"
-            class="container-table"
-            :style="{ minHeight }"
-            :tabindex="rowFocusable ? 0 : -1"
-            @keydown.up.prevent="rowFocusable && handleKeyDown($event, focusUp)"
-            @keydown.down.prevent="rowFocusable && handleKeyDown($event, focusDown)"
-            @keydown.enter.prevent="rowFocusable && handleKeyDown($event, selectFocusedRow)"
-        >
+        <div ref="container" class="container-table" :style="{ minHeight }">
             <table ref="jdtable" :class="{ 'table-cols-resizable': columnsResizable }">
                 <colgroup>
                     <col v-if="rowReorderable" style="width: 2rem" />
@@ -59,12 +51,7 @@
                             resizable: columnsResizable,
                             inputsDisabled,
                         }"
-                        @select="
-                            (item, index) => {
-                                selectRow(item, index)
-                                rowFocusable && focusContainer()
-                            }
-                        "
+                        @select="(item, index) => selectRow(item, index)"
                         @toggleOptions="toogleRowOptions"
                         @action="selectOptionRaw"
                         @dragStart="draggedRowIndex = $event"
@@ -99,8 +86,9 @@
                 @click.stop
                 :id="'options-case-' + name"
             >
+                PERRO
                 <template v-for="(b, i) in rowOptions" :key="i">
-                    <li @click="selectOption(b)" v-if="verifyRowOptionPermiso(optionsCaseItem, b)">
+                    <li @click="selectOption(b)" v-if="buttonVerifyPermission(optionsCaseItem, b)">
                         <i :class="b.icon"></i>
                         <span>{{ b.label }}</span>
                     </li>
@@ -111,11 +99,11 @@
 </template>
 
 <script setup>
-import { computed, nextTick, ref, watch } from 'vue'
-import { useAuth } from '@/pinia/auth'
+import { computed, nextTick } from 'vue'
 import { useTable } from './useTable'
 import TableHead from './JdTableHead.vue'
 import TableRow from './JdTableRow.vue'
+import { buttonVerifyPermission } from '@/utils/mine'
 
 const props = defineProps({
     name: String,
@@ -135,49 +123,17 @@ const props = defineProps({
     inputsDisabled: { type: Boolean, default: false },
     rowOptions: { type: Array, default: () => [] },
     rowReorderable: { type: Boolean, default: false },
-    rowReorderProp: { type: String, default: 'orden' },
     bulkActions: { type: Array, default: () => [] },
     agregarFila: Function,
-    rowFocusable: { type: Boolean, default: false },
 })
 
 const emit = defineEmits(['rowSelected', 'rowOptionSelected', 'onReorder', 'rowDblclick'])
 
-const auth = useAuth()
-const container = ref(null)
-
-const {
-    draggedRowIndex,
-    optionsCaseItem,
-    datosFiltrados,
-    allSelected,
-    focusedIndex,
-    sortData,
-    selectRow,
-    focusUp,
-    focusDown,
-    selectFocusedRow,
-} = useTable(props, emit)
+const { draggedRowIndex, optionsCaseItem, datosFiltrados, allSelected, sortData, selectRow } =
+    useTable(props, emit)
 
 const computedColAct = computed(() => props.rowOptions && props.rowOptions.length > 0)
 const dynamicSlots = computed(() => props.columns.filter((c) => c.slot).map((c) => c.slot))
-
-watch(focusedIndex, (val) => {
-    if (val === -1) return
-    nextTick(() => {
-        const row = container.value.querySelector('.row-focused')
-        if (!row) return
-        row.scrollIntoView({ block: 'nearest', behavior: 'auto' })
-    })
-})
-
-const focusContainer = () => container.value?.focus()
-
-const handleKeyDown = (e, callback) => {
-    const isInput = ['INPUT', 'SELECT', 'TEXTAREA'].includes(document.activeElement.tagName)
-    if (isInput) return
-    callback()
-}
 
 const onColumnResize = ({ column, width }) => {
     column.width = `${width}px`
@@ -257,44 +213,6 @@ const selectOption = (a) => {
 
 const selectOptionRaw = (action, item) => {
     emit('rowOptionSelected', action, item)
-}
-
-const verifyRowOptionPermiso = (item, option) => {
-    if (option.ocultar) {
-        for (const prop in option.ocultar) {
-            const cond = option.ocultar[prop]
-            const val = item[prop]
-            if (val === undefined) continue
-            if (Array.isArray(cond)) {
-                if (cond.includes(val)) return false
-            } else if (typeof cond === 'object' && cond.op) {
-                if (comparar(val, cond.op, cond.val)) return false
-            } else if (cond == val) return false
-        }
-    }
-    if (!option.permiso) return true
-    return Array.isArray(option.permiso)
-        ? auth.verifyPermiso(...option.permiso)
-        : auth.verifyPermiso(option.permiso)
-}
-
-const comparar = (a, op, b) => {
-    switch (op) {
-        case '>':
-            return a > b
-        case '<':
-            return a < b
-        case '>=':
-            return a >= b
-        case '<=':
-            return a <= b
-        case '==':
-            return a == b
-        case '!=':
-            return a != b
-        default:
-            return false
-    }
 }
 
 // Expose methods for parent

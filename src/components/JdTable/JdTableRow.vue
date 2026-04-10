@@ -5,7 +5,6 @@
             'row-selected': item.selected,
             'row-reorderable': reorderable,
             'row-dragging': isDragging,
-            'row-focused': item.focused,
         }"
         :draggable="reorderable"
         @click="onRowClick"
@@ -184,13 +183,6 @@ tr {
     &.row-dragging {
         opacity: 0.5;
         background-color: var(--bg-color-hover);
-    }
-    &.row-focused {
-        outline: 1px solid var(--primary-color);
-        outline-offset: -1px;
-        &:not(.row-selected) {
-            background-color: var(--bg-color-hover);
-        }
     }
     &.row-drag-over-top {
         border-top: 2px solid var(--primary-color) !important;

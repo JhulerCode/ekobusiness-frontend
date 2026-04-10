@@ -1,10 +1,9 @@
-import { computed, ref, watch } from 'vue'
+import { computed, ref } from 'vue'
 
 export function useTable(props, emit) {
     const draggedRowIndex = ref(null)
     const optionsCaseItem = ref({})
     const selectedActionsVisible = ref(false)
-    const focusedIndex = ref(-1)
 
     // Computed
     const seekProperties = computed(() => {
@@ -27,11 +26,6 @@ export function useTable(props, emit) {
         set: (val) => {
             props.datos.forEach((a) => (a.selected = val))
         },
-    })
-
-    watch(datosFiltrados, () => {
-        focusedIndex.value = -1
-        props.datos.forEach((a) => (a.focused = false))
     })
 
     // Methods
@@ -66,21 +60,7 @@ export function useTable(props, emit) {
         })
     }
 
-    function setFocus(newIndex) {
-        if (!props.rowFocusable) return
-        if (focusedIndex.value >= 0 && focusedIndex.value < datosFiltrados.value.length) {
-            datosFiltrados.value[focusedIndex.value].focused = false
-        }
-        focusedIndex.value = newIndex
-        if (focusedIndex.value >= 0 && focusedIndex.value < datosFiltrados.value.length) {
-            datosFiltrados.value[focusedIndex.value].focused = true
-        }
-    }
-
-    function selectRow(item, index) {
-        if (index !== undefined) {
-            setFocus(index)
-        }
+    function selectRow(item) {
         if (!props.rowSelectable) return
         if (props.rsUno) {
             props.datos.forEach((a) => {
@@ -91,41 +71,14 @@ export function useTable(props, emit) {
         }
     }
 
-    function focusUp() {
-        if (focusedIndex.value > 0) {
-            setFocus(focusedIndex.value - 1)
-        } else if (focusedIndex.value === -1 && datosFiltrados.value.length > 0) {
-            setFocus(datosFiltrados.value.length - 1)
-        }
-    }
-
-    function focusDown() {
-        if (focusedIndex.value < datosFiltrados.value.length - 1) {
-            setFocus(focusedIndex.value + 1)
-        } else if (focusedIndex.value === -1 && datosFiltrados.value.length > 0) {
-            setFocus(0)
-        }
-    }
-
-    function selectFocusedRow() {
-        if (focusedIndex.value >= 0 && focusedIndex.value < datosFiltrados.value.length) {
-            const item = datosFiltrados.value[focusedIndex.value]
-            emit('rowDblclick', item)
-        }
-    }
-
     return {
         draggedRowIndex,
         optionsCaseItem,
         selectedActionsVisible,
         datosFiltrados,
         allSelected,
-        focusedIndex,
         getNestedProp,
         sortData,
         selectRow,
-        focusUp,
-        focusDown,
-        selectFocusedRow,
     }
 }

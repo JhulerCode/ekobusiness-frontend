@@ -7,7 +7,6 @@
             rowOptionsMode="buttons"
             @rowOptionSelected="runMethod"
             :inputsDisabled="vista.mode == 'view'"
-            @onInput="runMethod"
         />
 
         <div class="botom">
@@ -75,26 +74,28 @@ export default {
                     id: 'cantidad',
                     title: 'Cantidad',
                     type: 'number',
-                    input: true,
+                    input: {
+                        onInput: this.sumarUno,
+                    },
                     width: '6rem',
                     show: true,
-                    oninput: 'sumarUno',
                 },
                 {
                     id: 'vu',
                     title: 'Valor unitario',
                     type: 'number',
-                    input: true,
+                    input: {
+                        onInput: this.sumarUno,
+                    },
                     width: '6rem',
                     show: true,
-                    oninput: 'sumarUno',
                 },
                 {
                     id: 'igv_afectacion',
                     title: 'Tipo igv',
                     width: '15rem',
-                    input: true,
-                    select: {
+                    type: 'select',
+                    input: {
                         lista: this.system.data.igv_afectaciones,
                         elegir: this.elegirIgv,
                     },

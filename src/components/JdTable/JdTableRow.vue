@@ -62,13 +62,7 @@
             ]"
             :style="col.width ? { width: col.width } : {}"
         >
-            <TableCell
-                :column="col"
-                :item="item"
-                :disabled="inputsDisabled"
-                @onChange="(...args) => $emit('onChange', ...args)"
-                @onInput="(...args) => $emit('onInput', ...args)"
-            >
+            <TableCell :column="col" :item="item" :disabled="inputsDisabled">
                 <!-- Forward slots -->
                 <template v-if="col.slot" v-slot:[col.slot]="slotProps">
                     <slot :name="col.slot" v-bind="slotProps"></slot>
@@ -104,54 +98,13 @@ const emit = defineEmits([
     'toggleOptions',
     'action',
     'reorder',
-    'onChange',
-    'onInput',
     'dragStart',
     'drop',
     'dragEnd',
     'rowDblclick',
 ])
 
-// const auth = useAuth()
 const isDragging = ref(false)
-
-// const verifyPermission = (item, option) => {
-//     if (option.ocultar) {
-//         for (const prop in option.ocultar) {
-//             const cond = option.ocultar[prop]
-//             const val = item[prop]
-//             if (val === undefined) continue
-//             if (Array.isArray(cond)) {
-//                 if (cond.includes(val)) return false
-//             } else if (typeof cond === 'object' && cond.op) {
-//                 if (comparar(val, cond.op, cond.val)) return false
-//             } else if (cond == val) return false
-//         }
-//     }
-//     if (!option.permiso) return true
-//     return Array.isArray(option.permiso)
-//         ? auth.verifyPermiso(...option.permiso)
-//         : auth.verifyPermiso(option.permiso)
-// }
-
-// const comparar = (a, op, b) => {
-//     switch (op) {
-//         case '>':
-//             return a > b
-//         case '<':
-//             return a < b
-//         case '>=':
-//             return a >= b
-//         case '<=':
-//             return a <= b
-//         case '==':
-//             return a == b
-//         case '!=':
-//             return a != b
-//         default:
-//             return false
-//     }
-// }
 
 const onDragStart = (e) => {
     isDragging.value = true

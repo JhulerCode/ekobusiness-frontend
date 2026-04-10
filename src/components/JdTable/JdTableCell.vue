@@ -7,98 +7,54 @@
     <template v-else-if="column.input">
         <JdInput
             v-if="['text', 'number', 'email', 'date', 'time'].includes(column.type)"
-            v-model="modelValue"
             :type="column.type"
-            :disabled="disabled"
-            :toRight="column.type === 'number'"
-            @change="column.onchange ? $emit('onChange', column.onchange, item) : null"
-            @input="column.oninput ? $emit('onInput', column.oninput, item) : null"
-        />
-
-        <JdSelect
-            v-else-if="column.type === 'select' && !column.select"
             v-model="modelValue"
-            :disabled="disabled"
-            :lista="column.list"
-            :mostrar="column.mostrar"
-            @elegir="column.onchange ? $emit('onChange', column.onchange, item) : null"
-        />
-
-        <JdCheckBox
-            v-else-if="column.type === 'check'"
-            v-model="modelValue"
-            :disabled="disabled"
-            @change="column.onchange ? $emit('onChange', column.onchange, item) : null"
+            :disabled="setDisabled(item, column)"
+            :toRight="column.toRight"
+            @change="onChange(item, column)"
+            @input="onInput(item, column)"
         />
 
         <JdTextArea
             v-else-if="column.type === 'longtext'"
             v-model="modelValue"
-            :disabled="disabled"
-        />
-
-        <JdInput
-            v-else-if="column.text"
-            v-model="modelValue"
-            :disabled="column.text.disabled ? column.text.disabled(item) : null"
-            :toRight="column.text?.toRight"
-            @change="column.onchange ? $emit('onChange', column.onchange, item) : null"
-            @input="column.oninput ? $emit('onInput', column.oninput, item) : null"
-        />
-
-        <JdInput
-            v-else-if="column.date"
-            v-model="modelValue"
-            type="date"
-            :disabled="column.date.disabled ? column.date.disabled(item) : null"
-            :toRight="column.date?.toRight"
-            @change="column.onchange ? $emit('onChange', column.onchange, item) : null"
-            @input="column.oninput ? $emit('onInput', column.oninput, item) : null"
-        />
-
-        <JdInput
-            v-else-if="column.number"
-            v-model="modelValue"
-            type="number"
-            :disabled="column.number.disabled ? column.number.disabled(item) : null"
-            :toRight="column.number?.toRight"
-            @change="column.onchange ? $emit('onChange', column.onchange, item) : null"
-            @input="column.oninput ? $emit('onInput', column.oninput, item) : null"
-        />
-
-        <JdSelect
-            v-else-if="column.select"
-            v-model="modelValue"
-            v-bind="column.select"
-            :disabled="item.table_columns?.[`${column.id}_disabled`] || disabled"
-            @elegir="column.select.elegir ? column.select.elegir($event, item, column) : null"
-            @reload="() => column.select.reload(item, column)"
-            :lista="column.select.lista"
-            :mostrar="column.select.mostrar"
-            :loaded="true"
+            :disabled="setDisabled(item, column)"
         />
 
         <JdSelectQuery
-            v-else-if="column.select_query"
+            v-else-if="column.type == 'select_query'"
             v-model="modelValue"
-            v-bind="column.select_query"
-            :search="(txt) => column.select_query.search(txt, item, column)"
-            :selectedObject="item[column.select_query.selectedObjectProp || column.id + '1']"
-            :disabled="column.select_query.disabled ? column.select_query.disabled(item) : disabled"
+            :disabled="setDisabled(item, column)"
             :mostrar="setMostrar(item, column)"
-            @elegir="
-                column.select_query.elegir ? column.select_query.elegir($event, item, column) : null
-            "
+            :selectedObject="item[column.input.selectedObjectProp]"
+            :search="(txt) => column.input.search(txt, item, column)"
+            @elegir="elegirOption($event, item, column)"
         />
 
-        <!-- {{ column.select?.lista }} -->
+        <JdSelect
+            v-else-if="column.type == 'select'"
+            v-model="modelValue"
+            :disabled="setDisabled(item, column)"
+            :lista="column.input.lista"
+            :loaded="true"
+            :mostrar="setMostrar(item, column)"
+            @reload="() => column.input.reload(item, column)"
+            @elegir="elegirOption($event, item, column)"
+        />
+
+        <JdCheckBox
+            v-else-if="column.type === 'check'"
+            v-model="modelValue"
+            :disabled="setDisabled(item, column)"
+            @change="onChange(item, column)"
+        />
     </template>
 
     <!-- Format Mode -->
     <template v-else-if="column.format">
         <div
             v-if="['yesno', 'estado'].includes(column.format)"
-            class="estado"
+            class="chip"
             :class="`chip-${valueColor}`"
         >
             {{ value }}
@@ -135,7 +91,6 @@ import { computed } from 'vue'
 import { redondear } from '@/utils/mine'
 
 const props = defineProps(['column', 'item', 'disabled'])
-defineEmits(['onChange', 'onInput'])
 
 const modelValue = computed({
     get: () => {
@@ -165,19 +120,43 @@ const valueColor = computed(() => {
     return prop.split('.').reduce((acc, part) => acc?.[part], props.item) || ''
 })
 
-function setMostrar(item, column) {
-    if (column.select_query) {
-        if (typeof column.select_query.mostrar === 'function') {
-            return column.select_query.mostrar(item, column)
-        }
-        return column.select_query.mostrar
+//--- input props ---//
+function setDisabled(fila, column) {
+    if (props.disabled) return true
+    if (!column.input.disabled) return undefined
+    if (typeof column.input.disabled === 'function') {
+        return column.input.disabled(fila, column)
     }
-    return null
+    return column.input.disabled
+}
+
+function setMostrar(fila, column) {
+    if (!column.input.mostrar) return undefined
+    if (typeof column.input.mostrar === 'function') {
+        return column.input.mostrar(fila, column)
+    }
+    return column.input.mostrar
+}
+
+//--- input actions ---//
+function onChange(fila, column) {
+    if (!column.input.onChange) return
+    column.input.onChange(fila)
+}
+
+function onInput(fila, column) {
+    if (!column.input.onInput) return
+    column.input.onInput(fila)
+}
+
+function elegirOption(event, fila, column) {
+    if (!column.input.elegir) return
+    column.input.elegir(event, fila, column)
 }
 </script>
 
 <style lang="scss" scoped>
-.estado {
+.chip {
     padding: 0.1rem 0.5rem;
     width: fit-content;
     border-radius: 0.3rem;

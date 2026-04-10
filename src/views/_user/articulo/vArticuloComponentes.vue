@@ -6,7 +6,6 @@
             :rowOptions="rowActions"
             rowOptionsMode="buttons"
             @rowOptionSelected="runMethod"
-            :inputsDisabled="vista.mode == 'view'"
             :agregarFila="vista.mode == 'view' ? null : addComponente"
             style="grid-column: 1/3"
         />
@@ -34,9 +33,11 @@ export default {
                     id: 'articulo',
                     title: 'Artículo',
                     width: '30rem',
-                    input: true,
-                    select_query: {
+                    type: 'select_query',
+                    input: {
                         search: this.loadArticulos,
+                        selectedObjectProp: 'articulo1',
+                        disabled: () => this.vista.mode == 'view',
                     },
                     show: true,
                 },
@@ -44,7 +45,9 @@ export default {
                     id: 'cantidad',
                     title: 'Cantidad',
                     type: 'number',
-                    input: true,
+                    input: {
+                        disabled: () => this.vista.mode == 'view',
+                    },
                     width: '6rem',
                     show: true,
                 },

@@ -35,10 +35,10 @@ export default {
                     id: 'articulo',
                     title: 'Artículo',
                     width: '30rem',
-                    input: true,
-                    select_query: {
-                        mostrar: 'nombre',
+                    type: 'select_query',
+                    input: {
                         search: this.loadArticulosConsumables,
+                        selectedObjectProp: 'articulo1',
                     },
                     show: true,
                 },
@@ -52,9 +52,9 @@ export default {
                 {
                     id: 'cantidad',
                     title: 'Cantidad',
-                    toRight: true,
-                    input: true,
                     type: 'number',
+                    input: {},
+                    toRight: true,
                     width: '6rem',
                     show: true,
                 },

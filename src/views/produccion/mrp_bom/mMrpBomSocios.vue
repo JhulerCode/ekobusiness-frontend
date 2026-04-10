@@ -33,10 +33,11 @@ export default {
                     id: 'socio',
                     title: 'Subcontratistas',
                     width: '30rem',
-                    input: true,
-                    select_query: {
-                        mostrar: 'nombres',
+                    type: 'select_query',
+                    input: {
                         search: this.loadSocios,
+                        selectedObjectProp: 'socio1',
+                        mostrar: 'nombres',
                     },
                     show: true,
                 },

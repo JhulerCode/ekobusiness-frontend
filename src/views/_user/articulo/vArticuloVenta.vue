@@ -70,7 +70,7 @@
 
             <JdTable
                 :columns="columns_ingredientes"
-                :datos="vista.data.ingredientes"
+                :datos="vista.data.ingredientes || []"
                 :rowOptions="rowActionsIngredientes"
                 rowOptionsMode="buttons"
                 @rowOptionSelected="runMethod"
@@ -81,7 +81,7 @@
 
             <JdTable
                 :columns="columns_beneficios"
-                :datos="vista.data.beneficios"
+                :datos="vista.data.beneficios || []"
                 :rowOptions="rowActionsBeneficios"
                 rowOptionsMode="buttons"
                 @rowOptionSelected="runMethod"
@@ -104,8 +104,8 @@ export default {
                 id: 'nombre',
                 title: 'Ingredientes',
                 width: '25rem',
-                input: true,
                 type: 'longtext',
+                input: {},
                 show: true,
             },
         ],
@@ -114,8 +114,8 @@ export default {
                 id: 'nombre',
                 title: 'Beneficios',
                 width: '25rem',
-                input: true,
                 type: 'longtext',
+                input: {},
                 show: true,
             },
         ],

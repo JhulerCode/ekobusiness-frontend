@@ -25,8 +25,6 @@
             rowOptionsMode="buttons"
             @rowOptionSelected="runMethod"
             :inputsDisabled="vista.mode == 'view'"
-            @onInput="runMethod"
-            @onChange="runMethod"
             :agregarFila="agregarFila"
         >
             <template v-slot:cLotes="{ item }">
@@ -95,11 +93,12 @@ export default {
                     id: 'articulo',
                     title: 'Artículo',
                     width: '30rem',
-                    input: true,
-                    disabled: this.$route.params.pedido_id,
-                    select_query: {
+                    type: 'select_query',
+                    input: {
                         search: this.loadArticulos,
                         elegir: this.elegirArticulo,
+                        selectedObjectProp: 'articulo1',
+                        disabled: this.$route.params.pedido_id,
                     },
                     show: true,
                     sort: true,
@@ -114,9 +113,10 @@ export default {
                 {
                     id: 'cantidad',
                     title: 'Cantidad',
-                    input: true,
                     type: 'number',
-                    onchange: 'setKardexesOnUpdateCantidad',
+                    input: {
+                        onChange: this.setKardexesOnUpdateCantidad,
+                    },
                     width: '8rem',
                     show: true,
                 },

@@ -25,7 +25,6 @@
             rowOptionsMode="buttons"
             @rowOptionSelected="runMethod"
             :inputsDisabled="vista.mode == 'view'"
-            @onInput="runMethod"
             :agregarFila="vista.mode == 'view' ? null : addLine"
         />
 
@@ -81,10 +80,11 @@ export default {
                     id: 'articulo',
                     title: 'Artículo',
                     width: '30rem',
-                    input: true,
-                    select_query: {
+                    type: 'select_query',
+                    input: {
                         search: this.loadArticulos,
                         elegir: this.elegirArticulo,
+                        selectedObjectProp: 'articulo1',
                     },
                     show: true,
                 },
@@ -98,10 +98,11 @@ export default {
                     id: 'cantidad',
                     title: 'Cantidad',
                     type: 'number',
-                    input: true,
+                    input: {
+                        onInput: this.sumarUno,
+                    },
                     width: '6rem',
                     show: true,
-                    oninput: 'sumarUno',
                 },
                 {
                     id: 'pedido_item_entregado',
@@ -115,17 +116,18 @@ export default {
                     id: 'pu',
                     title: 'Valor unitario',
                     type: 'number',
-                    input: true,
+                    input: {
+                        onInput: this.sumarUno,
+                    },
                     width: '6rem',
                     show: true,
-                    oninput: 'sumarUno',
                 },
                 {
                     id: 'igv_afectacion',
                     title: 'Tipo igv',
                     width: '15rem',
-                    input: true,
-                    select: {
+                    type: 'select',
+                    input: {
                         lista: this.useSystem.data.igv_afectaciones,
                         elegir: this.elegirIgv,
                     },

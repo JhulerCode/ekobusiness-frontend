@@ -70,8 +70,6 @@
                         @dragStart="draggedRowIndex = $event"
                         @drop="handleDrop"
                         @dragEnd="draggedRowIndex = null"
-                        @onChange="(...args) => $emit('onChange', ...args)"
-                        @onInput="(...args) => $emit('onInput', ...args)"
                         @rowDblclick="(...args) => $emit('rowDblclick', ...args)"
                     >
                         <!-- Dynamic slots forwarding -->
@@ -143,14 +141,7 @@ const props = defineProps({
     rowFocusable: { type: Boolean, default: false },
 })
 
-const emit = defineEmits([
-    'rowSelected',
-    'rowOptionSelected',
-    'onReorder',
-    'onChange',
-    'onInput',
-    'rowDblclick',
-])
+const emit = defineEmits(['rowSelected', 'rowOptionSelected', 'onReorder', 'rowDblclick'])
 
 const auth = useAuth()
 const container = ref(null)

@@ -81,8 +81,8 @@ export default {
                     id: 'componente',
                     title: 'Componente',
                     width: '20rem',
-                    input: true,
-                    select: {
+                    type: 'select',
+                    input: {
                         lista: this.modal.combo_componentes,
                         mostrar: 'articulo1.nombre',
                         reload: this.loadComboComponentes,
@@ -94,8 +94,8 @@ export default {
                     id: 'lote_id',
                     title: 'Lote | Fv | Stock',
                     width: '22rem',
-                    input: true,
-                    select_query: {
+                    type: 'select_query',
+                    input: {
                         search: this.loadLotes,
                         mostrar: 'codigo_fv_stock',
                         selectedObjectProp: 'lote1',
@@ -107,7 +107,7 @@ export default {
                     id: 'lote1.codigo',
                     title: 'Lote',
                     width: '12rem',
-                    input: true,
+                    input: {},
                     type: 'text',
                     show: this.modal.type == 'new',
                 },
@@ -115,7 +115,7 @@ export default {
                     id: 'lote1.fv',
                     title: 'F.v.',
                     width: '12rem',
-                    input: true,
+                    input: {},
                     type: 'date',
                     show: this.modal.type == 'new' && this.modal.articulo1.has_fv,
                 },
@@ -124,7 +124,7 @@ export default {
                     title: 'Cantidad',
                     prop: 'cantidad',
                     width: '10rem',
-                    input: true,
+                    input: {},
                     type: 'number',
                     toRight: true,
                     show: true,

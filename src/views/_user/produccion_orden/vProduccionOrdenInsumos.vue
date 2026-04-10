@@ -24,7 +24,6 @@
             :rowOptions="rowActions"
             rowOptionsMode="buttons"
             @rowOptionSelected="runMethod"
-            @onChange="runMethod"
             :agregarFila="agregarFila"
         />
     </div>
@@ -76,13 +75,14 @@ export default {
                 {
                     id: 'articulo',
                     title: 'Artículo',
-                    width: '30rem',
-                    input: true,
                     prop: 'articulo1.nombre',
-                    select_query: {
+                    width: '30rem',
+                    type: 'select_query',
+                    input: {
                         search: this.loadArticulos,
                         elegir: this.elegirArticulo,
                         disabled: (item) => item._state === 'view' || this.is_nuevo,
+                        selectedObjectProp: 'articulo1',
                     },
                     show: true,
                 },
@@ -96,10 +96,9 @@ export default {
                 {
                     id: 'cantidad',
                     title: 'Cantidad',
-                    input: true,
+                    type: 'number',
                     toRight: true,
-                    number: {
-                        toRight: true,
+                    input: {
                         disabled: (item) => item._state === 'view' || this.is_nuevo,
                     },
                     width: '8rem',
@@ -108,13 +107,13 @@ export default {
                 {
                     id: 'lote_id',
                     title: 'Lote | Fv | Stock',
-                    input: true,
-                    select_query: {
+                    type: 'select_query',
+                    input: {
                         search: this.loadLotes,
                         mostrar: (item) => (item._state === 'view' ? 'lote_fv' : 'codigo_fv_stock'),
-                        selectedObjectProp: 'lote1',
                         elegir: this.elegirLote,
                         disabled: (item) => item._state === 'view',
+                        selectedObjectProp: 'lote1',
                     },
                     width: '22rem',
                     show: !this.is_nuevo,

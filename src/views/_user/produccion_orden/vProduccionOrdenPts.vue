@@ -16,7 +16,6 @@
             :rowOptions="rowActions"
             rowOptionsMode="buttons"
             @rowOptionSelected="runMethod"
-            @onChange="runMethod"
             :agregarFila="agregarFila"
         />
     </div>
@@ -46,8 +45,8 @@ export default {
                 {
                     id: 'lote1.codigo',
                     title: 'Lote',
-                    input: true,
-                    text: {
+                    type: 'text',
+                    input: {
                         disabled: (item) => item._state === 'view',
                     },
                     width: '20rem',
@@ -56,8 +55,8 @@ export default {
                 {
                     id: 'lote1.fv',
                     title: 'F. Vencimiento',
-                    input: true,
-                    date: {
+                    type: 'date',
+                    input: {
                         disabled: (item) => item._state === 'view',
                     },
                     width: '15rem',
@@ -67,10 +66,9 @@ export default {
                     id: 'cantidad',
                     title: 'Cantidad',
                     toRight: true,
-                    input: true,
-                    number: {
+                    type: 'number',
+                    input: {
                         disabled: (item) => item._state === 'view',
-                        toRight: true,
                     },
                     width: '8rem',
                     show: true,

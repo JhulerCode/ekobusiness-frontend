@@ -47,11 +47,10 @@
                 style="grid-column: 4/5"
             />
 
-            <JdSelectQuery
+            <JdSelect
                 label="Estado"
-                mostrar="nombre"
+                :lista="system.data.transaccion_estados || []"
                 v-model="vista.data.estado"
-                :selectedObject="vista.data.estado1"
                 :disabled="true"
                 style="grid-column: 4/5"
             />
@@ -67,6 +66,7 @@
 import vTrasladoLine from './vTrasladoLine.vue'
 
 import VIEW_CONFIG from './traslado.config.js'
+import { useSystem } from '@/pinia/system.js'
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
 import { useModals } from '@/pinia/modals'
@@ -81,6 +81,7 @@ export default {
     },
     data: () => ({
         VIEW_CONFIG,
+        system: useSystem(),
         auth: useAuth(),
         vistas: useVistas(),
         modals: useModals(),
@@ -97,6 +98,9 @@ export default {
         is_nuevo() {
             return this.$route.params[this.vista.pathKey] === 'nuevo'
         },
+    },
+    created() {
+        this.system.load(['transaccion_estados'])
     },
     methods: {
         runMethod(method, item) {
@@ -195,7 +199,9 @@ export default {
             if (res.code != 0) return
 
             if (this.is_nuevo) {
-                this.$router.push({
+                this.vista.data.id = res.data.id
+
+                this.$router.replace({
                     name: this.$route.name,
                     params: { [this.vista.pathKey]: res.data.id },
                 })
@@ -448,7 +454,6 @@ export default {
                     titleKey: 'codigo',
                     pathKey: 'pedido_id',
                     data: this.vista.socio_pedido,
-                    loaded: true,
                 })
             }
 

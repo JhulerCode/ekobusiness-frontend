@@ -96,15 +96,14 @@ export default {
                 {
                     id: 'cantidad',
                     title: 'Cantidad',
-                    // type: 'number',
                     input: true,
                     toRight: true,
                     number: {
                         toRight: true,
-                        disabled: (item) => item._state === 'view',
+                        disabled: (item) => item._state === 'view' || this.is_nuevo,
                     },
                     width: '8rem',
-                    show: !this.is_nuevo,
+                    show: true,
                 },
                 {
                     id: 'lote_id',

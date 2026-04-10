@@ -162,7 +162,9 @@ export default {
             if (res.code != 0) return
 
             if (this.is_nuevo) {
-                this.$router.push({
+                this.vista.data.id = res.data.id
+
+                this.$router.replace({
                     name: this.$route.name,
                     params: { [this.vista.pathKey]: res.data.id },
                 })
@@ -291,7 +293,6 @@ export default {
                     titleKey: 'guia',
                     pathKey: 'traslado_id',
                     data: this.vista.traslado,
-                    loaded: true,
                     last_path: this.$route.path.split('/comprobantes')[0],
                 })
             }
@@ -331,7 +332,6 @@ export default {
         async loadPedido() {
             const pedido_id = this.$route.params.pedido_id
             const vPedido = this.$route.path.includes('compras') ? 'vCompraPedido' : 'vVentaPedido'
-
             this.vista.pedido = {}
 
             if (this.vistas[vPedido]?.data?.id == pedido_id) {
@@ -362,7 +362,6 @@ export default {
                     titleKey: 'codigo',
                     pathKey: 'pedido_id',
                     data: this.vista.pedido,
-                    loaded: true,
                     last_path: this.$route.path.split('/comprobantes')[0],
                 })
             }
@@ -381,6 +380,10 @@ export default {
                 )
 
                 if (por_facturar.length == 0) {
+                    jmsg(
+                        'error',
+                        `No ha realizado ${this.vista.pedido.tipo == 1 ? 'ninguna recepción' : 'ningún despacho'}`,
+                    )
                     this.auth.goBack(this.$router)
                     return
                 }

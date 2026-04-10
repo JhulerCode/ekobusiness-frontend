@@ -8,6 +8,24 @@
     >
         <template #principal-datos>
             <JdSelectQuery
+                label="Línea"
+                v-model="vista.data.linea"
+                :search="loadLineas"
+                :selectedObject="vista.data.linea1"
+                @elegir="elegirLinea"
+                :disabled="vista.mode == 'view'"
+            />
+
+            <JdInput
+                type="date"
+                label="Fecha"
+                :nec="true"
+                v-model="vista.data.fecha"
+                :disabled="vista.mode == 'view'"
+                style="grid-column: 4/5"
+            />
+
+            <JdSelectQuery
                 label="Producto"
                 :nec="true"
                 v-model="vista.data.articulo"
@@ -18,11 +36,12 @@
                 style="grid-column: 1/3"
             />
 
-            <JdInput
-                type="date"
-                label="Fecha"
-                :nec="true"
-                v-model="vista.data.fecha"
+            <JdSelectQuery
+                label="Máquina"
+                v-model="vista.data.maquina"
+                :search="loadMaquinas"
+                :selectedObject="vista.data.maquina1"
+                @elegir="elegirMaquina"
                 :disabled="vista.mode == 'view'"
                 style="grid-column: 4/5"
             />
@@ -36,12 +55,10 @@
                 :disabled="vista.mode == 'view'"
             />
 
-            <JdSelectQuery
-                label="Máquina"
-                v-model="vista.data.maquina"
-                :search="loadMaquinas"
-                :selectedObject="vista.data.maquina1"
-                @elegir="elegirMaquina"
+            <JdInput
+                type="number"
+                label="Prioridad"
+                v-model="vista.data.orden"
                 :disabled="vista.mode == 'view'"
                 style="grid-column: 4/5"
             />
@@ -58,11 +75,11 @@
                 style="grid-column: 1/3"
             />
 
-            <JdInput
-                type="number"
-                label="Prioridad"
-                v-model="vista.data.orden"
-                :disabled="vista.mode == 'view'"
+            <JdSelect
+                label="Estado"
+                :lista="useSystem.data.produccion_orden_estados || []"
+                v-model="vista.data.estado"
+                :disabled="true"
                 style="grid-column: 4/5"
             />
 
@@ -75,14 +92,6 @@
                 :selectedObject="vista.data.responsable1"
                 :disabled="vista.mode == 'view'"
                 style="grid-column: 1/3"
-            />
-
-            <JdSelect
-                label="Estado"
-                :lista="useSystem.data.produccion_orden_estados || []"
-                v-model="vista.data.estado"
-                :disabled="true"
-                style="grid-column: 4/5"
             />
 
             <JdTextArea
@@ -244,12 +253,13 @@ export default {
             if (res.code != 0) return
 
             if (this.is_nuevo) {
-                this.$router.push({
+                this.vista.data.id = res.data.id
+                this.vista.data.produccion_orden_insumos = []
+
+                this.$router.replace({
                     name: this.$route.name,
                     params: { [this.vista.pathKey]: res.data.id },
                 })
-
-                this.vista.data.produccion_orden_insumos = []
             }
 
             this.vista.mode = 'view'
@@ -359,6 +369,13 @@ export default {
                 }
             }
         },
+        elegirLinea(a) {
+            if (a == null) {
+                this.vista.data.maquina = null
+                this.vista.data.maquina1 = null
+                return
+            }
+        },
         elegirMaquina(a) {
             if (a == null) {
                 this.vista.data.maquina_info = {}
@@ -380,9 +397,30 @@ export default {
         },
 
         //--- Auxiliar data ---//
+        async loadLineas(txt) {
+            const qry = {
+                fltr: {},
+                cols: ['nombre'],
+                ordr: [['nombre', 'ASC']],
+                limt: 25,
+            }
+
+            if (txt) {
+                qry.fltr.nombre = { op: 'Contiene', val: txt }
+            }
+
+            const res = await get(`${urls.articulo_lineas}?qry=${JSON.stringify(qry)}`)
+
+            if (res.code != 0) return
+
+            return res.data
+        },
         async loadMaquinas(txt) {
             const qry = {
-                fltr: { tipo: { op: 'Es', val: 1 } },
+                fltr: {
+                    tipo: { op: 'Es', val: 1 },
+                    linea: { op: 'Es', val: this.vista.data.linea },
+                },
                 cols: ['codigo', 'nombre', 'linea', 'velocidad', 'limpieza_tiempo'],
                 ordr: [['nombre', 'ASC']],
                 limt: 25,

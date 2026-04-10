@@ -48,7 +48,6 @@ export default {
             const qry = {
                 fltr: {
                     mrp_bom: { op: 'Es', val: this.modal.mrp_bom },
-                    tipo: { op: 'Es', val: 'fabricar' },
                 },
                 cols: ['articulo', 'cantidad', 'orden'],
                 incl: ['articulo1'],

@@ -16,6 +16,10 @@ import { urls, get } from '@/utils/crud'
 
 export default {
     components: {},
+    data: () => ({
+        auth: useAuth(),
+        vistas: useVistas(),
+    }),
     computed: {
         vista() {
             return this.vistas[this.$route.name]
@@ -42,8 +46,6 @@ export default {
                         })(),
                     },
                 ],
-
-                tableRowActions: [],
 
                 tableColumns: [
                     {
@@ -135,10 +137,6 @@ export default {
             return this.$route.path.includes('compras') ? 'vCompraComprobante' : null
         },
     },
-    data: () => ({
-        auth: useAuth(),
-        vistas: useVistas(),
-    }),
     created() {
         const sit = setInterval(() => {
             if (this.vista) {
@@ -211,7 +209,6 @@ export default {
                     titleKey: 'guia',
                     pathKey: 'traslado_id',
                     data: this.vista.traslado,
-                    loaded: true,
                     last_path: this.$route.path.split('/comprobantes')[0],
                 })
             }
@@ -250,7 +247,6 @@ export default {
                     titleKey: 'codigo',
                     pathKey: 'pedido_id',
                     data: this.vista.pedido,
-                    loaded: true,
                     last_path: this.$route.path.split('/comprobantes')[0],
                 })
             }

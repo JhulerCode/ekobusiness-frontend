@@ -197,7 +197,9 @@ export default {
             if (res.code != 0) return
 
             if (this.is_nuevo) {
-                this.$router.push({
+                this.vista.data.id = res.data.id
+
+                this.$router.replace({
                     name: 'vArticulo',
                     params: { [this.vista.pathKey]: res.data.id },
                 })

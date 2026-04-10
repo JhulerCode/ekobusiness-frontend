@@ -171,7 +171,7 @@ export const useAuth = defineStore('auth', {
             this.tables[tableName] = columns.map((col) => {
                 return {
                     id: col.id,
-                    width: col.width,
+                    // width: col.width,
                     show: col.show,
                     op: col.op,
                     val: col.val,
@@ -200,7 +200,7 @@ export const useAuth = defineStore('auth', {
                     const saved = this.tables[tableName].find((b) => b.id === a.id)
                     if (saved) {
                         Object.assign(a, {
-                            width: saved.width,
+                            // width: saved.width,
                             show: saved.show,
                             op: saved.op,
                             val: saved.val,

@@ -14,5 +14,21 @@ export default {
             permiso: ['vCompraComprobantes:crear'],
             ocultar: { tipo: 5, socio_pedido: { op: '!=', val: null } },
         },
+        {
+            text: 'Abrir',
+            icon: 'fa-solid fa-check-double',
+            tipo: '2',
+            action: 'abrir',
+            permiso: ['vCompras:abrir'],
+            ocultar: { estado: '1', socio_pedido: { op: '!=', val: null }, tipo: 5 },
+        },
+        {
+            text: 'Cerrar',
+            icon: 'fa-solid fa-check-double',
+            tipo: '2',
+            action: 'cerrar',
+            permiso: ['vCompras:cerrar'],
+            ocultar: { estado: '2', socio_pedido: { op: '!=', val: null }, tipo: 5 },
+        },
     ],
 }

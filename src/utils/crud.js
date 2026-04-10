@@ -24,6 +24,7 @@ const urls = {
     colaboradores: `${host}/api/colaboradores`,
     combo_componentes: `${host}/api/combo_componentes`,
     comprobantes: `${host}/api/comprobantes`,
+    comprobante_items: `${host}/api/comprobante_items`,
     documentos: `${host}/api/documentos`,
     formatos: `${host}/api/formatos`,
     formato_values: `${host}/api/formato_values`,

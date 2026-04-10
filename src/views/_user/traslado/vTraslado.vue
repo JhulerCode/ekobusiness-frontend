@@ -46,6 +46,15 @@
                 :disabled="vista.mode == 'view'"
                 style="grid-column: 4/5"
             />
+
+            <JdSelectQuery
+                label="Estado"
+                mostrar="nombre"
+                v-model="vista.data.estado"
+                :selectedObject="vista.data.estado1"
+                :disabled="true"
+                style="grid-column: 4/5"
+            />
         </template>
 
         <template #pestanas-body>
@@ -63,7 +72,7 @@ import { useVistas } from '@/pinia/vistas'
 import { useModals } from '@/pinia/modals'
 import { urls, post, get, patch } from '@/utils/crud'
 import { getItemFromArray, redondear, incompleteData, obtenerNumeroJuliano } from '@/utils/mine'
-import { jmsg } from '@/utils/swal'
+import { jmsg, jqst } from '@/utils/swal'
 import dayjs from 'dayjs'
 
 export default {
@@ -195,16 +204,22 @@ export default {
             this.vista.mode = 'view'
         },
         async facturar() {
-            const cantidad_comprobantes = await this.loadComprobantesPreviosCantidad()
+            // const cantidad_comprobantes = await this.loadComprobantesPreviosCantidad()
 
-            if (cantidad_comprobantes == 0) {
-                this.$router.push({
-                    name: 'vCompraTrasladoComprobante',
-                    params: { comprobante_id: 'nuevo' },
-                })
-            } else {
-                this.$router.push({ name: 'vCompraTrasladoComprobantes' })
-            }
+            // if (cantidad_comprobantes == 0) {
+            //     this.$router.push({
+            //         name: 'vCompraTrasladoComprobante',
+            //         params: { comprobante_id: 'nuevo' },
+            //     })
+            // } else {
+            this.$router.push({ name: 'vCompraTrasladoComprobantes' })
+            // }
+        },
+        abrir() {
+            this.abrirCerrar('1')
+        },
+        cerrar() {
+            this.abrirCerrar('2')
         },
 
         //--- Methods --//
@@ -292,6 +307,86 @@ export default {
         },
         setLote() {
             return `${obtenerNumeroJuliano(this.vista.data.fecha)}-${Math.floor(Math.random() * 90 + 10)}`
+        },
+        async abrirCerrar(estado) {
+            const resQst = await jqst(
+                `¿Está seguro de cerrar ${this.vista.data.tipo == 1 ? 'la recepción' : 'la entrega'}?`,
+            )
+            if (resQst.isConfirmed == false) return
+
+            if (estado == 2) {
+                const qry_ci = {
+                    incl: ['comprobante1'],
+                    cols: ['articulo', 'cantidad'],
+                    fltr: { 'comprobante1.traslado_id': { op: 'Es', val: this.vista.data.id } },
+                }
+
+                this.auth.setLoading(true, 'Cargando...')
+                const res_ci = await get(`${urls.comprobante_items}?qry=${JSON.stringify(qry_ci)}`)
+                this.auth.setLoading(false)
+
+                if (res_ci.code != 0) return
+
+                const itemsMap = {}
+
+                // 1. acumular comprobantes
+                for (const { articulo, cantidad } of res_ci.data) {
+                    if (!itemsMap[articulo]) {
+                        itemsMap[articulo] = {
+                            comprobante: 0,
+                            transaccion: 0,
+                            nombre: null,
+                        }
+                    }
+
+                    itemsMap[articulo].comprobante += cantidad
+                }
+
+                // 2. acumular transacciones
+                for (const a of this.vista.data.transaccion_items) {
+                    if (!itemsMap[a.articulo]) {
+                        itemsMap[a.articulo] = {
+                            comprobante: 0,
+                            transaccion: 0,
+                            nombre: a.articulo1?.nombre,
+                        }
+                    }
+
+                    itemsMap[a.articulo].transaccion += a.cantidad
+
+                    // asegurar nombre (por si ya existía desde comprobante)
+                    if (!itemsMap[a.articulo].nombre) {
+                        itemsMap[a.articulo].nombre = a.articulo1?.nombre
+                    }
+                }
+
+                // 4. detectar diferencias directamente
+                const diferencias = Object.entries(itemsMap)
+                    .filter(([, item]) => item.comprobante !== item.transaccion)
+                    .map(([articulo, item]) => ({ articulo, ...item }))
+
+                console.log(diferencias)
+
+                // 5. resultado
+                if (diferencias.length) {
+                    return jmsg('warning', `Facturación incompleta`)
+                }
+            }
+
+            const send = { id: this.vista.data.id, estado }
+
+            this.auth.setLoading(true, 'Cerrando...')
+            const res = await patch(
+                `${this.vista.apiUrl}/abrir-cerrar`,
+                send,
+                `Traslado ${send.estado == 1 ? 'abierta' : 'cerrado'}`,
+            )
+            this.auth.setLoading(false)
+
+            if (res.code != 0) return
+
+            this.vista.data.estado = res.data.estado
+            this.vista.data.estado1 = res.data.estado1
         },
 
         //--- Auxiliar data ---//

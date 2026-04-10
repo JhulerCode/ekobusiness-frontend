@@ -12,6 +12,7 @@
 <script>
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
+import { urls, get } from '@/utils/crud'
 
 export default {
     components: {},
@@ -29,7 +30,16 @@ export default {
                         text: 'Nuevo',
                         action: 'nuevo',
                         permiso: ['vCompraComprobantes:crear'],
-                        ocultar: this.$route.name == 'vCompraComprobantes',
+                        ocultar: (() => {
+                            if (this.$route.name == 'vCompraComprobantes') return true
+                            if (this.$route.params.traslado_id) {
+                                if (this.vista?.traslado?.estado == 2) return true
+                            }
+                            if (this.$route.params.pedido_id) {
+                                if (this.vista?.pedido?.estado == 2) return true
+                            }
+                            return false
+                        })(),
                     },
                 ],
 
@@ -129,6 +139,14 @@ export default {
         auth: useAuth(),
         vistas: useVistas(),
     }),
+    created() {
+        const sit = setInterval(() => {
+            if (this.vista) {
+                this.loadTraslado()
+                clearInterval(sit)
+            }
+        }, 100)
+    },
     methods: {
         runMethod(method, item) {
             this[method](item)
@@ -155,6 +173,82 @@ export default {
                 name: this.detailViewName,
                 params: { [this.vista.detailPath]: 'nuevo' },
             })
+        },
+
+        //--- Auxiliar data ---//
+        async loadTraslado() {
+            const traslado_id = this.$route.params.traslado_id
+            const vTraslado = this.$route.path.includes('compras')
+                ? 'vCompraTraslado'
+                : 'vVentaTraslado'
+
+            this.vista.traslado = {}
+
+            if (this.vistas[vTraslado]?.data?.id == traslado_id) {
+                this.vista.traslado = this.vistas[vTraslado].data
+            } else {
+                const qry = {
+                    incl: ['socio1', 'moneda1', 'transaccion_items'],
+                    iccl: {
+                        transaccion_items: { incl: ['articulo1', 'kardexes1'] },
+                    },
+                }
+                this.auth.setLoading(true, 'Cargando traslado...')
+                const res = await get(
+                    `${urls.transacciones}/uno/${traslado_id}?qry=${JSON.stringify(qry)}`,
+                )
+                this.auth.setLoading(false)
+                if (res.code !== 0 || !res.data) return
+                this.vista.traslado = res.data
+
+                this.vistas.initVista(vTraslado, 'detail')
+                this.vistas.updateVista(vTraslado, {
+                    titleKey: 'guia',
+                    pathKey: 'traslado_id',
+                    data: this.vista.traslado,
+                    loaded: true,
+                })
+
+                this.vistas[vTraslado].last_path = this.$route.path.replace('/comprobantes', '')
+            }
+        },
+        async loadPedido() {
+            const pedido_id = this.$route.params.pedido_id
+            const vPedido = this.$route.path.includes('compras') ? 'vCompraPedido' : 'vVentaPedido'
+
+            this.vista.pedido = {}
+
+            if (this.vistas[vPedido]?.data?.id == pedido_id) {
+                this.vista.pedido = this.vistas[vPedido].data
+            } else {
+                const qry = {
+                    incl: ['socio1', 'moneda1', 'socio_pedido_items'],
+                    iccl: {
+                        socio_pedido_items: {
+                            incl: ['articulo1'],
+                            sqls: ['pedido_item_entregado'],
+                        },
+                    },
+                }
+
+                this.auth.setLoading(true, 'Cargando pedido...')
+                const res = await get(
+                    `${urls.socio_pedidos}/uno/${pedido_id}?qry=${JSON.stringify(qry)}`,
+                )
+                this.auth.setLoading(false)
+
+                if (res.code !== 0 || !res.data) return this.auth.goBack(this.$router)
+
+                this.vista.pedido = res.data
+
+                this.vistas.initVista(vPedido, 'detail')
+                this.vistas.updateVista(vPedido, {
+                    titleKey: 'codigo',
+                    pathKey: 'pedido_id',
+                    data: this.vista.pedido,
+                    loaded: true,
+                })
+            }
         },
     },
 }

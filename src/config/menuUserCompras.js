@@ -128,6 +128,8 @@ export default {
                 { id: 'vCompras:ver', label: 'Ver' },
                 { id: 'vCompras:editar', label: 'Editar' },
                 { id: 'vCompras:eliminar', label: 'Eliminar' },
+                { id: 'vCompras:abrir', label: 'Abrir' },
+                { id: 'vCompras:cerrar', label: 'Cerrar' },
             ],
             children: [
                 {

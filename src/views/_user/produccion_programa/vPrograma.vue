@@ -134,7 +134,7 @@
 
         <div class="card" v-if="useAuth.verifyPermiso('vPrograma:crear')">
             <div class="card-head">
-                <p>Insumos requeridos</p>
+                <span class="subtitle">Insumos requeridos</span>
 
                 <JdButton text="Calcular" tipo="2" @click="calcularInsumosNecesarios" />
             </div>
@@ -884,5 +884,15 @@ export default {
     display: flex;
     align-items: center;
     gap: 0.5rem;
+}
+
+.card-head {
+    margin: 2rem 0 1rem;
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    span {
+        font-size: 1.2rem;
+    }
 }
 </style>

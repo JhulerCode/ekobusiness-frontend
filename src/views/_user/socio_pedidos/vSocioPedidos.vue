@@ -17,8 +17,7 @@ import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
 import { useModals } from '@/pinia/modals'
 import { patch } from '@/utils/crud'
-import { jqst, jmsg } from '@/utils/swal'
-// import dayjs from 'dayjs'
+import { jqst } from '@/utils/swal'
 
 export default {
     components: {},
@@ -88,70 +87,12 @@ export default {
             // this.modals.setModal('mSocioPedido', 'Nuevo pedido de compra', 1, send, true)
         },
 
-        //--- Bulk actions ---//
-        async abrirCerrarMasivo(estado) {
-            const selected = this.vista.tableData.filter((a) => a.selected)
-            if (selected.length == 0) return jmsg('warning', 'Seleccione al menos una orden')
-
-            const resQst = await jqst(
-                `¿Está seguro de ${estado == 1 ? 'abrir' : 'cerrar'} ${selected.length} pedidos?`,
-            )
-            if (resQst.isConfirmed == false) return
-
-            const send = { id: 'bulk', ids: selected.map((b) => b.id), estado }
-
-            this.auth.setLoading(true, 'Cargando...')
-            const res = await patch(
-                `${this.vista.apiUrl}/abrir-cerrar`,
-                send,
-                `Pedidos ${estado == 1 ? 'abiertos' : 'cerrados'}`,
-            )
-            this.auth.setLoading(false)
-
-            if (res.code == 0) {
-                for (const a of selected) {
-                    this.vistas.updateItem(
-                        this.vista.name,
-                        'tableData',
-                        { id: a.id, estado, estado1: res.data.estado1, selected: false },
-                        true,
-                    )
-                }
-            }
-        },
-        async abrirMasivo() {
-            this.abrirCerrarMasivo('1')
-        },
-        async cerrarMasivo() {
-            this.abrirCerrarMasivo('2')
-        },
-
         //--- Row actions ---//
         abrir(item) {
             this.abrirCerrar(item, '1')
         },
         cerrar(item) {
             this.abrirCerrar(item, '2')
-        },
-        async abrirCerrar(item, estado) {
-            const resQst = await jqst(
-                `¿Está seguro de ${estado == 1 ? 'abrir' : 'cerrar'} el pedido?`,
-            )
-            if (resQst.isConfirmed == false) return
-
-            const send = { id: item.id, ids: item.id, estado }
-
-            this.auth.setLoading(true, 'Cargando...')
-            const res = await patch(
-                `${this.vista.apiUrl}/abrir-cerrar`,
-                send,
-                `Pedido ${estado == 1 ? 'abierto' : 'cerrado'}`,
-            )
-            this.auth.setLoading(false)
-
-            if (res.code != 0) return
-
-            this.vistas.updateItem(this.vista.name, 'tableData', res.data, true)
         },
         async confirmarPago(item) {
             const resQst = await jqst('¿Está seguro de confirmar el pago?')
@@ -194,6 +135,28 @@ export default {
                 `${this.vista.apiUrl}/confirmar-entrega`,
                 item,
                 'Pedido entregado',
+            )
+            this.auth.setLoading(false)
+
+            if (res.code != 0) return
+
+            this.vistas.updateItem(this.vista.name, 'tableData', res.data, true)
+        },
+
+        //--- methods ---//
+        async abrirCerrar(item, estado) {
+            const resQst = await jqst(
+                `¿Está seguro de ${estado == 1 ? 'abrir' : 'cerrar'} el pedido?`,
+            )
+            if (resQst.isConfirmed == false) return
+
+            const send = { id: item.id, estado }
+
+            this.auth.setLoading(true, `${estado == 1 ? 'Abriendo' : 'Cerrando'}...`)
+            const res = await patch(
+                `${this.vista.apiUrl}/abrir-cerrar`,
+                send,
+                `Pedido ${estado == 1 ? 'abierto' : 'cerrado'}`,
             )
             this.auth.setLoading(false)
 

@@ -12,7 +12,7 @@ export default {
             tipo: '2',
             action: 'facturar',
             permiso: ['vCompraComprobantes:crear'],
-            ocultar: { tipo: 5, socio_pedido: { op: '!=', val: null } },
+            ocultar: { socio_pedido: { op: '!=', val: null }, tipo: 5 },
         },
         {
             text: 'Abrir',

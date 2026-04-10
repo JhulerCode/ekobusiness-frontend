@@ -149,35 +149,20 @@ export default {
         },
     ],
 
-    tableBulkActions: [
-        {
-            text: 'Abrir',
-            icon: 'fa-solid fa-check-double',
-            action: 'abrirMasivo',
-            permiso: 'vCompraPedidos:abrirCerrar',
-        },
-        {
-            text: 'Terminar',
-            icon: 'fa-solid fa-check-double',
-            action: 'cerrarMasivo',
-            permiso: 'vCompraPedidos:abrirCerrar',
-        },
-    ],
-
     tableRowActions: [
         {
             label: 'Abrir',
             icon: 'fa-solid fa-check-double',
             action: 'abrir',
-            permiso: 'vCompraPedidos:abrirCerrar',
-            ocultar: { tipo: 2, estado: 1 },
+            permiso: ['vCompraPedidos:abrir', 'vVentaPedidos:abrir'],
+            ocultar: { estado: 1 },
         },
         {
             label: 'Terminar',
             icon: 'fa-solid fa-check-double',
             action: 'cerrar',
-            permiso: 'vCompraPedidos:abrirCerrar',
-            ocultar: { tipo: 2, estado: 2 },
+            permiso: ['vVentaPedidos:cerrar'],
+            ocultar: { tipo: 1, estado: 2 },
         },
         {
             label: 'Confirmar pago',

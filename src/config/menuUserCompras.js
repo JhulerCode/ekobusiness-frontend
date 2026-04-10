@@ -42,9 +42,10 @@ export default {
                 { id: 'vCompraPedidos:ver', label: 'Ver' },
                 { id: 'vCompraPedidos:editar', label: 'Editar' },
                 { id: 'vCompraPedidos:eliminar', label: 'Eliminar' },
-                { id: 'vCompraPedidos:abrirCerrar', label: 'Abrir y cerrar' },
                 { id: 'vCompraPedidos:generarPdf', label: 'Generar PDF' },
                 { id: 'vCompraPedidos:ingresarMercaderia', label: 'Ingresar mercadería' },
+                { id: 'vCompraPedidos:abrir', label: 'Abrir' },
+                { id: 'vCompraPedidos:cerrar', label: 'Cerrar' },
             ],
             children: [
                 {

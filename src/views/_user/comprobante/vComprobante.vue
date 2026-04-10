@@ -261,86 +261,6 @@ export default {
 
             return res.data
         },
-        async loadPedido() {
-            const pedido_id = this.$route.params.pedido_id
-            const vPedido = this.$route.path.includes('compras') ? 'vCompraPedido' : 'vVentaPedido'
-
-            let pedido
-
-            if (this.vistas[vPedido]?.data?.id == pedido_id) {
-                pedido = this.vistas[vPedido].data
-            } else {
-                const qry = {
-                    incl: ['socio1', 'moneda1', 'socio_pedido_items'],
-                    iccl: {
-                        socio_pedido_items: {
-                            incl: ['articulo1'],
-                            sqls: ['pedido_item_entregado'],
-                        },
-                    },
-                }
-
-                this.auth.setLoading(true, 'Cargando pedido...')
-                const res = await get(
-                    `${urls.socio_pedidos}/uno/${pedido_id}?qry=${JSON.stringify(qry)}`,
-                )
-                this.auth.setLoading(false)
-
-                if (res.code !== 0 || !res.data) return this.auth.goBack(this.$router)
-
-                pedido = res.data
-
-                this.vistas.initVista(vPedido, 'detail')
-                this.vistas.updateVista(vPedido, {
-                    titleKey: 'codigo',
-                    pathKey: 'pedido_id',
-                    data: pedido,
-                    loaded: true,
-                })
-            }
-
-            if (this.is_nuevo) {
-                this.vista.data.pedido_id = pedido.id
-                this.vista.data.socio = pedido.socio
-                this.vista.data.socio1 = pedido.socio1
-                this.vista.data.moneda = pedido.moneda
-                this.vista.data.moneda1 = pedido.moneda1
-                this.vista.data.pago_condicion = pedido.pago_condicion
-
-                //--- CREAR ITEMS DEL COMPROBANTE ---//
-                const por_facturar = pedido.socio_pedido_items.filter(
-                    (a) => Number(a.pedido_item_entregado) > 0,
-                )
-
-                if (por_facturar.length == 0) {
-                    this.auth.goBack(this.$router)
-                    return
-                }
-
-                let i = 0
-                this.vista.data.comprobante_items = por_facturar.map((a) => {
-                    const item = {
-                        id: crypto.randomUUID(),
-                        orden: i++,
-                        articulo: a.articulo,
-                        descripcion: a.articulo1.nombre,
-                        unidad: a.articulo1?.unidad,
-                        cantidad: Number(a.pedido_item_entregado),
-
-                        vu: a.pu,
-
-                        igv_afectacion: a.igv_afectacion,
-                        igv_porcentaje: this.auth.empresa.igv_porcentaje,
-                    }
-
-                    return item
-                })
-
-                this.$nextTick(() => {
-                    this.$refs.vComprobanteItems.sumarItems()
-                })
-            }
-        },
         async loadTraslado() {
             const traslado_id = this.$route.params.traslado_id
             const vTraslado = this.$route.path.includes('compras')
@@ -372,6 +292,7 @@ export default {
                     pathKey: 'traslado_id',
                     data: this.vista.traslado,
                     loaded: true,
+                    last_path: this.$route.path.split('/comprobantes')[0],
                 })
             }
 
@@ -401,6 +322,87 @@ export default {
                         return item
                     },
                 )
+
+                this.$nextTick(() => {
+                    this.$refs.vComprobanteItems.sumarItems()
+                })
+            }
+        },
+        async loadPedido() {
+            const pedido_id = this.$route.params.pedido_id
+            const vPedido = this.$route.path.includes('compras') ? 'vCompraPedido' : 'vVentaPedido'
+
+            this.vista.pedido = {}
+
+            if (this.vistas[vPedido]?.data?.id == pedido_id) {
+                this.vista.pedido = this.vistas[vPedido].data
+            } else {
+                const qry = {
+                    incl: ['socio1', 'moneda1', 'socio_pedido_items'],
+                    iccl: {
+                        socio_pedido_items: {
+                            incl: ['articulo1'],
+                            sqls: ['pedido_item_entregado'],
+                        },
+                    },
+                }
+
+                this.auth.setLoading(true, 'Cargando pedido...')
+                const res = await get(
+                    `${urls.socio_pedidos}/uno/${pedido_id}?qry=${JSON.stringify(qry)}`,
+                )
+                this.auth.setLoading(false)
+
+                if (res.code !== 0 || !res.data) return this.auth.goBack(this.$router)
+
+                this.vista.pedido = res.data
+
+                this.vistas.initVista(vPedido, 'detail')
+                this.vistas.updateVista(vPedido, {
+                    titleKey: 'codigo',
+                    pathKey: 'pedido_id',
+                    data: this.vista.pedido,
+                    loaded: true,
+                    last_path: this.$route.path.split('/comprobantes')[0],
+                })
+            }
+
+            if (this.is_nuevo) {
+                this.vista.data.pedido_id = this.vista.pedido.id
+                this.vista.data.socio = this.vista.pedido.socio
+                this.vista.data.socio1 = this.vista.pedido.socio1
+                this.vista.data.moneda = this.vista.pedido.moneda
+                this.vista.data.moneda1 = this.vista.pedido.moneda1
+                this.vista.data.pago_condicion = this.vista.pedido.pago_condicion
+
+                //--- CREAR ITEMS DEL COMPROBANTE ---//
+                const por_facturar = this.vista.pedido.socio_pedido_items.filter(
+                    (a) => Number(a.pedido_item_entregado) > 0,
+                )
+
+                if (por_facturar.length == 0) {
+                    this.auth.goBack(this.$router)
+                    return
+                }
+
+                let i = 0
+                this.vista.data.comprobante_items = por_facturar.map((a) => {
+                    const item = {
+                        id: crypto.randomUUID(),
+                        orden: i++,
+                        articulo: a.articulo,
+                        descripcion: a.articulo1.nombre,
+                        unidad: a.articulo1?.unidad,
+                        cantidad: Number(a.pedido_item_entregado),
+
+                        vu: a.pu,
+
+                        igv_afectacion: a.igv_afectacion,
+                        igv_porcentaje: this.auth.empresa.igv_porcentaje,
+                    }
+
+                    return item
+                })
 
                 this.$nextTick(() => {
                     this.$refs.vComprobanteItems.sumarItems()

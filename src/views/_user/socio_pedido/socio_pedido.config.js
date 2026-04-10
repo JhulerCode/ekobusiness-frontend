@@ -39,9 +39,26 @@ export default {
         },
         {
             text: 'Facturas proveedor',
+            icon: 'fa-solid fa-file-invoice',
             action: 'facturar',
             permiso: ['vCompraComprobantes:crear'],
             tipo: '2',
+        },
+        {
+            text: 'Abrir',
+            icon: 'fa-solid fa-check-double',
+            tipo: '2',
+            action: 'abrir',
+            permiso: ['vCompraPedidos:abrir', 'vVentaPedidos:abrir'],
+            ocultar: { estado: '1', tipo: 2 },
+        },
+        {
+            text: 'Cerrar',
+            icon: 'fa-solid fa-check-double',
+            tipo: '2',
+            action: 'cerrar',
+            permiso: ['vCompraPedidos:cerrar', 'vVentaPedidos:cerrar'],
+            ocultar: { estado: '2', tipo: 2 },
         },
     ],
 }

@@ -99,7 +99,7 @@ import { useModals } from '@/pinia/modals'
 import { useSystem } from '@/pinia/system'
 import { urls, get, post, patch } from '@/utils/crud'
 import { getItemFromArray, redondear, incompleteData, genId } from '@/utils/mine'
-import { jmsg } from '@/utils/swal'
+import { jmsg, jqst } from '@/utils/swal'
 import dayjs from 'dayjs'
 
 export default {
@@ -297,22 +297,28 @@ export default {
             this.openStockMove(2)
         },
         async facturar() {
-            const cantidad_traslados = await this.loadTrasladosPreviosCantidad(1)
-            if (cantidad_traslados == 0) {
-                jmsg('warning', 'No se puede registrar facturas sin traslados previos')
-                return
-            }
+            // const cantidad_traslados = await this.loadTrasladosPreviosCantidad(1)
+            // if (cantidad_traslados == 0) {
+            //     jmsg('warning', 'No se puede registrar facturas sin traslados previos')
+            //     return
+            // }
 
-            const cantidad_comprobantes = await this.loadComprobantesPreviosCantidad()
+            // const cantidad_comprobantes = await this.loadComprobantesPreviosCantidad()
 
-            if (cantidad_comprobantes == 0) {
-                this.$router.push({
-                    name: 'vCompraPedidoComprobante',
-                    params: { comprobante_id: 'nuevo' },
-                })
-            } else {
-                this.$router.push({ name: 'vCompraPedidoComprobantes' })
-            }
+            // if (cantidad_comprobantes == 0) {
+            //     this.$router.push({
+            //         name: 'vCompraPedidoComprobante',
+            //         params: { comprobante_id: 'nuevo' },
+            //     })
+            // } else {
+            this.$router.push({ name: 'vCompraPedidoComprobantes' })
+            // }
+        },
+        abrir() {
+            this.abrirCerrar('1')
+        },
+        cerrar() {
+            this.abrirCerrar('2')
         },
 
         //--- Methods --//
@@ -383,38 +389,121 @@ export default {
         async openStockMove(tipo) {
             if (this.$route.path.includes('compras')) {
                 if (tipo == 2) {
-                    const cantidad_traslados =
-                        await this.loadTrasladosPreviosCantidad('abastacer_maquila')
-                    if (cantidad_traslados == 0) {
-                        this.$router.push({
-                            name: 'vCompraPedidoEntrega',
-                            params: { traslado_id: 'nuevo' },
-                        })
-                    } else {
-                        this.$router.push({ name: 'vCompraPedidoEntregas' })
-                    }
+                    // const cantidad_traslados =
+                    //     await this.loadTrasladosPreviosCantidad('abastacer_maquila')
+                    // if (cantidad_traslados == 0) {
+                    //     this.$router.push({
+                    //         name: 'vCompraPedidoEntrega',
+                    //         params: { traslado_id: 'nuevo' },
+                    //     })
+                    // } else {
+                    this.$router.push({ name: 'vCompraPedidoEntregas' })
+                    // }
                 } else {
-                    const cantidad_traslados = await this.loadTrasladosPreviosCantidad('1')
-                    if (cantidad_traslados == 0) {
-                        this.$router.push({
-                            name: 'vCompraPedidoRecepcion',
-                            params: { traslado_id: 'nuevo' },
-                        })
-                    } else {
-                        this.$router.push({ name: 'vCompraPedidoRecepciones' })
-                    }
+                    // const cantidad_traslados = await this.loadTrasladosPreviosCantidad('1')
+                    // if (cantidad_traslados == 0) {
+                    //     this.$router.push({
+                    //         name: 'vCompraPedidoRecepcion',
+                    //         params: { traslado_id: 'nuevo' },
+                    //     })
+                    // } else {
+                    this.$router.push({ name: 'vCompraPedidoRecepciones' })
+                    // }
                 }
             } else {
-                const cantidad_traslados = await this.loadTrasladosPreviosCantidad('5')
-                if (cantidad_traslados == 0) {
-                    this.$router.push({
-                        name: 'vVentaPedidoEntrega',
-                        params: { traslado_id: 'nuevo' },
-                    })
-                } else {
-                    this.$router.push({ name: 'vVentaPedidoEntregas' })
+                // const cantidad_traslados = await this.loadTrasladosPreviosCantidad('5')
+                // if (cantidad_traslados == 0) {
+                //     this.$router.push({
+                //         name: 'vVentaPedidoEntrega',
+                //         params: { traslado_id: 'nuevo' },
+                //     })
+                // } else {
+                this.$router.push({ name: 'vVentaPedidoEntregas' })
+                // }
+            }
+        },
+        async abrirCerrar(estado) {
+            const resQst = await jqst(
+                `¿Está seguro de ${estado == 1 ? 'abrir' : 'cerrar'} el pedido?`,
+            )
+            if (resQst.isConfirmed == false) return
+
+            if (this.vista.data.tipo == 1 && estado == 2) {
+                const qry_ti = {
+                    incl: ['transaccion1'],
+                    cols: ['articulo', 'cantidad'],
+                    fltr: { 'transaccion1.socio_pedido': { op: 'Es', val: this.vista.data.id } },
+                }
+
+                this.auth.setLoading(true, 'Cargando...')
+                const res_ti = await get(`${urls.transaccion_items}?qry=${JSON.stringify(qry_ti)}`)
+                this.auth.setLoading(false)
+
+                if (res_ti.code != 0) return
+
+                const qry_ci = {
+                    incl: ['comprobante1'],
+                    cols: ['articulo', 'cantidad'],
+                    fltr: { 'comprobante1.traslado_id': { op: 'Es', val: this.vista.data.id } },
+                }
+
+                this.auth.setLoading(true, 'Cargando...')
+                const res_ci = await get(`${urls.comprobante_items}?qry=${JSON.stringify(qry_ci)}`)
+                this.auth.setLoading(false)
+
+                if (res_ci.code != 0) return
+
+                const itemsMap = {}
+
+                // 1. acumular comprobantes
+                for (const { articulo, cantidad } of res_ci.data) {
+                    if (!itemsMap[articulo]) {
+                        itemsMap[articulo] = {
+                            comprobante: 0,
+                            transaccion: 0,
+                        }
+                    }
+
+                    itemsMap[articulo].comprobante += cantidad
+                }
+
+                // 2. acumular transacciones
+                for (const a of res_ti.data) {
+                    if (!itemsMap[a.articulo]) {
+                        itemsMap[a.articulo] = {
+                            comprobante: 0,
+                            transaccion: 0,
+                        }
+                    }
+
+                    itemsMap[a.articulo].transaccion += a.cantidad
+                }
+
+                // 4. detectar diferencias directamente
+                const diferencias = Object.entries(itemsMap)
+                    .filter(([, item]) => item.comprobante !== item.transaccion)
+                    .map(([articulo, item]) => ({ articulo, ...item }))
+
+                // 5. resultado
+                if (diferencias.length) {
+                    return jmsg('warning', `Facturación incompleta`)
                 }
             }
+
+            const send = { id: this.vista.data.id, estado }
+
+            this.auth.setLoading(true, `${estado == 1 ? 'Abriendo' : 'Cerrando'}...`)
+            const res = await patch(
+                `${this.vista.apiUrl}/abrir-cerrar`,
+                send,
+                `Pedido ${estado == 1 ? 'abierto' : 'cerrado'} correctamente`,
+            )
+            this.auth.setLoading(false)
+
+            if (res.code != 0) return
+
+            this.vista.data.estado = res.data.estado
+            this.vista.data.estado1 = res.data.estado1
         },
 
         //--- Auxiliar data ---//

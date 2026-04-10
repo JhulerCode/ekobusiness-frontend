@@ -57,6 +57,16 @@ export default {
             orden: 4,
         },
         {
+            id: 'stock_minimo',
+            title: 'Stock mínimo',
+            filtrable: false,
+            format: 'decimal',
+            toRight: true,
+            width: '7rem',
+            show: true,
+            orden: 4,
+        },
+        {
             id: 'stock_nivel',
             title: 'Nivel de stock',
             prop: 'stock_nivel1.nombre',

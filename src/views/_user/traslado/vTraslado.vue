@@ -310,7 +310,7 @@ export default {
         },
         async abrirCerrar(estado) {
             const resQst = await jqst(
-                `¿Está seguro de cerrar ${this.vista.data.tipo == 1 ? 'la recepción' : 'la entrega'}?`,
+                `¿Está seguro de ${estado == 1 ? 'abrir' : 'cerrar'} ${this.vista.data.tipo == 1 ? 'la recepción' : 'la entrega'}?`,
             )
             if (resQst.isConfirmed == false) return
 
@@ -365,8 +365,6 @@ export default {
                     .filter(([, item]) => item.comprobante !== item.transaccion)
                     .map(([articulo, item]) => ({ articulo, ...item }))
 
-                console.log(diferencias)
-
                 // 5. resultado
                 if (diferencias.length) {
                     return jmsg('warning', `Facturación incompleta`)
@@ -375,11 +373,11 @@ export default {
 
             const send = { id: this.vista.data.id, estado }
 
-            this.auth.setLoading(true, 'Cerrando...')
+            this.auth.setLoading(true, `${estado == 1 ? 'Abriendo' : 'Cerrando'}...`)
             const res = await patch(
                 `${this.vista.apiUrl}/abrir-cerrar`,
                 send,
-                `Traslado ${send.estado == 1 ? 'abierta' : 'cerrado'}`,
+                `Traslado ${estado == 1 ? 'abierto' : 'cerrado'} correctamente`,
             )
             this.auth.setLoading(false)
 
@@ -461,7 +459,10 @@ export default {
                 //--- CREAR ITEMS DEL COMPROBANTE ---//
                 const por_trasladar = this.vista.socio_pedido.socio_pedido_items
                     .filter((a) => Number(a.pedido_item_entregado) < a.cantidad)
-                    .map((a) => ({ ...a, cantidad: a.cantidad - a.pedido_item_entregado }))
+                    .map((a) => ({
+                        ...a,
+                        cantidad: (a.cantidad - a.pedido_item_entregado).toFixed(2),
+                    }))
 
                 this.$nextTick(() => {
                     this.$refs.vTrasladoLine.agregarPedidoItems(por_trasladar)

@@ -142,7 +142,8 @@ export default {
     created() {
         const sit = setInterval(() => {
             if (this.vista) {
-                this.loadTraslado()
+                if (this.$route.params.pedido_id) this.loadPedido()
+                if (this.$route.params.traslado_id) this.loadTraslado()
                 clearInterval(sit)
             }
         }, 100)
@@ -160,8 +161,12 @@ export default {
             }
 
             const traslado_id = this.$route.params.traslado_id
+            const pedido_id = this.$route.params.pedido_id
             if (traslado_id) {
                 this.vista.qry.fltr.traslado_id = { op: 'Es', val: traslado_id }
+            }
+            if (pedido_id) {
+                this.vista.qry.fltr.pedido_id = { op: 'Es', val: pedido_id }
             }
 
             this.auth.updateQuery(this.vista.tableColumns, this.vista.qry)
@@ -207,9 +212,8 @@ export default {
                     pathKey: 'traslado_id',
                     data: this.vista.traslado,
                     loaded: true,
+                    last_path: this.$route.path.split('/comprobantes')[0],
                 })
-
-                this.vistas[vTraslado].last_path = this.$route.path.replace('/comprobantes', '')
             }
         },
         async loadPedido() {
@@ -247,6 +251,7 @@ export default {
                     pathKey: 'pedido_id',
                     data: this.vista.pedido,
                     loaded: true,
+                    last_path: this.$route.path.split('/comprobantes')[0],
                 })
             }
         },

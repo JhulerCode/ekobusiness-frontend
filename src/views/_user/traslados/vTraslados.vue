@@ -112,12 +112,6 @@ export default {
                 params: { [this.vista.detailPath]: 'nuevo' },
             })
         },
-        // async recuperarGuardado() {
-        //     this.$router.push({
-        //         name: this.detailViewName,
-        //         params: { [this.vista.detailPath]: 'avance' },
-        //     })
-        // },
 
         //--- Row actions ---//
         // async ver(item) {

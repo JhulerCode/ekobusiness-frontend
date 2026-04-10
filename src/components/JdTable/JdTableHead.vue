@@ -7,7 +7,7 @@
                 <div><span>#</span></div>
             </th>
 
-            <th v-if="rowSelectable" class="th-checkbox">
+            <th v-if="showCheckboxes" class="th-checkbox">
                 <JdCheckBox
                     v-if="!rsUno"
                     :modelValue="allSelected"
@@ -47,7 +47,7 @@ defineProps([
     'rowReorderable',
     'colNro',
     'colAct',
-    'rowSelectable',
+    'showCheckboxes',
     'resizable',
     'allSelected',
     'rsUno',
@@ -133,6 +133,9 @@ thead {
     }
     .th-vfor-right {
         text-align: right;
+    }
+    .th-checkbox-hidden {
+        display: none;
     }
 }
 </style>

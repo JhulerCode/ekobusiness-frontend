@@ -16,15 +16,16 @@
             <!-- Acciones Masivas o Buscador -->
             <div class="header-center">
                 <JdBulkActions
-                    v-if="selectedCount > 0"
+                    v-if="vista.selectionMode"
                     :view="vista"
                     dataKey="tableData"
                     :bulkActions="bulkActions"
                     @bulkActionSelected="handleBulkAction"
+                    @exitSelectionMode="onExitSelectionMode"
                 />
 
                 <JdBuscador
-                    v-if="showBuscador && selectedCount == 0"
+                    v-if="showBuscador && !vista.selectionMode"
                     :tableName="viewName"
                     :columns="vista?.tableColumns || []"
                     @reload="loadTableData"
@@ -35,7 +36,7 @@
                     icon="fa-solid fa-magnifying-glass"
                     v-model="busquedaSimple"
                     type="search"
-                    v-if="showBuscadorSimple && selectedCount == 0"
+                    v-if="showBuscadorSimple && !vista.selectionMode"
                 />
 
                 <slot name="header-center"></slot>
@@ -61,13 +62,16 @@
             <slot name="content-top"></slot>
 
             <JdTable
+                ref="jdTableRef"
                 :name="viewName"
                 :columns="vista?.tableColumns || []"
                 :datos="tableDataFiltrados || []"
                 :rowSelectable="props.rowSelectable"
                 :rowOptions="rowActions"
+                :initialSelectionMode="vista.selectionMode"
                 @rowOptionSelected="handleRowAction"
-                @rowDblclick="verRow"
+                @rowClick="verRow"
+                @enterSelectionMode="vista.selectionMode = true"
             />
         </main>
     </div>
@@ -103,6 +107,7 @@ const modals = useModals()
 const vistas = useVistas()
 
 const busquedaSimple = ref('')
+const jdTableRef = ref(null)
 
 const tableDataFiltrados = computed(() => {
     const data = vista?.tableData || []
@@ -388,14 +393,6 @@ function handleRowAction(action, item) {
 }
 
 // --- Methods de apoyo ---
-// const title = computed(() => {
-//     return route.meta.title
-// })
-
-const selectedCount = computed(() => {
-    return tableDataFiltrados.value.filter((a) => a.selected).length
-})
-
 function updatedBulk(item) {
     for (const a of vista.tableData) {
         if (!item.ids.includes(a.id)) continue
@@ -412,6 +409,11 @@ function verRow(item) {
     if (!detailViewName || !param_id) return
 
     router.push({ name: detailViewName, params: { [vista.detailPath]: param_id } })
+}
+
+function onExitSelectionMode() {
+    jdTableRef.value?.exitSelectionMode()
+    vista.selectionMode = false
 }
 </script>
 

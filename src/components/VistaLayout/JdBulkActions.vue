@@ -1,5 +1,5 @@
 <template>
-    <div class="jd-bulk-actions" ref="containerRef" v-if="count > 0">
+    <div class="jd-bulk-actions" ref="containerRef">
         <div class="info-badge">
             <span> {{ count }} {{ messageText }} </span>
 
@@ -43,7 +43,7 @@ const props = defineProps({
     bulkActions: { type: Array, default: () => [] },
 })
 
-const emit = defineEmits(['bulkActionSelected'])
+const emit = defineEmits(['bulkActionSelected', 'exitSelectionMode'])
 
 const auth = useAuth()
 const showMenu = ref(false)
@@ -70,6 +70,7 @@ const clearSelection = () => {
     if (props.view[props.dataKey]) {
         props.view[props.dataKey].forEach((a) => (a.selected = false))
     }
+    emit('exitSelectionMode')
 }
 
 const toggleMenu = () => {

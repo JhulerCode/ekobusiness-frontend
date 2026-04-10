@@ -5,7 +5,7 @@
                 <colgroup>
                     <col v-if="rowReorderable" style="width: 2rem" />
                     <col v-if="colNro" style="width: 2rem" />
-                    <col v-if="rowSelectable" style="width: 2.5rem" />
+                    <col v-if="showCheckboxes" style="width: 2.5rem" />
                     <col v-if="computedColAct" :style="`width: ${colActWidth}`" />
                     <col
                         v-for="col in columns"
@@ -23,7 +23,7 @@
                         rowReorderable,
                         colNro,
                         colAct: computedColAct,
-                        rowSelectable: rowSelectable,
+                        showCheckboxes,
                         resizable: columnsResizable,
                         allSelected,
                         rsUno,
@@ -43,6 +43,7 @@
                             index: i,
                             columns,
                             rowSelectable: rowSelectable,
+                            showCheckboxes,
                             reorderable: rowReorderable,
                             colNro,
                             colAct: computedColAct,
@@ -50,14 +51,16 @@
                             rowOptionsMode,
                             resizable: columnsResizable,
                             inputsDisabled,
+                            rsUno,
                         }"
-                        @select="(item, index) => selectRow(item, index)"
+                        @select="(item) => selectRow(item, i)"
                         @toggleOptions="toogleRowOptions"
                         @action="selectOptionRaw"
                         @dragStart="draggedRowIndex = $event"
                         @drop="handleDrop"
                         @dragEnd="draggedRowIndex = null"
-                        @rowDblclick="(...args) => $emit('rowDblclick', ...args)"
+                        @rowClick="(...args) => $emit('rowClick', ...args)"
+                        @enterSelectionMode="onEnterSelectionMode()"
                     >
                         <!-- Dynamic slots forwarding -->
                         <template v-for="slot in dynamicSlots" v-slot:[slot]="slotProps">
@@ -86,7 +89,6 @@
                 @click.stop
                 :id="'options-case-' + name"
             >
-                PERRO
                 <template v-for="(b, i) in rowOptions" :key="i">
                     <li @click="selectOption(b)" v-if="buttonVerifyPermission(optionsCaseItem, b)">
                         <i :class="b.icon"></i>
@@ -99,7 +101,7 @@
 </template>
 
 <script setup>
-import { computed, nextTick } from 'vue'
+import { computed, nextTick, ref, onMounted } from 'vue'
 import { useTable } from './useTable'
 import TableHead from './JdTableHead.vue'
 import TableRow from './JdTableRow.vue'
@@ -119,6 +121,7 @@ const props = defineProps({
     rowOptionsMode: { type: String, default: 'menu' },
     columnsResizable: { type: Boolean, default: true },
     rowSelectable: { type: Boolean, default: false },
+    initialSelectionMode: { type: Boolean, default: false },
     rsUno: { type: Boolean, default: false },
     inputsDisabled: { type: Boolean, default: false },
     rowOptions: { type: Array, default: () => [] },
@@ -127,7 +130,20 @@ const props = defineProps({
     agregarFila: Function,
 })
 
-const emit = defineEmits(['rowSelected', 'rowOptionSelected', 'onReorder', 'rowDblclick'])
+const emit = defineEmits([
+    'rowSelected',
+    'rowOptionSelected',
+    'onReorder',
+    'rowClick',
+    'enterSelectionMode',
+])
+
+const showCheckboxes = ref(false)
+
+onMounted(() => {
+    showCheckboxes.value = props.initialSelectionMode
+})
+
 
 const { draggedRowIndex, optionsCaseItem, datosFiltrados, allSelected, sortData, selectRow } =
     useTable(props, emit)
@@ -166,10 +182,10 @@ const handleDrop = (targetItem) => {
 
 const toogleRowOptions = (item) => {
     if (optionsCaseItem.value.i === item.i) {
-        hide()
+        hidemenu()
         return
     }
-    hide()
+    hidemenu()
     optionsCaseItem.value = item
     nextTick(() => {
         const el = document.getElementById('options-case-' + props.name)
@@ -198,25 +214,34 @@ const toogleRowOptions = (item) => {
 const closeOnOutside = (e) => {
     const el = document.getElementById('options-case-' + props.name)
     const btn = document.getElementById(`button-options-${optionsCaseItem.value.id}`)
-    if (el && !el.contains(e.target) && btn && !btn.contains(e.target)) hide()
+    if (el && !el.contains(e.target) && btn && !btn.contains(e.target)) hidemenu()
 }
 
-const hide = () => {
+const hidemenu = () => {
     optionsCaseItem.value = {}
     document.removeEventListener('mousedown', closeOnOutside)
 }
 
 const selectOption = (a) => {
     emit('rowOptionSelected', a.action, optionsCaseItem.value)
-    hide()
+    hidemenu()
 }
 
 const selectOptionRaw = (action, item) => {
     emit('rowOptionSelected', action, item)
 }
 
+const exitSelectionMode = () => {
+    showCheckboxes.value = false
+}
+
+const onEnterSelectionMode = () => {
+    showCheckboxes.value = true
+    emit('enterSelectionMode', true)
+}
+
 // Expose methods for parent
-defineExpose({})
+defineExpose({ showCheckboxes, exitSelectionMode })
 </script>
 
 <style lang="scss" scoped>

@@ -61,14 +61,14 @@ export function useTable(props, emit) {
     }
 
     function selectRow(item) {
-        if (!props.rowSelectable) return
         if (props.rsUno) {
             props.datos.forEach((a) => {
                 if (a.id != item.id) a.selected = false
             })
-            item.selected = true
             emit('rowSelected', item)
         }
+
+        item.selected = !item.selected
     }
 
     return {

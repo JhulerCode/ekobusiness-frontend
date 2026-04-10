@@ -1,19 +1,20 @@
 <template>
     <tr
         :class="{
-            'row-selectable': rowSelectable,
             'row-selected': item.selected,
             'row-reorderable': reorderable,
             'row-dragging': isDragging,
         }"
         :draggable="reorderable"
         @click="onRowClick"
+        @mousedown="onMouseDown"
+        @mouseup="onMouseUp"
+        @mouseleave="onMouseUp"
         @dragstart="onDragStart"
         @dragover.prevent="onDragOver"
         @dragleave="onDragLeave"
         @drop="onDrop"
         @dragend="onDragEnd"
-        @dblclick="onRowDblclick"
     >
         <td v-if="reorderable" class="td-reorder">
             <i class="fa-solid fa-grip-vertical"></i>
@@ -21,8 +22,8 @@
 
         <td v-if="colNro" class="td-numero">{{ index + 1 }}</td>
 
-        <td v-if="rowSelectable" class="td-checkbox">
-            <JdCheckBox v-model="item.selected" @change="$emit('select', item)" />
+        <td v-if="showCheckboxes" class="td-checkbox">
+            <JdCheckBox v-model="row_is_selected" />
         </td>
 
         <td v-if="colAct" class="td-act">
@@ -44,7 +45,7 @@
                 tipo="2"
                 :small="true"
                 :id="`button-options-${item.id}`"
-                @click="$emit('toggleOptions', { ...item, i: index })"
+                @click.stop="$emit('toggleOptions', { ...item, i: index })"
             />
         </td>
 
@@ -74,8 +75,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-// import { useAuth } from '@/pinia/auth'
+import { ref, onUnmounted, computed } from 'vue'
 import TableCell from './JdTableCell.vue'
 import { buttonVerifyPermission } from '@/utils/mine'
 
@@ -84,6 +84,7 @@ const props = defineProps([
     'index',
     'columns',
     'rowSelectable',
+    'showCheckboxes',
     'reorderable',
     'colNro',
     'colAct',
@@ -91,19 +92,72 @@ const props = defineProps([
     'rowOptionsMode',
     'resizable',
     'inputsDisabled',
+    'rsUno',
 ])
 const emit = defineEmits([
-    'select',
-    'toggleOptions',
-    'action',
     'reorder',
     'dragStart',
     'drop',
     'dragEnd',
-    'rowDblclick',
+    'toggleOptions',
+    'action',
+    'select',
+    'rowClick',
+    'enterSelectionMode',
 ])
 
+const row_is_selected = computed(() => {
+    return props.item.selected
+})
+
 const isDragging = ref(false)
+const longPressTimer = ref(null)
+const hasLongPressed = ref(false)
+const LONG_PRESS_DURATION = 500 // ms
+
+const onMouseDown = (e) => {
+    const isInput = ['INPUT', 'SELECT', 'TEXTAREA'].includes(e.target.tagName)
+    const isInsideInput = e.target.closest('input, select, textarea')
+    const isInsideActs = e.target.closest('.acts')
+
+    if (isInput || isInsideInput || isInsideActs) return
+
+    hasLongPressed.value = false
+    longPressTimer.value = setTimeout(() => {
+        hasLongPressed.value = true
+        if (props.rowSelectable && !props.showCheckboxes) {
+            emit('enterSelectionMode')
+        }
+    }, LONG_PRESS_DURATION)
+}
+
+const onRowClick = (e) => {
+    const isInput = ['INPUT', 'SELECT', 'TEXTAREA'].includes(e.target.tagName)
+    const isInsideInput = e.target.closest('input, select, textarea')
+    const isInsideActs = e.target.closest('.acts')
+
+    if (isInput || isInsideInput || isInsideActs) return
+
+    if (props.rowSelectable && props.showCheckboxes) {
+        emit('select', props.item)
+        return
+    }
+
+    emit('rowClick', props.item)
+}
+
+const onMouseUp = () => {
+    if (longPressTimer.value) {
+        clearTimeout(longPressTimer.value)
+        longPressTimer.value = null
+    }
+}
+
+onUnmounted(() => {
+    if (longPressTimer.value) {
+        clearTimeout(longPressTimer.value)
+    }
+})
 
 const onDragStart = (e) => {
     isDragging.value = true
@@ -138,41 +192,19 @@ const onDragEnd = () => {
     isDragging.value = false
     emit('dragEnd')
 }
-
-const onRowDblclick = (e) => {
-    const isInput = ['INPUT', 'SELECT', 'TEXTAREA'].includes(e.target.tagName)
-    const isInsideInput = e.target.closest('input, select, textarea')
-    const isInsideAct = e.target.closest('.td-act, .td-reorder, .td-checkbox')
-
-    if (isInput || isInsideInput || isInsideAct) return
-
-    emit('rowDblclick', props.item)
-}
-
-const onRowClick = (e) => {
-    const isInput = ['INPUT', 'SELECT', 'TEXTAREA'].includes(e.target.tagName)
-    const isInsideInput = e.target.closest('input, select, textarea')
-    const isInsideActs = e.target.closest('.acts')
-
-    if (isInput || isInsideInput || isInsideActs) return
-
-    emit('select', props.item, props.index)
-}
 </script>
 
 <style lang="scss" scoped>
 tr {
     border-bottom: var(--border);
     scroll-margin-top: 2.3rem;
+    cursor: pointer;
 
     &:hover {
         background-color: var(--bg-color-hover);
         .td-numero {
             background-color: var(--bg-color-hover);
         }
-    }
-    &.row-selectable {
-        cursor: pointer;
     }
     &.row-selected {
         background-color: var(--bg-color-selected);

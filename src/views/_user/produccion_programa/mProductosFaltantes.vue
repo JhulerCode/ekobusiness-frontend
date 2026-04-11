@@ -45,7 +45,8 @@ export default {
             {
                 id: 'cantidad',
                 title: 'Pedido',
-                format: 'number',
+                type: 'number',
+                format: {},
                 align: 'right',
                 width: '7rem',
                 show: true,
@@ -54,7 +55,8 @@ export default {
             {
                 id: 'pedido_item_entregado',
                 title: 'Entregado',
-                format: 'number',
+                type: 'number',
+                format: {},
                 align: 'right',
                 width: '7rem',
                 show: true,
@@ -63,7 +65,8 @@ export default {
             {
                 id: 'pendiente',
                 title: 'Pendiente',
-                format: 'number',
+                type: 'number',
+                format: {},
                 align: 'right',
                 width: '7rem',
                 show: true,
@@ -72,7 +75,8 @@ export default {
             {
                 id: 'articulo_stock',
                 title: 'Stock',
-                format: 'number',
+                type: 'number',
+                format: {},
                 align: 'right',
                 width: '7rem',
                 show: true,

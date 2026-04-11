@@ -58,8 +58,8 @@ export default {
         {
             id: 'cantidad',
             title: 'Cantidad',
-            type: 'number',
-            format: 'decimal',
+            type: 'decimal',
+            format: {},
             align: 'right',
             width: '8rem',
             show: true,
@@ -68,8 +68,8 @@ export default {
         {
             id: 'pedido_item_entregado',
             title: 'Entregado',
-            type: 'number',
-            format: 'decimal',
+            type: 'decimal',
+            format: {},
             align: 'right',
             filtrable: false,
             width: '8rem',

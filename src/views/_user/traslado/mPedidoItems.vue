@@ -55,7 +55,8 @@ export default {
             {
                 id: 'cantidad',
                 title: 'Pedido',
-                format: 'decimal',
+                type: 'decimal',
+                format: {},
                 align: 'right',
                 width: '7rem',
                 show: true,
@@ -64,7 +65,8 @@ export default {
             {
                 id: 'pedido_item_entregado',
                 title: 'Entregado',
-                format: 'decimal',
+                type: 'decimal',
+                format: {},
                 align: 'right',
                 width: '7rem',
                 show: true,

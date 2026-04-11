@@ -32,8 +32,8 @@ export default {
         {
             id: 'monto_apertura',
             title: 'Monto apertura',
-            type: 'number',
-            format: 'decimal',
+            type: 'decimal',
+            format: {},
             width: '12rem',
             show: true,
             orden: 3,

@@ -198,7 +198,8 @@ export default {
             {
                 id: 'monto',
                 title: 'Monto',
-                format: 'decimal',
+                type: 'decimal',
+                format: {},
                 width: '10rem',
                 show: true,
             },

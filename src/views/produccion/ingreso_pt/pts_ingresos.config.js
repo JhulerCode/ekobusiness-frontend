@@ -54,8 +54,8 @@ export default {
         {
             id: 'cantidad',
             title: 'Cantidad',
-            type: 'number',
-            format: 'number',
+            type: 'decimal',
+            format: {},
             align: 'right',
             width: '8rem',
             show: true,

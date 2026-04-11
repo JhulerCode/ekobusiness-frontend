@@ -72,8 +72,8 @@ export default {
         {
             id: 'monto',
             title: 'Importe',
-            type: 'number',
-            format: 'decimal',
+            type: 'decimal',
+            format: {},
             align: 'right',
             width: '10rem',
             show: true,

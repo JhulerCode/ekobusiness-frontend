@@ -109,7 +109,8 @@ export default {
             {
                 id: 'cantidad',
                 title: 'Cantidad',
-                format: 'number',
+                type: 'number',
+                format: {},
                 align: 'right',
                 width: '7rem',
                 show: true,
@@ -130,7 +131,8 @@ export default {
             {
                 id: 'cantidad_plan',
                 title: 'Cant. receta',
-                format: 'decimal',
+                type: 'decimal',
+                format: {},
                 align: 'right',
                 width: '7rem',
                 show: true,
@@ -140,7 +142,8 @@ export default {
             {
                 id: 'cantidad',
                 title: 'Cant. real',
-                format: 'decimal',
+                type: 'decimal',
+                format: {},
                 align: 'right',
                 width: '7rem',
                 show: true,
@@ -150,7 +153,8 @@ export default {
             {
                 id: 'diferencia',
                 title: 'Diferencia',
-                format: 'decimal',
+                type: 'decimal',
+                format: {},
                 align: 'right',
                 width: '7rem',
                 show: true,
@@ -171,7 +175,8 @@ export default {
             {
                 id: 'cantidad_plan',
                 title: 'Cant. receta',
-                format: 'decimal',
+                type: 'decimal',
+                format: {},
                 align: 'right',
                 width: '7rem',
                 show: true,
@@ -181,7 +186,8 @@ export default {
             {
                 id: 'cantidad',
                 title: 'Cant. real',
-                format: 'decimal',
+                type: 'decimal',
+                format: {},
                 align: 'right',
                 width: '7rem',
                 show: true,
@@ -191,7 +197,8 @@ export default {
             {
                 id: 'diferencia',
                 title: 'Diferencia',
-                format: 'decimal',
+                type: 'decimal',
+                format: {},
                 align: 'right',
                 width: '7rem',
                 show: true,
@@ -213,7 +220,8 @@ export default {
             {
                 id: 'cantidad',
                 title: 'Cant. programada',
-                format: 'number',
+                type: 'number',
+                format: {},
                 align: 'right',
                 width: '7rem',
                 show: true,
@@ -223,7 +231,8 @@ export default {
             {
                 id: 'productos_terminados',
                 title: 'Cant. real',
-                format: 'number',
+                type: 'number',
+                format: {},
                 align: 'right',
                 width: '7rem',
                 show: true,
@@ -233,7 +242,8 @@ export default {
             {
                 id: 'diferencia',
                 title: 'Diferencia',
-                format: 'number',
+                type: 'number',
+                format: {},
                 align: 'right',
                 width: '7rem',
                 show: true,

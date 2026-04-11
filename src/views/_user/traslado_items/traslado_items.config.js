@@ -61,8 +61,8 @@ export default {
         {
             id: 'cantidad',
             title: 'Cantidad',
-            type: 'number',
-            format: 'decimal',
+            type: 'decimal',
+            format: {},
             align: 'right',
             width: '8rem',
             show: true,

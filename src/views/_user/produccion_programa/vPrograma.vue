@@ -200,7 +200,8 @@ export default {
             {
                 id: 'cantidad_necesitada',
                 title: 'Cantidad necesaria',
-                format: 'decimal',
+                type: 'decimal',
+                format: {},
                 align: 'right',
                 width: '8rem',
                 show: true,

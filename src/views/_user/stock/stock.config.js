@@ -43,7 +43,8 @@ export default {
         {
             id: 'articulo_stock',
             title: 'Stock',
-            format: 'decimal',
+            type: 'decimal',
+            format: {},
             align: 'right',
             filtrable: false,
             width: '7rem',
@@ -53,7 +54,8 @@ export default {
         {
             id: 'articulo_stock_valor',
             title: 'Valor',
-            format: 'decimal',
+            type: 'decimal',
+            format: {},
             align: 'right',
             filtrable: false,
             width: '7rem',

@@ -39,8 +39,8 @@ export default {
         {
             id: 'cantidad',
             title: 'Cantidad planificada',
-            type: 'number',
-            format: 'decimal',
+            type: 'decimal',
+            format: {},
             align: 'right',
             width: '8rem',
             show: true,
@@ -59,8 +59,8 @@ export default {
         {
             id: 'productos_terminados',
             title: 'Productos terminados',
-            type: 'number',
-            format: 'decimal',
+            type: 'decimal',
+            format: {},
             filtrable: false,
             align: 'right',
             width: '8rem',

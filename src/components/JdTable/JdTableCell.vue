@@ -52,31 +52,31 @@
 
     <!-- Format Mode -->
     <template v-else-if="column.format">
-        <div
-            v-if="['yesno', 'estado'].includes(column.format)"
-            class="chip"
-            :class="`chip-${valueColor}`"
-        >
+        <template v-if="column.type == 'number'">
+            {{ redondear(value, 0) }}
+        </template>
+
+        <template v-else-if="column.type == 'decimal'">
+            {{ redondear(value, column.format.decimalPlaces) }}
+        </template>
+
+        <div v-else-if="column.format == 'estado'" class="chip" :class="`chip-${valueColor}`">
             {{ value }}
         </div>
 
-        <template v-else-if="['number', 'decimal'].includes(column.format)">
-            {{ redondear(value, column.format === 'number' ? 0 : 2) }}
-        </template>
-
         <div
-            v-else-if="column.format === 'color'"
+            v-else-if="column.type == 'color'"
             class="color-box"
             :style="{ background: value }"
         ></div>
 
-        <div v-else-if="column.format === 'currency' && value" class="currency-box">
-            <span>{{ column.moneda }}</span>
+        <div v-else-if="column.type == 'currency' && value" class="currency-box">
+            <span>{{ column.format.moneda }}</span>
             <span>{{ redondear(value) }}</span>
         </div>
 
-        <div v-else-if="column.format === 'img' && value" class="img-box">
-            <img :src="`${column.host}/${value}`" :alt="value" />
+        <div v-else-if="column.type == 'image' && value" class="img-box">
+            <img :src="value" :alt="column.format.alt" />
         </div>
     </template>
 

@@ -138,7 +138,8 @@ export default {
                 {
                     id: 'mtoValorVenta',
                     title: 'Subtotal',
-                    format: 'decimal',
+                    type: 'decimal',
+                    format: {},
                     width: '7rem',
                     show: true,
                     align: 'right',
@@ -146,7 +147,8 @@ export default {
                 {
                     id: 'igv',
                     title: 'Igv',
-                    format: 'decimal',
+                    type: 'decimal',
+                    format: {},
                     width: '7rem',
                     show: true,
                     align: 'right',
@@ -154,7 +156,8 @@ export default {
                 {
                     id: 'total',
                     title: 'Importe',
-                    format: 'decimal',
+                    type: 'decimal',
+                    format: {},
                     width: '7rem',
                     show: true,
                     align: 'right',

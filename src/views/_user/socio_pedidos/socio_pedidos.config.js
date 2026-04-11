@@ -74,7 +74,7 @@ export default {
             title: 'Importe',
             type: 'number',
             format: 'decimal',
-            toRight: true,
+            align: 'right',
             width: '10rem',
             show: true,
             orden: 6,

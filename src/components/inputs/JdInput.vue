@@ -18,31 +18,51 @@
                     :placeholder="placeholder"
                     v-model="inputModel"
                     v-if="!disabled"
-                    :class="{ 'to-right': toRight }"
+                    :class="{
+                        'align-right': align === 'right',
+                        'align-center': align === 'center',
+                    }"
                 />
 
                 <template v-else>
                     <template v-if="['text', 'number', 'email', 'hour', 'search'].includes(type)">
-                        <p :class="{ 'to-right-p': toRight }">
+                        <p
+                            :class="{
+                                'align-right-p': align === 'right',
+                                'align-center-p': align === 'center',
+                            }"
+                        >
                             {{ inputModel }}
                         </p>
                     </template>
 
                     <template v-else-if="type == 'date'">
-                        <p :class="{ 'to-right-p': toRight }" v-if="inputModel">
+                        <p
+                            :class="{
+                                'align-right-p': align === 'right',
+                                'align-center-p': align === 'center',
+                            }"
+                            v-if="inputModel"
+                        >
                             {{
                                 dayjs(inputModel).format(
-                                    useAuth.usuario.format_date || 'DD-MM-YYYY'
+                                    useAuth.usuario.format_date || 'DD-MM-YYYY',
                                 )
                             }}
                         </p>
                     </template>
 
                     <template v-else-if="type == 'datetime-local'">
-                        <p :class="{ 'to-right-p': toRight }" v-if="inputModel">
+                        <p
+                            :class="{
+                                'align-right-p': align === 'right',
+                                'align-center-p': align === 'center',
+                            }"
+                            v-if="inputModel"
+                        >
                             {{
                                 dayjs(inputModel).format(
-                                    `${useAuth.usuario.format_date || 'DD-MM-YYYY'} HH:mm:ss`
+                                    `${useAuth.usuario.format_date || 'DD-MM-YYYY'} HH:mm:ss`,
                                 )
                             }}
                         </p>
@@ -89,7 +109,7 @@ export default {
         type: { type: String, default: 'text' },
         placeholder: String,
         disabled: { type: Boolean, default: false },
-        toRight: { type: Boolean, default: false },
+        align: { type: String, default: 'left' },
         height: { type: [String, Number], default: '2.2' },
     },
     computed: {
@@ -150,18 +170,27 @@ export default {
         input[type='number']::-webkit-outer-spin-button,
         input[type='number']::-webkit-inner-spin-button {
             -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
             margin: 0;
         }
 
-        .to-right {
-            -moz-appearance: textfield;
-            appearance: textfield;
+        .align-right {
             text-align: right;
         }
 
-        .to-right-p {
+        .align-center {
+            text-align: center;
+        }
+
+        .align-right-p {
             width: 100%;
             text-align: right;
+        }
+
+        .align-center-p {
+            width: 100%;
+            text-align: center;
         }
 
         p {

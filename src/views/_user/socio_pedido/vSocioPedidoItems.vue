@@ -101,13 +101,14 @@ export default {
                     input: {
                         onInput: this.sumarUno,
                     },
+                    align: 'right',
                     width: '6rem',
                     show: true,
                 },
                 {
                     id: 'pedido_item_entregado',
                     title: 'Entregado',
-                    toRight: true,
+                    align: 'right',
                     type: 'number',
                     width: '6rem',
                     show: this.vista.mode == 'view',
@@ -120,6 +121,7 @@ export default {
                         onInput: this.sumarUno,
                     },
                     width: '6rem',
+                    align: 'right',
                     show: true,
                 },
                 {
@@ -139,7 +141,7 @@ export default {
                     format: 'decimal',
                     width: '7rem',
                     show: true,
-                    toRight: true,
+                    align: 'right',
                 },
                 {
                     id: 'igv',
@@ -147,7 +149,7 @@ export default {
                     format: 'decimal',
                     width: '7rem',
                     show: true,
-                    toRight: true,
+                    align: 'right',
                 },
                 {
                     id: 'total',
@@ -155,7 +157,7 @@ export default {
                     format: 'decimal',
                     width: '7rem',
                     show: true,
-                    toRight: true,
+                    align: 'right',
                 },
             ]
         },

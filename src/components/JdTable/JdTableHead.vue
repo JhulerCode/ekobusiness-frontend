@@ -21,7 +21,8 @@
                 v-for="col in columns"
                 :key="col.id"
                 v-show="col.show"
-                :class="['th-vfor', { 'th-vfor-right': col.toRight }]"
+                :class="['th-vfor']"
+                :style="[col.align ? { textAlign: col.align } : {}]"
             >
                 <div class="th-vfor-title th-vfor-sortable" @click="$emit('sort', col)">
                     <i v-if="col.sortDirection === 'desc'" class="fa-solid fa-arrow-up"></i>
@@ -130,9 +131,6 @@ thead {
                 border-right: solid 2px var(--primary-color);
             }
         }
-    }
-    .th-vfor-right {
-        text-align: right;
     }
     .th-checkbox-hidden {
         display: none;

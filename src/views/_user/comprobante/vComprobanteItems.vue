@@ -78,6 +78,7 @@ export default {
                         onInput: this.sumarUno,
                     },
                     width: '6rem',
+                    align: 'right',
                     show: true,
                 },
                 {
@@ -88,6 +89,7 @@ export default {
                         onInput: this.sumarUno,
                     },
                     width: '6rem',
+                    align: 'right',
                     show: true,
                 },
                 {
@@ -107,7 +109,7 @@ export default {
                     format: 'decimal',
                     width: '7rem',
                     show: true,
-                    toRight: true,
+                    align: 'right',
                 },
                 {
                     id: 'igv',
@@ -115,7 +117,7 @@ export default {
                     format: 'decimal',
                     width: '7rem',
                     show: true,
-                    toRight: true,
+                    align: 'right',
                 },
                 {
                     id: 'total',
@@ -123,7 +125,7 @@ export default {
                     format: 'decimal',
                     width: '7rem',
                     show: true,
-                    toRight: true,
+                    align: 'right',
                 },
             ]
         },

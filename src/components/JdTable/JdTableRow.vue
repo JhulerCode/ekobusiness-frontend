@@ -56,11 +56,13 @@
             :class="[
                 'td-vfor',
                 {
-                    'td-vfor-right': col.toRight,
                     'td-vfor-resizable': resizable,
                 },
             ]"
-            :style="col.width ? { width: col.width } : {}"
+            :style="[
+                col.width ? { width: col.width } : {},
+                col.align ? { textAlign: col.align } : {},
+            ]"
         >
             <TableCell :column="col" :item="item" :disabled="inputsDisabled">
                 <!-- Forward slots -->
@@ -263,9 +265,5 @@ td {
         overflow: hidden;
         text-overflow: ellipsis;
     }
-}
-
-.td-vfor-right {
-    text-align: right;
 }
 </style>

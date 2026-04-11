@@ -126,7 +126,7 @@ export default {
                     width: '10rem',
                     input: {},
                     type: 'number',
-                    toRight: true,
+                    align: 'right',
                     show: true,
                 },
             ]

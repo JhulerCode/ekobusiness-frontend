@@ -178,14 +178,14 @@ export default {
             {
                 id: 'cantidad_necesitada',
                 title: 'Cantidad requerida',
-                toRight: true,
+                align: 'right',
                 format: 'decimal',
                 width: '8rem',
                 show: true,
             },
             {
                 title: 'Stock',
-                toRight: true,
+                align: 'right',
                 slot: 'colStock',
                 width: '8rem',
                 show: true,

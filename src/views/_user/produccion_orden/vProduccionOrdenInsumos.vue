@@ -97,7 +97,7 @@ export default {
                     id: 'cantidad',
                     title: 'Cantidad',
                     type: 'number',
-                    toRight: true,
+                    align: 'right',
                     input: {
                         disabled: (item) => item._state === 'view' || this.is_nuevo,
                     },
@@ -122,7 +122,7 @@ export default {
                     id: 'mrp_bom_line_articulo_stock',
                     title: 'Stock',
                     width: '8rem',
-                    toRight: true,
+                    align: 'right',
                     show: this.is_nuevo,
                 },
             ]

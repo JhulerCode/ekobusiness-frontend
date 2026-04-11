@@ -63,18 +63,8 @@
                 :showResumen="false"
                 :rowOptions="tableRowActions"
                 @rowOptionSelected="runMethod"
-            >
-                <template v-slot:cCantidad="{ item }">
-                    <JdInput
-                        v-model="item.cantidad"
-                        type="number"
-                        :toRight="true"
-                        @input="calcularProducto(item)"
-                        @change="modificarProduccionOrden(item)"
-                        :disabled="!useAuth.verifyPermiso('vPrograma:crear') || item.estado == 2"
-                    />
-                </template>
-            </JdTable>
+                :inputsDisabled="!useAuth.verifyPermiso('vPrograma:crear')"
+            />
         </div>
 
         <ul class="container-programa" v-else>
@@ -115,20 +105,8 @@
                     :showResumen="false"
                     :rowOptions="tableRowActions"
                     @rowOptionSelected="runMethod"
-                >
-                    <template v-slot:cCantidad="{ item }">
-                        <JdInput
-                            v-model="item.cantidad"
-                            type="number"
-                            :toRight="true"
-                            @input="calcularProducto(item)"
-                            @change="modificarProduccionOrden(item)"
-                            :disabled="
-                                !useAuth.verifyPermiso('vPrograma:crear') || item.estado == 2
-                            "
-                        />
-                    </template>
-                </JdTable>
+                    :inputsDisabled="!useAuth.verifyPermiso('vPrograma:crear')"
+                />
             </li>
         </ul>
 
@@ -188,54 +166,6 @@ export default {
         vista: {},
 
         tableName: 'vPrograma',
-        columns: [
-            {
-                id: 'fecha',
-                title: 'Fecha',
-                width: '10rem',
-                show: false,
-            },
-            {
-                id: 'linea',
-                title: 'Línea',
-                width: '10rem',
-                show: false,
-            },
-            {
-                id: 'maquina',
-                title: 'Máquina',
-                prop: 'maquina1.nombre',
-                width: '10rem',
-                show: false,
-            },
-            {
-                id: 'orden',
-                title: 'Prioridad',
-                width: '4rem',
-                show: true,
-            },
-            {
-                id: 'articulo1.nombre',
-                title: 'Producto',
-                prop: 'articulo1.nombre',
-                width: '30rem',
-                show: true,
-            },
-            {
-                id: 'cantidad',
-                title: 'Cantidad',
-                format: 'number',
-                slot: 'cCantidad',
-                width: '7rem',
-                show: true,
-            },
-            {
-                id: 'observacion',
-                title: 'Observación',
-                width: '15rem',
-                show: true,
-            },
-        ],
         tableRowActions: [
             {
                 label: 'Ver',
@@ -271,7 +201,7 @@ export default {
                 id: 'cantidad_necesitada',
                 title: 'Cantidad necesaria',
                 format: 'decimal',
-                toRight: true,
+                align: 'right',
                 width: '8rem',
                 show: true,
             },
@@ -279,13 +209,69 @@ export default {
                 id: 'stock',
                 title: 'Stock',
                 slot: 'colStock',
-                toRight: true,
+                align: 'right',
                 width: '8rem',
                 show: true,
             },
         ],
     }),
     computed: {
+        columns() {
+            return [
+                {
+                    id: 'fecha',
+                    title: 'Fecha',
+                    width: '10rem',
+                    show: false,
+                },
+                {
+                    id: 'linea',
+                    title: 'Línea',
+                    width: '10rem',
+                    show: false,
+                },
+                {
+                    id: 'maquina',
+                    title: 'Máquina',
+                    prop: 'maquina1.nombre',
+                    width: '10rem',
+                    show: false,
+                },
+                {
+                    id: 'orden',
+                    title: 'Prioridad',
+                    width: '4rem',
+                    show: true,
+                },
+                {
+                    id: 'articulo1.nombre',
+                    title: 'Producto',
+                    prop: 'articulo1.nombre',
+                    width: '30rem',
+                    show: true,
+                },
+                {
+                    id: 'cantidad',
+                    title: 'Cantidad',
+                    align: 'right',
+                    // slot: 'cCantidad',
+                    type: 'number',
+                    input: {
+                        onInput: (item) => this.calcularProducto(item),
+                        onChange: (item) => this.modificarProduccionOrden(item),
+                        disabled: (item) => item.estado == 2,
+                    },
+                    width: '7rem',
+                    show: true,
+                },
+                {
+                    id: 'observacion',
+                    title: 'Observación',
+                    width: '15rem',
+                    show: true,
+                },
+            ]
+        },
         produccion_ordenes_hoy() {
             if (!this.vista.tableData) return []
 
@@ -803,7 +789,7 @@ export default {
                 return
             }
 
-            this.useAuth.setLoading(true)
+            this.useAuth.setLoading(true, 'Actualizando cantidad...')
             const res = await patch(urls.produccion_ordenes, item)
             this.useAuth.setLoading(false)
 

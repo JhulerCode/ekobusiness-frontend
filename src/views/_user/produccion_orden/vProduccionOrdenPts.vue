@@ -65,7 +65,7 @@ export default {
                 {
                     id: 'cantidad',
                     title: 'Cantidad',
-                    toRight: true,
+                    align: 'right',
                     type: 'number',
                     input: {
                         disabled: (item) => item._state === 'view',

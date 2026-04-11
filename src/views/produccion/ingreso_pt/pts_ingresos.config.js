@@ -56,7 +56,7 @@ export default {
             title: 'Cantidad',
             type: 'number',
             format: 'number',
-            toRight: true,
+            align: 'right',
             width: '8rem',
             show: true,
         },

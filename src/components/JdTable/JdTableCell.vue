@@ -10,7 +10,7 @@
             :type="column.type"
             v-model="modelValue"
             :disabled="setDisabled(item, column)"
-            :toRight="column.toRight"
+            :align="column.align"
             @change="onChange(item, column)"
             @input="onInput(item, column)"
         />

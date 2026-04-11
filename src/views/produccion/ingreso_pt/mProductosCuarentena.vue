@@ -28,7 +28,7 @@
         >
             <template v-slot:cCantidad="{ item }">
                 {{ redondear(item.cantidad, 0) }}
-                <JdInput type="number" :toRight="true" v-model="item.cantidad_real" />
+                <JdInput type="number" align="right" v-model="item.cantidad_real" />
             </template>
         </JdTable>
     </JdModal>
@@ -93,14 +93,6 @@ export default {
                 sort: true,
             },
             {
-                id: 'lote',
-                title: 'Lote',
-                type: 'text',
-                width: '7rem',
-                show: true,
-                sort: true,
-            },
-            {
                 id: 'lote1.codigo',
                 title: 'Lote',
                 prop: 'lote1.codigo',
@@ -119,7 +111,7 @@ export default {
                 id: 'cantidad',
                 title: 'Cantidad',
                 slot: 'cCantidad',
-                toRight: true,
+                align: 'right',
                 width: '8rem',
                 show: true,
                 sort: true,

@@ -8,11 +8,8 @@
             </template>
 
             <template v-slot:cFaltante="{ item }">
-                <span
-                    class="negativo"
-                    v-if="item.stock < item.cantidad - item.pedido_item_entregado"
-                >
-                    {{ redondear(item.cantidad - item.pedido_item_entregado - item.stock, 0) }}
+                <span class="negativo" v-if="item.faltante > 0">
+                    {{ redondear(item.faltante, 0) }}
                 </span>
             </template>
         </JdTable>
@@ -49,7 +46,7 @@ export default {
                 id: 'cantidad',
                 title: 'Pedido',
                 format: 'number',
-                toRight: true,
+                align: 'right',
                 width: '7rem',
                 show: true,
                 sort: true,
@@ -58,7 +55,7 @@ export default {
                 id: 'pedido_item_entregado',
                 title: 'Entregado',
                 format: 'number',
-                toRight: true,
+                align: 'right',
                 width: '7rem',
                 show: true,
                 sort: true,
@@ -67,7 +64,7 @@ export default {
                 id: 'pendiente',
                 title: 'Pendiente',
                 format: 'number',
-                toRight: true,
+                align: 'right',
                 width: '7rem',
                 show: true,
                 sort: true,
@@ -76,7 +73,7 @@ export default {
                 id: 'articulo_stock',
                 title: 'Stock',
                 format: 'number',
-                toRight: true,
+                align: 'right',
                 width: '7rem',
                 show: true,
                 sort: true,
@@ -85,7 +82,7 @@ export default {
                 id: 'faltante',
                 title: 'Faltante',
                 slot: 'cFaltante',
-                toRight: true,
+                align: 'right',
                 width: '7rem',
                 show: true,
                 sort: true,
@@ -99,6 +96,8 @@ export default {
     },
     methods: {
         async loadPedidos() {
+            this.modal.articulos = []
+
             this.useAuth.setLoading(true, 'Cargando...')
             const res = await get(`${urls.socio_pedidos}/pendientes?linea=${this.modal.linea}`)
             this.useAuth.setLoading(false)

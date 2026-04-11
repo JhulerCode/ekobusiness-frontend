@@ -110,7 +110,7 @@ export default {
                 id: 'cantidad',
                 title: 'Cantidad',
                 format: 'number',
-                toRight: true,
+                align: 'right',
                 width: '7rem',
                 show: true,
 
@@ -131,7 +131,7 @@ export default {
                 id: 'cantidad_plan',
                 title: 'Cant. receta',
                 format: 'decimal',
-                toRight: true,
+                align: 'right',
                 width: '7rem',
                 show: true,
 
@@ -141,7 +141,7 @@ export default {
                 id: 'cantidad',
                 title: 'Cant. real',
                 format: 'decimal',
-                toRight: true,
+                align: 'right',
                 width: '7rem',
                 show: true,
 
@@ -151,7 +151,7 @@ export default {
                 id: 'diferencia',
                 title: 'Diferencia',
                 format: 'decimal',
-                toRight: true,
+                align: 'right',
                 width: '7rem',
                 show: true,
 
@@ -172,7 +172,7 @@ export default {
                 id: 'cantidad_plan',
                 title: 'Cant. receta',
                 format: 'decimal',
-                toRight: true,
+                align: 'right',
                 width: '7rem',
                 show: true,
 
@@ -182,7 +182,7 @@ export default {
                 id: 'cantidad',
                 title: 'Cant. real',
                 format: 'decimal',
-                toRight: true,
+                align: 'right',
                 width: '7rem',
                 show: true,
 
@@ -192,7 +192,7 @@ export default {
                 id: 'diferencia',
                 title: 'Diferencia',
                 format: 'decimal',
-                toRight: true,
+                align: 'right',
                 width: '7rem',
                 show: true,
 
@@ -214,7 +214,7 @@ export default {
                 id: 'cantidad',
                 title: 'Cant. programada',
                 format: 'number',
-                toRight: true,
+                align: 'right',
                 width: '7rem',
                 show: true,
 
@@ -224,7 +224,7 @@ export default {
                 id: 'productos_terminados',
                 title: 'Cant. real',
                 format: 'number',
-                toRight: true,
+                align: 'right',
                 width: '7rem',
                 show: true,
 
@@ -234,7 +234,7 @@ export default {
                 id: 'diferencia',
                 title: 'Diferencia',
                 format: 'number',
-                toRight: true,
+                align: 'right',
                 width: '7rem',
                 show: true,
 

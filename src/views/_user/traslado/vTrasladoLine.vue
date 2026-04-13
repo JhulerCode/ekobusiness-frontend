@@ -98,7 +98,7 @@ export default {
                         search: this.loadArticulos,
                         elegir: this.elegirArticulo,
                         selectedObjectProp: 'articulo1',
-                        disabled: this.$route.params.pedido_id,
+                        // disabled: this.$route.params.pedido_id && ,
                     },
                     show: true,
                     sort: true,

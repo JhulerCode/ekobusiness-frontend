@@ -287,7 +287,11 @@ export default {
 
             if (res.code != 0) return
 
-            this.initTransaccion()
+            // this.initTransaccion()
+            this.modal.transaccion.lote_id = null
+            this.modal.lotes = []
+            // this.modal.lotesLoaded = true
+            this.modal.transaccion.cantidad = null
             this.modal.produccion_insumos.unshift(res.data)
         },
 

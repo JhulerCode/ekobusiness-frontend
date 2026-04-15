@@ -7,6 +7,9 @@
         <p class="mrg-btm1">
             {{ modal.articulo.nombre }}
         </p>
+        <!-- <pre>
+            {{ modal.transaccion }}
+        </pre> -->
 
         <div class="container-datos1">
             <JdInput type="date" :nec="true" label="Fecha" v-model="modal.transaccion.fecha" />

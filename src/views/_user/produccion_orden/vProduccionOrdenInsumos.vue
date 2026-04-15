@@ -195,7 +195,15 @@ export default {
                     produccion_orden: { op: 'Es', val: this.$route.params[this.vista.pathKey] },
                     tipo: { op: 'Es', val: [2, 3] },
                 },
-                cols: ['tipo', 'fecha', 'articulo', 'lote_id', 'cantidad'],
+                cols: [
+                    'tipo',
+                    'fecha',
+                    'articulo',
+                    'lote_id',
+                    'cantidad',
+                    'produccion_orden',
+                    'maquina',
+                ],
                 incl: ['articulo1', 'lote1'],
             }
 
@@ -295,6 +303,7 @@ export default {
                     tipo: 3,
                     fecha: item.fecha,
                     maquina: item.maquina,
+                    produccion_orden: item.produccion_orden,
                     articulo: item.articulo,
                     lote_id: item.lote_id,
                 },

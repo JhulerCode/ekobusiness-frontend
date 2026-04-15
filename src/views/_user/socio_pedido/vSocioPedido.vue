@@ -446,7 +446,7 @@ export default {
                 const qry_ci = {
                     incl: ['comprobante1'],
                     cols: ['articulo', 'cantidad'],
-                    fltr: { 'comprobante1.traslado_id': { op: 'Es', val: this.vista.data.id } },
+                    fltr: { 'comprobante1.pedido_id': { op: 'Es', val: this.vista.data.id } },
                 }
 
                 this.auth.setLoading(true, 'Cargando...')
@@ -488,6 +488,7 @@ export default {
 
                 // 5. resultado
                 if (diferencias.length) {
+                    // console.log(diferencias)
                     return jmsg('warning', `Facturación incompleta`)
                 }
             }

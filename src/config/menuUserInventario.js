@@ -84,7 +84,10 @@ export default {
             goto: 'vKardex',
             path: 'kardex',
             view: '_user/kardex/vKardex.vue',
-            permisos: [{ id: 'vKardex:listar', label: 'Listar' }],
+            permisos: [
+                { id: 'vKardex:listar', label: 'Listar' },
+                { id: 'vKardex:eliminar', label: 'Eliminar' },
+            ],
         },
         {
             label: 'Historial de consumos',

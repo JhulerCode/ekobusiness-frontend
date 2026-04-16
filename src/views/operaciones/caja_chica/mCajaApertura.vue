@@ -45,8 +45,16 @@
         </div>
 
         <div class="container-movimientos" v-if="[3, 4].includes(modal.mode)">
-            <p class="mrg-btm1">
+            <p class="mrg-btm1" style="display: flex; gap: 1rem">
                 <strong>--- Movimientos ---</strong>
+
+                <JdButton
+                    icon="fa-solid fa-download"
+                    title="Descargar"
+                    tipo="2"
+                    :small="true"
+                    @click="downloadData"
+                />
             </p>
 
             <div
@@ -122,7 +130,7 @@ import { useVistas } from '@/pinia/vistas'
 import { useSystem } from '@/pinia/system'
 
 import { urls, post, patch, delet, get } from '@/utils/crud'
-import { incompleteData, redondear } from '@/utils/mine'
+import { incompleteData, redondear, downloadExcel } from '@/utils/mine'
 import { jmsg, jqst } from '@/utils/swal'
 
 export default {
@@ -336,6 +344,13 @@ export default {
             if (res.code != 0) return
 
             this.modal.caja_apertura.caja_movimientos = res.data
+        },
+
+        downloadData() {
+            downloadExcel(
+                this.columns.filter((a) => a.show),
+                this.modal.caja_apertura.caja_movimientos,
+            )
         },
     },
 }

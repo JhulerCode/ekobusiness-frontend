@@ -14,7 +14,6 @@
 </template>
 
 <script>
-import VIEW_CONFIG from './kardex.config.js'
 import { useSystem } from '@/pinia/system.js'
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
@@ -24,14 +23,137 @@ import { jmsg } from '@/utils/swal'
 
 export default {
     data: () => ({
-        VIEW_CONFIG,
-        articulo_id: null,
+        system: useSystem(),
+        auth: useAuth(),
+        vistas: useVistas(),
+        modals: useModals(),
     }),
     computed: {
-        system: () => useSystem(),
-        auth: () => useAuth(),
-        vistas: () => useVistas(),
-        modals: () => useModals(),
+        VIEW_CONFIG() {
+            return {
+                name: 'vKardex',
+                title: 'Kardex',
+                apiPath: 'kardex',
+                headerActions: [],
+                tableColumns: [
+                    {
+                        id: 'fecha',
+                        title: 'Fecha',
+                        type: 'date',
+                        prop: 'fecha1',
+                        width: '8rem',
+                        show: true,
+                    },
+                    {
+                        id: 'tipo',
+                        title: 'Operación',
+                        prop: 'tipo1.nombre',
+                        width: '15rem',
+                        show: true,
+                        type: 'select',
+                        systemKey: 'kardex_operaciones',
+                    },
+                    {
+                        id: 'articulo',
+                        title: 'Artículo',
+                        prop: 'articulo1.nombre',
+                        type: 'related',
+                        relatedUrl: 'articulos',
+                        width: '20rem',
+                        show: this.$route.params.articulo_id ? false : true,
+                        seek: this.$route.params.articulo_id ? false : true,
+                        filtrable: this.$route.params.articulo_id ? false : true,
+                    },
+                    {
+                        id: 'lote',
+                        title: 'Lote',
+                        prop: 'lote1.codigo',
+                        type: 'related',
+                        relatedUrl: 'lotes',
+                        width: '8rem',
+                        show: true,
+                        seek: true,
+                    },
+                    {
+                        id: 'lote1.fv',
+                        title: 'Fecha vencimiento',
+                        prop: 'lote1.fv1',
+                        width: '8rem',
+                        show: true,
+                    },
+                    {
+                        id: 'lote1.vu',
+                        title: 'Valor unitario',
+                        align: 'right',
+                        type: 'number',
+                        width: '8rem',
+                        show: true,
+                    },
+                    {
+                        id: 'cantidad',
+                        title: 'Cantidad',
+                        prop: 'cantidad1',
+                        type: 'decimal',
+                        format: {},
+                        align: 'right',
+                        width: '8rem',
+                        show: true,
+                    },
+                    {
+                        id: 'maquina',
+                        title: 'Máquina',
+                        prop: 'maquina1.nombre',
+                        type: 'related',
+                        relatedUrl: 'maquinas',
+                        width: '10rem',
+                        show: true,
+                        seek: true,
+                    },
+                    {
+                        id: 'transaccion1.socio',
+                        title: 'Socio comercial',
+                        prop: 'transaccion1.socio1.nombres',
+                        type: 'related',
+                        relatedUrl: 'socios',
+                        mostrar: 'nombres',
+                        width: '15rem',
+                        show: true,
+                        seek: true,
+                    },
+                    {
+                        id: 'transaccion1.guia',
+                        title: 'Guía',
+                        prop: 'transaccion1.guia',
+                        width: '8rem',
+                        show: true,
+                        seek: true,
+                    },
+                    {
+                        id: 'observacion',
+                        title: 'Observación',
+                        type: 'text',
+                        width: '8rem',
+                        show: true,
+                        seek: true,
+                    },
+                ],
+                tableRowActions: [
+                    {
+                        label: 'Ver compra',
+                        icon: 'fa-regular fa-folder-open',
+                        action: 'verCompra',
+                        ocultar: { tipo: { op: '!=', val: 1 } },
+                    },
+                    {
+                        label: 'Ver venta',
+                        icon: 'fa-regular fa-folder-open',
+                        action: 'verCompra',
+                        ocultar: { tipo: { op: '!=', val: 5 } },
+                    },
+                ],
+            }
+        },
+
         vista() {
             return this.vistas[this.$route.name]
         },
@@ -45,15 +167,7 @@ export default {
             return redondear(suma)
         },
     },
-    created() {
-        if (this.$route.params.articulo_id) {
-            const colArticulo = this.VIEW_CONFIG.tableColumns.find((a) => a.id == 'articulo')
-            if (colArticulo) {
-                colArticulo.show = false
-                colArticulo.seek = false
-            }
-        }
-    },
+    created() {},
     methods: {
         runMethod(method, item) {
             this[method](item)

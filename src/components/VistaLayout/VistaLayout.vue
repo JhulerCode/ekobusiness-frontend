@@ -179,12 +179,12 @@ async function loadTableData(init_page) {
         return
     }
 
+    if (!vista.dwal) vista.tableData = []
+    busquedaSimple.value = ''
+
     if (props.checkFiltros && props.checkFiltros()) return
     if (init_page) vista.table_page = 1
     props.setQuery()
-
-    if (!vista.dwal) vista.tableData = []
-    busquedaSimple.value = ''
 
     if (vista.dwal == true) vista.qry.dwal = true
 

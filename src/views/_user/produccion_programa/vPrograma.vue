@@ -215,64 +215,59 @@ export default {
                 show: true,
             },
         ],
+        columns: [
+            {
+                id: 'fecha',
+                title: 'Fecha',
+                width: '10rem',
+                show: false,
+                op: 'Es',
+                val: dayjs().format('YYYY-MM-DD'),
+            },
+            {
+                id: 'linea',
+                title: 'Línea',
+                width: '10rem',
+                show: false,
+            },
+            {
+                id: 'maquina',
+                title: 'Máquina',
+                prop: 'maquina1.nombre',
+                width: '10rem',
+                show: false,
+            },
+            {
+                id: 'orden',
+                title: 'Prioridad',
+                width: '4rem',
+                show: true,
+            },
+            {
+                id: 'articulo1.nombre',
+                title: 'Producto',
+                prop: 'articulo1.nombre',
+                width: '30rem',
+                show: true,
+            },
+            {
+                id: 'cantidad',
+                title: 'Cantidad',
+                align: 'right',
+                // slot: 'cCantidad',
+                type: 'number',
+                width: '7rem',
+                show: true,
+            },
+            {
+                id: 'observacion',
+                title: 'Observación',
+                width: '15rem',
+                show: true,
+            },
+        ],
     }),
     computed: {
-        columns() {
-            return [
-                {
-                    id: 'fecha',
-                    title: 'Fecha',
-                    width: '10rem',
-                    show: false,
-                },
-                {
-                    id: 'linea',
-                    title: 'Línea',
-                    width: '10rem',
-                    show: false,
-                },
-                {
-                    id: 'maquina',
-                    title: 'Máquina',
-                    prop: 'maquina1.nombre',
-                    width: '10rem',
-                    show: false,
-                },
-                {
-                    id: 'orden',
-                    title: 'Prioridad',
-                    width: '4rem',
-                    show: true,
-                },
-                {
-                    id: 'articulo1.nombre',
-                    title: 'Producto',
-                    prop: 'articulo1.nombre',
-                    width: '30rem',
-                    show: true,
-                },
-                {
-                    id: 'cantidad',
-                    title: 'Cantidad',
-                    align: 'right',
-                    // slot: 'cCantidad',
-                    type: 'number',
-                    input: {
-                        onInput: (item) => this.calcularProducto(item),
-                        onChange: (item) => this.modificarProduccionOrden(item),
-                        disabled: (item) => item.estado == 2,
-                    },
-                    width: '7rem',
-                    show: true,
-                },
-                {
-                    id: 'observacion',
-                    title: 'Observación',
-                    width: '15rem',
-                    show: true,
-                },
-            ]
-        },
         produccion_ordenes_hoy() {
             if (!this.vista.tableData) return []
 
@@ -365,8 +360,15 @@ export default {
     },
     async created() {
         this.vista = this.useVistas.vPrograma
-        this.initFiltros()
         this.useAuth.setColumns(this.tableName, this.columns)
+
+        // Set input callbacks here because `this` is not available in data()
+        const colCantidad = this.columns.find((a) => a.id == 'cantidad')
+        colCantidad.input = {
+            onInput: (item) => this.calcularProducto(item),
+            onChange: (item) => this.modificarProduccionOrden(item),
+            disabled: (item) => item.estado == 2,
+        }
 
         if (!this.vista.lineasLoaded) await this.loadArticuloLineas()
 
@@ -377,10 +379,6 @@ export default {
         }
     },
     methods: {
-        initFiltros() {
-            this.column_fecha.op = 'Es'
-            this.column_fecha.val = dayjs().format('YYYY-MM-DD')
-        },
         async setFecha() {
             if (this.column_fecha.val == null) {
                 delete this.column_fecha.op

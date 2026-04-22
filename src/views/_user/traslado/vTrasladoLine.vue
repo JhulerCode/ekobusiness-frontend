@@ -433,9 +433,16 @@ export default {
         //--- Methods ---//
         async openPedidoItems() {
             const send = {
-                articulos: this.vista.socio_pedido.socio_pedido_items.filter(
-                    (a) => a.pedido_item_entregado < a.cantidad,
-                ),
+                // articulos: this.vista.socio_pedido.socio_pedido_items.filter(
+                //     (a) => a.pedido_item_entregado < a.cantidad,
+                // ),
+                articulos: this.vista.socio_pedido.socio_pedido_items.map((a) => ({
+                    ...a,
+                    cantidad:
+                        a.cantidad - a.pedido_item_entregado < 0
+                            ? 0
+                            : a.cantidad - a.pedido_item_entregado,
+                })),
                 socio_pedido: this.vista.data.socio_pedido,
             }
 

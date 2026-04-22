@@ -200,12 +200,12 @@ export default {
                     this.vista.qry.fltr.tipo = { op: 'Es', val: 1 }
                 }
                 if (this.$route.path.includes('ventas')) {
-                    this.vista.qry.fltr.tipo = { op: 'Es', val: [5, 'abastacer_maquila'] }
+                    this.vista.qry.fltr.tipo = { op: 'Es', val: 5 }
                 }
             }
 
             this.auth.updateQuery(this.vista.tableColumns, this.vista.qry)
-            this.vista.qry.cols.push('tipo')
+            this.vista.qry.cols.push('tipo', 'calidad_revisado_despacho')
         },
 
         //--- Header actions ---//

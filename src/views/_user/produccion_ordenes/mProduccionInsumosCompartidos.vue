@@ -292,6 +292,7 @@ export default {
             this.modal.lotes = []
             // this.modal.lotesLoaded = true
             this.modal.transaccion.cantidad = null
+            this.modal.transaccion.observacion = null
             this.modal.produccion_insumos.unshift(res.data)
         },
 

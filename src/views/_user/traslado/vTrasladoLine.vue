@@ -42,7 +42,13 @@
                         <li v-for="(a, i) in item.kardexes" :key="i">
                             <div>
                                 {{ a.lote1?.codigo }}
-                                {{ a.lote1?.fv ? ' | ' + a.lote1.fv1 : '' }} ({{ a.cantidad }})
+                                {{
+                                    a.lote1?.fv
+                                        ? ' | ' +
+                                          (a.lote1.fv1 || dayjs(a.lote1.fv).format('DD-MM-YYYY'))
+                                        : ''
+                                }}
+                                ({{ a.cantidad }})
                                 {{ i == item.kardexes.length - 1 ? '' : ',' }}
                             </div>
                         </li>
@@ -70,6 +76,7 @@ import { useVistas } from '@/pinia/vistas'
 import { urls, get } from '@/utils/crud'
 import { jmsg } from '@/utils/swal'
 import { obtenerNumeroJuliano, genCorrelativo } from '@/utils/mine'
+import dayjs from 'dayjs'
 
 export default {
     components: {
@@ -81,7 +88,7 @@ export default {
         modals: useModals(),
         vistas: useVistas(),
 
-        nuevo: null,
+        dayjs,
     }),
     computed: {
         vista() {

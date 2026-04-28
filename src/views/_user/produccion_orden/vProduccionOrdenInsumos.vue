@@ -394,7 +394,7 @@ export default {
         async loadLotes(txt, item) {
             const qry = {
                 incl: ['kardexes_for_sqls'],
-                cols: ['codigo', 'fv', 'codigo_fv_stock'],
+                cols: ['codigo', 'fv', 'codigo_fv_stock', 'lote_fv'],
                 sqls: ['lote_stock'],
                 fltr: {
                     articulo: { op: 'Es', val: item.articulo },

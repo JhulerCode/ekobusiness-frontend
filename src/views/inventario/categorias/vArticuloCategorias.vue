@@ -39,7 +39,8 @@ export default {
         setQuery() {
             this.vista.qry = {
                 fltr: {},
-                ordr: [['nombre', 'ASC']],
+                sqls: ['categoria_nombre_completo'],
+                ordr: [['categoria_nombre_completo', 'ASC']],
                 page: this.vista.table_page,
             }
             this.auth.updateQuery(this.vista.tableColumns, this.vista.qry)
@@ -55,8 +56,11 @@ export default {
 
         //--- Row actions ---//
         async editar(item) {
+            const qry = {
+                incl: ['categoria_parent1'],
+            }
             this.auth.setLoading(true, 'Cargando...')
-            const res = await get(`${this.vista.apiUrl}/uno/${item.id}`)
+            const res = await get(`${this.vista.apiUrl}/uno/${item.id}?qry=${JSON.stringify(qry)}`)
             this.auth.setLoading(false)
             if (res.code != 0) return
             const send = {

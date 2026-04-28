@@ -13,10 +13,10 @@ export default {
 
     tableColumns: [
         {
-            id: 'nombre',
+            id: 'categoria_nombre_completo',
             title: 'Nombre',
             type: 'text',
-            width: '15rem',
+            width: '25rem',
             show: true,
             seek: true,
             orden: 1,

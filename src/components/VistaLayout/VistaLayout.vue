@@ -152,6 +152,7 @@ const viewName = route.name
 vistas.updateVista(viewName, {
     ...JSON.parse(JSON.stringify(props.config)),
     apiUrl: urls[props.config.apiPath],
+    loadTableData: loadTableData,
 })
 
 const vista = vistas[viewName]

@@ -26,6 +26,7 @@
         <JdSelectQuery
             label="Categoría"
             :search="loadCategorias"
+            mostrar="categoria_nombre_completo"
             v-model="vista.data.categoria"
             :selectedObject="vista.data.categoria1"
             :disabled="vista.mode != 'edit'"
@@ -67,7 +68,8 @@ export default {
             const qry = {
                 fltr: { activo: { op: 'Es', val: true } },
                 cols: ['nombre'],
-                ordr: [['nombre', 'ASC']],
+                sqls: ['categoria_nombre_completo'],
+                ordr: [['categoria_nombre_completo', 'ASC']],
                 limt: 25,
             }
 

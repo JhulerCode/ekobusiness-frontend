@@ -16,6 +16,11 @@ export default {
             permiso: 'vArticulos:importar',
             tipo: '2',
         },
+        // {
+        //     text: 'Lotes con stock',
+        //     action: 'loadLotesConStock',
+        //     tipo: '2',
+        // },
     ],
 
     tableColumns: [

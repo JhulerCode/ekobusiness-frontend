@@ -23,10 +23,9 @@ import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
 import { useModals } from '@/pinia/modals'
 import { useSystem } from '@/pinia/system'
-// import { get } from '@/utils/crud'
-import { tryOficialExcel } from '@/utils/mine'
+import { urls, get } from '@/utils/crud'
+import { tryOficialExcel, downloadExcel } from '@/utils/mine'
 import { jmsg } from '@/utils/swal'
-// import dayjs from 'dayjs'
 
 export default {
     components: {
@@ -84,6 +83,32 @@ export default {
         },
         abrirExcel() {
             this.$refs.excel.click()
+        },
+        async loadLotesConStock() {
+            this.auth.setLoading(true, 'Cargando lotes con stock...')
+            const res = await get(`${urls.lotes}/with-stock`)
+            this.auth.setLoading(false)
+
+            if (res.code != 0) return
+
+            const columns = [
+                { id: 'id', title: 'id' },
+                { id: 'articulo1_nombre', title: 'articulo1_nombre' },
+                { id: 'lote_stock', title: 'lote_stock' },
+                { id: 'fv', title: 'fv' },
+                { id: 'codigo', title: 'codigo' },
+                { id: 'vu', title: 'vu' },
+                { id: 'moneda', title: 'moneda' },
+                { id: 'tipo_cambio', title: 'tipo_cambio' },
+                { id: 'igv_afectacion', title: 'igv_afectacion' },
+                { id: 'articulo1_id', title: 'articulo1_id' },
+                { id: 'articulo1_type', title: 'articulo1_type' },
+                { id: 'articulo1_purchase_ok', title: 'articulo1_purchase_ok' },
+                { id: 'articulo1_sale_ok', title: 'articulo1_sale_ok' },
+                { id: 'articulo1_unidad', title: 'articulo1_unidad' },
+                { id: 'articulo1_has_fv', title: 'articulo1_has_fv' },
+            ]
+            downloadExcel(columns, res.data)
         },
 
         //--- Row actions ---//

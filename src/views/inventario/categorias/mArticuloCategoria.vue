@@ -12,6 +12,15 @@
                 :disabled="modal.mode == 3"
             />
 
+            <JdSelectQuery
+                label="Categoría padre"
+                :search="loadCategorias"
+                mostrar="categoria_nombre_completo"
+                v-model="modal.articulo_categoria.categoria_parent"
+                :selectedObject="modal.articulo_categoria.categoria_parent1"
+                :disabled="modal.mode == 3"
+            />
+
             <JdTextArea
                 label="Descripción"
                 v-model="modal.articulo_categoria.descripcion"
@@ -45,7 +54,7 @@ import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
 import { useVistas } from '@/pinia/vistas'
 
-import { urls, post, patch } from '@/utils/crud'
+import { urls, post, patch, get } from '@/utils/crud'
 import { incompleteData } from '@/utils/mine'
 import { jmsg } from '@/utils/swal'
 
@@ -78,7 +87,7 @@ export default {
         },
 
         checkDatos() {
-            if (incompleteData(this.modal.articulo_categoria, ['tipo', 'nombre'])) {
+            if (incompleteData(this.modal.articulo_categoria, ['nombre'])) {
                 jmsg('warning', 'Ingrese los datos necesarios')
                 return true
             }
@@ -94,7 +103,8 @@ export default {
 
             if (res.code != 0) return
 
-            this.useVistas.addItem('vArticuloCategorias', 'tableData', res.data)
+            // this.useVistas.addItem('vArticuloCategorias', 'tableData', res.data)
+            this.useVistas.vArticuloCategorias.loadTableData()
             this.useModals.show.mArticuloCategoria = false
         },
         async modificar() {
@@ -106,8 +116,29 @@ export default {
 
             if (res.code != 0) return
 
-            this.useVistas.updateItem('vArticuloCategorias', 'tableData', res.data)
+            // this.useVistas.updateItem('vArticuloCategorias', 'tableData', res.data)
+            this.useVistas.vArticuloCategorias.loadTableData()
             this.useModals.show.mArticuloCategoria = false
+        },
+
+        async loadCategorias(txtBuscar) {
+            const qry = {
+                fltr: { activo: { op: 'Es', val: true } },
+                cols: ['nombre'],
+                sqls: ['categoria_nombre_completo'],
+                ordr: [['categoria_nombre_completo', 'ASC']],
+                limt: 25,
+            }
+
+            if (txtBuscar) {
+                qry.fltr.nombre = { op: 'Contiene', val: txtBuscar }
+            }
+
+            const res = await get(`${urls.articulo_categorias}?qry=${JSON.stringify(qry)}`)
+
+            if (res.code != 0) return []
+
+            return res.data
         },
     },
 }

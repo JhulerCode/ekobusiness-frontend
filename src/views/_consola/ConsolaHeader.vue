@@ -5,8 +5,10 @@
                 <ul>
                     <li v-for="(crumb, index) in breadcrumbs" :key="index">
                         <span v-if="index > 0" class="separator">></span>
-                        <a
-                            @click="crumb.name ? navigateTo(crumb.name) : null"
+                        <component
+                            :is="crumb.name ? 'router-link' : 'div'"
+                            :to="crumb.name ? { name: crumb.name, params: crumb.params } : undefined"
+                            class="breadcrumb-item"
                             :class="{
                                 clickable: crumb.name,
                                 active: index === breadcrumbs.length - 1,
@@ -14,7 +16,7 @@
                         >
                             <i v-if="crumb.icon" :class="crumb.icon"></i>
                             <span>{{ crumb.label }}</span>
-                        </a>
+                        </component>
                     </li>
                 </ul>
             </nav>
@@ -105,10 +107,28 @@ export default {
                     label = label.substring(0, 27) + '...'
                 }
 
+                let targetParams = {}
+                if (!isLast && item.goto) {
+                    const allRoutes = this.$router.getRoutes()
+                    const targetRoute = allRoutes.find((r) => r.name === item.goto)
+                    if (targetRoute && targetRoute.path) {
+                        const paramMatches = targetRoute.path.match(/:([a-zA-Z0-9_]+)/g)
+                        if (paramMatches) {
+                            paramMatches.forEach((m) => {
+                                const paramKey = m.substring(1)
+                                if (this.$route.params[paramKey] !== undefined) {
+                                    targetParams[paramKey] = this.$route.params[paramKey]
+                                }
+                            })
+                        }
+                    }
+                }
+
                 crumbs.push({
                     label,
                     icon: item.icon,
                     name: isLast ? null : item.goto,
+                    params: targetParams,
                 })
             })
 
@@ -160,31 +180,6 @@ export default {
                 cancelFullScreen.call(doc)
             }
         },
-
-        navigateTo(name) {
-            if (this.$route.name !== name) {
-                // Filtramos los params para que solo pasen los que la ruta destino necesita.
-                // Esto evita el warning de "Discarded invalid param(s)" de Vue Router.
-                const allRoutes = this.$router.getRoutes()
-                const targetRoute = allRoutes.find((r) => r.name === name)
-                const targetParams = {}
-
-                if (targetRoute) {
-                    // Buscamos los tokens :nombreParam en el path de la ruta.
-                    const paramMatches = targetRoute.path.match(/:([a-zA-Z0-9_]+)/g)
-                    if (paramMatches) {
-                        paramMatches.forEach((m) => {
-                            const paramKey = m.substring(1)
-                            if (this.$route.params[paramKey] !== undefined) {
-                                targetParams[paramKey] = this.$route.params[paramKey]
-                            }
-                        })
-                    }
-                }
-
-                this.$router.push({ name, params: targetParams })
-            }
-        },
     },
 }
 </script>
@@ -225,7 +220,7 @@ header {
                         font-family: inherit;
                     }
 
-                    a {
+                    .breadcrumb-item {
                         color: var(--text-color2);
                         text-decoration: none;
                         display: flex;

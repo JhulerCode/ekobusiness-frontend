@@ -8,14 +8,16 @@
 
         <div class="menu">
             <div v-for="(a, i) in menu" :key="i" class="menu-item-wrapper">
-                <div
+                <component
+                    :is="a.children && a.children.length > 0 ? 'div' : 'router-link'"
                     class="btn option"
+                    :to="a.children && a.children.length > 0 ? undefined : { name: a.goto }"
                     @mouseenter="onMouseEnter(a, $event)"
                     @mouseleave="onMouseLeave"
                     @click="
                         a.children && a.children.length > 0
                             ? this.toggleList(a.label, $event)
-                            : navigateTo(a.goto)
+                            : closeFlyouts()
                     "
                     :key="a.label"
                     :class="{
@@ -28,7 +30,7 @@
                     <transition name="to-width-cero">
                         <span v-if="useAuth.showNavbar">{{ a.label }}</span>
                     </transition>
-                </div>
+                </component>
 
                 <div
                     v-if="a.children && grupoExpandido === a.label"
@@ -44,17 +46,18 @@
                         {{ a.label }}
                     </strong>
 
-                    <div
+                    <router-link
                         v-for="(b, j) in a.children"
                         :key="j"
                         class="btn"
+                        :to="{ name: b.goto }"
                         :class="{
                             'option-active': useVistas.show?.[b.goto] || isRouteInItem(b),
                         }"
-                        @click="navigateTo(b.goto)"
+                        @click="closeFlyouts()"
                     >
                         <span>{{ b.label }}</span>
-                    </div>
+                    </router-link>
                 </div>
             </div>
 
@@ -330,12 +333,9 @@ export default {
                 }
             }
         },
-        navigateTo(routeName) {
+        closeFlyouts() {
             this.grupoExpandido = null
             this.hoveredItem = null
-            if (this.$route.name !== routeName) {
-                this.$router.push({ name: routeName })
-            }
         },
         isRouteInItem(item) {
             if (!item) return false
@@ -395,6 +395,7 @@ export default {
     align-items: center;
     gap: 0.5rem;
     cursor: pointer;
+    text-decoration: none;
 
     i {
         font-size: 1.2rem;

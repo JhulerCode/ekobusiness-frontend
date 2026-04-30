@@ -7,22 +7,15 @@
                 </div>
 
                 <div class="center">
-                    <p>
-                        <strong>{{ useAuth.empresa?.razon_social }}</strong>
-                    </p>
-                    <p>
-                        <span>{{
-                            useAuth.empresa?.direcciones.find((a) => a.principal == true).direccion
-                        }}</span
-                        ><br />
-                        <span>{{
-                            useAuth.empresa?.direcciones.find((a) => a.principal == true).distrito
-                        }}</span
-                        ><br />
-                        <span>{{ useAuth.empresa?.telefono }}</span
-                        ><br />
-                        <span>{{ useAuth.empresa?.correo }}</span>
-                    </p>
+                    <strong>{{ useAuth.empresa?.razon_social }}</strong>
+                    <span>{{
+                        useAuth.empresa?.direcciones.find((a) => a.principal == true).direccion
+                    }}</span>
+                    <span>{{
+                        useAuth.empresa?.direcciones.find((a) => a.principal == true).distrito
+                    }}</span>
+                    <span>{{ useAuth.empresa?.telefono }}</span>
+                    <span>{{ useAuth.empresa?.correo }}</span>
                 </div>
 
                 <div class="right">
@@ -326,7 +319,8 @@ export default {
                 this.modal.mtoOperInafectas
             this.modal.mtoImpVenta = this.modal.valorVenta + this.modal.mtoIGV
         },
-        exportarPdf() {
+        async exportarPdf() {
+            this.useAuth.setLoading(true, 'Generando PDF...')
             const element = this.$refs.elementoPdf
 
             const opciones = {
@@ -338,30 +332,26 @@ export default {
             }
 
             // html2pdf().set(opciones).from(element).save()
-            html2pdf()
-                .set(opciones)
-                .from(element)
-                .toPdf()
-                .get('pdf')
-                .then((pdf) => {
-                    const totalPages = pdf.internal.getNumberOfPages() // Obtenemos el total de páginas
-                    for (let i = 1; i <= totalPages; i++) {
-                        pdf.setPage(i) // Nos situamos en la página i
-                        pdf.setFontSize(8)
-                        pdf.setTextColor(150)
+            const worker = html2pdf().set(opciones).from(element).toPdf()
+            const pdf = await worker.get('pdf')
+            const totalPages = pdf.internal.getNumberOfPages() // Obtenemos el total de páginas
+            for (let i = 1; i <= totalPages; i++) {
+                pdf.setPage(i) // Nos situamos en la página i
+                pdf.setFontSize(8)
+                pdf.setTextColor(150)
 
-                        // Añadimos el texto: Página X de Y
-                        // El formato es: texto, x (horizontal), y (vertical)
-                        // 8.27 es el ancho de A4 en pulgadas, 11.69 es el alto
-                        pdf.text(
-                            `Página ${i} de ${totalPages}`,
-                            pdf.internal.pageSize.getWidth() / 2,
-                            pdf.internal.pageSize.getHeight() - 0.25,
-                            { align: 'center' },
-                        )
-                    }
-                })
-                .save()
+                // Añadimos el texto: Página X de Y
+                // El formato es: texto, x (horizontal), y (vertical)
+                // 8.27 es el ancho de A4 en pulgadas, 11.69 es el alto
+                pdf.text(
+                    `Página ${i} de ${totalPages}`,
+                    pdf.internal.pageSize.getWidth() / 2,
+                    pdf.internal.pageSize.getHeight() - 0.25,
+                    { align: 'center' },
+                )
+            }
+            await worker.save()
+            this.useAuth.setLoading(false)
         },
     },
 }
@@ -409,16 +399,17 @@ export default {
     }
 
     .center {
-        text-align: center;
-        margin-top: 1rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
 
-        p {
+        strong {
             margin-bottom: 0.5rem;
         }
     }
 
     .right {
-        // text-align: center;
         border: var(--border);
         border-radius: 1rem;
 

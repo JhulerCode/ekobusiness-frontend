@@ -11,25 +11,31 @@
 
     <!-- Modales -->
     <mFormato v-if="modals?.show?.mFormato" @created="setTransaccionDespachoRevisado" />
+
+    <mFormatoRenderer v-if="modals?.show?.mFormatoRenderer" />
 </template>
 
 <script>
 import mFormato from '@/views/calidad/formatos/mFormato.vue'
+import mFormatoRenderer from '@/components/mFormatoRenderer.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
 import { useModals } from '@/pinia/modals'
+import { useSystem } from '@/pinia/system'
 import { urls, get } from '@/utils/crud'
 import dayjs from 'dayjs'
 
 export default {
     components: {
         mFormato,
+        mFormatoRenderer,
     },
     data: () => ({
         auth: useAuth(),
         vistas: useVistas(),
         modals: useModals(),
+        system: useSystem(),
     }),
     computed: {
         vista() {
@@ -132,6 +138,13 @@ export default {
                         action: 'controlDespacho',
                         permiso: 'vVentas:controlDespacho',
                         ocultar: { tipo: 1 },
+                    },
+                    {
+                        label: 'Control de recepción',
+                        icon: 'fa-solid fa-star',
+                        action: 'controlRecepcion',
+                        permiso: 'vVentas:controlDespacho',
+                        ocultar: { tipo: 5 },
                     },
                 ],
             }
@@ -265,31 +278,63 @@ export default {
             this.auth.setLoading(false)
             if (res1.code != 0) return
 
-            if (res1.data == null) {
-                const send = {
-                    transaccion: item.id,
-                    transaccion1: { ...item },
-                    formato: {
-                        codigo: res.data.id,
-                        columns: res.data.columns,
-                        instructivo: res.data.instructivo,
-                    },
-                }
-                this.modals.setModal('mFormato', formato_id, 1, send, true)
-            } else {
-                for (const a of res.data.columns) a.value = res1.data[a.id]
-                const send = {
-                    transaccion: item.id,
-                    transaccion1: res1.data.transaccion1,
-                    formato: {
-                        id: res1.data.id,
-                        codigo: res.data.id,
-                        columns: res.data.columns,
-                        instructivo: res.data.instructivo,
-                    },
-                }
-                this.modals.setModal('mFormato', formato_id, 2, send, true)
+
+
+            // if (res1.data == null) {
+            //     const send = {
+            //         transaccion: item.id,
+            //         transaccion1: { ...item },
+            //         formato: {
+            //             codigo: res.data.id,
+            //             columns: res.data.columns,
+            //             instructivo: res.data.instructivo,
+            //         },
+            //     }
+            //     this.modals.setModal('mFormato', formato_id, 1, send, true)
+            // } else {
+            //     for (const a of res.data.columns) a.value = res1.data[a.id]
+            //     const send = {
+            //         transaccion: item.id,
+            //         transaccion1: res1.data.transaccion1,
+            //         formato: {
+            //             id: res1.data.id,
+            //             codigo: res.data.id,
+            //             columns: res.data.columns,
+            //             instructivo: res.data.instructivo,
+            //         },
+            //     }
+            //     this.modals.setModal('mFormato', formato_id, 2, send, true)
+            // }
+
+            await this.system.load(['conformidad_estados'])
+
+            const send = {
+                relacion: item,
+                estructura: res.data,
+                listas: {
+                    conformidad_estados: this.system.data.conformidad_estados,
+                },
             }
+
+            this.modals.setModal('mFormatoRenderer', '', 1, send, true)
+        },
+        async controlRecepcion() {
+            const formato_id = 'RE-BPM-05.01'
+            this.auth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.formatos}/uno/${formato_id}`)
+            this.auth.setLoading(false)
+            if (res.code != 0) return
+
+            await this.system.load(['conformidad_estados'])
+
+            const send = {
+                estructura: res.data,
+                listas: {
+                    conformidad_estados: this.system.data.conformidad_estados,
+                },
+            }
+
+            this.modals.setModal('mFormatoRenderer', '', 1, send, true)
         },
 
         //--- auxiliar data ---//

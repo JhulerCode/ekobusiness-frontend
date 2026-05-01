@@ -274,49 +274,37 @@ export default {
             if (res.code != 0) return
 
             this.auth.setLoading(true, 'Cargando...')
-            const res1 = await get(`${urls.formato_values}/uno/${item.calidad_revisado_despacho}`)
+            const res_values = await get(
+                `${urls.formato_values}/uno/${item.calidad_revisado_despacho}`,
+            )
             this.auth.setLoading(false)
-            if (res1.code != 0) return
-
-
-
-            // if (res1.data == null) {
-            //     const send = {
-            //         transaccion: item.id,
-            //         transaccion1: { ...item },
-            //         formato: {
-            //             codigo: res.data.id,
-            //             columns: res.data.columns,
-            //             instructivo: res.data.instructivo,
-            //         },
-            //     }
-            //     this.modals.setModal('mFormato', formato_id, 1, send, true)
-            // } else {
-            //     for (const a of res.data.columns) a.value = res1.data[a.id]
-            //     const send = {
-            //         transaccion: item.id,
-            //         transaccion1: res1.data.transaccion1,
-            //         formato: {
-            //             id: res1.data.id,
-            //             codigo: res.data.id,
-            //             columns: res.data.columns,
-            //             instructivo: res.data.instructivo,
-            //         },
-            //     }
-            //     this.modals.setModal('mFormato', formato_id, 2, send, true)
-            // }
+            if (res_values.code != 0) return
 
             await this.system.load(['conformidad_estados'])
 
             const send = {
-                relacion: item,
                 estructura: res.data,
                 listas: {
                     conformidad_estados: this.system.data.conformidad_estados,
                 },
+                transaccion: item.id,
+                values: {
+                    traslado_fecha: item.fecha,
+                    traslado_guia: item.guia,
+                    traslado_destino: item.socio1.nombres,
+                },
             }
 
-            this.modals.setModal('mFormatoRenderer', '', 1, send, true)
+            if (res_values.data) {
+                send.values = {
+                    ...res_values.data.values,
+                    ...send.values,
+                }
+
+                this.modals.setModal('mFormatoRenderer', '', 3, send, true)
+            } else {
+                this.modals.setModal('mFormatoRenderer', '', 1, send, true)
+            }
         },
         async controlRecepcion() {
             const formato_id = 'RE-BPM-05.01'

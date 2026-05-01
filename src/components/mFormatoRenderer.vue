@@ -4,82 +4,85 @@
         :buttons="buttons"
         @button-click="(action) => actions[action]()"
     >
-        <div ref="elementoPdf" class="pdfall">
-            <div class="document-header">
-                <div class="header-left" crossorigin="anonymous">
-                    <img :src="auth.empresa?.logo?.url" class="logo" />
-                </div>
-
-                <div class="header-center">
-                    <div class="header-system">{{ estructura.header.topTitle }}</div>
-
-                    <div class="header-title">
-                        {{ estructura.header.title }}
+        <div class="extra-space">
+            <div ref="elementoPdf" class="pdfall">
+                <div class="document-header">
+                    <div class="header-left" crossorigin="anonymous">
+                        <img :src="auth.empresa?.logo?.url" class="logo" />
                     </div>
-                </div>
 
-                <div class="header-right">
-                    <div
-                        v-for="item in estructura.header.rightInfo"
-                        :key="item.label"
-                        class="header-info-row"
-                    >
-                        {{ item.label }}: {{ item.value }}
+                    <div class="header-center">
+                        <div class="header-system">{{ estructura.header.topTitle }}</div>
+
+                        <div class="header-title">
+                            {{ estructura.header.title }}
+                        </div>
                     </div>
-                </div>
-            </div>
 
-            <div v-for="section in estructura.layout" :key="section.title" class="section">
-                <div class="section-header">
-                    <strong>{{ section.title }}</strong>
-                </div>
-
-                <div class="section-body">
-                    <div
-                        v-for="(row, rowIndex) in section.rows"
-                        :key="rowIndex"
-                        class="row"
-                        :style="{ 'margin-bottom': modal.mode == 3 ? '0.75rem' : '0.5rem' }"
-                    >
+                    <div class="header-right">
                         <div
-                            v-for="column in row.columns"
-                            :key="column.field"
-                            class="column"
-                            :class="'col-' + column.span"
+                            v-for="item in estructura.header.rightInfo"
+                            :key="item.label"
+                            class="header-info-row"
                         >
-                            <FieldRenderer
-                                :field="getField(column.field)"
-                                v-model="form[column.field]"
-                                :listas="listas"
-                                :mode="modal.mode"
-                            />
+                            {{ item.label }}: {{ item.value }}
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div v-if="estructura.instructivo">
-                <h3 class="section">Instructivo</h3>
-                <ul class="instructivo">
-                    <li v-for="(a, i) in estructura.instructivo" :key="i">
-                        {{ a }}
-                    </li>
-                </ul>
+                <div v-for="section in estructura.layout" :key="section.title" class="section">
+                    <div class="section-header">
+                        <strong>{{ section.title }}</strong>
+                    </div>
+
+                    <div class="section-body">
+                        <div
+                            v-for="(row, rowIndex) in section.rows"
+                            :key="rowIndex"
+                            class="row"
+                            :style="{ 'margin-bottom': modal.mode == 3 ? '0.75rem' : '0.5rem' }"
+                        >
+                            <div
+                                v-for="column in row.columns"
+                                :key="column.field"
+                                class="column"
+                                :class="'col-' + column.span"
+                            >
+                                <FieldRenderer
+                                    :field="getField(column.field)"
+                                    v-model="modal.values[column.field]"
+                                    :listas="listas"
+                                    :mode="modal.mode"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div v-if="estructura.instructivo">
+                    <h3 class="section">Instructivo</h3>
+                    <ul class="instructivo">
+                        <li v-for="(a, i) in estructura.instructivo" :key="i">
+                            {{ a }}
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
     </JdModal>
 </template>
 
 <script setup>
-import { reactive, computed, ref } from 'vue'
+import { computed, ref } from 'vue'
 import FieldRenderer from './FieldRenderer.vue'
 import { useModals } from '@/pinia/modals'
 import { useAuth } from '@/pinia/auth'
+import { urls, post, patch } from '@/utils/crud'
 import html2pdf from 'html2pdf.js'
 
 const modals = useModals()
 const auth = useAuth()
-const form = reactive({})
+// const form = reactive({})
 const elementoPdf = ref(null)
 const modal = modals.mFormatoRenderer
 
@@ -95,14 +98,48 @@ const listas = computed(() => {
     return modal.listas || {}
 })
 
-const buttons = [
-    { text: 'Print mode', action: 'togglePrintMode', show: true },
-    { text: 'Exportar PDF', action: 'exportarPdf', show: true },
-]
+const buttons = computed(() => {
+    return [
+        { text: 'Grabar', action: 'grabar', show: modal.mode == 1 },
+        { text: 'Cancelar', action: 'cancelEdit', tipo: 2, show: modal.mode == 2 },
+        { text: 'Modificar', action: 'modificar', show: modal.mode == 2 },
+        { text: 'Editar', action: 'editar', tipo: 2, show: modal.mode == 3 },
+        { text: 'Exportar PDF', action: 'exportarPdf', show: modal.mode == 3 },
+    ]
+})
+
 const actions = {
-    // togglePrintMode: () => {
-    //     modal.printMode = !modal.printMode
-    // },
+    grabar: async () => {
+        auth.setLoading(true, 'Grabando...')
+        const res = await post(urls.formato_values, modal.values)
+        auth.setLoading(false)
+
+        if (res.code != 0) return
+
+        modal.mode = 3
+    },
+    editar: () => {
+        modal.original_data = JSON.parse(JSON.stringify(modal.values))
+        modal.mode = 2
+    },
+    cancelEdit: () => {
+        modal.values = JSON.parse(JSON.stringify(modal.original_data))
+        modal.mode = 3
+    },
+    modificar: async () => {
+        const send = {
+            id: modal.values.id,
+            values: modal.values,
+        }
+
+        auth.setLoading(true, 'Actualizando...')
+        const res = await patch(urls.formato_values, send)
+        auth.setLoading(false)
+
+        if (res.code != 0) return
+
+        modal.mode = 3
+    },
     exportarPdf: async () => {
         auth.setLoading(true, 'Generando PDF...')
         const element = elementoPdf.value
@@ -140,6 +177,11 @@ const actions = {
 </script>
 
 <style lang="scss" scoped>
+.extra-space {
+    padding: 2.5rem;
+    background-color: white;
+}
+
 .pdfall {
     width: 7.27in;
     // height: 10.69in;

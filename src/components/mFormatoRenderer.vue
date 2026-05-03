@@ -85,10 +85,7 @@ const auth = useAuth()
 // const form = reactive({})
 const elementoPdf = ref(null)
 const modal = modals.mFormatoRenderer
-
-const getField = (fieldId) => {
-    return estructura.value.fields.find((x) => x.id === fieldId)
-}
+console.log(modal.values)
 
 const estructura = computed(() => {
     return modal.estructura || {}
@@ -107,6 +104,27 @@ const buttons = computed(() => {
         { text: 'Exportar PDF', action: 'exportarPdf', show: modal.mode == 3 },
     ]
 })
+
+const initializeValues = () => {
+    if (!estructura.value?.fields) return
+
+    estructura.value.fields.forEach((field) => {
+        if (!field.related) return
+
+        const entityData = modal[field.related.entity]
+
+        if (!entityData) return
+
+        modal.values[field.id] = field.related.path
+            .split('.')
+            .reduce((acc, key) => acc?.[key], entityData)
+    })
+}
+initializeValues()
+
+const getField = (fieldId) => {
+    return estructura.value.fields.find((x) => x.id === fieldId)
+}
 
 const actions = {
     grabar: async () => {

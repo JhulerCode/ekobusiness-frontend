@@ -288,21 +288,14 @@ export default {
                     conformidad_estados: this.system.data.conformidad_estados,
                 },
                 transaccion: item.id,
-                values: {
-                    traslado_fecha: item.fecha,
-                    traslado_guia: item.guia,
-                    traslado_destino: item.socio1.nombres,
-                },
+                transaccion1: item,
             }
 
             if (res_values.data) {
-                send.values = {
-                    ...res_values.data.values,
-                    ...send.values,
-                }
-
+                send.values = res_values.data.values
                 this.modals.setModal('mFormatoRenderer', '', 3, send, true)
             } else {
+                send.values = {}
                 this.modals.setModal('mFormatoRenderer', '', 1, send, true)
             }
         },

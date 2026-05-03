@@ -21,6 +21,7 @@
         :mostrar="field.mostrar || 'nombre'"
         :disabled="field.readonly"
     />
+    <!-- {{ field }} -->
 </template>
 
 <script setup>
@@ -35,7 +36,7 @@ const props = defineProps({
     field: Object,
     modelValue: [String, Number, Object],
     listas: Object,
-    mode: Boolean,
+    mode: [String, Number],
 })
 
 const emit = defineEmits(['update:modelValue'])

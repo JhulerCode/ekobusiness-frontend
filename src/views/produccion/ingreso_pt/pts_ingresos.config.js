@@ -93,5 +93,13 @@ export default {
         },
     ],
 
-    tableRowActions: [],
+    tableRowActions: [
+        {
+            label: 'Control de despacho',
+            icon: 'fa-solid fa-star',
+            action: 'controlDespacho',
+            permiso: 'vVentas:controlDespacho',
+            ocultar: { tipo: 1 },
+        },
+    ],
 }

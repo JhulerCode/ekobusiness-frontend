@@ -26,7 +26,7 @@ const urls = {
     comprobantes: `${host}/api/comprobantes`,
     comprobante_items: `${host}/api/comprobante_items`,
     documentos: `${host}/api/documentos`,
-    formatos: `${host}/api/formatos`,
+    formato_structures: `${host}/api/formato_structures`,
     formato_values: `${host}/api/formato_values`,
     helpdesk_tickets: `${host}/api/helpdesk_tickets`,
     inspecciones: `${host}/api/inspecciones`,

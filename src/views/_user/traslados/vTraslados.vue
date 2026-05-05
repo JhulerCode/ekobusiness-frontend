@@ -10,14 +10,11 @@
     </VistaLayout>
 
     <!-- Modales -->
-    <mFormato v-if="modals?.show?.mFormato" @created="setTransaccionDespachoRevisado" />
-
     <mFormatoRenderer v-if="modals?.show?.mFormatoRenderer" />
 </template>
 
 <script>
-import mFormato from '@/views/calidad/formatos/mFormato.vue'
-import mFormatoRenderer from '@/components/mFormatoRenderer.vue'
+import mFormatoRenderer from '@/components/formatos/mFormatoRenderer.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
@@ -28,7 +25,6 @@ import dayjs from 'dayjs'
 
 export default {
     components: {
-        mFormato,
         mFormatoRenderer,
     },
     data: () => ({

@@ -139,11 +139,16 @@
             <vProduccionOrdenPts v-if="vista.pestana == 2" />
         </template>
     </VistaDetalleLayout>
+
+    <mFormatosRelated v-if="modals.show.mFormatosRelated" />
+    <mFormatoRenderer v-if="modals.show.mFormatoRenderer" />
 </template>
 
 <script>
 import vProduccionOrdenInsumos from './vProduccionOrdenInsumos.vue'
 import vProduccionOrdenPts from './vProduccionOrdenPts.vue'
+import mFormatosRelated from '@/components/formatos/mFormatosRelated.vue'
+import mFormatoRenderer from '@/components/formatos/mFormatoRenderer.vue'
 
 import VIEW_CONFIG from './produccion_orden.config.js'
 import { useAuth } from '@/pinia/auth'
@@ -159,6 +164,8 @@ export default {
     components: {
         vProduccionOrdenInsumos,
         vProduccionOrdenPts,
+        mFormatosRelated,
+        mFormatoRenderer,
     },
     data: () => ({
         VIEW_CONFIG,
@@ -275,6 +282,32 @@ export default {
         },
         cerrar() {
             this.abrirCerrar('2')
+        },
+        async openFormatos() {
+            const qry = {
+                fltr: {
+                    entity: { op: 'Es', val: 'produccion_ordenes' },
+                },
+                cols: { exclude: [] },
+            }
+
+            this.auth.setLoading(true, 'Cargando formatos...')
+            const res = await get(`${urls.formato_structures}?qry=${JSON.stringify(qry)}`)
+            this.auth.setLoading(false)
+
+            if (res.code != 0) return
+
+            if (res.data.length == 0) {
+                jmsg('warning', 'No hay formatos disponibles')
+                return
+            }
+
+            const send = {
+                formatos: res.data,
+                produccion_orden: this.vista.data.id,
+            }
+
+            this.modals.setModal('mFormatosRelated', 'Formatos de calidad', null, send, true)
         },
 
         //--- Methods --//

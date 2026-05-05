@@ -38,5 +38,13 @@ export default {
             permiso: 'vProduccionOrdenes:abrirCerrar',
             ocultar: { estado: 2 },
         },
+        {
+            text: 'Formatos de calidad',
+            icon: 'fa-regular fa-file',
+            tipo: '2',
+            action: 'openFormatos',
+            permiso: 'vProduccionOrdenes:abrirCerrar',
+            ocultar: { estado: 2 },
+        },
     ],
 }

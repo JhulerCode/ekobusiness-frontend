@@ -30,5 +30,12 @@ export default {
             permiso: ['vCompras:cerrar'],
             ocultar: { estado: '2', socio_pedido: { op: '!=', val: null }, tipo: 5 },
         },
+        {
+            text: 'Formatos de calidad',
+            icon: 'fa-regular fa-file',
+            tipo: '2',
+            action: 'openFormatos',
+            permiso: 'vVentas:controlDespacho',
+        },
     ],
 }

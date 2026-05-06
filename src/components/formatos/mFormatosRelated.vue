@@ -6,6 +6,7 @@
             :colAct="false"
             @rowClick="verRow"
         />
+        <pre>{{ modal.entity }}</pre>
     </JdModal>
 </template>
 
@@ -32,13 +33,17 @@ export default {
     },
     methods: {
         async verRow(row) {
-            console.log(row)
-
             const qry = {
                 fltr: {
                     formato_structure: { op: 'Es', val: row.id },
-                    produccion_orden: { op: 'Es', val: this.modal.produccion_orden },
                 },
+                cols: { exclude: [] },
+            }
+
+            if (this.modal.entity == 'produccion_ordenes') {
+                qry.fltr.produccion_orden = { op: 'Es', val: this.modal.produccion_orden }
+            } else if (this.modal.entity == 'lotes') {
+                qry.fltr.lote = { op: 'Es', val: this.modal.lote }
             }
 
             this.auth.setLoading(true, 'Cargando...')
@@ -46,24 +51,36 @@ export default {
             this.auth.setLoading(false)
             if (res_values.code != 0) return
 
-            await this.system.load(['conformidad_estados'])
+            await this.system.load(row.system_lists)
 
             const send = {
                 estructura: row,
-                listas: {
-                    conformidad_estados: this.system.data.conformidad_estados,
+                listas: {},
+                formato_value: {
+                    formato_structure: row.id,
+                    values: {},
                 },
-                produccion_orden: this.modal.produccion_orden,
-                transaccion1: {},
+            }
+
+            if (this.modal.entity == 'transacciones') {
+                console.log('ASD')
+                send.formato_value.transaccion = this.modal.transacciones
+                send.transaccion1 = this.modal.transaccion1
+            } else if (this.modal.entity == 'lotes') {
+                send.formato_value.lote = this.modal.lote
+                send.lote1 = this.modal.lote1
+            }
+
+            for (const sl of row.system_lists) {
+                send.listas[sl] = this.system.data[sl]
             }
 
             this.modals.show.mFormatosRelated = false
 
             if (res_values.data.length > 0) {
-                send.values = res_values.data[0].values
+                send.formato_value = res_values.data[0]
                 this.modals.setModal('mFormatoRenderer', '', 3, send, true)
             } else {
-                send.values = {}
                 this.modals.setModal('mFormatoRenderer', '', 1, send, true)
             }
         },

@@ -11,16 +11,24 @@
         </div>
     </div>
 
-    <component
-        v-else
-        :is="resolveComponent(field.component)"
-        v-model="model"
-        :label="field.label"
-        :type="field.inputType"
-        :lista="getOptions()"
-        :mostrar="field.mostrar || 'nombre'"
-        :disabled="field.readonly"
-    />
+    <div v-else class="field-wrapper">
+        <component
+            :is="resolveComponent(field.component)"
+            v-model="model"
+            :label="field.label"
+            :type="field.inputType"
+            :lista="getOptions()"
+            :search="field.searchUrl ? handleSearch : undefined"
+            :mostrar="field.mostrar || 'nombre'"
+            :disabled="field.readonly"
+            :selectedObject="data ? data[field.id + '1'] : null"
+            @elegir="(obj) => $emit('elegir-obj', obj, field.id)"
+        />
+    </div>
+
+    <div v-if="field.help" class="field-help">
+        {{ field.help }}
+    </div>
     <!-- {{ field }} -->
 </template>
 
@@ -31,15 +39,17 @@ import JdInput from '@/components/inputs/JdInput.vue'
 import JdSelect from '@/components/inputs/JdSelect.vue'
 import JdSelectQuery from '@/components/inputs/JdSelectQuery.vue'
 import JdTextArea from '@/components/inputs/JdTextArea.vue'
+import { urls, get } from '@/utils/crud'
 
 const props = defineProps({
     field: Object,
     modelValue: [String, Number, Object],
     listas: Object,
     mode: [String, Number],
+    data: Object,
 })
 
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue', 'elegir-obj'])
 
 const model = computed({
     get() {
@@ -57,9 +67,16 @@ const displayValue = computed(() => {
     }
 
     if (props.field.component === 'JdSelect') {
-        const options = getOptions()
+        const options = getOptions() || []
         const mostrar = props.field.mostrar || 'nombre'
         return options.find((o) => o.id === model.value)?.[mostrar]
+    }
+
+    if (props.field.component === 'JdSelectQuery') {
+        if (props.data && props.data[props.field.id + '1']) {
+            const mostrar = props.field.mostrar || 'nombre'
+            return props.data[props.field.id + '1'][mostrar]
+        }
     }
 
     return model.value
@@ -78,10 +95,32 @@ const resolveComponent = (component) => {
 
 const getOptions = () => {
     if (!props.field.optionsKey) {
-        return []
+        return undefined
     }
 
-    return props.listas[props.field.optionsKey] || []
+    return props.listas[props.field.optionsKey]
+}
+
+const handleSearch = async (txtBuscar) => {
+    if (!props.field.searchUrl) return []
+
+    const qry = {
+        fltr: props.field.searchFltr || {},
+        cols: props.field.searchCols || ['nombre'],
+        ordr: props.field.searchOrdr || [[props.field.searchCols?.[0] || 'nombre', 'ASC']],
+        limt: props.field.searchLimt || 25,
+    }
+
+    if (txtBuscar) {
+        const searchField = props.field.searchField || props.field.mostrar || 'nombre'
+        qry.fltr[searchField] = { op: 'Contiene', val: txtBuscar }
+    }
+
+    const res = await get(`${urls[props.field.searchUrl]}?qry=${JSON.stringify(qry)}`)
+
+    if (res.code !== 0) return []
+
+    return res.data
 }
 </script>
 
@@ -107,5 +146,16 @@ const getOptions = () => {
     /* flex: 1; */
     word-break: break-word;
     /* line-height: 1.2rem; */
+}
+
+.field-wrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+.field-help {
+    font-size: 0.8rem;
+    color: var(--text-color2);
+    margin-top: 0.2rem;
 }
 </style>

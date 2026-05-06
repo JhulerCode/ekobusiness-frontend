@@ -17,7 +17,11 @@
             rowOptionsMode="buttons"
             @rowOptionSelected="runMethod"
             :agregarFila="agregarFila"
-        />
+        >
+            <template v-slot:cFormatos="{ item }">
+                <JdButton text="Formatos" tipo="2" :small="true" @click="openFormatos(item)" />
+            </template>
+        </JdTable>
     </div>
 </template>
 
@@ -25,6 +29,7 @@
 import { useSystem } from '@/pinia/system'
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
+import { useModals } from '@/pinia/modals'
 import { urls, get, post, patch, delet } from '@/utils/crud'
 import { redondear, incompleteData, obtenerNumeroJuliano, deepCopy } from '@/utils/mine'
 import { jmsg, jqst } from '@/utils/swal'
@@ -34,6 +39,7 @@ export default {
         useSystem: useSystem(),
         auth: useAuth(),
         vistas: useVistas(),
+        modals: useModals(),
         redondear,
     }),
     computed: {
@@ -80,6 +86,13 @@ export default {
                     format: 'estado',
                     color: 'pt_cuarentena1.color',
                     width: '9rem',
+                    show: true,
+                },
+                {
+                    id: 'cFormatos',
+                    title: 'Formatos calidad',
+                    slot: 'cFormatos',
+                    width: '8rem',
                     show: true,
                 },
             ]
@@ -278,6 +291,38 @@ export default {
             }
 
             return false
+        },
+
+        async openFormatos(item) {
+            const qry = {
+                fltr: {
+                    entity: { op: 'Es', val: 'lotes' },
+                },
+                cols: { exclude: [] },
+            }
+
+            this.auth.setLoading(true, 'Cargando formatos...')
+            const res = await get(`${urls.formato_structures}?qry=${JSON.stringify(qry)}`)
+            this.auth.setLoading(false)
+
+            if (res.code != 0) return
+
+            if (res.data.length == 0) {
+                jmsg('warning', 'No hay formatos disponibles')
+                return
+            }
+
+            const send = {
+                formatos: res.data,
+                lote: item.lote1.id,
+                lote1: {
+                    ...item.lote1,
+                    articulo1: item.articulo1,
+                },
+                entity: 'lotes',
+            }
+
+            this.modals.setModal('mFormatosRelated', 'Formatos de calidad', null, send, true)
         },
     },
 }

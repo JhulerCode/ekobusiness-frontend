@@ -283,32 +283,6 @@ export default {
         cerrar() {
             this.abrirCerrar('2')
         },
-        async openFormatos() {
-            const qry = {
-                fltr: {
-                    entity: { op: 'Es', val: 'produccion_ordenes' },
-                },
-                cols: { exclude: [] },
-            }
-
-            this.auth.setLoading(true, 'Cargando formatos...')
-            const res = await get(`${urls.formato_structures}?qry=${JSON.stringify(qry)}`)
-            this.auth.setLoading(false)
-
-            if (res.code != 0) return
-
-            if (res.data.length == 0) {
-                jmsg('warning', 'No hay formatos disponibles')
-                return
-            }
-
-            const send = {
-                formatos: res.data,
-                produccion_orden: this.vista.data.id,
-            }
-
-            this.modals.setModal('mFormatosRelated', 'Formatos de calidad', null, send, true)
-        },
 
         //--- Methods --//
         checkDatos() {

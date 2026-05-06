@@ -5,6 +5,7 @@
         @button-click="(action) => actions[action]()"
     >
         <div class="extra-space">
+            <pre>{{ modal.transaccion1 }}</pre>
             <div ref="elementoPdf" class="pdfall">
                 <div class="document-header">
                     <div class="header-left" crossorigin="anonymous">
@@ -35,6 +36,10 @@
                         <strong>{{ section.title }}</strong>
                     </div>
 
+                    <div v-if="section.description" class="section-description">
+                        {{ section.description }}
+                    </div>
+
                     <div class="section-body">
                         <div
                             v-for="(row, rowIndex) in section.rows"
@@ -50,9 +55,15 @@
                             >
                                 <FieldRenderer
                                     :field="getField(column.field)"
-                                    v-model="modal.values[column.field]"
+                                    v-model="modal.formato_value.values[column.field]"
+                                    :data="modal.formato_value.values"
                                     :listas="listas"
                                     :mode="modal.mode"
+                                    @elegir-obj="
+                                        (obj, fieldId) => {
+                                            modal.formato_value.values[fieldId + '1'] = obj
+                                        }
+                                    "
                                 />
                             </div>
                         </div>
@@ -85,7 +96,6 @@ const auth = useAuth()
 // const form = reactive({})
 const elementoPdf = ref(null)
 const modal = modals.mFormatoRenderer
-console.log(modal.values)
 
 const estructura = computed(() => {
     return modal.estructura || {}
@@ -102,6 +112,7 @@ const buttons = computed(() => {
         { text: 'Modificar', action: 'modificar', show: modal.mode == 2 },
         { text: 'Editar', action: 'editar', tipo: 2, show: modal.mode == 3 },
         { text: 'Exportar PDF', action: 'exportarPdf', show: modal.mode == 3 },
+        // { text: 'Toggle mode', action: 'toggleMode', show: true },
     ]
 })
 
@@ -115,7 +126,7 @@ const initializeValues = () => {
 
         if (!entityData) return
 
-        modal.values[field.id] = field.related.path
+        modal.formato_value.values[field.id] = field.related.path
             .split('.')
             .reduce((acc, key) => acc?.[key], entityData)
     })
@@ -129,29 +140,25 @@ const getField = (fieldId) => {
 const actions = {
     grabar: async () => {
         auth.setLoading(true, 'Grabando...')
-        const res = await post(urls.formato_values, modal.values)
+        const res = await post(urls.formato_values, modal.formato_value)
         auth.setLoading(false)
 
         if (res.code != 0) return
 
+        modal.formato_value.id = res.data.id
         modal.mode = 3
     },
     editar: () => {
-        modal.original_data = JSON.parse(JSON.stringify(modal.values))
+        modal.original_data = JSON.parse(JSON.stringify(modal.formato_value.values))
         modal.mode = 2
     },
     cancelEdit: () => {
-        modal.values = JSON.parse(JSON.stringify(modal.original_data))
+        modal.formato_value.values = JSON.parse(JSON.stringify(modal.original_data))
         modal.mode = 3
     },
     modificar: async () => {
-        const send = {
-            id: modal.values.id,
-            values: modal.values,
-        }
-
         auth.setLoading(true, 'Actualizando...')
-        const res = await patch(urls.formato_values, send)
+        const res = await patch(urls.formato_values, modal.formato_value)
         auth.setLoading(false)
 
         if (res.code != 0) return
@@ -190,6 +197,9 @@ const actions = {
 
         await worker.save()
         auth.setLoading(false)
+    },
+    toggleMode: () => {
+        modal.mode = modal.mode == 1 ? 3 : 1
     },
 }
 </script>
@@ -278,6 +288,13 @@ const actions = {
         * {
             color: var(--text-color2);
         }
+    }
+
+    .section-description {
+        font-size: 0.8rem;
+        color: var(--text-color2);
+        margin-top: 0.2rem;
+        padding: 0 0.3rem;
     }
 
     .section-body {

@@ -60,10 +60,15 @@
             <vTrasladoLine v-if="vista.pestana == 1" ref="vTrasladoLine" />
         </template>
     </VistaDetalleLayout>
+
+    <mFormatosRelated v-if="modals.show.mFormatosRelated" />
+    <mFormatoRenderer v-if="modals.show.mFormatoRenderer" />
 </template>
 
 <script>
 import vTrasladoLine from './vTrasladoLine.vue'
+import mFormatosRelated from '@/components/formatos/mFormatosRelated.vue'
+import mFormatoRenderer from '@/components/formatos/mFormatoRenderer.vue'
 
 import VIEW_CONFIG from './traslado.config.js'
 import { useSystem } from '@/pinia/system.js'
@@ -78,6 +83,8 @@ import dayjs from 'dayjs'
 export default {
     components: {
         vTrasladoLine,
+        mFormatosRelated,
+        mFormatoRenderer,
     },
     data: () => ({
         VIEW_CONFIG,
@@ -226,6 +233,34 @@ export default {
         },
         cerrar() {
             this.abrirCerrar('2')
+        },
+        async openFormatos() {
+            const qry = {
+                fltr: {
+                    entity: { op: 'Es', val: 'transacciones' },
+                },
+                cols: { exclude: [] },
+            }
+
+            this.auth.setLoading(true, 'Cargando formatos...')
+            const res = await get(`${urls.formato_structures}?qry=${JSON.stringify(qry)}`)
+            this.auth.setLoading(false)
+
+            if (res.code != 0) return
+
+            if (res.data.length == 0) {
+                jmsg('warning', 'No hay formatos disponibles')
+                return
+            }
+
+            const send = {
+                formatos: res.data,
+                transaccion: this.vista.data.id,
+                transaccion1: this.vista.data,
+                entity: 'transacciones',
+            }
+
+            this.modals.setModal('mFormatosRelated', 'Formatos de calidad', null, send, true)
         },
 
         //--- Methods --//

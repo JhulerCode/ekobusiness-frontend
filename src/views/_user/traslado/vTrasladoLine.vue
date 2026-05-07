@@ -208,7 +208,7 @@ export default {
                     kardexes: this.setKardexesHoy({
                         id: a.articulo1.id,
                         cantidad: a.cantidad,
-                        vu: a.pu,
+                        // vu: a.pu,
                         igv_afectacion: a.articulo1.igv_afectacion,
                     }),
                     vu_pedido: a.pu,
@@ -241,21 +241,21 @@ export default {
             if (this.vista.data.tipo == 5) return []
 
             if (this.vista.data.tipo == 1) {
-                let moneda = 'PEN'
-                if (this.vista.socio_pedido) {
-                    moneda = this.vista.socio_pedido.moneda
-                }
+                let moneda = this.auth.empresa.moneda
+                // if (this.vista.socio_pedido) {
+                //     moneda = this.vista.socio_pedido.moneda
+                // }
 
                 let tipo_cambio = 1
-                if (this.vista.socio_pedido) {
-                    if (this.vista.socio_pedido.moneda != this.auth.empresa.moneda)
-                        tipo_cambio = 3.5
-                }
+                // if (this.vista.socio_pedido) {
+                //     if (this.vista.socio_pedido.moneda != this.auth.empresa.moneda)
+                //         tipo_cambio = 3.5
+                // }
 
-                let vu = 1
-                if (this.vista.socio_pedido) {
-                    vu = item.vu
-                }
+                let vu = 0
+                // if (this.vista.socio_pedido) {
+                //     vu = item.vu
+                // }
 
                 const kdx = [
                     {
@@ -263,7 +263,7 @@ export default {
                         articulo: item.id,
                         lote1: {
                             id: crypto.randomUUID(),
-                            codigo: `${obtenerNumeroJuliano(this.vista.data.fecha)}-${Math.floor(Math.random() * 90 + 10)}`,
+                            codigo: `${obtenerNumeroJuliano(this.vista.data.fecha)}`,
                             moneda,
                             tipo_cambio,
                             vu,

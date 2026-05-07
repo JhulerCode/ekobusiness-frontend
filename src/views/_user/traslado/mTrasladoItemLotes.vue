@@ -5,7 +5,6 @@
         @button-click="(action) => this[action]()"
     >
         <div class="container-agregar">
-            <!-- <JdInput label="Artículo" v-model="modal.articulo1.nombre" :disabled="true" /> -->
             <span>{{ modal.articulo1.nombre }}</span>
 
             <div class="resumen">
@@ -159,7 +158,13 @@ export default {
                 this.modal.kardexes.push({
                     id: crypto.randomUUID(),
                     lote1: {
-                        codigo: `${obtenerNumeroJuliano(this.modal.fecha)}-${Math.floor(Math.random() * 90 + 10)}`,
+                        id: crypto.randomUUID(),
+                        codigo: `${obtenerNumeroJuliano(this.modal.fecha)}`,
+                        moneda: this.useAuth.empresa.moneda,
+                        tipo_cambio: 1,
+                        vu: 0,
+                        igv_afectacion: this.modal.articulo1.igv_afectacion,
+                        igv_porcentaje: this.useAuth.empresa.igv_porcentaje,
                     },
                     articulo: this.modal.articulo,
                 })
@@ -191,6 +196,8 @@ export default {
         },
         sendItems() {
             let fila = 1
+            const codigos_unicos = {}
+
             for (const a of this.modal.kardexes) {
                 if (this.modal.type == 'old') {
                     if (!a.lote1)
@@ -202,8 +209,18 @@ export default {
                 }
 
                 if (this.modal.type == 'new') {
-                    if (!a.lote1.codigo)
+                    if (!a.lote1.codigo) {
                         return jmsg('warning', `Falta codigo de lote en la fila ${fila}`)
+                    }
+
+                    if (codigos_unicos[a.lote1.codigo]) {
+                        return jmsg(
+                            'warning',
+                            `El codigo de lote "${a.lote1.codigo}" está repetido`,
+                        )
+                    }
+
+                    codigos_unicos[a.lote1.codigo] = 1
 
                     if (this.modal.articulo1.has_fv && !a.lote1.fv) {
                         return jmsg('warning', `Falta fecha de vencimiento en la fila ${fila}`)

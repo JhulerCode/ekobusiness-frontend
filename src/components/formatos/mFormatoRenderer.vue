@@ -5,7 +5,7 @@
         @button-click="(action) => actions[action]()"
     >
         <div class="extra-space">
-            <pre>{{ modal.transaccion1 }}</pre>
+            <!-- <pre>{{ modal.transaccion1 }}</pre> -->
             <div ref="elementoPdf" class="pdfall">
                 <div class="document-header">
                     <div class="header-left" crossorigin="anonymous">
@@ -125,7 +125,7 @@ const initializeValues = () => {
         const entityData = modal[field.related.entity]
 
         if (!entityData) return
-
+        console.log(field.related)
         modal.formato_value.values[field.id] = field.related.path
             .split('.')
             .reduce((acc, key) => acc?.[key], entityData)
@@ -171,7 +171,7 @@ const actions = {
 
         const opciones = {
             margin: 0.5,
-            filename: `recepcion_1.pdf`,
+            filename: `${Date.now()}.pdf`,
             image: { type: 'jpeg', quality: 1 },
             html2canvas: { scale: 4, useCORS: true },
             jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' },

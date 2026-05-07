@@ -61,8 +61,8 @@
         </template>
     </VistaDetalleLayout>
 
-    <mFormatosRelated v-if="modals.show.mFormatosRelated" />
-    <mFormatoRenderer v-if="modals.show.mFormatoRenderer" />
+    <mFormatosRelated v-if="modals?.show?.mFormatosRelated" />
+    <mFormatoRenderer v-if="modals?.show?.mFormatoRenderer" />
 </template>
 
 <script>
@@ -186,7 +186,7 @@ export default {
 
                 this.vista.data = res.data
                 document.title = `Traslado ${this.vista.data[this.vista.titleKey] || ''}`
-                if (res.data.socio_pedido) await this.loadSocioPedido(res.data.socio_pedido1)
+                if (res.data.socio_pedido) await this.loadSocioPedido()
             }
         },
 
@@ -452,12 +452,12 @@ export default {
             return res.data
         },
         async loadSocioPedido() {
-            const pedido_id = this.$route.params.pedido_id
+            const pedido_id = this.$route.params.pedido_id || this.vista.data.socio_pedido
             const vPedido = this.$route.path.includes('compras') ? 'vCompraPedido' : 'vVentaPedido'
 
             this.vista.socio_pedido = {}
 
-            if (this.vistas[vPedido]?.data?.id == pedido_id) {
+            if (this.vistas[vPedido] && this.vistas[vPedido].data?.id == pedido_id) {
                 this.vista.socio_pedido = this.vistas[vPedido].data
             } else {
                 const qry = {

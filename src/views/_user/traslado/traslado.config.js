@@ -35,7 +35,8 @@ export default {
             icon: 'fa-regular fa-file',
             tipo: '2',
             action: 'openFormatos',
-            permiso: 'vVentas:controlDespacho',
+            permiso: 'vProduccionOrdenes:calidadFormatos',
+            ocultar: { id: 'nuevo' },
         },
     ],
 }

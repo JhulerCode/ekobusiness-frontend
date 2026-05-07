@@ -6,7 +6,7 @@
             :colAct="false"
             @rowClick="verRow"
         />
-        <pre>{{ modal.entity }}</pre>
+        <!-- <pre>{{ modal.entity }}</pre> -->
     </JdModal>
 </template>
 
@@ -40,8 +40,8 @@ export default {
                 cols: { exclude: [] },
             }
 
-            if (this.modal.entity == 'produccion_ordenes') {
-                qry.fltr.produccion_orden = { op: 'Es', val: this.modal.produccion_orden }
+            if (this.modal.entity == 'transacciones') {
+                qry.fltr.transaccion = { op: 'Es', val: this.modal.transaccion }
             } else if (this.modal.entity == 'lotes') {
                 qry.fltr.lote = { op: 'Es', val: this.modal.lote }
             }
@@ -63,8 +63,7 @@ export default {
             }
 
             if (this.modal.entity == 'transacciones') {
-                console.log('ASD')
-                send.formato_value.transaccion = this.modal.transacciones
+                send.formato_value.transaccion = this.modal.transaccion
                 send.transaccion1 = this.modal.transaccion1
             } else if (this.modal.entity == 'lotes') {
                 send.formato_value.lote = this.modal.lote

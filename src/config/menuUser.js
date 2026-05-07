@@ -14,45 +14,19 @@ export default [
         icon: 'fa-solid fa-magnifying-glass',
         path: 'calidad',
         children: [
-            // {
-            //     label: 'Formatos BPM',
-            //     goto: 'vFormatosBpm',
-            //     path: 'formatos-bpm',
-            //     view: 'calidad/formatos/vFormatosBpm.vue',
-            //     permisos: [
-            //         { id: 'vFormatosBpm:listar', label: 'Listar' },
-            //         { id: 'vFormatosBpm:crear', label: 'Crear' },
-            //         { id: 'vFormatosBpm:ver', label: 'Ver' },
-            //         { id: 'vFormatosBpm:editar', label: 'Editar' },
-            //         { id: 'vFormatosBpm:eliminar', label: 'Eliminar' },
-            //     ],
-            // },
-            // {
-            //     label: 'Formatos PHS',
-            //     goto: 'vFormatosPhs',
-            //     path: 'formatos-phs',
-            //     view: 'calidad/formatos/vFormatosPhs.vue',
-            //     permisos: [
-            //         { id: 'vFormatosPhs:listar', label: 'Listar' },
-            //         { id: 'vFormatosPhs:crear', label: 'Crear' },
-            //         { id: 'vFormatosPhs:ver', label: 'Ver' },
-            //         { id: 'vFormatosPhs:editar', label: 'Editar' },
-            //         { id: 'vFormatosPhs:eliminar', label: 'Eliminar' },
-            //     ],
-            // },
-            // {
-            //     label: 'Formatos HACCP',
-            //     goto: 'vFormatosHaccp',
-            //     path: 'formatos-haccp',
-            //     view: 'calidad/formatos/vFormatosHaccp.vue',
-            //     permisos: [
-            //         { id: 'vFormatosHaccp:listar', label: 'Listar' },
-            //         { id: 'vFormatosHaccp:crear', label: 'Crear' },
-            //         { id: 'vFormatosHaccp:ver', label: 'Ver' },
-            //         { id: 'vFormatosHaccp:editar', label: 'Editar' },
-            //         { id: 'vFormatosHaccp:eliminar', label: 'Eliminar' },
-            //     ],
-            // },
+            {
+                label: 'Formatos calidad',
+                goto: 'vFormatosCalidad',
+                path: 'formatos-calidad',
+                view: 'calidad/formatos/vFormatosCalidad.vue',
+                permisos: [
+                    { id: 'vFormatosCalidad:listar', label: 'Listar' },
+                    { id: 'vFormatosCalidad:crear', label: 'Crear' },
+                    { id: 'vFormatosCalidad:ver', label: 'Ver' },
+                    { id: 'vFormatosCalidad:editar', label: 'Editar' },
+                    { id: 'vFormatosCalidad:eliminar', label: 'Eliminar' },
+                ],
+            },
             {
                 label: 'Registros sanitarios',
                 goto: 'vRegistrosSanitarios',

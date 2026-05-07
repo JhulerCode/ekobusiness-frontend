@@ -93,7 +93,7 @@ export default {
                     title: 'Formatos calidad',
                     slot: 'cFormatos',
                     width: '8rem',
-                    show: true,
+                    show: this.auth.verifyPermiso('vVentas:calidadFormatos'),
                 },
             ]
         },

@@ -54,8 +54,8 @@ export default {
                     id: 'vProduccionOrdenes:productosTerminadosAprobados',
                     label: 'Productos terminados aprobados',
                 },
-                // { id: 'vProduccionOrdenes:controlPesos', label: 'Control de pesos' },
-                // { id: 'vProduccionOrdenes:controlPpc', label: 'Control del PPC' },
+                { id: 'vProduccionOrdenes:calidadFormatos', label: 'Formatos de calidad' },
+
                 {
                     id: 'vProduccionOrdenes:verProductosPedidos',
                     label: 'Ver productos pedidos',

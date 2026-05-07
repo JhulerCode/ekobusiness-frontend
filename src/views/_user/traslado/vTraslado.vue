@@ -212,6 +212,11 @@ export default {
                     name: this.$route.name,
                     params: { [this.vista.pathKey]: res.data.id },
                 })
+
+                this.vista.data = {
+                    ...res.data,
+                    transaccion_items: this.vista.data.transaccion_items,
+                }
             }
 
             this.vista.mode = 'view'

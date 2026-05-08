@@ -364,7 +364,7 @@ export default {
 
             const qry = {
                 incl: ['kardexes_for_sqls'],
-                cols: ['codigo', 'fv', 'stock', 'codigo_fv_stock'],
+                cols: ['codigo', 'fv', 'codigo_fv_stock'],
                 sqls: ['lote_stock'],
                 fltr: {
                     articulo: { op: 'Es', val: this.modal.transaccion.articulo },

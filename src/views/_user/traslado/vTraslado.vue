@@ -439,6 +439,7 @@ export default {
                 fltr: {
                     tipo: { op: 'Es', val: this.vista.data.tipo == 1 ? 1 : 2 },
                     activo: { op: 'Es', val: true },
+                    only_newsletter: { op: 'Es', val: false },
                 },
                 cols: ['nombres', 'contactos', 'direcciones', 'precio_lista', 'pago_condicion'],
                 incl: ['precio_lista1'],

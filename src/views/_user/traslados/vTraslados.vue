@@ -128,20 +128,20 @@ export default {
                 ],
 
                 tableRowActions: [
-                    {
-                        label: 'Control de despacho',
-                        icon: 'fa-solid fa-star',
-                        action: 'controlDespacho',
-                        permiso: 'vVentas:controlDespacho',
-                        ocultar: { tipo: 1 },
-                    },
-                    {
-                        label: 'Control de recepción',
-                        icon: 'fa-solid fa-star',
-                        action: 'controlRecepcion',
-                        permiso: 'vVentas:controlDespacho',
-                        ocultar: { tipo: 5 },
-                    },
+                    // {
+                    //     label: 'Control de despacho',
+                    //     icon: 'fa-solid fa-star',
+                    //     action: 'controlDespacho',
+                    //     permiso: 'vVentas:controlDespacho',
+                    //     ocultar: { tipo: 1 },
+                    // },
+                    // {
+                    //     label: 'Control de recepción',
+                    //     icon: 'fa-solid fa-star',
+                    //     action: 'controlRecepcion',
+                    //     permiso: 'vVentas:controlDespacho',
+                    //     ocultar: { tipo: 5 },
+                    // },
                 ],
             }
         },

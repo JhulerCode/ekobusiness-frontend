@@ -16,15 +16,25 @@ export default [
         children: [
             {
                 label: 'Formatos calidad',
-                goto: 'vFormatosCalidad',
-                path: 'formatos-calidad',
-                view: 'calidad/formatos/vFormatosCalidad.vue',
+                goto: 'vFormatoStructures',
+                path: 'formatos-estructuras',
+                view: 'calidad/formato_structures/vFormatoStructures.vue',
                 permisos: [
-                    { id: 'vFormatosCalidad:listar', label: 'Listar' },
-                    { id: 'vFormatosCalidad:crear', label: 'Crear' },
-                    { id: 'vFormatosCalidad:ver', label: 'Ver' },
-                    { id: 'vFormatosCalidad:editar', label: 'Editar' },
-                    { id: 'vFormatosCalidad:eliminar', label: 'Eliminar' },
+                    { id: 'vFormatoStructures:listar', label: 'Listar' },
+                    { id: 'vFormatoStructures:crear', label: 'Crear' },
+                    { id: 'vFormatoStructures:ver', label: 'Ver' },
+                    { id: 'vFormatoStructures:editar', label: 'Editar' },
+                    { id: 'vFormatoStructures:eliminar', label: 'Eliminar' },
+                ],
+                children: [
+                    {
+                        label: 'Diseño de Formato',
+                        goto: 'vFormatoStructure',
+                        path: ':formato_structure_id',
+                        view: 'calidad/formato_structures/vFormatoStructure.vue',
+                        permission: 'vFormatoStructures:ver',
+                        viewType: 'detail',
+                    },
                 ],
             },
             {

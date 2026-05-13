@@ -1,35 +1,36 @@
 <template>
-    <div v-if="mode == 3" class="print-field">
-        <div class="print-label">
-            {{ field.label }}
+    <template v-if="field">
+        <div v-if="mode == 3" class="print-field">
+            <div class="print-label">
+                {{ field.label }}
+            </div>
+
+            <div class="print-separator">:</div>
+
+            <div class="print-value">
+                {{ displayValue }}
+            </div>
         </div>
 
-        <div class="print-separator">:</div>
-
-        <div class="print-value">
-            {{ displayValue }}
+        <div v-else class="field-wrapper">
+            <component
+                :is="resolveComponent(field.component)"
+                v-model="model"
+                :label="field.label"
+                :type="field.inputType"
+                :lista="getOptions()"
+                :search="field.searchUrl ? handleSearch : undefined"
+                :mostrar="field.mostrar || 'nombre'"
+                :disabled="field.readonly"
+                :selectedObject="data ? data[field.id + '1'] : null"
+                @elegir="(obj) => $emit('elegir-obj', obj, field.id)"
+            />
         </div>
-    </div>
 
-    <div v-else class="field-wrapper">
-        <component
-            :is="resolveComponent(field.component)"
-            v-model="model"
-            :label="field.label"
-            :type="field.inputType"
-            :lista="getOptions()"
-            :search="field.searchUrl ? handleSearch : undefined"
-            :mostrar="field.mostrar || 'nombre'"
-            :disabled="field.readonly"
-            :selectedObject="data ? data[field.id + '1'] : null"
-            @elegir="(obj) => $emit('elegir-obj', obj, field.id)"
-        />
-    </div>
-
-    <div v-if="field.help" class="field-help">
-        {{ field.help }}
-    </div>
-    <!-- {{ field }} -->
+        <div v-if="field.help" class="field-help">
+            {{ field.help }}
+        </div>
+    </template>
 </template>
 
 <script setup>

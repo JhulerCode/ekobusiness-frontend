@@ -1,12 +1,18 @@
 <template>
-    <div class="tree-item-wrapper">
+    <div class="tree-item-wrapper" :class="[isOver ? 'drop-' + isOver : '']">
         <div
             class="tree-item-content"
             :class="{
                 selected: selectedId === item.id,
                 'is-hovered': hoveredId === item.id,
             }"
-            @click.stop="$emit('select', item.id, item)"
+            draggable="true"
+            @dragstart="handleDragStart"
+            @dragover.prevent="handleDragOver"
+            @dragleave="isOver = null"
+            @drop.stop="handleDrop"
+            @click.stop="(() => { closeMenu(); $emit('select', item.id, item); })()"
+            @contextmenu.prevent.stop="handleContextMenu"
             @mouseenter="$emit('hover', item.id)"
             @mouseleave="$emit('hover', null)"
         >
@@ -25,13 +31,25 @@
                 <i :class="getIcon(item.type)"></i>
                 <span class="item-name">{{ item.name || item.id }}</span>
             </div>
-            <div class="item-actions">
-                <i
-                    v-if="item.id !== 'root'"
-                    class="fas fa-trash-alt delete-btn"
-                    @click.stop="$emit('delete', item.id)"
-                ></i>
-            </div>
+
+            <teleport to="body">
+                <div
+                    v-if="menuData.show"
+                    class="item-dropdown"
+                    :style="{ top: menuData.y + 'px', left: menuData.x + 'px' }"
+                >
+                    <div class="dropdown-item" @click.stop="handleDuplicate">
+                        <i class="fas fa-copy"></i> Duplicar
+                    </div>
+                    <div
+                        v-if="item.id !== 'root'"
+                        class="dropdown-item delete"
+                        @click.stop="handleDelete"
+                    >
+                        <i class="fas fa-trash-alt"></i> Eliminar
+                    </div>
+                </div>
+            </teleport>
         </div>
 
         <div v-if="item.children?.length" v-show="!collapsed" class="tree-children">
@@ -44,23 +62,92 @@
                 @select="(id, el) => $emit('select', id, el)"
                 @hover="(id) => $emit('hover', id)"
                 @delete="(id) => $emit('delete', id)"
+                @duplicate="(id) => $emit('duplicate', id)"
+                @move="(dragId, targetId, pos) => $emit('move', dragId, targetId, pos)"
             />
         </div>
     </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, reactive, onMounted, onUnmounted } from 'vue'
 
-defineProps({
+const props = defineProps({
     item: { type: Object, required: true },
     selectedId: { type: String, default: null },
     hoveredId: { type: String, default: null },
 })
 
-defineEmits(['select', 'hover', 'delete'])
+const emit = defineEmits(['select', 'hover', 'delete', 'move', 'duplicate'])
 
 const collapsed = ref(false)
+const isOver = ref(null) // 'before', 'inside', 'after'
+const menuData = reactive({ show: false, x: 0, y: 0 })
+
+const handleContextMenu = (e) => {
+    if (props.item.id === 'root') return
+    window.dispatchEvent(new CustomEvent('close-context-menus'))
+    menuData.show = true
+    menuData.x = e.clientX
+    menuData.y = e.clientY
+}
+
+const closeMenu = () => {
+    menuData.show = false
+}
+
+onMounted(() => {
+    window.addEventListener('click', closeMenu)
+    window.addEventListener('contextmenu', closeMenu)
+    window.addEventListener('scroll', closeMenu, true)
+    window.addEventListener('close-context-menus', closeMenu)
+})
+
+onUnmounted(() => {
+    window.removeEventListener('click', closeMenu)
+    window.removeEventListener('contextmenu', closeMenu)
+    window.removeEventListener('scroll', closeMenu, true)
+    window.removeEventListener('close-context-menus', closeMenu)
+})
+
+const handleDuplicate = () => {
+    closeMenu()
+    emit('duplicate', props.item.id)
+}
+
+const handleDelete = () => {
+    closeMenu()
+    emit('delete', props.item.id)
+}
+
+const handleDragStart = (e) => {
+    e.dataTransfer.effectAllowed = 'move'
+    e.dataTransfer.setData('text/plain', props.item.id)
+}
+
+const handleDragOver = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect()
+    const relativeY = e.clientY - rect.top
+    const height = rect.height
+
+    if (relativeY < height * 0.25) {
+        isOver.value = 'before'
+    } else if (relativeY > height * 0.75) {
+        isOver.value = 'after'
+    } else {
+        isOver.value = 'inside'
+    }
+}
+
+const handleDrop = (e) => {
+    const dragId = e.dataTransfer.getData('text/plain')
+    const pos = isOver.value
+    isOver.value = null
+
+    if (dragId && dragId !== props.item.id) {
+        emit('move', dragId, props.item.id, pos)
+    }
+}
 
 const getIcon = (type) => {
     const icons = {
@@ -84,6 +171,34 @@ const getIcon = (type) => {
 .tree-item-wrapper {
     display: flex;
     flex-direction: column;
+    position: relative;
+
+    &.drop-before::before {
+        content: '';
+        position: absolute;
+        top: -2px;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background-color: var(--primary-color);
+        z-index: 10;
+    }
+
+    &.drop-after::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background-color: var(--primary-color);
+        z-index: 10;
+    }
+
+    &.drop-inside > .tree-item-content {
+        background-color: var(--bg-color-selected);
+        outline: 1px solid var(--primary-color);
+    }
 }
 
 .tree-item-content {
@@ -95,6 +210,7 @@ const getIcon = (type) => {
     cursor: pointer;
     font-size: 0.75rem;
     color: var(--text-color);
+    position: relative;
 
     &:hover {
         .item-actions {
@@ -140,15 +256,43 @@ const getIcon = (type) => {
     max-width: 180px;
 }
 
-.item-actions {
-    opacity: 0;
-    transition: opacity 0.2s;
-    .delete-btn {
-        color: var(--rojo);
-        opacity: 0.5;
-        font-size: 0.7rem;
-        &:hover {
-            opacity: 1;
+.item-dropdown {
+    position: fixed;
+    background-color: var(--bg-color);
+    border: var(--border);
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 9999;
+    min-width: 140px;
+    padding: 0.4rem 0;
+    overflow: hidden;
+
+    .dropdown-item {
+        padding: 0.6rem 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        font-size: 0.75rem;
+        color: var(--text-color);
+        transition: all 0.2s;
+        cursor: pointer;
+
+            i {
+                width: 14px;
+                text-align: center;
+                font-size: 0.8rem;
+            }
+
+            &:hover {
+                background-color: var(--bg-color-hover);
+                color: var(--primary-color);
+            }
+
+            &.delete {
+                color: var(--rojo);
+                &:hover {
+                    background-color: rgba(233, 67, 67, 0.1);
+                }
         }
     }
 }

@@ -1,13 +1,13 @@
 <template>
     <template v-if="field">
         <div v-if="mode == 3" class="print-field">
-            <div class="print-label">
+            <div class="print-label" :style="labelStyle">
                 {{ field.label }}
             </div>
 
-            <div class="print-separator">:</div>
+            <div class="print-separator" :style="labelStyle">:</div>
 
-            <div class="print-value">
+            <div class="print-value" :style="valueStyle">
                 {{ displayValue }}
             </div>
         </div>
@@ -48,6 +48,8 @@ const props = defineProps({
     listas: Object,
     mode: [String, Number],
     data: Object,
+    labelStyle: Object,
+    valueStyle: Object,
 })
 
 const emit = defineEmits(['update:modelValue', 'elegir-obj'])

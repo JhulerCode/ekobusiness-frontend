@@ -6,15 +6,19 @@
         :class="[
             block.type,
             ...(block.classList || []),
-            { 'is-selected': selectedId === block.id, 'selectable': editable, 'is-hovered': hoveredId === block.id }
+            {
+                'is-selected': selectedId === block.id,
+                selectable: editable,
+                'is-hovered': hoveredId === block.id,
+            },
         ]"
-        :style="block.style"
+        :style="combinedStyle"
         @click.stop="onSelect"
         @mouseenter.stop="$emit('hover', block.id)"
         @mouseleave.stop="$emit('hover', null)"
     >
         <!-- 1. CONTAINER TYPES (Recursion) -->
-        <template v-if="block.type === 'page' || block.type === 'group'">
+        <template v-if="block.type === 'document' || block.type === 'page' || block.type === 'group'">
             <RenderBlock
                 v-for="child in block.children"
                 :key="child.id"
@@ -44,16 +48,74 @@
                     :listas="listas"
                     :mode="mode"
                     @elegir-obj="(obj, fId) => $emit('elegir-obj', obj, fId)"
+                    :style="typographyStyle"
+                />
+            </template>
+
+            <!-- Manual Inputs (Texto, Numero, Fecha, etc) -->
+            <template v-else-if="block.type.startsWith('input_')">
+                <FieldRenderer
+                    :field="{
+                        label: block.props?.label,
+                        component: getComponentForInputType(block.props?.inputType),
+                        inputType: block.props?.inputType,
+                        id: block.props?.fieldId,
+                        optionsKey: block.props?.optionsKey,
+                        searchUrl: block.props?.searchUrl,
+                        mostrar: block.props?.mostrar,
+                    }"
+                    v-model="values[block.props?.fieldId]"
+                    :data="values"
+                    :listas="listas"
+                    :mode="editable ? 3 : mode"
+                    :label-style="labelStyle"
+                    :value-style="valueStyle"
+                    @elegir-obj="(obj, fId) => $emit('elegir-obj', obj, fId)"
+                    :style="typographyStyle"
                 />
             </template>
 
             <!-- HTML / TEXT -->
-            <div v-else-if="block.type === 'h1'" class="h1">{{ block.props?.content }}</div>
-            <div v-else-if="block.type === 'h2'" class="h2">{{ block.props?.content }}</div>
-            <div v-else-if="block.type === 'h3'" class="h3">{{ block.props?.content }}</div>
-            <div v-else-if="block.type === 'p'" class="p">{{ block.props?.content }}</div>
-            <div v-else-if="block.type === 'text'" class="text">{{ block.props?.content }}</div>
-            <div v-else-if="block.type === 'small'" class="small">{{ block.props?.content }}</div>
+            <div
+                v-else-if="block.type === 'h1'"
+                class="h1"
+                :style="typographyStyle"
+            >{{ block.props?.content }}</div>
+            <div
+                v-else-if="block.type === 'h2'"
+                class="h2"
+                :style="typographyStyle"
+            >{{ block.props?.content }}</div>
+            <div
+                v-else-if="block.type === 'h3'"
+                class="h3"
+                :style="typographyStyle"
+            >{{ block.props?.content }}</div>
+            <div
+                v-else-if="block.type === 'h4'"
+                class="h4"
+                :style="typographyStyle"
+            >{{ block.props?.content }}</div>
+            <div
+                v-else-if="block.type === 'p'"
+                class="p"
+                :style="typographyStyle"
+            >{{ block.props?.content }}</div>
+            <div
+                v-else-if="block.type === 'span'"
+                class="span"
+                :style="typographyStyle"
+            >{{ block.props?.content }}</div>
+            <div
+                v-else-if="block.type === 'text'"
+                class="text"
+                :style="typographyStyle"
+            >{{ block.props?.content }}</div>
+            <div
+                v-else-if="block.type === 'small'"
+                class="small"
+                :style="typographyStyle"
+            >{{ block.props?.content }}</div>
 
             <!-- IMAGE -->
             <img
@@ -77,21 +139,101 @@ const props = defineProps({
     hoveredId: { type: String, default: null },
     mode: { type: Number, default: 3 },
     values: { type: Object, default: () => ({}) },
-    listas: { type: Object, default: () => ({}) }
+    listas: { type: Object, default: () => ({}) },
 })
 
 const emit = defineEmits(['select', 'hover', 'elegir-obj', 'delete'])
 const formContext = inject('formContext')
 
+const labelStyle = computed(() => {
+    const style = {}
+    const globalStyle = formContext.config?.globals?.inputLabel || {}
+    const blockStyle = props.block.styleLabel || {}
+
+    const keys = ['fontSize', 'fontWeight', 'color', 'textAlign', 'fontFamily']
+    keys.forEach((k) => {
+        style[k] = blockStyle[k] || globalStyle[k]
+    })
+    return style
+})
+
+const valueStyle = computed(() => {
+    const style = {}
+    const globalStyle = formContext.config?.globals?.inputValue || {}
+    const blockStyle = props.block.styleValue || {}
+
+    const keys = ['fontSize', 'fontWeight', 'color', 'textAlign', 'fontFamily']
+    keys.forEach((k) => {
+        style[k] = blockStyle[k] || globalStyle[k]
+    })
+    return style
+})
+
+const getComponentForInputType = (type) => {
+    const map = {
+        text: 'JdInput',
+        number: 'JdInput',
+        date: 'JdInput',
+        longtext: 'JdTextArea',
+        select: 'JdSelect',
+        ref: 'JdSelectQuery',
+    }
+    return map[type] || 'JdInput'
+}
+
 const fieldConfig = computed(() => {
     if (props.block.type !== 'field') return null
-    return formContext.fields.find(f => f.id === props.block.props?.fieldId) || props.block.props?.fieldConfig
+    return (
+        formContext.fields.find((f) => f.id === props.block.props?.fieldId) ||
+        props.block.props?.fieldConfig
+    )
 })
 
 const onSelect = () => {
     if (!props.editable) return
     emit('select', props.block.id, props.block)
 }
+
+const typographyStyle = computed(() => {
+    const style = {}
+    const globalForType = formContext.globals?.[props.block.type] || {}
+    const keys = [
+        'fontSize',
+        'fontWeight',
+        'color',
+        'textAlign',
+        'fontFamily',
+        'lineHeight',
+        'fontStyle',
+        'textDecoration',
+        'textTransform',
+    ]
+    keys.forEach((k) => {
+        // Preference: 1. block.style, 2. globalForType
+        if (props.block.style?.[k]) {
+            style[k] = props.block.style[k]
+        } else if (globalForType[k]) {
+            style[k] = globalForType[k]
+        }
+    })
+    return style
+})
+
+const combinedStyle = computed(() => {
+    let s = { ...props.block.style }
+    if (props.block.type === 'page') {
+        const p = props.block.props || {}
+        if (p.paddingTop) s.paddingTop = p.paddingTop
+        if (p.paddingRight) s.paddingRight = p.paddingRight
+        if (p.paddingBottom) s.paddingBottom = p.paddingBottom
+        if (p.paddingLeft) s.paddingLeft = p.paddingLeft
+
+        // Enforce layout for pages
+        s.display = 'flex'
+        s.flexDirection = 'column'
+    }
+    return s
+})
 </script>
 
 <style lang="scss" scoped>
@@ -101,7 +243,7 @@ const onSelect = () => {
     transition: all 0.2s;
     outline: 1px solid transparent;
     min-width: 0;
-    
+
     &.selectable:hover {
         outline: 1px dashed #409eff;
         background-color: rgba(64, 158, 255, 0.05);
@@ -149,10 +291,16 @@ const onSelect = () => {
     border: 1px solid #fbc4c4;
 }
 
-.section { margin: 0; padding: 0; }
-.h1 { font-size: 2rem; font-weight: bold; margin: 0; }
-.h2 { font-size: 1.5rem; font-weight: bold; margin: 0; }
-.h3 { font-size: 1.25rem; font-weight: bold; margin: 0; }
-.p { margin: 0; line-height: 1.4; }
+.section {
+    margin: 0;
+    padding: 0;
+}
+.h1 { font-size: inherit; font-weight: bold; margin: 0; color: inherit; }
+.h2 { font-size: inherit; font-weight: bold; margin: 0; color: inherit; }
+.h3 { font-size: inherit; font-weight: bold; margin: 0; color: inherit; }
+.h4 { font-size: inherit; font-weight: bold; margin: 0; color: inherit; }
+.p { margin: 0; line-height: 1.4; font-size: inherit; color: inherit; }
+.span { font-size: inherit; color: inherit; }
 .small { font-size: 0.8rem; color: #606266; }
+
 </style>

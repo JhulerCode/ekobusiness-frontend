@@ -2,259 +2,364 @@
     <VistaDetalleLayout
         v-if="vista"
         :config="VIEW_CONFIG"
-        :pestanas="pestanas"
         :loadNewData="loadNewData"
         :loadExistingData="loadExistingData"
         @runMethod="runMethod"
     >
         <template #principal-datos>
-            <div class="header-info">
-                <JdInput
-                    v-model="vista.data.codigo"
-                    label="Código"
-                    :disabled="vista.mode !== 'edit'"
-                />
-                <JdInput
-                    v-model="vista.data.nombre"
-                    label="Nombre"
-                    :disabled="vista.mode !== 'edit'"
-                />
-                <JdSelect
-                    v-model="vista.data.tipo"
-                    label="Tipo"
-                    :lista="[
-                        { id: 'REGISTRO', nombre: 'Registro' },
-                        { id: 'FORMATO', nombre: 'Formato' },
-                    ]"
-                    :disabled="vista.mode !== 'edit'"
-                />
-            </div>
+            <JdInput v-model="vista.data.codigo" label="Código" :disabled="vista.mode !== 'edit'" />
+            <JdInput v-model="vista.data.nombre" label="Nombre" :disabled="vista.mode !== 'edit'" />
+            <JdSelect
+                v-model="vista.data.tipo"
+                label="Tipo"
+                :lista="[
+                    { id: 'REGISTRO', nombre: 'Registro' },
+                    { id: 'FORMATO', nombre: 'Formato' },
+                ]"
+                :disabled="vista.mode !== 'edit'"
+            />
+            <JdButton text="nuevo" @click="loadNewData" />
         </template>
 
-        <template #pestanas-body>
-            <div v-if="vista.pestana === 1" class="editor-layout">
-                <!-- LEFT SIDEBAR: Structure & Toolbox -->
-                <div class="editor-side">
-                    <div class="editor-section">
-                        <div
-                            class="editor-header clickable"
-                            @click="collapsedSections.toolbox = !collapsedSections.toolbox"
+        <div class="editor-layout">
+            <!-- LEFT SIDEBAR: Structure & Toolbox -->
+            <div class="editor-side">
+                <div class="editor-section">
+                    <div
+                        class="editor-header clickable"
+                        @click="collapsedSections.toolbox = !collapsedSections.toolbox"
+                    >
+                        <strong>Componentes</strong>
+                        <i
+                            :class="[
+                                'fas fa-sm',
+                                collapsedSections.toolbox ? 'fa-chevron-right' : 'fa-chevron-down',
+                            ]"
+                        ></i>
+                    </div>
+                    <div v-show="!collapsedSections.toolbox" class="editor-content toolbox">
+                        <button
+                            v-for="el in ELEMENT_TYPES"
+                            :key="el.type"
+                            @click="addBlockToSelected(el.type)"
                         >
-                            <strong>Componentes</strong>
+                            <i :class="el.icon"></i> {{ el.label }}
+                        </button>
+                    </div>
+                </div>
+
+                <div class="editor-section">
+                    <div
+                        class="editor-header clickable"
+                        @click="collapsedSections.tree = !collapsedSections.tree"
+                    >
+                        <strong>Estructura / Esquema</strong>
+                        <i
+                            :class="[
+                                'fas fa-sm',
+                                collapsedSections.tree ? 'fa-chevron-right' : 'fa-chevron-down',
+                            ]"
+                        ></i>
+                    </div>
+                    <div v-show="!collapsedSections.tree" class="editor-content">
+                        <div class="tree-container">
+                            <TreeItem
+                                v-if="vista.data.structure"
+                                :item="vista.data.structure"
+                                :selectedId="selectedId"
+                                :hoveredId="hoveredId"
+                                @select="handleSelect"
+                                @hover="(id) => (hoveredId = id)"
+                                @delete="deleteBlock"
+                                @duplicate="duplicateBlock"
+                                @move="handleMove"
+                            />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MAIN RENDERER -->
+            <FormatoDocument
+                ref="documentRef"
+                :estructura="vista.data"
+                :values="{}"
+                :listas="{}"
+                :mode="2"
+                :editable="true"
+                :selectedId="selectedId"
+                :hoveredId="hoveredId"
+                @select="handleSelectDirect"
+                @hover="(id) => (hoveredId = id)"
+            />
+
+            <!-- RIGHT SIDEBAR: Properties & Metadata -->
+            <div class="editor-side">
+                <template v-if="selectedId && selectedElement">
+                    <div class="element-header">
+                        <strong>{{ selectedElement.type }}</strong>
+                        <JdInput v-model="selectedElement.name" :placeholder="selectedElement.id" />
+                    </div>
+
+                    <!-- DYNAMIC PROPS SECTION -->
+                    <div
+                        class="editor-section"
+                        v-if="selectedElementTypeConfig?.propsFields?.length"
+                    >
+                        <div class="editor-header clickable" @click="toggleSection('props')">
+                            <strong>Propiedades</strong>
                             <i
                                 :class="[
                                     'fas fa-sm',
-                                    collapsedSections.toolbox
+                                    collapsedSections.props
                                         ? 'fa-chevron-right'
                                         : 'fa-chevron-down',
                                 ]"
                             ></i>
                         </div>
-                        <div v-show="!collapsedSections.toolbox" class="editor-content toolbox">
-                            <button
-                                v-for="el in ELEMENT_TYPES"
-                                :key="el.type"
-                                @click="addBlockToSelected(el.type)"
+                        <div v-show="!collapsedSections.props" class="editor-content">
+                            <template
+                                v-for="field in selectedElementTypeConfig.propsFields"
+                                :key="field.key"
                             >
-                                <i :class="el.icon"></i> {{ el.label }}
-                            </button>
+                                <JdSelect
+                                    v-if="field.type === 'select'"
+                                    v-model="selectedElement.props[field.key]"
+                                    :label="field.label"
+                                    :lista="field.list === 'fieldList' ? fieldList : field.list"
+                                />
+                                <JdInput
+                                    v-else
+                                    v-model="selectedElement.props[field.key]"
+                                    :label="field.label"
+                                    :textarea="field.textarea"
+                                    :placeholder="field.placeholder"
+                                />
+                            </template>
                         </div>
                     </div>
 
-                    <div class="editor-section">
-                        <div
-                            class="editor-header clickable"
-                            @click="collapsedSections.tree = !collapsedSections.tree"
-                        >
-                            <strong>Estructura / Esquema</strong>
+                    <!-- STYLE LABEL SECTION -->
+                    <div
+                        class="editor-section"
+                        v-if="selectedElementTypeConfig?.styleLabelFields?.length"
+                    >
+                        <div class="editor-header clickable" @click="toggleSection('inputLabel')">
+                            <strong>Estilo Etiqueta</strong>
                             <i
                                 :class="[
                                     'fas fa-sm',
-                                    collapsedSections.tree ? 'fa-chevron-right' : 'fa-chevron-down',
+                                    collapsedSections.inputLabel
+                                        ? 'fa-chevron-right'
+                                        : 'fa-chevron-down',
                                 ]"
                             ></i>
                         </div>
-                        <div v-show="!collapsedSections.tree" class="editor-content">
-                            <div class="tree-container">
-                                <TreeItem
-                                    v-if="vista.data.structure"
-                                    :item="vista.data.structure"
-                                    :selectedId="selectedId"
-                                    :hoveredId="hoveredId"
-                                    @select="handleSelect"
-                                    @hover="(id) => (hoveredId = id)"
-                                    @delete="deleteBlock"
+                        <div v-show="!collapsedSections.inputLabel" class="editor-content">
+                            <template
+                                v-for="key in selectedElementTypeConfig.styleLabelFields"
+                                :key="key"
+                            >
+                                <JdSelect
+                                    v-if="STYLE_FIELDS_DEF[key].type === 'select'"
+                                    v-model="(selectedElement.styleLabel = selectedElement.styleLabel || {})[key]"
+                                    :label="STYLE_FIELDS_DEF[key].label"
+                                    :lista="STYLE_FIELDS_DEF[key].list"
                                 />
-                            </div>
+                                <JdInput
+                                    v-else
+                                    v-model="(selectedElement.styleLabel = selectedElement.styleLabel || {})[key]"
+                                    :label="STYLE_FIELDS_DEF[key].label"
+                                />
+                            </template>
                         </div>
                     </div>
-                </div>
 
-                <!-- MAIN RENDERER -->
-                <div class="renderer-side">
-                    <FormatoDocument
-                        ref="documentRef"
-                        :estructura="vista.data"
-                        :values="{}"
-                        :listas="{}"
-                        :mode="3"
-                        :editable="true"
-                        :selectedId="selectedId"
-                        :hoveredId="hoveredId"
-                        @select="handleSelectDirect"
-                        @hover="(id) => (hoveredId = id)"
-                    />
-                </div>
-
-                <!-- RIGHT SIDEBAR: Properties & Metadata -->
-                <div class="editor-side">
-                    <template v-if="selectedId && selectedElement">
-                        <div class="element-header">
-                            <strong>{{ selectedElement.type }}</strong>
-                            <JdInput
-                                v-model="selectedElement.name"
-                                :placeholder="selectedElement.id"
-                            />
+                    <!-- STYLE VALUE SECTION -->
+                    <div
+                        class="editor-section"
+                        v-if="selectedElementTypeConfig?.styleValueFields?.length"
+                    >
+                        <div class="editor-header clickable" @click="toggleSection('inputValue')">
+                            <strong>Estilo Valor</strong>
                             <i
-                                class="fas fa-times-circle btn"
-                                @click="((selectedId = null), (selectedElement = null))"
+                                :class="[
+                                    'fas fa-sm',
+                                    collapsedSections.inputValue
+                                        ? 'fa-chevron-right'
+                                        : 'fa-chevron-down',
+                                ]"
                             ></i>
                         </div>
+                        <div v-show="!collapsedSections.inputValue" class="editor-content">
+                            <template
+                                v-for="key in selectedElementTypeConfig.styleValueFields"
+                                :key="key"
+                            >
+                                <JdSelect
+                                    v-if="STYLE_FIELDS_DEF[key].type === 'select'"
+                                    v-model="(selectedElement.styleValue = selectedElement.styleValue || {})[key]"
+                                    :label="STYLE_FIELDS_DEF[key].label"
+                                    :lista="STYLE_FIELDS_DEF[key].list"
+                                />
+                                <JdInput
+                                    v-else
+                                    v-model="(selectedElement.styleValue = selectedElement.styleValue || {})[key]"
+                                    :label="STYLE_FIELDS_DEF[key].label"
+                                />
+                            </template>
+                        </div>
+                    </div>
 
-                        <!-- DYNAMIC PROPS SECTION -->
-                        <div
-                            class="editor-section"
-                            v-if="selectedElementTypeConfig?.propsFields?.length"
-                        >
-                            <div class="editor-header clickable" @click="toggleSection('props')">
-                                <strong>Propiedades</strong>
+                    <!-- DYNAMIC STYLE SECTIONS -->
+                    <template
+                        v-for="(fields, sectionKey) in selectedElementGroupedStyles"
+                        :key="sectionKey"
+                    >
+                        <div class="editor-section">
+                            <div class="editor-header clickable" @click="toggleSection(sectionKey)">
+                                <strong>{{ STYLE_SECTIONS_LABELS[sectionKey] }}</strong>
                                 <i
                                     :class="[
                                         'fas fa-sm',
-                                        collapsedSections.props
+                                        collapsedSections[sectionKey]
                                             ? 'fa-chevron-right'
                                             : 'fa-chevron-down',
                                     ]"
                                 ></i>
                             </div>
-                            <div v-show="!collapsedSections.props" class="editor-content">
-                                <template
-                                    v-for="field in selectedElementTypeConfig.propsFields"
-                                    :key="field.key"
-                                >
+                            <div v-show="!collapsedSections[sectionKey]" class="editor-content">
+                                <div class="style-grid">
+                                    <template v-for="fieldKey in fields" :key="fieldKey">
+                                        <div
+                                            :class="{
+                                                'full-width': !STYLE_FIELDS_DEF[fieldKey].grid,
+                                            }"
+                                        >
+                                            <JdSelect
+                                                v-if="STYLE_FIELDS_DEF[fieldKey].type === 'select'"
+                                                v-model="selectedElement.style[fieldKey]"
+                                                :label="STYLE_FIELDS_DEF[fieldKey].label"
+                                                :lista="STYLE_FIELDS_DEF[fieldKey].list"
+                                            />
+                                            <JdInput
+                                                v-else
+                                                v-model="selectedElement.style[fieldKey]"
+                                                :label="STYLE_FIELDS_DEF[fieldKey].label"
+                                            />
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+
+                    <!-- GLOBAL DOCUMENT CONFIGURATION (Only for 'document' type) -->
+                    <template v-if="selectedElement.type === 'document'">
+                        <div class="editor-section">
+                            <div
+                                class="editor-header clickable"
+                                @click="toggleSection('doc_config')"
+                            >
+                                <strong>Configuración del Formato</strong>
+                                <i
+                                    :class="[
+                                        'fas fa-sm',
+                                        collapsedSections.doc_config
+                                            ? 'fa-chevron-right'
+                                            : 'fa-chevron-down',
+                                    ]"
+                                ></i>
+                            </div>
+                            <div v-show="!collapsedSections.doc_config" class="editor-content">
+                                <JdSelect
+                                    v-model="vista.data.config.paperSize"
+                                    label="Tamaño de Papel"
+                                    :lista="PAPER_SIZES"
+                                />
+                            </div>
+                        </div>
+
+                        <div
+                            v-for="(gStyle, gType) in vista.data.config.globals"
+                            :key="gType"
+                            class="editor-section"
+                        >
+                            <div
+                                class="editor-header clickable"
+                                @click="toggleSection('global_' + gType)"
+                            >
+                                <strong>Estilo Global: {{ gType.toUpperCase() }}</strong>
+                                <i
+                                    :class="[
+                                        'fas fa-sm',
+                                        collapsedSections['global_' + gType]
+                                            ? 'fa-chevron-right'
+                                            : 'fa-chevron-down',
+                                    ]"
+                                ></i>
+                            </div>
+                            <div
+                                v-show="!collapsedSections['global_' + gType]"
+                                class="editor-content"
+                            >
+                                <template v-for="tKey in TYPOGRAPHY_STYLES" :key="tKey">
                                     <JdSelect
-                                        v-if="field.type === 'select'"
-                                        v-model="selectedElement.props[field.key]"
-                                        :label="field.label"
-                                        :lista="field.list === 'fieldList' ? fieldList : field.list"
+                                        v-if="STYLE_FIELDS_DEF[tKey].type === 'select'"
+                                        v-model="vista.data.config.globals[gType][tKey]"
+                                        :label="STYLE_FIELDS_DEF[tKey].label"
+                                        :lista="STYLE_FIELDS_DEF[tKey].list"
                                     />
                                     <JdInput
                                         v-else
-                                        v-model="selectedElement.props[field.key]"
-                                        :label="field.label"
-                                        :textarea="field.textarea"
-                                        :placeholder="field.placeholder"
+                                        v-model="vista.data.config.globals[gType][tKey]"
+                                        :label="STYLE_FIELDS_DEF[tKey].label"
                                     />
                                 </template>
                             </div>
                         </div>
-
-                        <!-- DYNAMIC STYLE SECTIONS -->
-                        <template
-                            v-for="(fields, sectionKey) in selectedElementGroupedStyles"
-                            :key="sectionKey"
-                        >
-                            <div class="editor-section">
-                                <div
-                                    class="editor-header clickable"
-                                    @click="toggleSection(sectionKey)"
-                                >
-                                    <strong>{{ STYLE_SECTIONS_LABELS[sectionKey] }}</strong>
-                                    <i
-                                        :class="[
-                                            'fas fa-sm',
-                                            collapsedSections[sectionKey]
-                                                ? 'fa-chevron-right'
-                                                : 'fa-chevron-down',
-                                        ]"
-                                    ></i>
-                                </div>
-                                <div v-show="!collapsedSections[sectionKey]" class="editor-content">
-                                    <div class="style-grid">
-                                        <template v-for="fieldKey in fields" :key="fieldKey">
-                                            <div
-                                                :class="{
-                                                    'full-width': !STYLE_FIELDS_DEF[fieldKey].grid,
-                                                }"
-                                            >
-                                                <JdSelect
-                                                    v-if="
-                                                        STYLE_FIELDS_DEF[fieldKey].type === 'select'
-                                                    "
-                                                    v-model="selectedElement.style[fieldKey]"
-                                                    :label="STYLE_FIELDS_DEF[fieldKey].label"
-                                                    :lista="STYLE_FIELDS_DEF[fieldKey].list"
-                                                />
-                                                <JdInput
-                                                    v-else
-                                                    v-model="selectedElement.style[fieldKey]"
-                                                    :label="STYLE_FIELDS_DEF[fieldKey].label"
-                                                />
-                                            </div>
-                                        </template>
-                                    </div>
-                                </div>
-                            </div>
-                        </template>
-
-                        <!-- OTHER SECTIONS -->
-                        <div class="editor-section" v-if="hasConfig('settings')">
-                            <div class="editor-header clickable" @click="toggleSection('settings')">
-                                <strong>Configuraciones</strong>
-                                <i
-                                    :class="[
-                                        'fas fa-sm',
-                                        collapsedSections.settings
-                                            ? 'fa-chevron-right'
-                                            : 'fa-chevron-down',
-                                    ]"
-                                ></i>
-                            </div>
-                            <div v-show="!collapsedSections.settings" class="editor-content">
-                                <p class="text-tiny">No hay configuraciones extras.</p>
-                            </div>
-                        </div>
-
-                        <div class="editor-section" v-if="hasConfig('visibility')">
-                            <div
-                                class="editor-header clickable"
-                                @click="toggleSection('visibility')"
-                            >
-                                <strong>Visibilidad</strong>
-                                <i
-                                    :class="[
-                                        'fas fa-sm',
-                                        collapsedSections.visibility
-                                            ? 'fa-chevron-right'
-                                            : 'fa-chevron-down',
-                                    ]"
-                                ></i>
-                            </div>
-                            <div v-show="!collapsedSections.visibility" class="editor-content">
-                                <JdInput
-                                    v-model="selectedElement.visibility.condition"
-                                    label="Condición (JS)"
-                                />
-                            </div>
-                        </div>
                     </template>
-                </div>
-            </div>
 
-            <div v-if="vista.pestana === 2" class="json-editor">
-                <pre>{{ JSON.stringify(vista.data, null, 8) }}</pre>
+                    <!-- OTHER SECTIONS -->
+                    <div class="editor-section" v-if="hasConfig('settings')">
+                        <div class="editor-header clickable" @click="toggleSection('settings')">
+                            <strong>Configuraciones</strong>
+                            <i
+                                :class="[
+                                    'fas fa-sm',
+                                    collapsedSections.settings
+                                        ? 'fa-chevron-right'
+                                        : 'fa-chevron-down',
+                                ]"
+                            ></i>
+                        </div>
+                        <div v-show="!collapsedSections.settings" class="editor-content">
+                            <p class="text-tiny">No hay configuraciones extras.</p>
+                        </div>
+                    </div>
+
+                    <div class="editor-section" v-if="hasConfig('visibility')">
+                        <div class="editor-header clickable" @click="toggleSection('visibility')">
+                            <strong>Visibilidad</strong>
+                            <i
+                                :class="[
+                                    'fas fa-sm',
+                                    collapsedSections.visibility
+                                        ? 'fa-chevron-right'
+                                        : 'fa-chevron-down',
+                                ]"
+                            ></i>
+                        </div>
+                        <div v-show="!collapsedSections.visibility" class="editor-content">
+                            <JdInput
+                                v-model="selectedElement.visibility.condition"
+                                label="Condición (JS)"
+                            />
+                        </div>
+                    </div>
+                </template>
             </div>
-        </template>
+        </div>
     </VistaDetalleLayout>
 </template>
 
@@ -296,11 +401,21 @@ const ALIGN_OPTIONS = [
 ]
 
 const BORDER_STYLE_OPTIONS = [
-    { id: 'none', nombre: 'Ninguno' },
     { id: 'solid', nombre: 'Sólido' },
     { id: 'dashed', nombre: 'Guiones' },
     { id: 'dotted', nombre: 'Puntos' },
     { id: 'double', nombre: 'Doble' },
+]
+
+const PAPER_SIZES = [
+    { id: 'A4', nombre: 'A4 (210 x 297 mm)' },
+    { id: 'LETTER', nombre: 'Carta (215.9 x 279.4 mm)' },
+    { id: 'LEGAL', nombre: 'Oficio (215.9 x 355.6 mm)' },
+]
+
+const ORIENTATIONS = [
+    { id: 'portrait', nombre: 'Vertical' },
+    { id: 'landscape', nombre: 'Horizontal' },
 ]
 
 const STYLE_SECTIONS_LABELS = {
@@ -309,6 +424,8 @@ const STYLE_SECTIONS_LABELS = {
     border: 'Bordes y Fondo',
     typography: 'Tipografía',
     other: 'Otros',
+    inputLabel: 'Estilo de Etiqueta (PDF)',
+    inputValue: 'Estilo de Valor (PDF)',
 }
 
 const STYLE_FIELDS_DEF = {
@@ -382,6 +499,36 @@ const TYPOGRAPHY_STYLES = ['fontSize', 'fontWeight', 'color', 'textAlign']
 
 const ELEMENT_TYPES = [
     {
+        type: 'page',
+        label: 'Página',
+        icon: 'fas fa-file-alt',
+        defaultProps: {
+            orientation: 'portrait',
+            paddingTop: '0.5in',
+            paddingRight: '0.5in',
+            paddingBottom: '0.5in',
+            paddingLeft: '0.5in',
+            headerId: '',
+        },
+        defaultStyle: {
+            backgroundColor: '#ffffff',
+        },
+        hasChildren: true,
+        propsFields: [
+            { key: 'orientation', label: 'Orientación', type: 'select', list: ORIENTATIONS },
+            {
+                key: 'headerId',
+                label: 'ID Encabezado Reutilizable',
+                placeholder: 'Ej: header_group',
+            },
+            { key: 'paddingTop', label: 'Padding Sup.' },
+            { key: 'paddingRight', label: 'Padding Der.' },
+            { key: 'paddingBottom', label: 'Padding Inf.' },
+            { key: 'paddingLeft', label: 'Padding Izq.' },
+        ],
+        styleFields: ['backgroundColor'],
+    },
+    {
         type: 'group',
         label: 'Grupo',
         icon: 'fas fa-layer-group',
@@ -413,6 +560,42 @@ const ELEMENT_TYPES = [
         ],
     },
     {
+        type: 'h1',
+        label: 'Título H1',
+        icon: 'fas fa-heading',
+        defaultProps: { content: 'Título 1' },
+        defaultStyle: { margin: '0', padding: '0' },
+        propsFields: [{ key: 'content', label: 'Contenido', textarea: true }],
+        styleFields: [...TYPOGRAPHY_STYLES, ...COMMON_STYLES],
+    },
+    {
+        type: 'h2',
+        label: 'Título H2',
+        icon: 'fas fa-heading',
+        defaultProps: { content: 'Título 2' },
+        defaultStyle: { margin: '0', padding: '0' },
+        propsFields: [{ key: 'content', label: 'Contenido', textarea: true }],
+        styleFields: [...TYPOGRAPHY_STYLES, ...COMMON_STYLES],
+    },
+    {
+        type: 'h3',
+        label: 'Título H3',
+        icon: 'fas fa-heading',
+        defaultProps: { content: 'Título 3' },
+        defaultStyle: { margin: '0', padding: '0' },
+        propsFields: [{ key: 'content', label: 'Contenido', textarea: true }],
+        styleFields: [...TYPOGRAPHY_STYLES, ...COMMON_STYLES],
+    },
+    {
+        type: 'h4',
+        label: 'Título H4',
+        icon: 'fas fa-heading',
+        defaultProps: { content: 'Título 4' },
+        defaultStyle: { margin: '0', padding: '0' },
+        propsFields: [{ key: 'content', label: 'Contenido', textarea: true }],
+        styleFields: [...TYPOGRAPHY_STYLES, ...COMMON_STYLES],
+    },
+    {
         type: 'p',
         label: 'Párrafo',
         icon: 'fas fa-paragraph',
@@ -422,12 +605,12 @@ const ELEMENT_TYPES = [
         styleFields: [...TYPOGRAPHY_STYLES, ...COMMON_STYLES],
     },
     {
-        type: 'h1',
-        label: 'Título H1',
-        icon: 'fas fa-heading',
-        defaultProps: { content: 'Título' },
-        defaultStyle: { margin: '0', padding: '0', fontSize: '1.5rem', fontWeight: 'bold' },
-        propsFields: [{ key: 'content', label: 'Contenido', textarea: true }],
+        type: 'small',
+        label: 'Texto Pequeño',
+        icon: 'fas fa-minus',
+        defaultProps: { content: 'Nota al pie...' },
+        defaultStyle: { margin: '0', padding: '0' },
+        propsFields: [{ key: 'content', label: 'Contenido' }],
         styleFields: [...TYPOGRAPHY_STYLES, ...COMMON_STYLES],
     },
     {
@@ -440,13 +623,83 @@ const ELEMENT_TYPES = [
         styleFields: COMMON_STYLES,
     },
     {
-        type: 'input',
-        label: 'Input',
-        icon: 'fas fa-keyboard',
-        defaultProps: { fieldId: '' },
+        type: 'input_text',
+        label: 'Input Texto',
+        icon: 'fas fa-font',
+        defaultProps: { fieldId: '', inputType: 'text', label: 'Nuevo Campo' },
         defaultStyle: { margin: '0', padding: '0' },
-        propsFields: [{ key: 'fieldId', label: 'Campo', type: 'select', list: 'fieldList' }],
+        propsFields: [
+            { key: 'fieldId', label: 'ID del Campo (v-model)' },
+            { key: 'label', label: 'Etiqueta' },
+        ],
         styleFields: [...TYPOGRAPHY_STYLES, ...COMMON_STYLES],
+    },
+    {
+        type: 'input_number',
+        label: 'Input Número',
+        icon: 'fas fa-hashtag',
+        defaultProps: { fieldId: '', inputType: 'number', label: 'Nuevo Número' },
+        defaultStyle: { margin: '0', padding: '0' },
+        propsFields: [
+            { key: 'fieldId', label: 'ID del Campo (v-model)' },
+            { key: 'label', label: 'Etiqueta' },
+        ],
+        styleFields: [...TYPOGRAPHY_STYLES, ...COMMON_STYLES],
+    },
+    {
+        type: 'input_date',
+        label: 'Input Fecha',
+        icon: 'fas fa-calendar-alt',
+        defaultProps: { fieldId: '', inputType: 'date', label: 'Fecha' },
+        defaultStyle: { margin: '0', padding: '0' },
+        propsFields: [
+            { key: 'fieldId', label: 'ID del Campo (v-model)' },
+            { key: 'label', label: 'Etiqueta' },
+        ],
+        styleFields: [...TYPOGRAPHY_STYLES, ...COMMON_STYLES],
+    },
+    {
+        type: 'input_longtext',
+        label: 'Texto Largo',
+        icon: 'fas fa-align-left',
+        defaultProps: { fieldId: '', inputType: 'longtext', label: 'Observaciones' },
+        defaultStyle: { margin: '0', padding: '0' },
+        propsFields: [
+            { key: 'fieldId', label: 'ID del Campo (v-model)' },
+            { key: 'label', label: 'Etiqueta' },
+        ],
+        styleFields: [...TYPOGRAPHY_STYLES, ...COMMON_STYLES],
+    },
+    {
+        type: 'input_select',
+        label: 'Selector',
+        icon: 'fas fa-list',
+        defaultProps: { fieldId: '', inputType: 'select', label: 'Opción' },
+        defaultStyle: { margin: '0', padding: '0' },
+        propsFields: [
+            { key: 'fieldId', label: 'ID del Campo (v-model)' },
+            { key: 'label', label: 'Etiqueta' },
+            { key: 'optionsKey', label: 'Key de Lista (Pinia)' },
+        ],
+        styleFields: [...TYPOGRAPHY_STYLES, ...COMMON_STYLES],
+        styleLabelFields: TYPOGRAPHY_STYLES,
+        styleValueFields: TYPOGRAPHY_STYLES,
+    },
+    {
+        type: 'input_ref',
+        label: 'Buscador',
+        icon: 'fas fa-search',
+        defaultProps: { fieldId: '', inputType: 'ref', label: 'Referencia' },
+        defaultStyle: { margin: '0', padding: '0' },
+        propsFields: [
+            { key: 'fieldId', label: 'ID del Campo (v-model)' },
+            { key: 'label', label: 'Etiqueta' },
+            { key: 'searchUrl', label: 'URL de Búsqueda' },
+            { key: 'mostrar', label: 'Propiedad a mostrar', placeholder: 'nombre' },
+        ],
+        styleFields: [...TYPOGRAPHY_STYLES, ...COMMON_STYLES],
+        styleLabelFields: TYPOGRAPHY_STYLES,
+        styleValueFields: TYPOGRAPHY_STYLES,
     },
 ]
 
@@ -470,14 +723,14 @@ export default {
                 pathKey: 'formato_structure_id',
                 permisoEditar: 'vFormatoStructures:editar',
                 permisoCrear: 'vFormatoStructures:crear',
+                fullWidth: true,
             },
-            pestanas: [
-                { id: 1, label: 'Editor Visual', show: true },
-                { id: 2, label: 'JSON / Datos', show: true },
-            ],
             ELEMENT_TYPES,
             STYLE_FIELDS_DEF,
             STYLE_SECTIONS_LABELS,
+            PAPER_SIZES,
+            ORIENTATIONS,
+            TYPOGRAPHY_STYLES,
             collapsedSections: {
                 toolbox: false,
                 tree: false,
@@ -488,7 +741,12 @@ export default {
                 typography: true,
                 settings: true,
                 visibility: true,
+                inputLabel: true,
+                inputValue: true,
             },
+            history: [],
+            historyIndex: -1,
+            isUndoingRedoing: false,
         }
     },
     computed: {
@@ -518,7 +776,96 @@ export default {
             return groups
         },
     },
+    watch: {
+        'vista.data': {
+            handler() {
+                this.debouncedSaveHistory()
+            },
+            deep: true,
+        },
+    },
+    mounted() {
+        window.addEventListener('keydown', this.handleGlobalKeyDown)
+        // Initial snapshot after potential data load
+        setTimeout(() => this.saveHistory(), 1000)
+    },
+    beforeUnmount() {
+        window.removeEventListener('keydown', this.handleGlobalKeyDown)
+    },
     methods: {
+        handleGlobalKeyDown(e) {
+            if (['INPUT', 'TEXTAREA'].includes(e.target.tagName) || e.target.isContentEditable) {
+                return
+            }
+
+            if (e.key === 'Delete' || e.key === 'Backspace') {
+                if (this.selectedId && this.selectedId !== 'root') {
+                    e.preventDefault()
+                    this.deleteBlock(this.selectedId)
+                }
+            }
+
+            if (e.ctrlKey && e.key.toLowerCase() === 'z') {
+                e.preventDefault()
+                this.undo()
+            }
+
+            if (
+                e.ctrlKey &&
+                (e.key.toLowerCase() === 'y' || (e.shiftKey && e.key.toLowerCase() === 'z'))
+            ) {
+                e.preventDefault()
+                this.redo()
+            }
+        },
+        saveHistory() {
+            if (this.isUndoingRedoing || !this.vista.data?.structure) return
+
+            const snapshot = JSON.stringify({
+                structure: this.vista.data.structure,
+                config: this.vista.data.config,
+            })
+
+            // Don't save if it's the same as the current top of history
+            if (this.historyIndex >= 0 && this.history[this.historyIndex] === snapshot) return
+
+            // If we have a redo branch, cut it
+            this.history = this.history.slice(0, this.historyIndex + 1)
+            this.history.push(snapshot)
+
+            // Limit history to 50 steps
+            if (this.history.length > 50) {
+                this.history.shift()
+            } else {
+                this.historyIndex++
+            }
+        },
+        debouncedSaveHistory() {
+            clearTimeout(this._historyTimer)
+            this._historyTimer = setTimeout(() => {
+                this.saveHistory()
+            }, 500)
+        },
+        undo() {
+            if (this.historyIndex > 0) {
+                this.isUndoingRedoing = true
+                this.historyIndex--
+                const state = JSON.parse(this.history[this.historyIndex])
+                this.vista.data.structure = state.structure
+                this.vista.data.config = state.config
+                this.$nextTick(() => (this.isUndoingRedoing = false))
+            }
+        },
+        redo() {
+            if (this.historyIndex < this.history.length - 1) {
+                this.isUndoingRedoing = true
+                this.historyIndex++
+                const state = JSON.parse(this.history[this.historyIndex])
+                this.vista.data.structure = state.structure
+                this.vista.data.config = state.config
+                this.$nextTick(() => (this.isUndoingRedoing = false))
+            }
+        },
         runMethod(action) {
             this[action]()
         },
@@ -527,131 +874,120 @@ export default {
                 codigo: '',
                 nombre: '',
                 tipo: 'REGISTRO',
-                system_lists: [],
-                fields: [],
+                config: {
+                    paperSize: 'A4',
+                    globals: {
+                        h1: { fontSize: '12pt', fontWeight: 'bold', color: '#000000' },
+                        h2: { fontSize: '11pt', fontWeight: 'bold', color: '#000000' },
+                        h3: { fontSize: '11pt', fontWeight: 'bold', color: '#000000' },
+                        p: { fontSize: '10pt', color: '#000000' },
+                        small: { fontSize: '8pt', color: '#000000' },
+                        inputLabel: { fontSize: '10pt', fontWeight: 'bold', color: '#000000' },
+                        inputValue: { fontSize: '10pt', color: '#000000' },
+                    },
+                },
                 structure: {
                     id: 'root',
-                    type: 'page',
-                    name: 'Página Principal',
-                    style: {
-                        backgroundColor: '#ffffff',
-                        padding: '0.5in',
-                        flexDirection: 'column',
-                    },
-                    children: [
-                        {
-                            id: 'header_group',
-                            type: 'group',
-                            name: 'Encabezado',
-                            props: {},
-                            style: {
-                                display: 'flex',
-                                flexDirection: 'row',
-                                justifyContent: 'space-between',
-                                alignItems: 'center',
-                                gap: '20px',
-                            },
-                            children: [
-                                {
-                                    id: 'header_left',
-                                    type: 'group',
-                                    name: 'Logo',
-                                    props: {},
-                                    style: {
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        flex: '25%',
-                                    },
-                                    children: [
-                                        {
-                                            id: 'logo_img',
-                                            type: 'image',
-                                            name: 'Logo',
-                                            props: { src: this.auth.empresa?.logo?.url },
-                                            style: { width: '100%' },
-                                        },
-                                    ],
-                                },
-                                {
-                                    id: 'header_center',
-                                    type: 'group',
-                                    name: 'Título',
-                                    props: {},
-                                    style: {
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        flex: '50%',
-                                        alignItems: 'center',
-                                        textAlign: 'center',
-                                        gap: '0.5rem',
-                                    },
-                                    children: [
-                                        {
-                                            id: 'h_title',
-                                            type: 'h1',
-                                            props: { content: 'TITULO DEL FORMATO' },
-                                            style: { fontSize: '1.2rem', fontWeight: 'bold' },
-                                        },
-                                        {
-                                            id: 'h_subtitle',
-                                            type: 'p',
-                                            props: { content: 'SUBTITULO' },
-                                            style: { fontSize: '0.8rem' },
-                                        },
-                                    ],
-                                },
-                                {
-                                    id: 'header_right',
-                                    type: 'group',
-                                    name: 'Metadatos',
-                                    props: {},
-                                    style: {
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        flex: '25%',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        borderWidth: '1px',
-                                        borderStyle: 'solid',
-                                        borderColor: '#dfdfdf',
-                                        borderRadius: '15px',
-                                        paddingTop: '0.5rem',
-                                        paddingRight: '0.5rem',
-                                        paddingBottom: '0.5rem',
-                                        paddingLeft: '0.5rem',
-                                    },
-                                    children: [
-                                        {
-                                            id: 'h_cod',
-                                            type: 'p',
-                                            props: { content: 'CÓDIGO: XX-YYY-ZZ' },
-                                            style: { fontSize: '0.8rem' },
-                                        },
-                                        {
-                                            id: 'h_ver',
-                                            type: 'p',
-                                            props: { content: 'VERSIÓN: 1.0' },
-                                            style: { fontSize: '0.8rem' },
-                                        },
-                                    ],
-                                },
-                            ],
-                        },
-                        {
-                            id: 'main_content',
-                            type: 'group',
-                            name: 'Contenido Principal',
-                            props: {},
-                            style: {
-                                display: 'flex',
-                                flexDirection: 'column',
-                                gap: '1rem',
-                            },
-                            children: [],
-                        },
-                    ],
+                    type: 'document',
+                    name: 'Documento',
+                    props: {},
+                    style: {},
+                    children: [],
                 },
             }
+
+            this.handleSelect(this.vista.data.structure.id, this.vista.data.structure)
+            this.addBlockToSelected('page')
+            this.addHeader()
+        },
+        addHeader() {
+            const page = this.vista.data.structure.children[0]
+            if (!page) return
+
+            this.handleSelect(page.id, page)
+
+            // 1. Header Group
+            const headerGroup = this.addBlockToSelected('group')
+            headerGroup.name = 'Encabezado'
+            Object.assign(headerGroup.style, {
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                gap: '20px',
+            })
+
+            this.handleSelect(headerGroup.id, headerGroup)
+
+            // 1.1 Left (Logo)
+            const headerLeft = this.addBlockToSelected('group')
+            headerLeft.name = 'Logo'
+            Object.assign(headerLeft.style, {
+                display: 'flex',
+                flexDirection: 'column',
+                flex: '25%',
+            })
+
+            this.handleSelect(headerLeft.id, headerLeft)
+            const logo = this.addBlockToSelected('image')
+            logo.name = 'Logo'
+            logo.props.src = this.auth.empresa?.logo?.url || ''
+            logo.style.width = '100%'
+
+            // 1.2 Center (Título)
+            this.handleSelect(headerGroup.id, headerGroup)
+            const headerCenter = this.addBlockToSelected('group')
+            headerCenter.name = 'Título'
+            Object.assign(headerCenter.style, {
+                display: 'flex',
+                flexDirection: 'column',
+                flex: '50%',
+                alignItems: 'center',
+                textAlign: 'center',
+                gap: '0.5rem',
+            })
+
+            this.handleSelect(headerCenter.id, headerCenter)
+            const hTitle = this.addBlockToSelected('h1')
+            hTitle.props.content = 'TITULO DEL FORMATO'
+            hTitle.id = 'h_title'
+            const hSubtitle = this.addBlockToSelected('p')
+            hSubtitle.props.content = 'SUBTITULO'
+            hSubtitle.id = 'h_subtitle'
+
+            // 1.3 Right (Metadatos)
+            this.handleSelect(headerGroup.id, headerGroup)
+            const headerRight = this.addBlockToSelected('group')
+            headerRight.name = 'Metadatos'
+            Object.assign(headerRight.style, {
+                display: 'flex',
+                flexDirection: 'column',
+                flex: '25%',
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderWidth: '1px',
+                borderStyle: 'solid',
+                borderColor: '#dfdfdf',
+                borderRadius: '15px',
+                paddingTop: '0.5rem',
+                paddingRight: '0.5rem',
+                paddingBottom: '0.5rem',
+                paddingLeft: '0.5rem',
+            })
+
+            this.handleSelect(headerRight.id, headerRight)
+            const hCod = this.addBlockToSelected('small')
+            hCod.props.content = 'CÓDIGO: XX-YYY-ZZ'
+            hCod.id = 'h_cod'
+            const hVer = this.addBlockToSelected('small')
+            hVer.props.content = 'VERSIÓN: 1.0'
+            hVer.id = 'h_ver'
+            const hFec = this.addBlockToSelected('small')
+            hFec.props.content = 'FECHA: Ene-26'
+            hFec.id = 'h_fec'
+            const hAprov = this.addBlockToSelected('small')
+            hAprov.props.content = 'APROBADO POR: GG'
+            hAprov.id = 'h_aprov'
         },
         async loadExistingData() {
             this.auth.setLoading(true, 'Cargando formato...')
@@ -672,16 +1008,26 @@ export default {
             this.selectedId = id
             this.selectedElement = element
         },
+        selectDocumentRoot() {
+            if (!this.vista.data.structure) return
+            this.selectedId = this.vista.data.structure.id
+            this.selectedElement = this.vista.data.structure
+        },
         handleSelectDirect({ id, element }) {
             this.selectedId = id
             this.selectedElement = element
         },
         addBlockToSelected(type) {
+            if (type === 'page' && this.selectedElement?.type === 'page') {
+                this.auth.setAlert('No se puede añadir una página dentro de otra página', 'error')
+                return
+            }
             const config = ELEMENT_TYPES.find((t) => t.type === type)
             if (!config) return
 
             const newBlock = {
-                id: type + '_' + Date.now().toString().slice(-6),
+                // id: type + '_' + Date.now().toString().slice(-6),
+                id: crypto.randomUUID(),
                 type: type,
                 name: 'Nuevo ' + config.label,
 
@@ -701,6 +1047,7 @@ export default {
             } else {
                 this.vista.data.structure.children.push(newBlock)
             }
+            return newBlock
         },
         hasConfig(key) {
             if (!this.selectedElement) return false
@@ -725,25 +1072,109 @@ export default {
                 this.selectedElement = null
             }
         },
+        handleMove(dragId, targetId, pos) {
+            if (dragId === targetId) return
+
+            let draggedItem = null
+            const findAndRemove = (list) => {
+                const idx = list.findIndex((it) => it.id === dragId)
+                if (idx !== -1) {
+                    draggedItem = list.splice(idx, 1)[0]
+                    return true
+                }
+                for (const it of list) {
+                    if (it.children && findAndRemove(it.children)) return true
+                }
+                return false
+            }
+
+            // Remove from current position
+            findAndRemove(this.vista.data.structure.children)
+            if (!draggedItem) return
+
+            const insertAtTarget = (list) => {
+                const idx = list.findIndex((it) => it.id === targetId)
+                if (idx !== -1) {
+                    const target = list[idx]
+
+                    if (pos === 'inside' && target.children) {
+                        target.children.push(draggedItem)
+                    } else if (pos === 'before') {
+                        list.splice(idx, 0, draggedItem)
+                    } else {
+                        // 'after' or fallback
+                        list.splice(idx + 1, 0, draggedItem)
+                    }
+                    return true
+                }
+                for (const it of list) {
+                    if (it.children && insertAtTarget(it.children)) return true
+                }
+                return false
+            }
+
+            insertAtTarget(this.vista.data.structure.children)
+        },
+        duplicateBlock(id) {
+            let itemToClone = null
+            const findItem = (list) => {
+                for (const it of list) {
+                    if (it.id === id) {
+                        itemToClone = it
+                        return true
+                    }
+                    if (it.children && findItem(it.children)) return true
+                }
+                return false
+            }
+
+            findItem(this.vista.data.structure.children)
+            if (!itemToClone) return
+
+            // Deep clone and generate new IDs
+            const cloneWithNewIds = (obj) => {
+                const newObj = JSON.parse(JSON.stringify(obj))
+                const randomizeIds = (item) => {
+                    item.id = crypto.randomUUID()
+                    if (item.children) {
+                        item.children.forEach(randomizeIds)
+                    }
+                }
+                randomizeIds(newObj)
+                return newObj
+            }
+
+            const cloned = cloneWithNewIds(itemToClone)
+
+            // Insert after original
+            const insertAfter = (list) => {
+                const idx = list.findIndex((it) => it.id === id)
+                if (idx !== -1) {
+                    list.splice(idx + 1, 0, cloned)
+                    return true
+                }
+                for (const it of list) {
+                    if (it.children && insertAfter(it.children)) return true
+                }
+                return false
+            }
+
+            insertAfter(this.vista.data.structure.children)
+        },
     },
 }
 </script>
 
 <style lang="scss" scoped>
-.header-info {
-    display: grid;
-    grid-template-columns: 10rem 20rem 15rem;
-    gap: 1rem;
-    padding: 0.5rem 0;
-}
-
 .editor-layout {
     display: flex;
     height: calc(100vh - 250px);
     gap: 1rem;
+    width: 100%;
 
     .editor-side {
-        width: 20rem;
+        flex: 0 0 20rem;
+        min-width: 20rem;
         max-height: calc(100vh - 250px);
         overflow-y: auto;
         display: flex;
@@ -782,15 +1213,6 @@ export default {
             display: grid;
             gap: 0.75rem;
         }
-    }
-
-    .renderer-side {
-        flex: 1;
-        overflow-y: auto;
-        padding: 2rem;
-        background-color: #333;
-        display: flex;
-        justify-content: center;
     }
 }
 
@@ -838,11 +1260,6 @@ export default {
         background-color: var(--primary-color);
         text-transform: uppercase;
         font-size: 0.8rem;
-    }
-
-    .btn {
-        cursor: pointer;
-        color: var(--text-color2);
     }
 }
 

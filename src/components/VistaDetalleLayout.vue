@@ -23,7 +23,7 @@
         </header>
 
         <main class="content">
-            <div class="content-central">
+            <div class="content-central" :class="{ 'full-width': config.fullWidth }">
                 <div class="principal-datos">
                     <slot name="principal-datos"></slot>
                 </div>
@@ -40,9 +40,11 @@
                     </template>
                 </ul>
 
-                <div class="pestanas-body">
+                <div class="pestanas-body" v-if="pestanas.length > 0">
                     <slot name="pestanas-body"></slot>
                 </div>
+
+                <slot></slot>
             </div>
         </main>
     </div>
@@ -345,6 +347,10 @@ const handleTabClick = (tabId) => {
         max-width: 1400px;
         background-color: var(--bg-color);
         border-radius: 0.25rem;
+
+        &.full-width {
+            max-width: none;
+        }
         // box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); /* Ligero popup */
         border: var(--border);
         padding: 2rem;

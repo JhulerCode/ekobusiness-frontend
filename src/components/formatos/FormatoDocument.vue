@@ -1,20 +1,44 @@
 <template>
-    <div ref="elementoPdf" class="pdfall" :class="{ 'is-editing': editable }">
-        <!-- Render the Root Structure recursively -->
-        <RenderBlock
-            v-if="estructura.structure"
-            :block="estructura.structure"
-            :editable="editable"
-            :selectedId="selectedId"
-            :hoveredId="hoveredId"
-            :mode="mode"
-            :values="values"
-            :listas="listas"
-            @select="(id, element) => $emit('select', { id, element })"
-            @hover="(id) => $emit('hover', id)"
-            @elegir-obj="(obj, fieldId) => $emit('elegir-obj', obj, fieldId)"
-        />
-        <div v-else class="empty-state">Diseño no inicializado</div>
+    <div ref="elementoPdf" class="document-container" :class="{ 'is-editing': editable }">
+        <div class="pages-wrapper">
+            <!-- Render the Root Structure -->
+            <template v-if="estructura.structure?.type === 'document'">
+                <RenderBlock
+                    v-for="page in estructura.structure.children"
+                    :key="page.id"
+                    :block="page"
+                    class="page-sheet"
+                    :class="[
+                        page.props?.orientation || 'portrait',
+                        estructura.config?.paperSize || 'A4',
+                    ]"
+                    :editable="editable"
+                    :selectedId="selectedId"
+                    :hoveredId="hoveredId"
+                    :mode="mode"
+                    :values="values"
+                    :listas="listas"
+                    @select="(id, element) => $emit('select', { id, element })"
+                    @hover="(id) => $emit('hover', id)"
+                    @elegir-obj="(obj, fieldId) => $emit('elegir-obj', obj, fieldId)"
+                />
+            </template>
+            <div v-else-if="estructura.structure" class="page-sheet A4 portrait">
+                <RenderBlock
+                    :block="estructura.structure"
+                    :editable="editable"
+                    :selectedId="selectedId"
+                    :hoveredId="hoveredId"
+                    :mode="mode"
+                    :values="values"
+                    :listas="listas"
+                    @select="(id, element) => $emit('select', { id, element })"
+                    @hover="(id) => $emit('hover', id)"
+                    @elegir-obj="(obj, fieldId) => $emit('elegir-obj', obj, fieldId)"
+                />
+            </div>
+            <div v-else class="empty-state">Diseño no inicializado</div>
+        </div>
     </div>
 </template>
 
@@ -40,9 +64,11 @@ const elementoPdf = ref(null)
 
 // Provide context to all nested blocks
 provide('formContext', {
-    fields: props.estructura.fields || [], // Fallback if still using global fields registry
+    fields: props.estructura.fields || [],
     mode: props.mode,
     auth,
+    config: props.estructura.config || {},
+    globals: props.estructura.config?.globals || {},
 })
 
 defineExpose({
@@ -51,21 +77,68 @@ defineExpose({
 </script>
 
 <style lang="scss" scoped>
-.pdfall {
-    width: 8.27in;
-    box-sizing: border-box; /* Total width will be exactly 8.27in including padding */
+.document-container {
+    flex: 1;
+    overflow: auto;
+    background-color: var(--bg-color2);
+}
+
+.pages-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3rem;
+    padding: 3rem;
+    min-height: 100%;
+    width: 100%;
+    min-width: min-content;
+}
+
+.page-sheet {
     background-color: white !important;
-    box-shadow: 0 0 1rem rgba(0, 0, 0, 0.3);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
     position: relative;
-    color: #333; /* Ensure text is dark on white paper */
+    color: #000;
+    overflow: hidden;
+    box-sizing: border-box;
+    flex-shrink: 0; /* Prevent pages from squashing */
+
+    /* PAPER SIZES */
+    &.A4 {
+        &.portrait {
+            width: 210mm;
+            height: 297mm;
+        }
+        &.landscape {
+            width: 297mm;
+            height: 210mm;
+        }
+    }
+    &.LETTER {
+        &.portrait {
+            width: 215.9mm;
+            height: 279.4mm;
+        }
+        &.landscape {
+            width: 279.4mm;
+            height: 215.9mm;
+        }
+    }
+    &.LEGAL {
+        &.portrait {
+            width: 215.9mm;
+            height: 355.6mm;
+        }
+        &.landscape {
+            width: 355.6mm;
+            height: 215.9mm;
+        }
+    }
 
     * {
         margin: 0;
         padding: 0;
-        color: #000;
-        font-size: 0.9rem;
-        --primary-border: #409eff;
-        --primary-light: rgba(64, 158, 255, 0.1);
+        box-sizing: border-box;
     }
 }
 

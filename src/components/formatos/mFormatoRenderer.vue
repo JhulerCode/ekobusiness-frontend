@@ -37,12 +37,7 @@ if (!modal.formato_value) modal.formato_value = { values: {} }
 if (!modal.formato_value.values) modal.formato_value.values = {}
 
 const estructura = computed(() => {
-    return {
-        header: modal.header || {},
-        layout: modal.layout || [],
-        fields: modal.fields || [],
-        instructivo: modal.instructivo || [],
-    }
+    return modal.formato_structure?.data || {}
 })
 
 const listas = computed(() => {

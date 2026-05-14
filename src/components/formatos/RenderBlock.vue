@@ -18,7 +18,9 @@
         @mouseleave.stop="$emit('hover', null)"
     >
         <!-- 1. CONTAINER TYPES (Recursion) -->
-        <template v-if="block.type === 'document' || block.type === 'page' || block.type === 'group'">
+        <template
+            v-if="block.type === 'document' || block.type === 'page' || block.type === 'group'"
+        >
             <RenderBlock
                 v-for="child in block.children"
                 :key="child.id"
@@ -38,22 +40,10 @@
 
         <!-- 2. COMPONENT TYPES -->
         <template v-else>
-            <!-- Field Input -->
-            <template v-if="block.type === 'field'">
-                <FieldRenderer
-                    v-if="fieldConfig"
-                    :field="fieldConfig"
-                    v-model="values[block.props?.fieldId]"
-                    :data="values"
-                    :listas="listas"
-                    :mode="mode"
-                    @elegir-obj="(obj, fId) => $emit('elegir-obj', obj, fId)"
-                    :style="typographyStyle"
-                />
-            </template>
+
 
             <!-- Manual Inputs (Texto, Numero, Fecha, etc) -->
-            <template v-else-if="block.type.startsWith('input_')">
+            <template v-if="block.type.startsWith('input_')">
                 <FieldRenderer
                     :field="{
                         label: block.props?.label,
@@ -62,12 +52,17 @@
                         id: block.props?.fieldId,
                         optionsKey: block.props?.optionsKey,
                         searchUrl: block.props?.searchUrl,
+                        searchField: block.props?.searchField,
                         mostrar: block.props?.mostrar,
+                        searchFltr: block.props?.searchFltr,
+                        searchCols: block.props?.searchCols,
+                        searchOrdr: block.props?.searchOrdr,
+                        searchLimt: block.props?.searchLimt,
                     }"
                     v-model="values[block.props?.fieldId]"
                     :data="values"
                     :listas="listas"
-                    :mode="editable ? 3 : mode"
+                    :mode="mode"
                     :label-style="labelStyle"
                     :value-style="valueStyle"
                     @elegir-obj="(obj, fId) => $emit('elegir-obj', obj, fId)"
@@ -76,46 +71,21 @@
             </template>
 
             <!-- HTML / TEXT -->
-            <div
-                v-else-if="block.type === 'h1'"
-                class="h1"
-                :style="typographyStyle"
-            >{{ block.props?.content }}</div>
-            <div
-                v-else-if="block.type === 'h2'"
-                class="h2"
-                :style="typographyStyle"
-            >{{ block.props?.content }}</div>
-            <div
-                v-else-if="block.type === 'h3'"
-                class="h3"
-                :style="typographyStyle"
-            >{{ block.props?.content }}</div>
-            <div
-                v-else-if="block.type === 'h4'"
-                class="h4"
-                :style="typographyStyle"
-            >{{ block.props?.content }}</div>
-            <div
-                v-else-if="block.type === 'p'"
-                class="p"
-                :style="typographyStyle"
-            >{{ block.props?.content }}</div>
-            <div
-                v-else-if="block.type === 'span'"
-                class="span"
-                :style="typographyStyle"
-            >{{ block.props?.content }}</div>
-            <div
-                v-else-if="block.type === 'text'"
-                class="text"
-                :style="typographyStyle"
-            >{{ block.props?.content }}</div>
-            <div
-                v-else-if="block.type === 'small'"
-                class="small"
-                :style="typographyStyle"
-            >{{ block.props?.content }}</div>
+            <div v-else-if="block.type === 'h1'" :style="typographyStyle">
+                {{ block.props?.content }}
+            </div>
+            <div v-else-if="block.type === 'h2'" :style="typographyStyle">
+                {{ block.props?.content }}
+            </div>
+            <div v-else-if="block.type === 'h3'" :style="typographyStyle">
+                {{ block.props?.content }}
+            </div>
+            <div v-else-if="block.type === 'p'" :style="typographyStyle">
+                {{ block.props?.content }}
+            </div>
+            <div v-else-if="block.type === 'small'" :style="typographyStyle">
+                {{ block.props?.content }}
+            </div>
 
             <!-- IMAGE -->
             <img
@@ -181,13 +151,7 @@ const getComponentForInputType = (type) => {
     return map[type] || 'JdInput'
 }
 
-const fieldConfig = computed(() => {
-    if (props.block.type !== 'field') return null
-    return (
-        formContext.fields.find((f) => f.id === props.block.props?.fieldId) ||
-        props.block.props?.fieldConfig
-    )
-})
+
 
 const onSelect = () => {
     if (!props.editable) return
@@ -295,12 +259,4 @@ const combinedStyle = computed(() => {
     margin: 0;
     padding: 0;
 }
-.h1 { font-size: inherit; font-weight: bold; margin: 0; color: inherit; }
-.h2 { font-size: inherit; font-weight: bold; margin: 0; color: inherit; }
-.h3 { font-size: inherit; font-weight: bold; margin: 0; color: inherit; }
-.h4 { font-size: inherit; font-weight: bold; margin: 0; color: inherit; }
-.p { margin: 0; line-height: 1.4; font-size: inherit; color: inherit; }
-.span { font-size: inherit; color: inherit; }
-.small { font-size: 0.8rem; color: #606266; }
-
 </style>

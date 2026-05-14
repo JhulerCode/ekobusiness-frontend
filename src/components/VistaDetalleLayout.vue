@@ -28,7 +28,7 @@
                     <slot name="principal-datos"></slot>
                 </div>
 
-                <ul class="pestanas">
+                <ul class="pestanas" v-if="pestanas.length > 0">
                     <template v-for="tab in pestanas" :key="tab.id">
                         <li
                             v-if="tab.show"

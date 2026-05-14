@@ -95,6 +95,16 @@ defineExpose({
 }
 
 .page-sheet {
+    /* Force Light Mode Variables */
+    --bg-color: #ffffff;
+    --bg-color-hover: whitesmoke;
+    --bg-color-selected: #cef8f8;
+    --bg-color2: #f2f2f2;
+    --text-color: black;
+    --text-color2: rgba(60, 60, 60, 0.66);
+    --border: solid 1px #dfdfdf;
+    --shadow-color: #d1d0d0;
+
     background-color: white !important;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
     position: relative;

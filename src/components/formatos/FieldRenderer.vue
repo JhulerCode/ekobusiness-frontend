@@ -1,5 +1,5 @@
 <template>
-    <template v-if="field">
+    <div v-if="field" class="field-renderer-container">
         <div v-if="mode == 3" class="print-field">
             <div class="print-label" :style="labelStyle">
                 {{ field.label }}
@@ -20,8 +20,8 @@
                 :type="field.inputType"
                 :lista="getOptions()"
                 :search="field.searchUrl ? handleSearch : undefined"
-                :mostrar="field.mostrar || 'nombre'"
-                :disabled="field.readonly"
+                :mostrar="field.mostrar || field.searchField || 'nombre'"
+                :disabled="!field.relatedPath"
                 :selectedObject="data ? data[field.id + '1'] : null"
                 @elegir="(obj) => $emit('elegir-obj', obj, field.id)"
             />
@@ -30,7 +30,7 @@
         <div v-if="field.help" class="field-help">
             {{ field.help }}
         </div>
-    </template>
+    </div>
 </template>
 
 <script setup>
@@ -98,25 +98,58 @@ const resolveComponent = (component) => {
 
 const getOptions = () => {
     if (!props.field.optionsKey) {
-        return undefined
+        return null
     }
 
-    return props.listas[props.field.optionsKey]
+    return props.listas[props.field.optionsKey] || []
+}
+
+const safeJsonParse = (val, fallback) => {
+    if (!val) return fallback
+    if (typeof val !== 'string') return val
+
+    let cleanedVal = val.trim()
+    // Intentamos arreglar JSON perezoso (comillas simples o llaves sin comillas)
+    if (cleanedVal.startsWith('{') || cleanedVal.startsWith('[')) {
+        cleanedVal = cleanedVal
+            .replace(/'/g, '"')
+            .replace(/([{,])\s*([a-zA-Z0-9_]+)\s*:/g, '$1"$2":')
+    }
+
+    try {
+        const res = JSON.parse(cleanedVal)
+        if (typeof res === 'string' && (res.startsWith('[') || res.startsWith('{'))) {
+            return safeJsonParse(res, fallback)
+        }
+        return res
+    } catch {
+        try {
+            return JSON.parse(val)
+        } catch {
+            return fallback
+        }
+    }
 }
 
 const handleSearch = async (txtBuscar) => {
     if (!props.field.searchUrl) return []
 
+    const sField = props.field.searchField || props.field.mostrar || 'nombre'
+
     const qry = {
-        fltr: props.field.searchFltr || {},
-        cols: props.field.searchCols || ['nombre'],
-        ordr: props.field.searchOrdr || [[props.field.searchCols?.[0] || 'nombre', 'ASC']],
-        limt: props.field.searchLimt || 25,
+        fltr: safeJsonParse(props.field.searchFltr, {}),
+        cols: safeJsonParse(props.field.searchCols, [sField]),
+        ordr: safeJsonParse(props.field.searchOrdr, [[sField, 'ASC']]),
+        limt: parseInt(props.field.searchLimt) || 25,
+    }
+
+    // Aseguramos que sField esté siempre en las columnas para poder mostrar el valor
+    if (!qry.cols.includes(sField)) {
+        qry.cols.push(sField)
     }
 
     if (txtBuscar) {
-        const searchField = props.field.searchField || props.field.mostrar || 'nombre'
-        qry.fltr[searchField] = { op: 'Contiene', val: txtBuscar }
+        qry.fltr[sField] = { op: 'Contiene', val: txtBuscar }
     }
 
     const res = await get(`${urls[props.field.searchUrl]}?qry=${JSON.stringify(qry)}`)
@@ -149,6 +182,7 @@ const handleSearch = async (txtBuscar) => {
     /* flex: 1; */
     word-break: break-word;
     /* line-height: 1.2rem; */
+    white-space: pre-wrap;
 }
 
 .field-wrapper {

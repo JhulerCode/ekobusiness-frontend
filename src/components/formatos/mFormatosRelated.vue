@@ -40,18 +40,31 @@ export default {
                 cols: { exclude: [] },
             }
 
-            if (this.modal.entity == 'transacciones') {
-                qry.fltr.transaccion = { op: 'Es', val: this.modal.transaccion }
-            } else if (this.modal.entity == 'lotes') {
-                qry.fltr.lote = { op: 'Es', val: this.modal.lote }
-            }
+            // if (this.modal.entity == 'transacciones') {
+            //     qry.fltr.transaccion = { op: 'Es', val: this.modal.transaccion }
+            // } else if (this.modal.entity == 'lotes') {
+            //     qry.fltr.lote = { op: 'Es', val: this.modal.lote }
+            // }
 
             this.auth.setLoading(true, 'Cargando...')
             const res_values = await get(`${urls.formato_values}?qry=${JSON.stringify(qry)}`)
             this.auth.setLoading(false)
             if (res_values.code != 0) return
 
-            await this.system.load(row.system_lists)
+            // Buscamos dinámicamente qué listas de Pinia necesitamos cargar
+            const systemLists = []
+            const findKeys = (blocks) => {
+                if (!blocks) return
+                blocks.forEach((b) => {
+                    if (b.props?.optionsKey) systemLists.push(b.props.optionsKey)
+                    if (b.children) findKeys(b.children)
+                })
+            }
+            findKeys(row.structure?.children || [])
+
+            if (systemLists.length > 0) {
+                await this.system.load(systemLists)
+            }
 
             const send = {
                 estructura: row,
@@ -62,20 +75,21 @@ export default {
                 },
             }
 
-            if (this.modal.entity == 'transacciones') {
-                send.formato_value.transaccion = this.modal.transaccion
-                send.transaccion1 = this.modal.transaccion1
-            } else if (this.modal.entity == 'lotes') {
-                send.formato_value.lote = this.modal.lote
-                send.lote1 = this.modal.lote1
+            // Mapeamos los datos de la entidad principal para mFormatoRenderer
+            if (row.entity) {
+                send[row.entity] = this.modal[row.entity]
+                send[row.entity + '1'] = this.modal[row.entity + '1']
+
+                // También lo metemos en formato_value para persistencia
+                send.formato_value[row.entity] = this.modal[row.entity]
             }
 
-            for (const sl of row.system_lists) {
+            for (const sl of systemLists) {
                 send.listas[sl] = this.system.data[sl]
             }
 
             this.modals.show.mFormatosRelated = false
-
+            console.log(send)
             if (res_values.data.length > 0) {
                 send.formato_value = res_values.data[0]
                 this.modals.setModal('mFormatoRenderer', '', 3, send, true)

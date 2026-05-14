@@ -9,6 +9,12 @@
         <template #principal-datos>
             <JdInput v-model="vista.data.codigo" label="Código" :disabled="vista.mode !== 'edit'" />
             <JdInput v-model="vista.data.nombre" label="Nombre" :disabled="vista.mode !== 'edit'" />
+            <JdInput
+                v-model="vista.data.entity"
+                label="Entidad Relacionada"
+                placeholder="Ej: traslados, socios..."
+                :disabled="vista.mode !== 'edit'"
+            />
             <JdSelect
                 v-model="vista.data.tipo"
                 label="Tipo"
@@ -19,6 +25,7 @@
                 :disabled="vista.mode !== 'edit'"
             />
             <JdButton text="nuevo" @click="loadNewData" />
+            <JdButton :text="verInputs ? 'ver final' : 'ver inputs'" @click="toggleVerInputs" />
         </template>
 
         <div class="editor-layout">
@@ -83,9 +90,9 @@
             <FormatoDocument
                 ref="documentRef"
                 :estructura="vista.data"
-                :values="{}"
-                :listas="{}"
-                :mode="2"
+                :values="formato_value.values"
+                :listas="system.data"
+                :mode="verInputs ? 1 : 3"
                 :editable="true"
                 :selectedId="selectedId"
                 :hoveredId="hoveredId"
@@ -162,13 +169,19 @@
                             >
                                 <JdSelect
                                     v-if="STYLE_FIELDS_DEF[key].type === 'select'"
-                                    v-model="(selectedElement.styleLabel = selectedElement.styleLabel || {})[key]"
+                                    v-model="
+                                        (selectedElement.styleLabel =
+                                            selectedElement.styleLabel || {})[key]
+                                    "
                                     :label="STYLE_FIELDS_DEF[key].label"
                                     :lista="STYLE_FIELDS_DEF[key].list"
                                 />
                                 <JdInput
                                     v-else
-                                    v-model="(selectedElement.styleLabel = selectedElement.styleLabel || {})[key]"
+                                    v-model="
+                                        (selectedElement.styleLabel =
+                                            selectedElement.styleLabel || {})[key]
+                                    "
                                     :label="STYLE_FIELDS_DEF[key].label"
                                 />
                             </template>
@@ -198,13 +211,19 @@
                             >
                                 <JdSelect
                                     v-if="STYLE_FIELDS_DEF[key].type === 'select'"
-                                    v-model="(selectedElement.styleValue = selectedElement.styleValue || {})[key]"
+                                    v-model="
+                                        (selectedElement.styleValue =
+                                            selectedElement.styleValue || {})[key]
+                                    "
                                     :label="STYLE_FIELDS_DEF[key].label"
                                     :lista="STYLE_FIELDS_DEF[key].list"
                                 />
                                 <JdInput
                                     v-else
-                                    v-model="(selectedElement.styleValue = selectedElement.styleValue || {})[key]"
+                                    v-model="
+                                        (selectedElement.styleValue =
+                                            selectedElement.styleValue || {})[key]
+                                    "
                                     :label="STYLE_FIELDS_DEF[key].label"
                                 />
                             </template>
@@ -366,7 +385,10 @@
 <script>
 import { useVistas } from '@/pinia/vistas'
 import { useAuth } from '@/pinia/auth'
-import { get } from '@/utils/crud'
+import { useSystem } from '@/pinia/system'
+import { get, post, patch } from '@/utils/crud'
+import { incompleteData } from '@/utils/mine'
+import { jmsg } from '@/utils/swal'
 
 import VistaDetalleLayout from '@/components/VistaDetalleLayout.vue'
 import TreeItem from '@/components/formatos/TreeItem.vue'
@@ -631,6 +653,11 @@ const ELEMENT_TYPES = [
         propsFields: [
             { key: 'fieldId', label: 'ID del Campo (v-model)' },
             { key: 'label', label: 'Etiqueta' },
+            {
+                key: 'relatedPath',
+                label: 'Propiedad Relacionada (Entidad)',
+                placeholder: 'socio1.nombres',
+            },
         ],
         styleFields: [...TYPOGRAPHY_STYLES, ...COMMON_STYLES],
     },
@@ -643,6 +670,7 @@ const ELEMENT_TYPES = [
         propsFields: [
             { key: 'fieldId', label: 'ID del Campo (v-model)' },
             { key: 'label', label: 'Etiqueta' },
+            { key: 'relatedPath', label: 'Propiedad Relacionada (Entidad)' },
         ],
         styleFields: [...TYPOGRAPHY_STYLES, ...COMMON_STYLES],
     },
@@ -655,6 +683,7 @@ const ELEMENT_TYPES = [
         propsFields: [
             { key: 'fieldId', label: 'ID del Campo (v-model)' },
             { key: 'label', label: 'Etiqueta' },
+            { key: 'relatedPath', label: 'Propiedad Relacionada (Entidad)' },
         ],
         styleFields: [...TYPOGRAPHY_STYLES, ...COMMON_STYLES],
     },
@@ -667,6 +696,7 @@ const ELEMENT_TYPES = [
         propsFields: [
             { key: 'fieldId', label: 'ID del Campo (v-model)' },
             { key: 'label', label: 'Etiqueta' },
+            { key: 'relatedPath', label: 'Propiedad Relacionada (Entidad)' },
         ],
         styleFields: [...TYPOGRAPHY_STYLES, ...COMMON_STYLES],
     },
@@ -695,7 +725,12 @@ const ELEMENT_TYPES = [
             { key: 'fieldId', label: 'ID del Campo (v-model)' },
             { key: 'label', label: 'Etiqueta' },
             { key: 'searchUrl', label: 'URL de Búsqueda' },
+            { key: 'searchField', label: 'Columna de Búsqueda', placeholder: 'nombre' },
             { key: 'mostrar', label: 'Propiedad a mostrar', placeholder: 'nombre' },
+            { key: 'searchFltr', label: 'Filtros Extra (JSON)', placeholder: '{"activo":1}' },
+            { key: 'searchCols', label: 'Columnas Extra (JSON)', placeholder: '["id", "nombre"]' },
+            { key: 'searchOrdr', label: 'Orden (JSON)', placeholder: '[["id", "DESC"]]' },
+            { key: 'searchLimt', label: 'Límite', placeholder: '25' },
         ],
         styleFields: [...TYPOGRAPHY_STYLES, ...COMMON_STYLES],
         styleLabelFields: TYPOGRAPHY_STYLES,
@@ -715,6 +750,7 @@ export default {
         return {
             auth: useAuth(),
             vistas: useVistas(),
+            system: useSystem(),
             selectedId: null,
             hoveredId: null,
             selectedElement: null,
@@ -747,6 +783,8 @@ export default {
             history: [],
             historyIndex: -1,
             isUndoingRedoing: false,
+            verInputs: false,
+            formato_value: { values: {} },
         }
     },
     computed: {
@@ -783,6 +821,17 @@ export default {
             },
             deep: true,
         },
+        'selectedElement.props.optionsKey': {
+            handler(newKey) {
+                if (newKey) {
+                    clearTimeout(this._optionsTimer)
+                    this._optionsTimer = setTimeout(() => {
+                        this.system.load([newKey])
+                    }, 1000)
+                }
+            },
+            immediate: true,
+        },
     },
     mounted() {
         window.addEventListener('keydown', this.handleGlobalKeyDown)
@@ -793,81 +842,8 @@ export default {
         window.removeEventListener('keydown', this.handleGlobalKeyDown)
     },
     methods: {
-        handleGlobalKeyDown(e) {
-            if (['INPUT', 'TEXTAREA'].includes(e.target.tagName) || e.target.isContentEditable) {
-                return
-            }
-
-            if (e.key === 'Delete' || e.key === 'Backspace') {
-                if (this.selectedId && this.selectedId !== 'root') {
-                    e.preventDefault()
-                    this.deleteBlock(this.selectedId)
-                }
-            }
-
-            if (e.ctrlKey && e.key.toLowerCase() === 'z') {
-                e.preventDefault()
-                this.undo()
-            }
-
-            if (
-                e.ctrlKey &&
-                (e.key.toLowerCase() === 'y' || (e.shiftKey && e.key.toLowerCase() === 'z'))
-            ) {
-                e.preventDefault()
-                this.redo()
-            }
-        },
-        saveHistory() {
-            if (this.isUndoingRedoing || !this.vista.data?.structure) return
-
-            const snapshot = JSON.stringify({
-                structure: this.vista.data.structure,
-                config: this.vista.data.config,
-            })
-
-            // Don't save if it's the same as the current top of history
-            if (this.historyIndex >= 0 && this.history[this.historyIndex] === snapshot) return
-
-            // If we have a redo branch, cut it
-            this.history = this.history.slice(0, this.historyIndex + 1)
-            this.history.push(snapshot)
-
-            // Limit history to 50 steps
-            if (this.history.length > 50) {
-                this.history.shift()
-            } else {
-                this.historyIndex++
-            }
-        },
-        debouncedSaveHistory() {
-            clearTimeout(this._historyTimer)
-            this._historyTimer = setTimeout(() => {
-                this.saveHistory()
-            }, 500)
-        },
-        undo() {
-            if (this.historyIndex > 0) {
-                this.isUndoingRedoing = true
-                this.historyIndex--
-                const state = JSON.parse(this.history[this.historyIndex])
-                this.vista.data.structure = state.structure
-                this.vista.data.config = state.config
-                this.$nextTick(() => (this.isUndoingRedoing = false))
-            }
-        },
-        redo() {
-            if (this.historyIndex < this.history.length - 1) {
-                this.isUndoingRedoing = true
-                this.historyIndex++
-                const state = JSON.parse(this.history[this.historyIndex])
-                this.vista.data.structure = state.structure
-                this.vista.data.config = state.config
-                this.$nextTick(() => (this.isUndoingRedoing = false))
-            }
-        },
-        runMethod(action) {
-            this[action]()
+        runMethod(method, item) {
+            this[method](item)
         },
         loadNewData() {
             this.vista.data = {
@@ -988,6 +964,19 @@ export default {
             const hAprov = this.addBlockToSelected('small')
             hAprov.props.content = 'APROBADO POR: GG'
             hAprov.id = 'h_aprov'
+
+            this.handleSelect(page.id, page)
+
+            // 2. Body Group
+            const bodyGroup = this.addBlockToSelected('group')
+            bodyGroup.name = 'Cuerpo'
+            Object.assign(bodyGroup.style, {
+                display: 'flex',
+                flexDirection: 'row',
+                gap: '20px',
+            })
+
+            this.handleSelect(bodyGroup.id, bodyGroup)
         },
         async loadExistingData() {
             this.auth.setLoading(true, 'Cargando formato...')
@@ -999,6 +988,126 @@ export default {
             }
         },
 
+        //--- Header actions ---//
+        async guardar() {
+            if (this.checkDatos()) return
+            console.log(this.vista.data)
+            // this.auth.setLoading(true, 'Guardando...')
+            // let res
+            // if (this.is_nuevo) {
+            //     res = await post(this.vista.apiUrl, this.vista.data)
+            // } else {
+            //     res = await patch(this.vista.apiUrl, this.vista.data)
+            // }
+            // this.auth.setLoading(false)
+
+            // if (res.code != 0) return
+
+            // if (this.is_nuevo) {
+            //     this.vista.data.id = res.data.id
+
+            //     this.$router.replace({
+            //         name: this.$route.name,
+            //         params: { [this.vista.pathKey]: res.data.id },
+            //     })
+
+            //     this.vista.data = {
+            //         ...res.data,
+            //         transaccion_items: this.vista.data.transaccion_items,
+            //     }
+            // }
+
+            // this.vista.mode = 'view'
+        },
+
+        //--- Methods --//
+        checkDatos() {
+            const props = ['nombre', 'codigo', 'structure']
+
+            if (incompleteData(this.vista.data, props)) {
+                jmsg('warning', 'Ingrese los datos necesarios')
+                return true
+            }
+
+            return false
+        },
+
+        //--- History ---//
+        handleGlobalKeyDown(e) {
+            if (['INPUT', 'TEXTAREA'].includes(e.target.tagName) || e.target.isContentEditable) {
+                return
+            }
+
+            if (e.key === 'Delete' || e.key === 'Backspace') {
+                if (this.selectedId && this.selectedId !== 'root') {
+                    e.preventDefault()
+                    this.deleteBlock(this.selectedId)
+                }
+            }
+
+            if (e.ctrlKey && e.key.toLowerCase() === 'z') {
+                e.preventDefault()
+                this.undo()
+            }
+
+            if (
+                e.ctrlKey &&
+                (e.key.toLowerCase() === 'y' || (e.shiftKey && e.key.toLowerCase() === 'z'))
+            ) {
+                e.preventDefault()
+                this.redo()
+            }
+        },
+        saveHistory() {
+            if (this.isUndoingRedoing || !this.vista.data?.structure) return
+
+            const snapshot = JSON.stringify({
+                structure: this.vista.data.structure,
+                config: this.vista.data.config,
+            })
+
+            // Don't save if it's the same as the current top of history
+            if (this.historyIndex >= 0 && this.history[this.historyIndex] === snapshot) return
+
+            // If we have a redo branch, cut it
+            this.history = this.history.slice(0, this.historyIndex + 1)
+            this.history.push(snapshot)
+
+            // Limit history to 50 steps
+            if (this.history.length > 50) {
+                this.history.shift()
+            } else {
+                this.historyIndex++
+            }
+        },
+        debouncedSaveHistory() {
+            clearTimeout(this._historyTimer)
+            this._historyTimer = setTimeout(() => {
+                this.saveHistory()
+            }, 500)
+        },
+        undo() {
+            if (this.historyIndex > 0) {
+                this.isUndoingRedoing = true
+                this.historyIndex--
+                const state = JSON.parse(this.history[this.historyIndex])
+                this.vista.data.structure = state.structure
+                this.vista.data.config = state.config
+                this.$nextTick(() => (this.isUndoingRedoing = false))
+            }
+        },
+        redo() {
+            if (this.historyIndex < this.history.length - 1) {
+                this.isUndoingRedoing = true
+                this.historyIndex++
+                const state = JSON.parse(this.history[this.historyIndex])
+                this.vista.data.structure = state.structure
+                this.vista.data.config = state.config
+                this.$nextTick(() => (this.isUndoingRedoing = false))
+            }
+        },
+
+        //--- Logic to control panels ---//
         toggleSection(key) {
             this.collapsedSections[key] = !this.collapsedSections[key]
         },
@@ -1160,6 +1269,9 @@ export default {
             }
 
             insertAfter(this.vista.data.structure.children)
+        },
+        toggleVerInputs() {
+            this.verInputs = !this.verInputs
         },
     },
 }

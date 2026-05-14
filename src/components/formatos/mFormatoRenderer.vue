@@ -11,9 +11,11 @@
                 :values="modal.formato_value.values"
                 :listas="listas"
                 :mode="modal.mode"
-                @elegir-obj="(obj, fieldId) => {
-                    modal.formato_value.values[fieldId + '1'] = obj
-                }"
+                @elegir-obj="
+                    (obj, fieldId) => {
+                        modal.formato_value.values[fieldId + '1'] = obj
+                    }
+                "
             />
         </div>
     </JdModal>
@@ -37,7 +39,7 @@ if (!modal.formato_value) modal.formato_value = { values: {} }
 if (!modal.formato_value.values) modal.formato_value.values = {}
 
 const estructura = computed(() => {
-    return modal.formato_structure?.data || {}
+    return modal.estructura || {}
 })
 
 const listas = computed(() => {
@@ -55,18 +57,37 @@ const buttons = computed(() => {
 })
 
 const initializeValues = () => {
-    if (!estructura.value?.fields) return
+    const entityName = modal.estructura?.entity
+    const entityData = entityName ? modal[entityName + '1'] || modal[entityName] : null
 
-    estructura.value.fields.forEach((field) => {
-        if (!field.related) return
+    const processBlocks = (blocks) => {
+        if (!blocks) return
+        blocks.forEach((block) => {
+            if (block.props?.fieldId && block.props?.relatedPath && entityData) {
+                // Solo inicializamos si el valor actual está vacío (para no sobreescribir datos cargados)
+                if (
+                    modal.formato_value.values[block.props.fieldId] === undefined ||
+                    modal.formato_value.values[block.props.fieldId] === null ||
+                    modal.formato_value.values[block.props.fieldId] === ''
+                ) {
+                    const value = block.props.relatedPath
+                        .split('.')
+                        .reduce((acc, key) => acc?.[key], entityData)
 
-        const entityData = modal[field.related.entity]
-        if (!entityData) return
+                    if (value !== undefined && value !== null) {
+                        modal.formato_value.values[block.props.fieldId] = value
+                    }
+                }
+            }
+            if (block.children) {
+                processBlocks(block.children)
+            }
+        })
+    }
 
-        modal.formato_value.values[field.id] = field.related.path
-            .split('.')
-            .reduce((acc, key) => acc?.[key], entityData)
-    })
+    if (estructura.value?.structure) {
+        processBlocks([estructura.value.structure])
+    }
 }
 initializeValues()
 

@@ -160,6 +160,22 @@ export default {
             return grouped
         },
     },
+    watch: {
+        isVisible(val) {
+            if (val) {
+                this.$nextTick(() => {
+                    this.updatePosition()
+                })
+            }
+        },
+        listaFiltrada() {
+            if (this.isVisible) {
+                this.$nextTick(() => {
+                    this.updatePosition()
+                })
+            }
+        },
+    },
     data: () => ({
         isVisible: false,
         txtBuscar: '',
@@ -187,20 +203,59 @@ export default {
 
             if (this.isVisible) {
                 this.$nextTick(() => {
-                    const rect = this.$refs.right.getBoundingClientRect()
-
-                    const el = this.$refs['lista-box']
-                    el.style.top = `${rect.bottom + window.scrollY}px`
-                    el.style.left = `${rect.left + window.scrollX}px`
-                    el.style.width = `${rect.width}px`
+                    this.updatePosition()
                 })
 
                 setTimeout(() => {
                     document.addEventListener('click', this.handleClickOutside)
                     window.addEventListener('keydown', this.handleEscapeKey)
+                    window.addEventListener('scroll', this.updatePosition, true)
+                    window.addEventListener('resize', this.updatePosition)
                 }, 0)
             } else {
                 this.ocultar()
+            }
+        },
+        updatePosition() {
+            const rect = this.$refs.right.getBoundingClientRect()
+            const el = this.$refs['lista-box']
+
+            if (el) {
+                const listHeight = el.offsetHeight
+                const windowHeight = window.innerHeight
+                const margin = 10
+
+                const spaceBelow = windowHeight - rect.bottom - margin
+                const spaceAbove = rect.top - margin
+
+                if (listHeight <= spaceBelow) {
+                    el.style.top = `${rect.bottom}px`
+                    el.style.bottom = 'auto'
+                    el.classList.add('lista-below')
+                    el.classList.remove('lista-above')
+                } else if (listHeight <= spaceAbove) {
+                    el.style.top = 'auto'
+                    el.style.bottom = `${windowHeight - rect.top}px`
+                    el.classList.add('lista-above')
+                    el.classList.remove('lista-below')
+                } else {
+                    if (spaceBelow >= spaceAbove) {
+                        el.style.top = `${rect.bottom}px`
+                        el.style.bottom = 'auto'
+                        el.style.maxHeight = `${spaceBelow}px`
+                        el.classList.add('lista-below')
+                        el.classList.remove('lista-above')
+                    } else {
+                        el.style.top = 'auto'
+                        el.style.bottom = `${windowHeight - rect.top}px`
+                        el.style.maxHeight = `${spaceAbove}px`
+                        el.classList.add('lista-above')
+                        el.classList.remove('lista-below')
+                    }
+                }
+
+                el.style.left = `${rect.left}px`
+                el.style.width = `${rect.width}px`
             }
         },
         ocultar() {
@@ -209,6 +264,8 @@ export default {
 
             document.removeEventListener('click', this.handleClickOutside)
             window.removeEventListener('keydown', this.handleEscapeKey)
+            window.removeEventListener('scroll', this.updatePosition, true)
+            window.removeEventListener('resize', this.updatePosition)
         },
 
         init(id) {
@@ -331,10 +388,16 @@ export default {
         }
 
         .lista-box {
-            z-index: 3;
-            position: absolute;
+            z-index: 1000;
+            position: fixed;
             background-color: var(--bg-color);
-            box-shadow: 0 0.5rem 0.7rem var(--shadow-color);
+
+            &.lista-below {
+                box-shadow: 0 0.5rem 0.7rem var(--shadow-color);
+            }
+            &.lista-above {
+                box-shadow: 0 -0.5rem 0.7rem var(--shadow-color);
+            }
 
             input {
                 border-bottom: var(--border);

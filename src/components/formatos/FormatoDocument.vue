@@ -87,8 +87,8 @@ defineExpose({
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 3rem;
-    padding: 3rem;
+    gap: 2rem;
+    padding: 2rem;
     min-height: 100%;
     width: 100%;
     min-width: min-content;

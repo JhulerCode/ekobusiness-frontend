@@ -62,13 +62,13 @@
     </VistaDetalleLayout>
 
     <mFormatosRelated v-if="modals?.show?.mFormatosRelated" />
-    <mFormatoRenderer v-if="modals?.show?.mFormatoRenderer" />
+    <mFormatoValue v-if="modals?.show?.mFormatoValue" />
 </template>
 
 <script>
 import vTrasladoLine from './vTrasladoLine.vue'
 import mFormatosRelated from '@/components/formatos/mFormatosRelated.vue'
-import mFormatoRenderer from '@/components/formatos/mFormatoRenderer.vue'
+import mFormatoValue from '@/components/formatos/mFormatoValue.vue'
 
 import VIEW_CONFIG from './traslado.config.js'
 import { useSystem } from '@/pinia/system.js'
@@ -84,7 +84,7 @@ export default {
     components: {
         vTrasladoLine,
         mFormatosRelated,
-        mFormatoRenderer,
+        mFormatoValue,
     },
     data: () => ({
         VIEW_CONFIG,

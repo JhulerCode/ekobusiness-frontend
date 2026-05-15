@@ -9,13 +9,7 @@
         <template #principal-datos>
             <JdInput v-model="vista.data.codigo" label="Código" :disabled="vista.mode !== 'edit'" />
             <JdInput v-model="vista.data.nombre" label="Nombre" :disabled="vista.mode !== 'edit'" />
-            <JdInput
-                v-model="vista.data.entity"
-                label="Entidad Relacionada"
-                placeholder="Ej: traslados, socios..."
-                :disabled="vista.mode !== 'edit'"
-            />
-            <JdSelect
+            <!-- <JdSelect
                 v-model="vista.data.tipo"
                 label="Tipo"
                 :lista="[
@@ -23,68 +17,32 @@
                     { id: 'FORMATO', nombre: 'Formato' },
                 ]"
                 :disabled="vista.mode !== 'edit'"
-            />
-            <JdButton text="nuevo" @click="loadNewData" />
-            <JdButton :text="verInputs ? 'ver final' : 'ver inputs'" @click="toggleVerInputs" />
+            /> -->
+            <div style="display: flex; gap: 0.25rem">
+                <JdButton tipo="2" text="nuevo" @click="loadNewData" />
+                <JdButton
+                    tipo="2"
+                    :text="verInputs ? 'ver final' : 'ver inputs'"
+                    @click="toggleVerInputs"
+                />
+            </div>
         </template>
 
         <div class="editor-layout">
             <!-- LEFT SIDEBAR: Structure & Toolbox -->
-            <div class="editor-side">
-                <div class="editor-section">
-                    <div
-                        class="editor-header clickable"
-                        @click="collapsedSections.toolbox = !collapsedSections.toolbox"
-                    >
-                        <strong>Componentes</strong>
-                        <i
-                            :class="[
-                                'fas fa-sm',
-                                collapsedSections.toolbox ? 'fa-chevron-right' : 'fa-chevron-down',
-                            ]"
-                        ></i>
-                    </div>
-                    <div v-show="!collapsedSections.toolbox" class="editor-content toolbox">
-                        <button
-                            v-for="el in ELEMENT_TYPES"
-                            :key="el.type"
-                            @click="addBlockToSelected(el.type)"
-                        >
-                            <i :class="el.icon"></i> {{ el.label }}
-                        </button>
-                    </div>
-                </div>
-
-                <div class="editor-section">
-                    <div
-                        class="editor-header clickable"
-                        @click="collapsedSections.tree = !collapsedSections.tree"
-                    >
-                        <strong>Estructura / Esquema</strong>
-                        <i
-                            :class="[
-                                'fas fa-sm',
-                                collapsedSections.tree ? 'fa-chevron-right' : 'fa-chevron-down',
-                            ]"
-                        ></i>
-                    </div>
-                    <div v-show="!collapsedSections.tree" class="editor-content">
-                        <div class="tree-container">
-                            <TreeItem
-                                v-if="vista.data.structure"
-                                :item="vista.data.structure"
-                                :selectedId="selectedId"
-                                :hoveredId="hoveredId"
-                                @select="handleSelect"
-                                @hover="(id) => (hoveredId = id)"
-                                @delete="deleteBlock"
-                                @duplicate="duplicateBlock"
-                                @move="handleMove"
-                            />
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <EditorSidebarLeft
+                v-model:activeTab="activeSideTab"
+                :elementTypes="ELEMENT_TYPES"
+                :structure="vista.data.structure"
+                :selectedId="selectedId"
+                :hoveredId="hoveredId"
+                @addBlock="addBlockToSelected"
+                @select="handleSelect"
+                @hover="(id) => (hoveredId = id)"
+                @delete="deleteBlock"
+                @duplicate="duplicateBlock"
+                @move="handleMove"
+            />
 
             <!-- MAIN RENDERER -->
             <FormatoDocument
@@ -101,283 +59,20 @@
             />
 
             <!-- RIGHT SIDEBAR: Properties & Metadata -->
-            <div class="editor-side">
-                <template v-if="selectedId && selectedElement">
-                    <div class="element-header">
-                        <strong>{{ selectedElement.type }}</strong>
-                        <JdInput v-model="selectedElement.name" :placeholder="selectedElement.id" />
-                    </div>
-
-                    <!-- DYNAMIC PROPS SECTION -->
-                    <div
-                        class="editor-section"
-                        v-if="selectedElementTypeConfig?.propsFields?.length"
-                    >
-                        <div class="editor-header clickable" @click="toggleSection('props')">
-                            <strong>Propiedades</strong>
-                            <i
-                                :class="[
-                                    'fas fa-sm',
-                                    collapsedSections.props
-                                        ? 'fa-chevron-right'
-                                        : 'fa-chevron-down',
-                                ]"
-                            ></i>
-                        </div>
-                        <div v-show="!collapsedSections.props" class="editor-content">
-                            <template
-                                v-for="field in selectedElementTypeConfig.propsFields"
-                                :key="field.key"
-                            >
-                                <JdSelect
-                                    v-if="field.type === 'select'"
-                                    v-model="selectedElement.props[field.key]"
-                                    :label="field.label"
-                                    :lista="field.list === 'fieldList' ? fieldList : field.list"
-                                />
-                                <JdInput
-                                    v-else
-                                    v-model="selectedElement.props[field.key]"
-                                    :label="field.label"
-                                    :textarea="field.textarea"
-                                    :placeholder="field.placeholder"
-                                />
-                            </template>
-                        </div>
-                    </div>
-
-                    <!-- STYLE LABEL SECTION -->
-                    <div
-                        class="editor-section"
-                        v-if="selectedElementTypeConfig?.styleLabelFields?.length"
-                    >
-                        <div class="editor-header clickable" @click="toggleSection('inputLabel')">
-                            <strong>Estilo Etiqueta</strong>
-                            <i
-                                :class="[
-                                    'fas fa-sm',
-                                    collapsedSections.inputLabel
-                                        ? 'fa-chevron-right'
-                                        : 'fa-chevron-down',
-                                ]"
-                            ></i>
-                        </div>
-                        <div v-show="!collapsedSections.inputLabel" class="editor-content">
-                            <template
-                                v-for="key in selectedElementTypeConfig.styleLabelFields"
-                                :key="key"
-                            >
-                                <JdSelect
-                                    v-if="STYLE_FIELDS_DEF[key].type === 'select'"
-                                    v-model="
-                                        (selectedElement.styleLabel =
-                                            selectedElement.styleLabel || {})[key]
-                                    "
-                                    :label="STYLE_FIELDS_DEF[key].label"
-                                    :lista="STYLE_FIELDS_DEF[key].list"
-                                />
-                                <JdInput
-                                    v-else
-                                    v-model="
-                                        (selectedElement.styleLabel =
-                                            selectedElement.styleLabel || {})[key]
-                                    "
-                                    :label="STYLE_FIELDS_DEF[key].label"
-                                />
-                            </template>
-                        </div>
-                    </div>
-
-                    <!-- STYLE VALUE SECTION -->
-                    <div
-                        class="editor-section"
-                        v-if="selectedElementTypeConfig?.styleValueFields?.length"
-                    >
-                        <div class="editor-header clickable" @click="toggleSection('inputValue')">
-                            <strong>Estilo Valor</strong>
-                            <i
-                                :class="[
-                                    'fas fa-sm',
-                                    collapsedSections.inputValue
-                                        ? 'fa-chevron-right'
-                                        : 'fa-chevron-down',
-                                ]"
-                            ></i>
-                        </div>
-                        <div v-show="!collapsedSections.inputValue" class="editor-content">
-                            <template
-                                v-for="key in selectedElementTypeConfig.styleValueFields"
-                                :key="key"
-                            >
-                                <JdSelect
-                                    v-if="STYLE_FIELDS_DEF[key].type === 'select'"
-                                    v-model="
-                                        (selectedElement.styleValue =
-                                            selectedElement.styleValue || {})[key]
-                                    "
-                                    :label="STYLE_FIELDS_DEF[key].label"
-                                    :lista="STYLE_FIELDS_DEF[key].list"
-                                />
-                                <JdInput
-                                    v-else
-                                    v-model="
-                                        (selectedElement.styleValue =
-                                            selectedElement.styleValue || {})[key]
-                                    "
-                                    :label="STYLE_FIELDS_DEF[key].label"
-                                />
-                            </template>
-                        </div>
-                    </div>
-
-                    <!-- DYNAMIC STYLE SECTIONS -->
-                    <template
-                        v-for="(fields, sectionKey) in selectedElementGroupedStyles"
-                        :key="sectionKey"
-                    >
-                        <div class="editor-section">
-                            <div class="editor-header clickable" @click="toggleSection(sectionKey)">
-                                <strong>{{ STYLE_SECTIONS_LABELS[sectionKey] }}</strong>
-                                <i
-                                    :class="[
-                                        'fas fa-sm',
-                                        collapsedSections[sectionKey]
-                                            ? 'fa-chevron-right'
-                                            : 'fa-chevron-down',
-                                    ]"
-                                ></i>
-                            </div>
-                            <div v-show="!collapsedSections[sectionKey]" class="editor-content">
-                                <div class="style-grid">
-                                    <template v-for="fieldKey in fields" :key="fieldKey">
-                                        <div
-                                            :class="{
-                                                'full-width': !STYLE_FIELDS_DEF[fieldKey].grid,
-                                            }"
-                                        >
-                                            <JdSelect
-                                                v-if="STYLE_FIELDS_DEF[fieldKey].type === 'select'"
-                                                v-model="selectedElement.style[fieldKey]"
-                                                :label="STYLE_FIELDS_DEF[fieldKey].label"
-                                                :lista="STYLE_FIELDS_DEF[fieldKey].list"
-                                            />
-                                            <JdInput
-                                                v-else
-                                                v-model="selectedElement.style[fieldKey]"
-                                                :label="STYLE_FIELDS_DEF[fieldKey].label"
-                                            />
-                                        </div>
-                                    </template>
-                                </div>
-                            </div>
-                        </div>
-                    </template>
-
-                    <!-- GLOBAL DOCUMENT CONFIGURATION (Only for 'document' type) -->
-                    <template v-if="selectedElement.type === 'document'">
-                        <div class="editor-section">
-                            <div
-                                class="editor-header clickable"
-                                @click="toggleSection('doc_config')"
-                            >
-                                <strong>Configuración del Formato</strong>
-                                <i
-                                    :class="[
-                                        'fas fa-sm',
-                                        collapsedSections.doc_config
-                                            ? 'fa-chevron-right'
-                                            : 'fa-chevron-down',
-                                    ]"
-                                ></i>
-                            </div>
-                            <div v-show="!collapsedSections.doc_config" class="editor-content">
-                                <JdSelect
-                                    v-model="vista.data.config.paperSize"
-                                    label="Tamaño de Papel"
-                                    :lista="PAPER_SIZES"
-                                />
-                            </div>
-                        </div>
-
-                        <div
-                            v-for="(gStyle, gType) in vista.data.config.globals"
-                            :key="gType"
-                            class="editor-section"
-                        >
-                            <div
-                                class="editor-header clickable"
-                                @click="toggleSection('global_' + gType)"
-                            >
-                                <strong>Estilo Global: {{ gType.toUpperCase() }}</strong>
-                                <i
-                                    :class="[
-                                        'fas fa-sm',
-                                        collapsedSections['global_' + gType]
-                                            ? 'fa-chevron-right'
-                                            : 'fa-chevron-down',
-                                    ]"
-                                ></i>
-                            </div>
-                            <div
-                                v-show="!collapsedSections['global_' + gType]"
-                                class="editor-content"
-                            >
-                                <template v-for="tKey in TYPOGRAPHY_STYLES" :key="tKey">
-                                    <JdSelect
-                                        v-if="STYLE_FIELDS_DEF[tKey].type === 'select'"
-                                        v-model="vista.data.config.globals[gType][tKey]"
-                                        :label="STYLE_FIELDS_DEF[tKey].label"
-                                        :lista="STYLE_FIELDS_DEF[tKey].list"
-                                    />
-                                    <JdInput
-                                        v-else
-                                        v-model="vista.data.config.globals[gType][tKey]"
-                                        :label="STYLE_FIELDS_DEF[tKey].label"
-                                    />
-                                </template>
-                            </div>
-                        </div>
-                    </template>
-
-                    <!-- OTHER SECTIONS -->
-                    <div class="editor-section" v-if="hasConfig('settings')">
-                        <div class="editor-header clickable" @click="toggleSection('settings')">
-                            <strong>Configuraciones</strong>
-                            <i
-                                :class="[
-                                    'fas fa-sm',
-                                    collapsedSections.settings
-                                        ? 'fa-chevron-right'
-                                        : 'fa-chevron-down',
-                                ]"
-                            ></i>
-                        </div>
-                        <div v-show="!collapsedSections.settings" class="editor-content">
-                            <p class="text-tiny">No hay configuraciones extras.</p>
-                        </div>
-                    </div>
-
-                    <div class="editor-section" v-if="hasConfig('visibility')">
-                        <div class="editor-header clickable" @click="toggleSection('visibility')">
-                            <strong>Visibilidad</strong>
-                            <i
-                                :class="[
-                                    'fas fa-sm',
-                                    collapsedSections.visibility
-                                        ? 'fa-chevron-right'
-                                        : 'fa-chevron-down',
-                                ]"
-                            ></i>
-                        </div>
-                        <div v-show="!collapsedSections.visibility" class="editor-content">
-                            <JdInput
-                                v-model="selectedElement.visibility.condition"
-                                label="Condición (JS)"
-                            />
-                        </div>
-                    </div>
-                </template>
-            </div>
+            <EditorSidebarRight
+                :selectedId="selectedId"
+                :selectedElement="selectedElement"
+                :config="selectedElementTypeConfig"
+                :groupedStyles="selectedElementGroupedStyles"
+                :collapsedSections="collapsedSections"
+                :styleFieldsDef="STYLE_FIELDS_DEF"
+                :styleSectionsLabels="STYLE_SECTIONS_LABELS"
+                :paperSizes="PAPER_SIZES"
+                :typographyStyles="TYPOGRAPHY_STYLES"
+                :fieldList="fieldList"
+                :vista="vista"
+                @toggleSection="toggleSection"
+            />
         </div>
     </VistaDetalleLayout>
 </template>
@@ -391,10 +86,9 @@ import { incompleteData } from '@/utils/mine'
 import { jmsg } from '@/utils/swal'
 
 import VistaDetalleLayout from '@/components/VistaDetalleLayout.vue'
-import TreeItem from '@/components/formatos/TreeItem.vue'
 import FormatoDocument from '@/components/formatos/FormatoDocument.vue'
-import JdInput from '@/components/inputs/JdInput.vue'
-import JdSelect from '@/components/inputs/JdSelect.vue'
+import EditorSidebarLeft from './EditorSidebarLeft.vue'
+import EditorSidebarRight from './EditorSidebarRight.vue'
 
 const TEXT_ALIGN_OPTIONS = [
     { id: 'left', nombre: 'Izquierda' },
@@ -522,6 +216,7 @@ const TYPOGRAPHY_STYLES = ['fontSize', 'fontWeight', 'color', 'textAlign']
 const ELEMENT_TYPES = [
     {
         type: 'page',
+        group: 'DESIGN',
         label: 'Página',
         icon: 'fas fa-file-alt',
         defaultProps: {
@@ -552,6 +247,7 @@ const ELEMENT_TYPES = [
     },
     {
         type: 'group',
+        group: 'DESIGN',
         label: 'Grupo',
         icon: 'fas fa-layer-group',
         defaultProps: {},
@@ -560,15 +256,6 @@ const ELEMENT_TYPES = [
             flexDirection: 'column',
             justifyContent: 'flex-start',
             alignItems: 'stretch',
-            gap: '0',
-            marginTop: '0',
-            marginRight: '0',
-            marginBottom: '0',
-            marginLeft: '0',
-            paddingTop: '0',
-            paddingRight: '0',
-            paddingBottom: '0',
-            paddingLeft: '0',
         },
         hasChildren: true,
         propsFields: [],
@@ -583,60 +270,57 @@ const ELEMENT_TYPES = [
     },
     {
         type: 'h1',
-        label: 'Título H1',
+        group: 'TEXT',
+        label: 'Título 1',
         icon: 'fas fa-heading',
         defaultProps: { content: 'Título 1' },
-        defaultStyle: { margin: '0', padding: '0' },
+        defaultStyle: {},
         propsFields: [{ key: 'content', label: 'Contenido', textarea: true }],
         styleFields: [...TYPOGRAPHY_STYLES, ...COMMON_STYLES],
     },
     {
         type: 'h2',
-        label: 'Título H2',
+        group: 'TEXT',
+        label: 'Título 2',
         icon: 'fas fa-heading',
         defaultProps: { content: 'Título 2' },
-        defaultStyle: { margin: '0', padding: '0' },
+        defaultStyle: {},
         propsFields: [{ key: 'content', label: 'Contenido', textarea: true }],
         styleFields: [...TYPOGRAPHY_STYLES, ...COMMON_STYLES],
     },
     {
         type: 'h3',
-        label: 'Título H3',
+        group: 'TEXT',
+        label: 'Título 3',
         icon: 'fas fa-heading',
         defaultProps: { content: 'Título 3' },
-        defaultStyle: { margin: '0', padding: '0' },
-        propsFields: [{ key: 'content', label: 'Contenido', textarea: true }],
-        styleFields: [...TYPOGRAPHY_STYLES, ...COMMON_STYLES],
-    },
-    {
-        type: 'h4',
-        label: 'Título H4',
-        icon: 'fas fa-heading',
-        defaultProps: { content: 'Título 4' },
-        defaultStyle: { margin: '0', padding: '0' },
+        defaultStyle: {},
         propsFields: [{ key: 'content', label: 'Contenido', textarea: true }],
         styleFields: [...TYPOGRAPHY_STYLES, ...COMMON_STYLES],
     },
     {
         type: 'p',
+        group: 'TEXT',
         label: 'Párrafo',
         icon: 'fas fa-paragraph',
         defaultProps: { content: 'Nuevo contenido...' },
-        defaultStyle: { margin: '0', padding: '0' },
+        defaultStyle: {},
         propsFields: [{ key: 'content', label: 'Contenido', textarea: true }],
         styleFields: [...TYPOGRAPHY_STYLES, ...COMMON_STYLES],
     },
     {
         type: 'small',
-        label: 'Texto Pequeño',
+        group: 'TEXT',
+        label: 'Small',
         icon: 'fas fa-minus',
         defaultProps: { content: 'Nota al pie...' },
-        defaultStyle: { margin: '0', padding: '0' },
+        defaultStyle: {},
         propsFields: [{ key: 'content', label: 'Contenido' }],
         styleFields: [...TYPOGRAPHY_STYLES, ...COMMON_STYLES],
     },
     {
         type: 'image',
+        group: 'MEDIA',
         label: 'Imagen',
         icon: 'fas fa-image',
         defaultProps: { src: '' },
@@ -646,6 +330,7 @@ const ELEMENT_TYPES = [
     },
     {
         type: 'input_text',
+        group: 'INPUTS',
         label: 'Input Texto',
         icon: 'fas fa-font',
         defaultProps: { fieldId: '', inputType: 'text', label: 'Nuevo Campo' },
@@ -663,6 +348,7 @@ const ELEMENT_TYPES = [
     },
     {
         type: 'input_number',
+        group: 'INPUTS',
         label: 'Input Número',
         icon: 'fas fa-hashtag',
         defaultProps: { fieldId: '', inputType: 'number', label: 'Nuevo Número' },
@@ -676,6 +362,7 @@ const ELEMENT_TYPES = [
     },
     {
         type: 'input_date',
+        group: 'INPUTS',
         label: 'Input Fecha',
         icon: 'fas fa-calendar-alt',
         defaultProps: { fieldId: '', inputType: 'date', label: 'Fecha' },
@@ -689,6 +376,7 @@ const ELEMENT_TYPES = [
     },
     {
         type: 'input_longtext',
+        group: 'INPUTS',
         label: 'Texto Largo',
         icon: 'fas fa-align-left',
         defaultProps: { fieldId: '', inputType: 'longtext', label: 'Observaciones' },
@@ -702,6 +390,7 @@ const ELEMENT_TYPES = [
     },
     {
         type: 'input_select',
+        group: 'INPUTS',
         label: 'Selector',
         icon: 'fas fa-list',
         defaultProps: { fieldId: '', inputType: 'select', label: 'Opción' },
@@ -717,6 +406,7 @@ const ELEMENT_TYPES = [
     },
     {
         type: 'input_ref',
+        group: 'INPUTS',
         label: 'Buscador',
         icon: 'fas fa-search',
         defaultProps: { fieldId: '', inputType: 'ref', label: 'Referencia' },
@@ -741,10 +431,9 @@ const ELEMENT_TYPES = [
 export default {
     components: {
         VistaDetalleLayout,
-        TreeItem,
         FormatoDocument,
-        JdInput,
-        JdSelect,
+        EditorSidebarLeft,
+        EditorSidebarRight,
     },
     data() {
         return {
@@ -767,6 +456,7 @@ export default {
             PAPER_SIZES,
             ORIENTATIONS,
             TYPOGRAPHY_STYLES,
+            activeSideTab: 'tree',
             collapsedSections: {
                 toolbox: false,
                 tree: false,
@@ -850,12 +540,13 @@ export default {
                 codigo: '',
                 nombre: '',
                 tipo: 'REGISTRO',
+                entity: '',
                 config: {
                     paperSize: 'A4',
                     globals: {
                         h1: { fontSize: '12pt', fontWeight: 'bold', color: '#000000' },
                         h2: { fontSize: '11pt', fontWeight: 'bold', color: '#000000' },
-                        h3: { fontSize: '11pt', fontWeight: 'bold', color: '#000000' },
+                        h3: { fontSize: '10pt', fontWeight: 'bold', color: '#000000' },
                         p: { fontSize: '10pt', color: '#000000' },
                         small: { fontSize: '8pt', color: '#000000' },
                         inputLabel: { fontSize: '10pt', fontWeight: 'bold', color: '#000000' },
@@ -991,33 +682,33 @@ export default {
         //--- Header actions ---//
         async guardar() {
             if (this.checkDatos()) return
-            console.log(this.vista.data)
-            // this.auth.setLoading(true, 'Guardando...')
-            // let res
-            // if (this.is_nuevo) {
-            //     res = await post(this.vista.apiUrl, this.vista.data)
-            // } else {
-            //     res = await patch(this.vista.apiUrl, this.vista.data)
-            // }
-            // this.auth.setLoading(false)
 
-            // if (res.code != 0) return
+            this.auth.setLoading(true, 'Guardando...')
+            let res
+            if (this.is_nuevo) {
+                res = await post(this.vista.apiUrl, this.vista.data)
+            } else {
+                res = await patch(this.vista.apiUrl, this.vista.data)
+            }
+            this.auth.setLoading(false)
 
-            // if (this.is_nuevo) {
-            //     this.vista.data.id = res.data.id
+            if (res.code != 0) return
 
-            //     this.$router.replace({
-            //         name: this.$route.name,
-            //         params: { [this.vista.pathKey]: res.data.id },
-            //     })
+            if (this.is_nuevo) {
+                this.vista.data.id = res.data.id
 
-            //     this.vista.data = {
-            //         ...res.data,
-            //         transaccion_items: this.vista.data.transaccion_items,
-            //     }
-            // }
+                this.$router.replace({
+                    name: this.$route.name,
+                    params: { [this.vista.pathKey]: res.data.id },
+                })
 
-            // this.vista.mode = 'view'
+                this.vista.data = {
+                    ...res.data,
+                    transaccion_items: this.vista.data.transaccion_items,
+                }
+            }
+
+            this.vista.mode = 'view'
         },
 
         //--- Methods --//
@@ -1138,7 +829,7 @@ export default {
                 // id: type + '_' + Date.now().toString().slice(-6),
                 id: crypto.randomUUID(),
                 type: type,
-                name: 'Nuevo ' + config.label,
+                name: config.label,
 
                 props: config.defaultProps ? { ...config.defaultProps } : {},
                 style: config.defaultStyle ? { ...config.defaultStyle } : {},
@@ -1283,123 +974,12 @@ export default {
     height: calc(100vh - 250px);
     gap: 1rem;
     width: 100%;
-
-    .editor-side {
-        flex: 0 0 20rem;
-        min-width: 20rem;
-        max-height: calc(100vh - 250px);
-        overflow-y: auto;
-        display: flex;
-        flex-direction: column;
-        gap: 0.75rem;
-
-        .editor-header {
-            padding: 0.6rem 1rem;
-            background-color: var(--bg-color2);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            user-select: none;
-
-            &.clickable {
-                cursor: pointer;
-                &:hover {
-                    background-color: var(--bg-color-hover);
-                }
-            }
-
-            i {
-                color: var(--text-color2);
-            }
-
-            strong {
-                font-size: 0.8rem;
-                text-transform: uppercase;
-                color: var(--text-color2);
-            }
-        }
-
-        .editor-content {
-            overflow-y: auto;
-            padding: 0.75rem;
-            display: grid;
-            gap: 0.75rem;
-        }
-    }
 }
 
 .sidebar-padding {
     padding: 0.75rem;
     display: grid;
     gap: 0.75rem;
-}
-
-.toolbox {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0.4rem;
-
-    button {
-        padding: 0.4rem;
-        font-size: 0.7rem;
-        border: var(--border);
-        background: var(--bg-color);
-        color: var(--text-color);
-        border-radius: 0.25rem;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        gap: 0.3rem;
-        i {
-            color: var(--primary-color);
-        }
-        &:hover {
-            border-color: var(--primary-color);
-            background: var(--bg-color-hover);
-        }
-    }
-}
-
-.element-header {
-    display: flex;
-    gap: 0.5rem;
-    align-items: center;
-    margin-bottom: 0.5rem;
-
-    strong {
-        padding: 0.25rem 0.5rem;
-        border-radius: 0.25rem;
-        background-color: var(--primary-color);
-        text-transform: uppercase;
-        font-size: 0.8rem;
-    }
-}
-
-.json-editor {
-    padding: 2rem;
-    background: #1e1e1e;
-    color: #d4d4d4;
-    font-family: monospace;
-    overflow: auto;
-}
-
-.grid-2 {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.5rem;
-}
-
-.style-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-
-    & > div {
-        flex: 1 1 45%;
-        &.full-width {
-            flex: 1 1 100%;
-        }
-    }
 }
 
 .text-tiny {

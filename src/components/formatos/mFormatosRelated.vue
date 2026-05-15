@@ -75,7 +75,7 @@ export default {
                 },
             }
 
-            // Mapeamos los datos de la entidad principal para mFormatoRenderer
+            // Mapeamos los datos de la entidad principal para mFormatoValue
             if (row.entity) {
                 send[row.entity] = this.modal[row.entity]
                 send[row.entity + '1'] = this.modal[row.entity + '1']
@@ -92,9 +92,9 @@ export default {
             console.log(send)
             if (res_values.data.length > 0) {
                 send.formato_value = res_values.data[0]
-                this.modals.setModal('mFormatoRenderer', '', 3, send, true)
+                this.modals.setModal('mFormatoValue', '', 3, send, true)
             } else {
-                this.modals.setModal('mFormatoRenderer', '', 1, send, true)
+                this.modals.setModal('mFormatoValue', '', 1, send, true)
             }
         },
     },

@@ -8,14 +8,9 @@
         @runMethod="runMethod"
     >
     </VistaLayout>
-
-    <!-- Modales -->
-    <mFormatoRenderer v-if="modals?.show?.mFormatoRenderer" />
 </template>
 
 <script>
-import mFormatoRenderer from '@/components/formatos/mFormatoRenderer.vue'
-
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
 import { useModals } from '@/pinia/modals'
@@ -24,9 +19,7 @@ import { urls, get } from '@/utils/crud'
 import dayjs from 'dayjs'
 
 export default {
-    components: {
-        mFormatoRenderer,
-    },
+    components: {},
     data: () => ({
         auth: useAuth(),
         vistas: useVistas(),
@@ -226,93 +219,6 @@ export default {
         },
 
         //--- Row actions ---//
-        // async ver(item) {
-        //     const qry = {
-        //         incl: ['socio1', 'moneda1', 'socio_pedido1', 'transaccion_items'],
-        //         iccl: { transaccion_items: { incl: ['articulo1'] } },
-        //     }
-        //     this.auth.setLoading(true, 'Cargando...')
-        //     const res = await get(`${this.vista.apiUrl}/uno/${item.id}?qry=${JSON.stringify(qry)}`)
-        //     this.auth.setLoading(false)
-        //     if (res.code != 0) return
-        //     const send = {
-        //         transaccion: res.data,
-        //         socio: { ...res.data.socio1 },
-        //         socios: [{ ...res.data.socio1 }],
-        //         monedas: [{ ...res.data.moneda1 }],
-        //         pedidos: res.data.socio_pedido ? [{ ...res.data.socio_pedido1 }] : [],
-        //     }
-        //     this.modals.setModal('mTransaccion', 'Ver compra', 3, send, true)
-        // },
-        // async editar(item) {
-        //     const qry = {
-        //         incl: ['socio1', 'moneda1', 'socio_pedido1', 'transaccion_items'],
-        //         iccl: { transaccion_items: { incl: ['articulo1'] } },
-        //     }
-        //     this.auth.setLoading(true, 'Cargando...')
-        //     const res = await get(`${this.vista.apiUrl}/uno/${item.id}?qry=${JSON.stringify(qry)}`)
-        //     this.auth.setLoading(false)
-        //     if (res.code != 0) return
-        //     const send = {
-        //         transaccion: res.data,
-        //         socio: { ...res.data.socio1 },
-        //         socios: [{ ...res.data.socio1 }],
-        //         monedas: [{ ...res.data.moneda1 }],
-        //         pedidos: res.data.socio_pedido ? [{ ...res.data.socio_pedido1 }] : [],
-        //     }
-        //     this.modals.setModal('mTransaccion', 'Editar compra', 2, send, true)
-        // },
-        async controlDespacho(item) {
-            const formato_id = 'RE-BPM-24'
-            this.auth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.formatos}/uno/${formato_id}`)
-            this.auth.setLoading(false)
-            if (res.code != 0) return
-
-            this.auth.setLoading(true, 'Cargando...')
-            const res_values = await get(
-                `${urls.formato_values}/uno/${item.calidad_revisado_despacho}`,
-            )
-            this.auth.setLoading(false)
-            if (res_values.code != 0) return
-
-            await this.system.load(['conformidad_estados'])
-
-            const send = {
-                estructura: res.data,
-                listas: {
-                    conformidad_estados: this.system.data.conformidad_estados,
-                },
-                transaccion: item.id,
-                transaccion1: item,
-            }
-
-            if (res_values.data) {
-                send.values = res_values.data.values
-                this.modals.setModal('mFormatoRenderer', '', 3, send, true)
-            } else {
-                send.values = {}
-                this.modals.setModal('mFormatoRenderer', '', 1, send, true)
-            }
-        },
-        async controlRecepcion() {
-            const formato_id = 'RE-BPM-05.01'
-            this.auth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.formatos}/uno/${formato_id}`)
-            this.auth.setLoading(false)
-            if (res.code != 0) return
-
-            await this.system.load(['conformidad_estados'])
-
-            const send = {
-                estructura: res.data,
-                listas: {
-                    conformidad_estados: this.system.data.conformidad_estados,
-                },
-            }
-
-            this.modals.setModal('mFormatoRenderer', '', 1, send, true)
-        },
 
         //--- auxiliar data ---//
         async loadPedido() {

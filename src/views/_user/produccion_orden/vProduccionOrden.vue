@@ -141,14 +141,14 @@
     </VistaDetalleLayout>
 
     <mFormatosRelated v-if="modals.show.mFormatosRelated" />
-    <mFormatoRenderer v-if="modals.show.mFormatoRenderer" />
+    <mFormatoValue v-if="modals.show.mFormatoValue" />
 </template>
 
 <script>
 import vProduccionOrdenInsumos from './vProduccionOrdenInsumos.vue'
 import vProduccionOrdenPts from './vProduccionOrdenPts.vue'
 import mFormatosRelated from '@/components/formatos/mFormatosRelated.vue'
-import mFormatoRenderer from '@/components/formatos/mFormatoRenderer.vue'
+import mFormatoValue from '@/components/formatos/mFormatoValue.vue'
 
 import VIEW_CONFIG from './produccion_orden.config.js'
 import { useAuth } from '@/pinia/auth'
@@ -165,7 +165,7 @@ export default {
         vProduccionOrdenInsumos,
         vProduccionOrdenPts,
         mFormatosRelated,
-        mFormatoRenderer,
+        mFormatoValue,
     },
     data: () => ({
         VIEW_CONFIG,

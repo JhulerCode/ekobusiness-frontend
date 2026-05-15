@@ -1,23 +1,17 @@
 <template>
-    <JdModal
-        modal="mFormatoRenderer"
-        :buttons="buttons"
-        @button-click="(action) => actions[action]()"
-    >
-        <div class="renderer-side">
-            <FormatoDocument
-                ref="documentRef"
-                :estructura="estructura"
-                :values="modal.formato_value.values"
-                :listas="listas"
-                :mode="modal.mode"
-                @elegir-obj="
-                    (obj, fieldId) => {
-                        modal.formato_value.values[fieldId + '1'] = obj
-                    }
-                "
-            />
-        </div>
+    <JdModal modal="mFormatoValue" :buttons="buttons" @button-click="(action) => actions[action]()">
+        <FormatoDocument
+            ref="documentRef"
+            :estructura="estructura"
+            :values="modal.formato_value.values"
+            :listas="listas"
+            :mode="modal.mode"
+            @elegir-obj="
+                (obj, fieldId) => {
+                    modal.formato_value.values[fieldId + '1'] = obj
+                }
+            "
+        />
     </JdModal>
 </template>
 
@@ -32,7 +26,7 @@ import html2pdf from 'html2pdf.js'
 const modals = useModals()
 const auth = useAuth()
 const documentRef = ref(null)
-const modal = modals.mFormatoRenderer
+const modal = modals.mFormatoValue
 
 // Initialize formatting values if they don't exist
 if (!modal.formato_value) modal.formato_value = { values: {} }
@@ -149,14 +143,4 @@ const actions = {
 }
 </script>
 
-<style lang="scss" scoped>
-.renderer-side {
-    overflow-y: auto;
-    display: flex;
-    justify-content: center;
-    background-color: #525659;
-    padding: 2rem;
-    box-shadow: inset 0 0 2rem rgba(0, 0, 0, 0.5);
-    min-height: 80vh;
-}
-</style>
+<style lang="scss" scoped></style>

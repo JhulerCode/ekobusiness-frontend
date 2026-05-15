@@ -18,9 +18,7 @@
         @mouseleave.stop="$emit('hover', null)"
     >
         <!-- 1. CONTAINER TYPES (Recursion) -->
-        <template
-            v-if="block.type === 'document' || block.type === 'page' || block.type === 'group'"
-        >
+        <template v-if="['document', 'page', 'group', 'grid'].includes(block.type)">
             <RenderBlock
                 v-for="child in block.children"
                 :key="child.id"
@@ -40,16 +38,15 @@
 
         <!-- 2. COMPONENT TYPES -->
         <template v-else>
-
-
             <!-- Manual Inputs (Texto, Numero, Fecha, etc) -->
             <template v-if="block.type.startsWith('input_')">
                 <FieldRenderer
                     :field="{
                         label: block.props?.label,
-                        component: getComponentForInputType(block.props?.inputType),
-                        inputType: block.props?.inputType,
+                        component: blockConfig.renderComponent,
+                        inputType: blockConfig.inputType,
                         id: block.props?.fieldId,
+                        relatedPath: block.props?.relatedPath,
                         optionsKey: block.props?.optionsKey,
                         searchUrl: block.props?.searchUrl,
                         searchField: block.props?.searchField,
@@ -101,7 +98,7 @@
 <script setup>
 import { computed, inject } from 'vue'
 import FieldRenderer from './FieldRenderer.vue'
-
+import { ELEMENT_TYPES } from '@/views/calidad/formato_structures/constants'
 const props = defineProps({
     block: { type: Object, required: true },
     editable: { type: Boolean, default: false },
@@ -113,11 +110,16 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['select', 'hover', 'elegir-obj', 'delete'])
+
+const blockConfig = computed(() => {
+    return ELEMENT_TYPES.find((e) => e.type === props.block.type) || {}
+})
+
 const formContext = inject('formContext')
 
 const labelStyle = computed(() => {
     const style = {}
-    const globalStyle = formContext.config?.globals?.inputLabel || {}
+    const globalStyle = formContext.config?.globals?.inputLabel?.styles || {}
     const blockStyle = props.block.styleLabel || {}
 
     const keys = ['fontSize', 'fontWeight', 'color', 'textAlign', 'fontFamily']
@@ -129,7 +131,7 @@ const labelStyle = computed(() => {
 
 const valueStyle = computed(() => {
     const style = {}
-    const globalStyle = formContext.config?.globals?.inputValue || {}
+    const globalStyle = formContext.config?.globals?.inputValue?.styles || {}
     const blockStyle = props.block.styleValue || {}
 
     const keys = ['fontSize', 'fontWeight', 'color', 'textAlign', 'fontFamily']
@@ -139,20 +141,6 @@ const valueStyle = computed(() => {
     return style
 })
 
-const getComponentForInputType = (type) => {
-    const map = {
-        text: 'JdInput',
-        number: 'JdInput',
-        date: 'JdInput',
-        longtext: 'JdTextArea',
-        select: 'JdSelect',
-        ref: 'JdSelectQuery',
-    }
-    return map[type] || 'JdInput'
-}
-
-
-
 const onSelect = () => {
     if (!props.editable) return
     emit('select', props.block.id, props.block)
@@ -160,7 +148,7 @@ const onSelect = () => {
 
 const typographyStyle = computed(() => {
     const style = {}
-    const globalForType = formContext.globals?.[props.block.type] || {}
+    const globalForType = formContext.globals?.[props.block.type]?.styles || {}
     const keys = [
         'fontSize',
         'fontWeight',
@@ -186,12 +174,6 @@ const typographyStyle = computed(() => {
 const combinedStyle = computed(() => {
     let s = { ...props.block.style }
     if (props.block.type === 'page') {
-        const p = props.block.props || {}
-        if (p.paddingTop) s.paddingTop = p.paddingTop
-        if (p.paddingRight) s.paddingRight = p.paddingRight
-        if (p.paddingBottom) s.paddingBottom = p.paddingBottom
-        if (p.paddingLeft) s.paddingLeft = p.paddingLeft
-
         // Enforce layout for pages
         s.display = 'flex'
         s.flexDirection = 'column'

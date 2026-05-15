@@ -40,11 +40,9 @@ export default {
                 cols: { exclude: [] },
             }
 
-            // if (this.modal.entity == 'transacciones') {
-            //     qry.fltr.transaccion = { op: 'Es', val: this.modal.transaccion }
-            // } else if (this.modal.entity == 'lotes') {
-            //     qry.fltr.lote = { op: 'Es', val: this.modal.lote }
-            // }
+            if (row.entity) {
+                qry.fltr[row.entity] = { op: 'Es', val: this.modal[row.entity] }
+            }
 
             this.auth.setLoading(true, 'Cargando...')
             const res_values = await get(`${urls.formato_values}?qry=${JSON.stringify(qry)}`)

@@ -1,8 +1,8 @@
 <template>
     <VistaLayout
+        :key="$route.fullPath"
         :config="VIEW_CONFIG"
         :setQuery="setQuery"
-        :rowSelectable="true"
         @runMethod="runMethod"
     />
 </template>
@@ -23,6 +23,8 @@ export default {
         VIEW_CONFIG() {
             return {
                 apiPath: 'formato_structures',
+                detailViewName: 'vFormatoStructure',
+                detailPath: 'formato_structure_id',
                 headerActions: [
                     {
                         text: 'Nuevo',
@@ -30,14 +32,7 @@ export default {
                         permiso: 'vFormatoStructures:crear',
                     },
                 ],
-                tableRowActions: [
-                    {
-                        icon: 'fa-solid fa-pen-to-square',
-                        label: 'Editar',
-                        action: 'editar',
-                        permiso: 'vFormatoStructures:editar',
-                    },
-                ],
+                tableRowActions: [],
                 tableColumns: [
                     {
                         id: 'codigo',

@@ -21,10 +21,11 @@
                 :lista="getOptions()"
                 :search="field.searchUrl ? handleSearch : undefined"
                 :mostrar="field.mostrar || field.searchField || 'nombre'"
-                :disabled="!field.relatedPath"
+                :disabled="!!field.relatedPath"
                 :selectedObject="data ? data[field.id + '1'] : null"
                 @elegir="(obj) => $emit('elegir-obj', obj, field.id)"
             />
+            <!-- {{ field }} -->
         </div>
 
         <div v-if="field.help" class="field-help">

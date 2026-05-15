@@ -2,11 +2,20 @@
     <div class="editor-side">
         <div class="side-tabs">
             <button
+                v-if="vista.mode === 'edit'"
                 :class="{ active: activeTab === 'toolbox' }"
                 @click="$emit('update:activeTab', 'toolbox')"
                 title="Componentes"
             >
                 Componentes
+            </button>
+            <button
+                v-if="vista.mode === 'edit'"
+                :class="{ active: activeTab === 'patterns' }"
+                @click="$emit('update:activeTab', 'patterns')"
+                title="Patrones"
+            >
+                Patrones
             </button>
             <button
                 :class="{ active: activeTab === 'tree' }"
@@ -17,7 +26,7 @@
             </button>
         </div>
 
-        <div v-if="activeTab === 'toolbox'" class="editor-section">
+        <div v-show="activeTab === 'toolbox'" class="editor-section">
             <div class="toolbox-container">
                 <div v-for="group in groupedElements" :key="group.name" class="toolbox-group">
                     <p class="group-title">{{ group.name }}</p>
@@ -36,13 +45,33 @@
             </div>
         </div>
 
-        <div v-if="activeTab === 'tree'" class="editor-section">
+        <div v-show="activeTab === 'patterns'" class="editor-section">
+            <div class="toolbox-container">
+                <div class="toolbox-group">
+                    <p class="group-title">DISEÑOS PREDEFINIDOS</p>
+                    <div class="toolbox-grid">
+                        <button
+                            v-for="pat in patterns"
+                            :key="pat.id"
+                            @click="$emit('addPattern', pat)"
+                            :title="pat.label"
+                        >
+                            <i :class="pat.icon"></i>
+                            <span>{{ pat.label }}</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div v-show="activeTab === 'tree'" class="editor-section">
             <TreeItem
                 v-for="child in structure.children"
                 :key="child.id"
                 :item="child"
                 :selectedId="selectedId"
                 :hoveredId="hoveredId"
+                :mode="vista.mode"
                 @select="(id, el) => $emit('select', id, el)"
                 @hover="(id) => $emit('hover', id)"
                 @delete="(id) => $emit('delete', id)"
@@ -61,10 +90,180 @@ export default {
     components: { TreeItem },
     props: {
         activeTab: String,
+        orderElementTypes: Array,
         elementTypes: Array,
-        structure: Object,
+        structure: { type: Object, default: () => ({}) },
         selectedId: String,
         hoveredId: String,
+        vista: Object,
+    },
+    data() {
+        return {
+            patterns: [
+                {
+                    id: 'pattern_header',
+                    label: 'Encabezado',
+                    icon: 'fas fa-id-card',
+                    type: 'grid',
+                    name: 'Encabezado',
+                    style: {
+                        gridTemplateColumns: '1fr 2fr 1fr',
+                        alignItems: 'center',
+                        gap: '20px',
+                        marginBottom: '1rem',
+                    },
+                    children: [
+                        {
+                            type: 'group',
+                            name: 'Logo',
+                            children: [
+                                {
+                                    type: 'image',
+                                    name: 'Logo',
+                                    props: { src: '' },
+                                    style: { width: '100%' },
+                                },
+                            ],
+                        },
+                        {
+                            type: 'group',
+                            name: 'Título',
+                            style: {
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                textAlign: 'center',
+                                gap: '0.5rem',
+                            },
+                            children: [
+                                { type: 'h1', props: { content: 'TITULO DEL FORMATO' } },
+                                { type: 'p', props: { content: 'SUBTITULO' } },
+                            ],
+                        },
+                        {
+                            type: 'group',
+                            name: 'Metadatos',
+                            style: {
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                borderWidth: '1px',
+                                borderStyle: 'solid',
+                                borderColor: '#dfdfdf',
+                                borderRadius: '1rem',
+                                padding: '0.5rem',
+                            },
+                            children: [
+                                { type: 'small', props: { content: 'CÓDIGO: XX-YYY-ZZ' } },
+                                { type: 'small', props: { content: 'VERSIÓN: 1.0' } },
+                                { type: 'small', props: { content: 'FECHA: Ene-26' } },
+                                { type: 'small', props: { content: 'APROBADO POR: GG' } },
+                            ],
+                        },
+                    ],
+                },
+                {
+                    id: 'group_2_cols',
+                    label: '2 Columnas',
+                    icon: 'fas fa-columns',
+                    type: 'group',
+                    name: 'Fila (2 Col)',
+                    style: { flexDirection: 'row', gap: '1rem' },
+                    children: [
+                        {
+                            type: 'group',
+                            name: 'Columna 1',
+                            style: { flex: '1' },
+                            children: [],
+                        },
+                        {
+                            type: 'group',
+                            name: 'Columna 2',
+                            style: { flex: '1' },
+                            children: [],
+                        },
+                    ],
+                },
+                {
+                    id: 'group_3_cols',
+                    label: '3 Columnas',
+                    icon: 'fas fa-th-large',
+                    type: 'group',
+                    name: 'Fila (3 Col)',
+                    style: { flexDirection: 'row', gap: '1rem' },
+                    children: [
+                        {
+                            type: 'group',
+                            name: 'Columna 1',
+                            style: { flex: '1' },
+                            children: [],
+                        },
+                        {
+                            type: 'group',
+                            name: 'Columna 2',
+                            style: { flex: '1' },
+                            children: [],
+                        },
+                        {
+                            type: 'group',
+                            name: 'Columna 3',
+                            style: { flex: '1' },
+                            children: [],
+                        },
+                    ],
+                },
+                {
+                    id: 'grid_2x2',
+                    label: 'Cuadrícula 2x2',
+                    icon: 'fas fa-th-large',
+                    type: 'grid',
+                    name: 'Grid 2x2',
+                    style: { gridTemplateColumns: '1fr 1fr', gap: '1rem' },
+                    children: [
+                        { type: 'group', name: 'Celda 1', children: [] },
+                        { type: 'group', name: 'Celda 2', children: [] },
+                        { type: 'group', name: 'Celda 3', children: [] },
+                        { type: 'group', name: 'Celda 4', children: [] },
+                    ],
+                },
+                {
+                    id: 'grid_section_2',
+                    label: 'Sección Grid (2)',
+                    icon: 'fas fa-th-list',
+                    type: 'group',
+                    name: 'Sección',
+                    style: { marginBottom: '1rem' },
+                    children: [
+                        {
+                            type: 'p',
+                            name: 'Cabecera',
+                            props: { content: 'Contenedor' },
+                            style: {
+                                backgroundColor: '#f2f2f2',
+                                padding: '4px 8px',
+                                fontWeight: 'bold',
+                                fontSize: '10pt',
+                                color: 'rgba(60, 60, 60, .66)',
+                            },
+                        },
+                        {
+                            type: 'grid',
+                            name: 'Cuadrícula',
+                            style: {
+                                gridTemplateColumns: '1fr 1fr',
+                                gap: '8px',
+                                padding: '8px',
+                            },
+                            children: [
+                                { type: 'input_text', props: { label: 'Campo 1' } },
+                                { type: 'input_text', props: { label: 'Campo 2' } },
+                            ],
+                        },
+                    ],
+                },
+            ],
+        }
     },
     computed: {
         groupedElements() {
@@ -75,9 +274,7 @@ export default {
                 groups[groupName].push(el)
             })
 
-            // Define order to match the desired UI
-            const order = ['DESIGN', 'TEXT', 'MEDIA', 'INPUTS']
-            return order
+            return this.orderElementTypes
                 .map((name) => ({
                     name,
                     elements: groups[name] || [],
@@ -90,8 +287,8 @@ export default {
 
 <style lang="scss" scoped>
 .editor-side {
-    flex: 0 0 25rem;
-    min-width: 25rem;
+    flex: 0 0 20rem;
+    min-width: 20rem;
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -107,14 +304,16 @@ export default {
             background: transparent;
             cursor: pointer;
             transition: all 0.2s;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
+            color: var(--text-color2);
             border-bottom: 2px solid transparent;
 
             &:hover {
-                color: var(--primary-color);
+                color: var(--primary-color) !important;
             }
 
             &.active {
+                color: var(--text-color);
                 border-bottom-color: var(--primary-color);
             }
         }

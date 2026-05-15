@@ -59,6 +59,7 @@
                 :item="child"
                 :selectedId="selectedId"
                 :hoveredId="hoveredId"
+                :mode="mode"
                 @select="(id, el) => $emit('select', id, el)"
                 @hover="(id) => $emit('hover', id)"
                 @delete="(id) => $emit('delete', id)"
@@ -71,20 +72,23 @@
 
 <script setup>
 import { ref, reactive, onMounted, onUnmounted } from 'vue'
+import { ELEMENT_TYPES } from './constants'
 
 const props = defineProps({
     item: { type: Object, required: true },
     selectedId: { type: String, default: null },
     hoveredId: { type: String, default: null },
+    mode: { type: String, default: 'edit' },
 })
 
 const emit = defineEmits(['select', 'hover', 'delete', 'move', 'duplicate'])
 
-const collapsed = ref(false)
+const collapsed = ref(true)
 const isOver = ref(null) // 'before', 'inside', 'after'
 const menuData = reactive({ show: false, x: 0, y: 0 })
 
 const handleContextMenu = (e) => {
+    if (props.mode !== 'edit') return
     if (props.item.id === 'root') return
     window.dispatchEvent(new CustomEvent('close-context-menus'))
     menuData.show = true
@@ -150,20 +154,8 @@ const handleDrop = (e) => {
 }
 
 const getIcon = (type) => {
-    const icons = {
-        page: 'fas fa-file',
-        section: 'fas fa-folder',
-        row: 'fas fa-grip-lines',
-        column: 'fas fa-columns',
-        field: 'fas fa-keyboard',
-        text: 'fas fa-paragraph',
-        p: 'fas fa-paragraph',
-        h1: 'fas fa-heading',
-        h2: 'fas fa-heading',
-        h3: 'fas fa-heading',
-        image: 'fas fa-image',
-    }
-    return icons[type] || 'fas fa-cube'
+    const elType = ELEMENT_TYPES.find((e) => e.type === type)
+    return elType?.icon || 'fas fa-cube'
 }
 </script>
 

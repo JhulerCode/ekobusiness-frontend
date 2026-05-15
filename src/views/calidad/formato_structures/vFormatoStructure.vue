@@ -32,11 +32,14 @@
             <!-- LEFT SIDEBAR: Structure & Toolbox -->
             <EditorSidebarLeft
                 v-model:activeTab="activeSideTab"
+                :orderElementTypes="ORDER_ELEMENT_TYPES"
                 :elementTypes="ELEMENT_TYPES"
                 :structure="vista.data.structure"
                 :selectedId="selectedId"
                 :hoveredId="hoveredId"
+                :vista="vista"
                 @addBlock="addBlockToSelected"
+                @addPattern="addPattern"
                 @select="handleSelect"
                 @hover="(id) => (hoveredId = id)"
                 @delete="deleteBlock"
@@ -45,7 +48,7 @@
             />
 
             <!-- MAIN RENDERER -->
-            <FormatoDocument
+            <FormatoRenderer
                 ref="documentRef"
                 :estructura="vista.data"
                 :values="formato_value.values"
@@ -86,66 +89,26 @@ import { incompleteData } from '@/utils/mine'
 import { jmsg } from '@/utils/swal'
 
 import VistaDetalleLayout from '@/components/VistaDetalleLayout.vue'
-import FormatoDocument from '@/components/formatos/FormatoDocument.vue'
+import FormatoRenderer from '@/components/formatos/FormatoRenderer.vue'
 import EditorSidebarLeft from './EditorSidebarLeft.vue'
 import EditorSidebarRight from './EditorSidebarRight.vue'
-
-const TEXT_ALIGN_OPTIONS = [
-    { id: 'left', nombre: 'Izquierda' },
-    { id: 'center', nombre: 'Centro' },
-    { id: 'right', nombre: 'Derecha' },
-    { id: 'justify', nombre: 'Justificado' },
-]
-
-const FLEX_DIRECTIONS = [
-    { id: 'column', nombre: 'Vertical' },
-    { id: 'row', nombre: 'Horizontal' },
-]
-
-const JUSTIFY_OPTIONS = [
-    { id: 'flex-start', nombre: 'Inicio' },
-    { id: 'center', nombre: 'Centro' },
-    { id: 'flex-end', nombre: 'Fin' },
-    { id: 'space-between', nombre: 'Espaciado' },
-]
-
-const ALIGN_OPTIONS = [
-    { id: 'stretch', nombre: 'Estirar' },
-    { id: 'flex-start', nombre: 'Inicio' },
-    { id: 'center', nombre: 'Centro' },
-    { id: 'flex-end', nombre: 'Fin' },
-]
-
-const BORDER_STYLE_OPTIONS = [
-    { id: 'solid', nombre: 'Sólido' },
-    { id: 'dashed', nombre: 'Guiones' },
-    { id: 'dotted', nombre: 'Puntos' },
-    { id: 'double', nombre: 'Doble' },
-]
-
-const PAPER_SIZES = [
-    { id: 'A4', nombre: 'A4 (210 x 297 mm)' },
-    { id: 'LETTER', nombre: 'Carta (215.9 x 279.4 mm)' },
-    { id: 'LEGAL', nombre: 'Oficio (215.9 x 355.6 mm)' },
-]
-
-const ORIENTATIONS = [
-    { id: 'portrait', nombre: 'Vertical' },
-    { id: 'landscape', nombre: 'Horizontal' },
-]
-
-const STYLE_SECTIONS_LABELS = {
-    layout: 'Layout / Flex',
-    box: 'Dimensiones y Espaciado',
-    border: 'Bordes y Fondo',
-    typography: 'Tipografía',
-    other: 'Otros',
-    inputLabel: 'Estilo de Etiqueta (PDF)',
-    inputValue: 'Estilo de Valor (PDF)',
-}
+import {
+    FLEX_DIRECTIONS,
+    JUSTIFY_OPTIONS,
+    ALIGN_OPTIONS,
+    BORDER_STYLE_OPTIONS,
+    PAPER_SIZES,
+    ORIENTATIONS,
+    STYLE_SECTIONS_LABELS,
+    TYPOGRAPHY_STYLES,
+    COMMON_STYLES,
+    ORDER_ELEMENT_TYPES,
+    ELEMENT_TYPES,
+    TEXT_ALIGN_OPTIONS,
+} from './constants'
 
 const STYLE_FIELDS_DEF = {
-    // Layout (Flex)
+    // Layout
     flexDirection: { label: 'Dirección', type: 'select', list: FLEX_DIRECTIONS, section: 'layout' },
     justifyContent: {
         label: 'Distribución',
@@ -154,6 +117,22 @@ const STYLE_FIELDS_DEF = {
         section: 'layout',
     },
     alignItems: { label: 'Alineación', type: 'select', list: ALIGN_OPTIONS, section: 'layout' },
+    justifyItems: {
+        label: 'Alineación Items (Grid)',
+        type: 'select',
+        list: ALIGN_OPTIONS,
+        section: 'layout',
+    },
+    gridTemplateColumns: {
+        label: 'Columnas (Grid)',
+        placeholder: '1fr 1fr',
+        section: 'layout',
+    },
+    gridTemplateRows: {
+        label: 'Filas (Grid)',
+        placeholder: 'auto',
+        section: 'layout',
+    },
     gap: { label: 'Gap', section: 'layout' },
     flex: { label: 'Flex (Ancho)', section: 'layout' },
 
@@ -193,247 +172,17 @@ const STYLE_FIELDS_DEF = {
     },
 }
 
-const COMMON_STYLES = [
-    'width',
-    'height',
-    'marginTop',
-    'marginRight',
-    'marginBottom',
-    'marginLeft',
-    'paddingTop',
-    'paddingRight',
-    'paddingBottom',
-    'paddingLeft',
-    'backgroundColor',
-    'borderStyle',
-    'borderWidth',
-    'borderColor',
-    'borderRadius',
-]
-
-const TYPOGRAPHY_STYLES = ['fontSize', 'fontWeight', 'color', 'textAlign']
-
-const ELEMENT_TYPES = [
-    {
-        type: 'page',
-        group: 'DESIGN',
-        label: 'Página',
-        icon: 'fas fa-file-alt',
-        defaultProps: {
-            orientation: 'portrait',
-            paddingTop: '0.5in',
-            paddingRight: '0.5in',
-            paddingBottom: '0.5in',
-            paddingLeft: '0.5in',
-            headerId: '',
-        },
-        defaultStyle: {
-            backgroundColor: '#ffffff',
-        },
-        hasChildren: true,
-        propsFields: [
-            { key: 'orientation', label: 'Orientación', type: 'select', list: ORIENTATIONS },
-            {
-                key: 'headerId',
-                label: 'ID Encabezado Reutilizable',
-                placeholder: 'Ej: header_group',
-            },
-            { key: 'paddingTop', label: 'Padding Sup.' },
-            { key: 'paddingRight', label: 'Padding Der.' },
-            { key: 'paddingBottom', label: 'Padding Inf.' },
-            { key: 'paddingLeft', label: 'Padding Izq.' },
-        ],
-        styleFields: ['backgroundColor'],
-    },
-    {
-        type: 'group',
-        group: 'DESIGN',
-        label: 'Grupo',
-        icon: 'fas fa-layer-group',
-        defaultProps: {},
-        defaultStyle: {
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'flex-start',
-            alignItems: 'stretch',
-        },
-        hasChildren: true,
-        propsFields: [],
-        styleFields: [
-            'flexDirection',
-            'justifyContent',
-            'alignItems',
-            'gap',
-            'flex',
-            ...COMMON_STYLES,
-        ],
-    },
-    {
-        type: 'h1',
-        group: 'TEXT',
-        label: 'Título 1',
-        icon: 'fas fa-heading',
-        defaultProps: { content: 'Título 1' },
-        defaultStyle: {},
-        propsFields: [{ key: 'content', label: 'Contenido', textarea: true }],
-        styleFields: [...TYPOGRAPHY_STYLES, ...COMMON_STYLES],
-    },
-    {
-        type: 'h2',
-        group: 'TEXT',
-        label: 'Título 2',
-        icon: 'fas fa-heading',
-        defaultProps: { content: 'Título 2' },
-        defaultStyle: {},
-        propsFields: [{ key: 'content', label: 'Contenido', textarea: true }],
-        styleFields: [...TYPOGRAPHY_STYLES, ...COMMON_STYLES],
-    },
-    {
-        type: 'h3',
-        group: 'TEXT',
-        label: 'Título 3',
-        icon: 'fas fa-heading',
-        defaultProps: { content: 'Título 3' },
-        defaultStyle: {},
-        propsFields: [{ key: 'content', label: 'Contenido', textarea: true }],
-        styleFields: [...TYPOGRAPHY_STYLES, ...COMMON_STYLES],
-    },
-    {
-        type: 'p',
-        group: 'TEXT',
-        label: 'Párrafo',
-        icon: 'fas fa-paragraph',
-        defaultProps: { content: 'Nuevo contenido...' },
-        defaultStyle: {},
-        propsFields: [{ key: 'content', label: 'Contenido', textarea: true }],
-        styleFields: [...TYPOGRAPHY_STYLES, ...COMMON_STYLES],
-    },
-    {
-        type: 'small',
-        group: 'TEXT',
-        label: 'Small',
-        icon: 'fas fa-minus',
-        defaultProps: { content: 'Nota al pie...' },
-        defaultStyle: {},
-        propsFields: [{ key: 'content', label: 'Contenido' }],
-        styleFields: [...TYPOGRAPHY_STYLES, ...COMMON_STYLES],
-    },
-    {
-        type: 'image',
-        group: 'MEDIA',
-        label: 'Imagen',
-        icon: 'fas fa-image',
-        defaultProps: { src: '' },
-        defaultStyle: { width: '100%' },
-        propsFields: [{ key: 'src', label: 'URL Imagen' }],
-        styleFields: COMMON_STYLES,
-    },
-    {
-        type: 'input_text',
-        group: 'INPUTS',
-        label: 'Input Texto',
-        icon: 'fas fa-font',
-        defaultProps: { fieldId: '', inputType: 'text', label: 'Nuevo Campo' },
-        defaultStyle: { margin: '0', padding: '0' },
-        propsFields: [
-            { key: 'fieldId', label: 'ID del Campo (v-model)' },
-            { key: 'label', label: 'Etiqueta' },
-            {
-                key: 'relatedPath',
-                label: 'Propiedad Relacionada (Entidad)',
-                placeholder: 'socio1.nombres',
-            },
-        ],
-        styleFields: [...TYPOGRAPHY_STYLES, ...COMMON_STYLES],
-    },
-    {
-        type: 'input_number',
-        group: 'INPUTS',
-        label: 'Input Número',
-        icon: 'fas fa-hashtag',
-        defaultProps: { fieldId: '', inputType: 'number', label: 'Nuevo Número' },
-        defaultStyle: { margin: '0', padding: '0' },
-        propsFields: [
-            { key: 'fieldId', label: 'ID del Campo (v-model)' },
-            { key: 'label', label: 'Etiqueta' },
-            { key: 'relatedPath', label: 'Propiedad Relacionada (Entidad)' },
-        ],
-        styleFields: [...TYPOGRAPHY_STYLES, ...COMMON_STYLES],
-    },
-    {
-        type: 'input_date',
-        group: 'INPUTS',
-        label: 'Input Fecha',
-        icon: 'fas fa-calendar-alt',
-        defaultProps: { fieldId: '', inputType: 'date', label: 'Fecha' },
-        defaultStyle: { margin: '0', padding: '0' },
-        propsFields: [
-            { key: 'fieldId', label: 'ID del Campo (v-model)' },
-            { key: 'label', label: 'Etiqueta' },
-            { key: 'relatedPath', label: 'Propiedad Relacionada (Entidad)' },
-        ],
-        styleFields: [...TYPOGRAPHY_STYLES, ...COMMON_STYLES],
-    },
-    {
-        type: 'input_longtext',
-        group: 'INPUTS',
-        label: 'Texto Largo',
-        icon: 'fas fa-align-left',
-        defaultProps: { fieldId: '', inputType: 'longtext', label: 'Observaciones' },
-        defaultStyle: { margin: '0', padding: '0' },
-        propsFields: [
-            { key: 'fieldId', label: 'ID del Campo (v-model)' },
-            { key: 'label', label: 'Etiqueta' },
-            { key: 'relatedPath', label: 'Propiedad Relacionada (Entidad)' },
-        ],
-        styleFields: [...TYPOGRAPHY_STYLES, ...COMMON_STYLES],
-    },
-    {
-        type: 'input_select',
-        group: 'INPUTS',
-        label: 'Selector',
-        icon: 'fas fa-list',
-        defaultProps: { fieldId: '', inputType: 'select', label: 'Opción' },
-        defaultStyle: { margin: '0', padding: '0' },
-        propsFields: [
-            { key: 'fieldId', label: 'ID del Campo (v-model)' },
-            { key: 'label', label: 'Etiqueta' },
-            { key: 'optionsKey', label: 'Key de Lista (Pinia)' },
-        ],
-        styleFields: [...TYPOGRAPHY_STYLES, ...COMMON_STYLES],
-        styleLabelFields: TYPOGRAPHY_STYLES,
-        styleValueFields: TYPOGRAPHY_STYLES,
-    },
-    {
-        type: 'input_ref',
-        group: 'INPUTS',
-        label: 'Buscador',
-        icon: 'fas fa-search',
-        defaultProps: { fieldId: '', inputType: 'ref', label: 'Referencia' },
-        defaultStyle: { margin: '0', padding: '0' },
-        propsFields: [
-            { key: 'fieldId', label: 'ID del Campo (v-model)' },
-            { key: 'label', label: 'Etiqueta' },
-            { key: 'searchUrl', label: 'URL de Búsqueda' },
-            { key: 'searchField', label: 'Columna de Búsqueda', placeholder: 'nombre' },
-            { key: 'mostrar', label: 'Propiedad a mostrar', placeholder: 'nombre' },
-            { key: 'searchFltr', label: 'Filtros Extra (JSON)', placeholder: '{"activo":1}' },
-            { key: 'searchCols', label: 'Columnas Extra (JSON)', placeholder: '["id", "nombre"]' },
-            { key: 'searchOrdr', label: 'Orden (JSON)', placeholder: '[["id", "DESC"]]' },
-            { key: 'searchLimt', label: 'Límite', placeholder: '25' },
-        ],
-        styleFields: [...TYPOGRAPHY_STYLES, ...COMMON_STYLES],
-        styleLabelFields: TYPOGRAPHY_STYLES,
-        styleValueFields: TYPOGRAPHY_STYLES,
-    },
-]
-
 export default {
     components: {
         VistaDetalleLayout,
-        FormatoDocument,
+        FormatoRenderer,
         EditorSidebarLeft,
         EditorSidebarRight,
+    },
+    provide() {
+        return {
+            ELEMENT_TYPES,
+        }
     },
     data() {
         return {
@@ -450,6 +199,7 @@ export default {
                 permisoCrear: 'vFormatoStructures:crear',
                 fullWidth: true,
             },
+            ORDER_ELEMENT_TYPES,
             ELEMENT_TYPES,
             STYLE_FIELDS_DEF,
             STYLE_SECTIONS_LABELS,
@@ -460,7 +210,7 @@ export default {
             collapsedSections: {
                 toolbox: false,
                 tree: false,
-                props: true,
+                props: false,
                 layout: true,
                 box: true,
                 border: true,
@@ -469,6 +219,8 @@ export default {
                 visibility: true,
                 inputLabel: true,
                 inputValue: true,
+                doc_general: false,
+                comp_general: false,
             },
             history: [],
             historyIndex: -1,
@@ -480,6 +232,9 @@ export default {
     computed: {
         vista() {
             return this.vistas[this.$route.name]
+        },
+        is_nuevo() {
+            return this.$route.params[this.vista.pathKey] === 'nuevo'
         },
         fieldList() {
             return (this.vista.data.fields || []).map((f) => ({
@@ -544,13 +299,93 @@ export default {
                 config: {
                     paperSize: 'A4',
                     globals: {
-                        h1: { fontSize: '12pt', fontWeight: 'bold', color: '#000000' },
-                        h2: { fontSize: '11pt', fontWeight: 'bold', color: '#000000' },
-                        h3: { fontSize: '10pt', fontWeight: 'bold', color: '#000000' },
-                        p: { fontSize: '10pt', color: '#000000' },
-                        small: { fontSize: '8pt', color: '#000000' },
-                        inputLabel: { fontSize: '10pt', fontWeight: 'bold', color: '#000000' },
-                        inputValue: { fontSize: '10pt', color: '#000000' },
+                        page: {
+                            props: {
+                                orientation: 'portrait',
+                                headerId: '',
+                            },
+                            styles: {
+                                backgroundColor: '#ffffff',
+                                paddingTop: '0.5in',
+                                paddingRight: '0.5in',
+                                paddingBottom: '0.5in',
+                                paddingLeft: '0.5in',
+                            },
+                        },
+                        group: {
+                            props: {},
+                            styles: {
+                                display: 'flex',
+                                flexDirection: 'column',
+                                justifyContent: 'flex-start',
+                                alignItems: 'stretch',
+                            },
+                        },
+                        grid: {
+                            props: {},
+                            styles: {
+                                display: 'grid',
+                                gridTemplateColumns: '1fr 1fr',
+                                gap: '1rem',
+                            },
+                        },
+                        h1: {
+                            props: { content: 'Título 1' },
+                            styles: { fontSize: '12pt', fontWeight: 'bold', color: '#000000' },
+                        },
+                        h2: {
+                            props: { content: 'Título 2' },
+                            styles: { fontSize: '11pt', fontWeight: 'bold', color: '#000000' },
+                        },
+                        h3: {
+                            props: { content: 'Título 3' },
+                            styles: { fontSize: '10pt', fontWeight: 'bold', color: '#000000' },
+                        },
+                        p: {
+                            props: { content: 'Nuevo contenido...' },
+                            styles: { fontSize: '10pt', color: '#000000' },
+                        },
+                        small: {
+                            props: { content: 'Nota al pie...' },
+                            styles: { fontSize: '8pt', color: '#000000' },
+                        },
+                        image: {
+                            props: { src: '' },
+                            styles: { width: '100%' },
+                        },
+                        input_text: {
+                            props: { fieldId: '', label: 'Texto' },
+                            styles: { margin: '0', padding: '0' },
+                        },
+                        input_number: {
+                            props: { fieldId: '', label: 'Número' },
+                            styles: { margin: '0', padding: '0' },
+                        },
+                        input_date: {
+                            props: { fieldId: '', label: 'Fecha' },
+                            styles: { margin: '0', padding: '0' },
+                        },
+                        input_time: {
+                            props: { fieldId: '', label: 'Hora' },
+                            styles: { margin: '0', padding: '0' },
+                        },
+                        input_longtext: {
+                            props: { fieldId: '', label: 'Observaciones' },
+                            styles: { margin: '0', padding: '0' },
+                        },
+                        input_select: {
+                            props: { fieldId: '', label: 'Opción' },
+                            styles: { margin: '0', padding: '0' },
+                        },
+                        input_ref: {
+                            props: { fieldId: '', label: 'Referencia' },
+                            styles: { margin: '0', padding: '0' },
+                        },
+                        inputLabel: {
+                            props: {},
+                            styles: { fontSize: '10pt', fontWeight: 'bold', color: '#000000' },
+                        },
+                        inputValue: { props: {}, styles: { fontSize: '10pt', color: '#000000' } },
                     },
                 },
                 structure: {
@@ -564,8 +399,97 @@ export default {
             }
 
             this.handleSelect(this.vista.data.structure.id, this.vista.data.structure)
-            this.addBlockToSelected('page')
-            this.addHeader()
+            const firstPage = this.addBlockToSelected('page')
+            this.handleSelect(firstPage.id, firstPage)
+            // this.addHeader()
+        },
+        async loadExistingData() {
+            this.auth.setLoading(true, 'Cargando formato...')
+            const res = await get(
+                `${this.vista.apiUrl}/uno/${this.$route.params.formato_structure_id}`,
+            )
+            this.auth.setLoading(false)
+            if (res.code === 0) {
+                this.vista.data = res.data
+                if (!this.vista.data.structure) this.loadNewData() // Fallback if no structure
+            }
+        },
+
+        //--- Header actions ---//
+        async guardar() {
+            if (this.checkDatos()) return
+            console.log(this.vista.data)
+            this.handleSelect(null, null)
+            this.auth.setLoading(true, 'Guardando...')
+            let res
+            if (this.is_nuevo) {
+                res = await post(this.vista.apiUrl, this.vista.data)
+            } else {
+                res = await patch(this.vista.apiUrl, this.vista.data)
+            }
+            this.auth.setLoading(false)
+
+            if (res.code != 0) return
+
+            if (this.is_nuevo) {
+                this.vista.data.id = res.data.id
+
+                this.$router.replace({
+                    name: this.$route.name,
+                    params: { [this.vista.pathKey]: res.data.id },
+                })
+
+                this.vista.data = {
+                    ...res.data,
+                    transaccion_items: this.vista.data.transaccion_items,
+                }
+            }
+
+            this.vista.mode = 'view'
+        },
+
+        //--- Methods --//
+        checkDatos() {
+            const props = ['nombre', 'codigo', 'structure']
+
+            if (incompleteData(this.vista.data, props)) {
+                jmsg('warning', 'Ingrese los datos necesarios')
+                return true
+            }
+
+            // Validar que los IDs de los campos sean únicos
+            const fieldIds = new Set()
+            const duplicates = []
+
+            const findDuplicates = (block) => {
+                if (block.props?.fieldId) {
+                    if (fieldIds.has(block.props.fieldId)) {
+                        duplicates.push(block.props.fieldId)
+                    } else {
+                        fieldIds.add(block.props.fieldId)
+                    }
+                }
+                if (block.children) {
+                    block.children.forEach(findDuplicates)
+                }
+            }
+
+            if (this.vista.data.structure) {
+                findDuplicates(this.vista.data.structure)
+            }
+
+            if (duplicates.length > 0) {
+                jmsg(
+                    'warning',
+                    `Hay IDs de campos duplicados: ${[...new Set(duplicates)].join(', ')}`,
+                )
+                return true
+            }
+
+            return false
+        },
+        toggleSection(key) {
+            this.collapsedSections[key] = !this.collapsedSections[key]
         },
         addHeader() {
             const page = this.vista.data.structure.children[0]
@@ -574,12 +498,11 @@ export default {
             this.handleSelect(page.id, page)
 
             // 1. Header Group
-            const headerGroup = this.addBlockToSelected('group')
+            const headerGroup = this.addBlockToSelected('grid')
             headerGroup.name = 'Encabezado'
             Object.assign(headerGroup.style, {
-                display: 'flex',
-                flexDirection: 'row',
-                justifyContent: 'space-between',
+                display: 'grid',
+                gridTemplateColumns: '1fr 2fr 1fr',
                 alignItems: 'center',
                 gap: '20px',
             })
@@ -663,64 +586,11 @@ export default {
             bodyGroup.name = 'Cuerpo'
             Object.assign(bodyGroup.style, {
                 display: 'flex',
-                flexDirection: 'row',
+                flexDirection: 'column',
                 gap: '20px',
             })
 
             this.handleSelect(bodyGroup.id, bodyGroup)
-        },
-        async loadExistingData() {
-            this.auth.setLoading(true, 'Cargando formato...')
-            const res = await get(`${this.vista.apiUrl}/uno/${this.$route.params.id}`)
-            this.auth.setLoading(false)
-            if (res.code === 0) {
-                this.vista.data = res.data
-                if (!this.vista.data.structure) this.loadNewData() // Fallback if no structure
-            }
-        },
-
-        //--- Header actions ---//
-        async guardar() {
-            if (this.checkDatos()) return
-
-            this.auth.setLoading(true, 'Guardando...')
-            let res
-            if (this.is_nuevo) {
-                res = await post(this.vista.apiUrl, this.vista.data)
-            } else {
-                res = await patch(this.vista.apiUrl, this.vista.data)
-            }
-            this.auth.setLoading(false)
-
-            if (res.code != 0) return
-
-            if (this.is_nuevo) {
-                this.vista.data.id = res.data.id
-
-                this.$router.replace({
-                    name: this.$route.name,
-                    params: { [this.vista.pathKey]: res.data.id },
-                })
-
-                this.vista.data = {
-                    ...res.data,
-                    transaccion_items: this.vista.data.transaccion_items,
-                }
-            }
-
-            this.vista.mode = 'view'
-        },
-
-        //--- Methods --//
-        checkDatos() {
-            const props = ['nombre', 'codigo', 'structure']
-
-            if (incompleteData(this.vista.data, props)) {
-                jmsg('warning', 'Ingrese los datos necesarios')
-                return true
-            }
-
-            return false
         },
 
         //--- History ---//
@@ -729,7 +599,7 @@ export default {
                 return
             }
 
-            if (e.key === 'Delete' || e.key === 'Backspace') {
+            if ((e.key === 'Delete' || e.key === 'Backspace') && this.vista.mode === 'edit') {
                 if (this.selectedId && this.selectedId !== 'root') {
                     e.preventDefault()
                     this.deleteBlock(this.selectedId)
@@ -798,11 +668,6 @@ export default {
             }
         },
 
-        //--- Logic to control panels ---//
-        toggleSection(key) {
-            this.collapsedSections[key] = !this.collapsedSections[key]
-        },
-
         //--- Editor logic ---//
         handleSelect(id, element) {
             this.selectedId = id
@@ -817,33 +682,77 @@ export default {
             this.selectedId = id
             this.selectedElement = element
         },
-        addBlockToSelected(type) {
-            if (type === 'page' && this.selectedElement?.type === 'page') {
-                this.auth.setAlert('No se puede añadir una página dentro de otra página', 'error')
-                return
+        addPattern(pattern) {
+            const createRecursive = (node) => {
+                // 1. Añadir el bloque base usando la lógica estándar (valida padres, aplica globals, genera UUID)
+                const newBlock = this.addBlockToSelected(node.type)
+                if (!newBlock) return null
+
+                // 2. Sobrescribir con valores específicos del patrón si existen
+                if (node.name) newBlock.name = node.name
+                if (node.style) Object.assign(newBlock.style, node.style)
+                if (node.props) Object.assign(newBlock.props, node.props)
+
+                // 3. Crear hijos recursivamente
+                if (node.children && node.children.length > 0) {
+                    for (const childNode of node.children) {
+                        // IMPORTANTE: Asegurar que el padre esté seleccionado antes de añadir cada hijo directo
+                        this.handleSelect(newBlock.id, newBlock)
+                        createRecursive(childNode)
+                    }
+                }
+
+                return newBlock
             }
+
+            createRecursive(pattern)
+
+            // Restaurar selección original (opcional, o dejar el último elemento creado seleccionado)
+            // this.handleSelect(originalSelection.id, originalSelection.element)
+        },
+        addBlockToSelected(type) {
             const config = ELEMENT_TYPES.find((t) => t.type === type)
             if (!config) return
 
+            // Si es una página, forzamos que el padre sea la raíz (documento)
+            const isPage = type === 'page'
+            const targetElement = isPage ? this.vista.data.structure : this.selectedElement
+            const parentType = targetElement?.type || 'document'
+
+            if (config.allowedParents && !config.allowedParents.includes(parentType)) {
+                const parentConfig = ELEMENT_TYPES.find((t) => t.type === parentType)
+                const parentLabel = parentConfig
+                    ? parentConfig.label
+                    : parentType === 'document'
+                      ? 'Documento'
+                      : parentType
+
+                jmsg('warning', `No se puede añadir "${config.label}" dentro de "${parentLabel}"`)
+                return
+            }
+
+            const defaults = this.vista.data.config.globals[type] || {}
+
             const newBlock = {
-                // id: type + '_' + Date.now().toString().slice(-6),
                 id: crypto.randomUUID(),
                 type: type,
                 name: config.label,
 
-                props: config.defaultProps ? { ...config.defaultProps } : {},
-                style: config.defaultStyle ? { ...config.defaultStyle } : {},
-                settings: config.defaultSettings ? { ...config.defaultSettings } : {},
-                actions: config.defaultActions ? { ...config.defaultActions } : {},
-                bindings: config.defaultBindings ? { ...config.defaultBindings } : {},
-                animations: config.defaultAnimations ? { ...config.defaultAnimations } : {},
-                visibility: config.defaultVisibility ? { ...config.defaultVisibility } : {},
+                props: defaults.props ? { ...defaults.props } : {},
+                style: defaults.styles ? { ...defaults.styles } : {},
+                settings: {},
+                actions: {},
+                bindings: {},
+                animations: {},
+                visibility: { condition: '' },
 
                 children: [],
             }
 
-            if (this.selectedId && this.selectedElement && this.selectedElement.children) {
-                this.selectedElement.children.push(newBlock)
+            if (isPage) {
+                this.vista.data.structure.children.push(newBlock)
+            } else if (targetElement && targetElement.children) {
+                targetElement.children.push(newBlock)
             } else {
                 this.vista.data.structure.children.push(newBlock)
             }
@@ -875,6 +784,56 @@ export default {
         handleMove(dragId, targetId, pos) {
             if (dragId === targetId) return
 
+            // 1. Encontrar el elemento que se va a mover para validar su tipo
+            let draggedItemType = null
+            let draggedItemLabel = ''
+            const findType = (list) => {
+                for (const it of list) {
+                    if (it.id === dragId) {
+                        draggedItemType = it.type
+                        const cfg = ELEMENT_TYPES.find((t) => t.type === it.type)
+                        draggedItemLabel = cfg ? cfg.label : it.type
+                        return true
+                    }
+                    if (it.children && findType(it.children)) return true
+                }
+                return false
+            }
+            findType([this.vista.data.structure])
+            if (!draggedItemType) return
+
+            // 2. Encontrar el tipo del nuevo padre
+            let newParentType = 'document'
+            const findParentType = (list, pType = 'document') => {
+                for (const it of list) {
+                    if (it.id === targetId) {
+                        newParentType = pos === 'inside' ? it.type : pType
+                        return true
+                    }
+                    if (it.children && findParentType(it.children, it.type)) return true
+                }
+                return false
+            }
+            findParentType(this.vista.data.structure.children)
+
+            // 3. Validar si el movimiento es permitido
+            const config = ELEMENT_TYPES.find((t) => t.type === draggedItemType)
+            if (config && config.allowedParents && !config.allowedParents.includes(newParentType)) {
+                const parentConfig = ELEMENT_TYPES.find((t) => t.type === newParentType)
+                const parentLabel = parentConfig
+                    ? parentConfig.label
+                    : newParentType === 'document'
+                      ? 'Documento'
+                      : newParentType
+
+                jmsg(
+                    'warning',
+                    `No se puede mover "${draggedItemLabel}" dentro de "${parentLabel}"`,
+                )
+                return
+            }
+
+            // 4. Proceder con el movimiento
             let draggedItem = null
             const findAndRemove = (list) => {
                 const idx = list.findIndex((it) => it.id === dragId)

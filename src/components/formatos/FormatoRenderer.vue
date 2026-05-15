@@ -23,21 +23,11 @@
                     @elegir-obj="(obj, fieldId) => $emit('elegir-obj', obj, fieldId)"
                 />
             </template>
-            <div v-else-if="estructura.structure" class="page-sheet A4 portrait">
-                <RenderBlock
-                    :block="estructura.structure"
-                    :editable="editable"
-                    :selectedId="selectedId"
-                    :hoveredId="hoveredId"
-                    :mode="mode"
-                    :values="values"
-                    :listas="listas"
-                    @select="(id, element) => $emit('select', { id, element })"
-                    @hover="(id) => $emit('hover', id)"
-                    @elegir-obj="(obj, fieldId) => $emit('elegir-obj', obj, fieldId)"
-                />
+
+            <div v-else class="empty-state">
+                <i class="fa-solid fa-ghost"></i>
+                <p>Diseño no inicializado</p>
             </div>
-            <div v-else class="empty-state">Diseño no inicializado</div>
         </div>
     </div>
 </template>
@@ -46,6 +36,7 @@
 import { ref, provide } from 'vue'
 import RenderBlock from './RenderBlock.vue'
 import { useAuth } from '@/pinia/auth'
+import { ELEMENT_TYPES } from '@/views/calidad/formato_structures/constants'
 
 const props = defineProps({
     estructura: { type: Object, required: true },
@@ -70,6 +61,8 @@ provide('formContext', {
     config: props.estructura.config || {},
     globals: props.estructura.config?.globals || {},
 })
+
+provide('ELEMENT_TYPES', ELEMENT_TYPES)
 
 defineExpose({
     elementoPdf,
@@ -153,9 +146,19 @@ defineExpose({
 }
 
 .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
     padding: 2rem;
-    text-align: center;
-    color: #909399;
-    border: 2px dashed #dcdfe6;
+
+    * {
+        color: var(--text-color2);
+    }
+
+    i {
+        font-size: 1.5rem;
+    }
 }
 </style>

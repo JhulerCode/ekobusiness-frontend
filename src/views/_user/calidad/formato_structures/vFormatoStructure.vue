@@ -195,9 +195,6 @@ export default {
             auth: useAuth(),
             vistas: useVistas(),
             system: useSystem(),
-            selectedId: null,
-            hoveredId: null,
-            selectedElement: null,
             VIEW_CONFIG: {
                 apiPath: 'formato_structures',
                 pathKey: 'formato_structure_id',
@@ -205,7 +202,20 @@ export default {
                 permisoEditar: 'vFormatoStructures:editar',
                 permisoCrear: 'vFormatoStructures:crear',
                 fullWidth: true,
+                headerActions: [
+                    {
+                        text: 'Registros',
+                        icon: 'fa-regular fa-file',
+                        tipo: '2',
+                        action: 'verRegistros',
+                        permiso: 'vFormatoValues:listar',
+                        ocultar: { id: 'nuevo' },
+                    },
+                ],
             },
+            selectedId: null,
+            hoveredId: null,
+            selectedElement: null,
             ORDER_ELEMENT_TYPES,
             ELEMENT_TYPES,
             STYLE_FIELDS_DEF,
@@ -448,6 +458,9 @@ export default {
             }
 
             this.vista.mode = 'view'
+        },
+        verRegistros() {
+            this.$router.push({ name: 'vFormatoStructureValues' })
         },
 
         //--- Methods --//

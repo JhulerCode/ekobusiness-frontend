@@ -18,17 +18,30 @@ export default {
             ],
             children: [
                 {
-                    label: 'Diseño de Formato',
+                    label: 'Detalle',
                     goto: 'vFormatoStructure',
                     path: ':formato_structure_id',
                     view: '_user/calidad/formato_structures/vFormatoStructure.vue',
                     permission: 'vFormatoStructures:ver',
                     viewType: 'detail',
+                    children: [
+                        {
+                            label: 'Registros',
+                            goto: 'vFormatoStructureValues',
+                            path: 'formato-values',
+                            view: '_user/calidad/formato_values/vFormatoValues.vue',
+                            permission: 'vFormatoValues:listar',
+                            // permisos: [
+                            //     { id: 'vFormatoValues:listar', label: 'Listar' },
+                            //     { id: 'vFormatoValues:crear', label: 'Crear' },
+                            //     { id: 'vFormatoValues:ver', label: 'Ver' },
+                            //     { id: 'vFormatoValues:editar', label: 'Editar' },
+                            //     { id: 'vFormatoValues:eliminar', label: 'Eliminar' },
+                            // ],
+                        },
+                    ],
                 },
             ],
-        },
-        {
-            // Registro de formatos por implementar
         },
         {
             label: 'Registros sanitarios',

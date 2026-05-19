@@ -43,6 +43,7 @@ export const useVistas = defineStore('vistas', {
         },
         removeItem(viewName, array, item) {
             const tableData = this[viewName]?.[array] || this[viewName]?.tableData
+            console.log(tableData)
             if (!tableData) return
             const i = tableData.findIndex((a) => a.id == item.id)
             if (i !== -1) tableData.splice(i, 1)

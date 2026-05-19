@@ -17,6 +17,9 @@ import dayjs from 'dayjs'
 
 export default {
     components: {},
+    data: () => ({
+        VIEW_CONFIG,
+    }),
     computed: {
         auth: () => useAuth(),
         vistas: () => useVistas(),
@@ -24,9 +27,6 @@ export default {
             return this.vistas[this.$route.name]
         },
     },
-    data: () => ({
-        VIEW_CONFIG,
-    }),
     methods: {
         runMethod(method, item) {
             this[method](item)

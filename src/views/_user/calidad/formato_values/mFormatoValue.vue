@@ -89,8 +89,9 @@ export default {
             const res = await post(urls.formato_values, this.modal.formato_value)
             this.auth.setLoading(false)
             if (res.code != 0) return
-            this.modal.formato_value.id = res.data.id
+            this.modal.formato_value = res.data
             this.modal.mode = 3
+            this.$emit('created', res.data)
         },
         editar() {
             this.modal.original_data = JSON.parse(JSON.stringify(this.modal.formato_value.values))
@@ -165,12 +166,9 @@ export default {
                 const width = pdf.internal.pageSize.getWidth()
                 const height = pdf.internal.pageSize.getHeight()
 
-                pdf.text(
-                    `Página ${i} de ${totalPages}`,
-                    width / 2,
-                    height - 0.25,
-                    { align: 'center' },
-                )
+                pdf.text(`Página ${i} de ${totalPages}`, width / 2, height - 0.25, {
+                    align: 'center',
+                })
             }
 
             await worker.save()

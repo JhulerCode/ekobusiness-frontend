@@ -208,6 +208,7 @@
                                     <JdInput
                                         v-else
                                         v-model="selectedElement.style[fieldKey]"
+                                        :type="styleFieldsDef[fieldKey].type"
                                         :label="styleFieldsDef[fieldKey].label"
                                         :disabled="vista.mode !== 'edit'"
                                     />

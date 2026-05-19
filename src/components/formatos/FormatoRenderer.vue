@@ -20,20 +20,22 @@
                         flexDirection: 'column',
                     }"
                 >
-                    <RenderBlock
-                        v-for="child in estructura.structure.children"
-                        :key="child.id"
-                        :block="child"
-                        :editable="editable"
-                        :selectedId="selectedId"
-                        :hoveredId="hoveredId"
-                        :mode="mode"
-                        :values="values"
-                        :listas="listas"
-                        @select="(id, element) => $emit('select', { id, element })"
-                        @hover="(id) => $emit('hover', id)"
-                        @elegir-obj="(obj, fieldId) => $emit('elegir-obj', obj, fieldId)"
-                    />
+                    <div class="page-real">
+                        <RenderBlock
+                            v-for="child in estructura.structure.children"
+                            :key="child.id"
+                            :block="child"
+                            :editable="editable"
+                            :selectedId="selectedId"
+                            :hoveredId="hoveredId"
+                            :mode="mode"
+                            :values="values"
+                            :listas="listas"
+                            @select="(id, element) => $emit('select', { id, element })"
+                            @hover="(id) => $emit('hover', id)"
+                            @elegir-obj="(obj, fieldId) => $emit('elegir-obj', obj, fieldId)"
+                        />
+                    </div>
                 </div>
             </template>
 

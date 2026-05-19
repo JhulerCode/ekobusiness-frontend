@@ -155,7 +155,7 @@ const STYLE_FIELDS_DEF = {
     paddingLeft: { label: 'Padding Left', section: 'box' },
 
     // Fondo y bordes
-    backgroundColor: { label: 'Color Fondo', section: 'border' },
+    backgroundColor: { label: 'Color Fondo', type: 'color', section: 'border' },
     borderStyle: {
         label: 'Estilo Borde',
         type: 'select',
@@ -421,9 +421,11 @@ export default {
                 `${this.vista.apiUrl}/uno/${this.$route.params.formato_structure_id}`,
             )
             this.auth.setLoading(false)
-            if (res.code === 0) {
+
+            if (res.code === 0 && res.data) {
                 this.vista.data = res.data
-                if (!this.vista.data.structure) this.loadNewData() // Fallback if no structure
+            } else {
+                this.auth.goBack(this.$router)
             }
         },
 
@@ -709,6 +711,11 @@ export default {
                 if (node.style) Object.assign(newBlock.style, node.style)
                 if (node.props) Object.assign(newBlock.props, node.props)
 
+                // Ensure input elements always get a unique fieldId, even from patterns
+                if (newBlock.type.startsWith('input_')) {
+                    newBlock.props.fieldId = crypto.randomUUID()
+                }
+
                 // 3. Crear hijos recursivamente
                 if (node.children && node.children.length > 0) {
                     for (const childNode of node.children) {
@@ -761,6 +768,11 @@ export default {
                 visibility: { condition: '' },
 
                 children: [],
+            }
+
+            // Auto-generate unique fieldId for input elements
+            if (type.startsWith('input_')) {
+                newBlock.props.fieldId = crypto.randomUUID()
             }
 
             if (targetElement && targetElement.children) {
@@ -907,6 +919,10 @@ export default {
                 const newObj = JSON.parse(JSON.stringify(obj))
                 const randomizeIds = (item) => {
                     item.id = crypto.randomUUID()
+                    // Regenerate fieldId for input elements to avoid duplicates
+                    if (item.type?.startsWith('input_') && item.props) {
+                        item.props.fieldId = crypto.randomUUID()
+                    }
                     if (item.children) {
                         item.children.forEach(randomizeIds)
                     }

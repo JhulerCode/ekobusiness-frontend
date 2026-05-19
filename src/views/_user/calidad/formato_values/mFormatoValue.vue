@@ -108,52 +108,56 @@ export default {
             if (res.code != 0) return
             this.modal.mode = 3
         },
+        cssToInches(value) {
+            if (!value || typeof value !== 'string') return 0
+            const num = parseFloat(value)
+            if (isNaN(num)) return 0
+
+            const unit = value.replace(/[\d.\-+\s]/g, '').toLowerCase()
+
+            switch (unit) {
+                case 'in':
+                    return num
+                case 'cm':
+                    return num / 2.54
+                case 'mm':
+                    return num / 25.4
+                case 'px':
+                    return num / 96
+                case 'pt':
+                    return num / 72
+                case 'rem':
+                case 'em':
+                    // 1rem/em ≈ 16px at default browser settings
+                    return (num * 16) / 96
+                default:
+                    // If no unit, assume px
+                    return num / 96
+            }
+        },
         async exportarPdf() {
             this.auth.setLoading(true, 'Generando PDF...')
             const container = this.$refs.documentRef.elementoPdf
-            const pages = Array.from(container.querySelectorAll('.page-sheet'))
-            const docConfig = this.modal.estructura?.config?.document || {}
+            // const pageSheet = container.querySelector('.page-sheet')
+            const pageReal = container.querySelector('.page-real')
+            const docConfig = this.modal.estructura?.config || {}
 
-            if (pages.length === 0) {
-                this.auth.setLoading(false)
-                return
+            const marginTop = this.cssToInches(docConfig.paddingTop)
+            const marginRight = this.cssToInches(docConfig.paddingRight)
+            const marginBottom = this.cssToInches(docConfig.paddingBottom)
+            const marginLeft = this.cssToInches(docConfig.paddingLeft)
+            const paperFormat = (docConfig.paperSize || 'A4').toLowerCase()
+            const orientation = docConfig.orientation === 'landscape' ? 'l' : 'p'
+
+            const opciones = {
+                margin: [marginTop, marginLeft, marginBottom, marginRight],
+                filename: `${Date.now()}.pdf`,
+                image: { type: 'jpeg', quality: 1 },
+                html2canvas: { scale: 4, useCORS: true },
+                jsPDF: { unit: 'in', format: paperFormat, orientation: orientation },
             }
 
-            // Ocultar sombras temporalmente para que no aparezcan en el PDF
-            const originalShadows = pages.map((page) => page.style.boxShadow)
-            pages.forEach((page) => (page.style.boxShadow = 'none'))
-
-            let worker = html2pdf()
-
-            for (let i = 0; i < pages.length; i++) {
-                const orientation = docConfig.orientation === 'landscape' ? 'l' : 'p'
-
-                // NOTA TÉCNICA: Se asigna margin: 0 a html2pdf porque la clase .page-sheet
-                // ya tiene exactamente el tamaño físico (ej. A4) y el padding CSS actúa como el margen.
-                // Si pusiéramos margen en html2pdf, la página se encogería y los tamaños de fuente serían inexactos.
-                const opciones = {
-                    margin: 0,
-                    filename: `${Date.now()}.pdf`,
-                    image: { type: 'jpeg', quality: 1 },
-                    html2canvas: { scale: 4, useCORS: true },
-                    jsPDF: { unit: 'in', format: 'a4', orientation: orientation },
-                }
-
-                if (i === 0) {
-                    worker = worker.set(opciones).from(pages[i]).toPdf()
-                } else {
-                    worker = worker
-                        .set(opciones)
-                        .get('pdf')
-                        .then((pdf) => {
-                            pdf.addPage('a4', orientation)
-                        })
-                        .from(pages[i])
-                        .toContainer()
-                        .toCanvas()
-                        .toPdf()
-                }
-            }
+            let worker = html2pdf().set(opciones).from(pageReal).toPdf()
 
             const pdf = await worker.get('pdf')
             const totalPages = pdf.internal.getNumberOfPages()
@@ -172,11 +176,6 @@ export default {
             }
 
             await worker.save()
-
-            // Restaurar sombras
-            pages.forEach((page, index) => {
-                page.style.boxShadow = originalShadows[index]
-            })
 
             this.auth.setLoading(false)
         },

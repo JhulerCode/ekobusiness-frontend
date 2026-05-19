@@ -70,6 +70,12 @@ export default {
                 ],
                 tableRowActions: [
                     {
+                        label: 'Ver',
+                        icon: 'fa-solid fa-folder-open',
+                        action: 'ver',
+                        permiso: 'vFormatoValues:ver',
+                    },
+                    {
                         label: 'Eliminar',
                         icon: 'fa-solid fa-trash',
                         action: 'eliminar',
@@ -157,8 +163,43 @@ export default {
         },
 
         //--- Row actions ---//
+        async ver(row) {
+            this.auth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.formato_values}/uno/${row.id}`, {
+                incl: ['formato_structure1', 'createdBy1'],
+            })
+            this.auth.setLoading(false)
+
+            if (res.code !== 0) return
+
+            // Buscamos dinámicamente qué listas de Pinia necesitamos cargar
+            const systemLists = []
+            const findKeys = (blocks) => {
+                if (!blocks) return
+                blocks.forEach((b) => {
+                    if (b.props?.optionsKey) systemLists.push(b.props.optionsKey)
+                    if (b.children) findKeys(b.children)
+                })
+            }
+            findKeys(this.vistas.vFormatoStructure.data.structure?.children || [])
+
+            if (systemLists.length > 0) {
+                await this.system.load(systemLists)
+            }
+
+            const send = {
+                estructura: this.vistas.vFormatoStructure.data,
+                listas: {},
+                formato_value: res.data,
+            }
+
+            for (const sl of systemLists) {
+                send.listas[sl] = this.system.data[sl]
+            }
+
+            this.modals.setModal('mFormatoValue', '', 3, send, true)
+        },
         async eliminar(row) {
-            console.log(row)
             const resQst = await jqst('¿Está seguro de eliminar?')
             if (resQst.isConfirmed == false) return
 

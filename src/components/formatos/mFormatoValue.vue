@@ -109,17 +109,51 @@ export default {
         },
         async exportarPdf() {
             this.auth.setLoading(true, 'Generando PDF...')
-            const element = this.$refs.documentRef.elementoPdf
+            const container = this.$refs.documentRef.elementoPdf
+            const pages = Array.from(container.querySelectorAll('.page-sheet'))
+            const docConfig = this.modal.estructura?.config?.document || {}
 
-            const opciones = {
-                margin: 0.5,
-                filename: `${Date.now()}.pdf`,
-                image: { type: 'jpeg', quality: 1 },
-                html2canvas: { scale: 4, useCORS: true },
-                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' },
+            if (pages.length === 0) {
+                this.auth.setLoading(false)
+                return
             }
 
-            const worker = html2pdf().set(opciones).from(element).toPdf()
+            // Ocultar sombras temporalmente para que no aparezcan en el PDF
+            const originalShadows = pages.map((page) => page.style.boxShadow)
+            pages.forEach((page) => (page.style.boxShadow = 'none'))
+
+            let worker = html2pdf()
+
+            for (let i = 0; i < pages.length; i++) {
+                const orientation = docConfig.orientation === 'landscape' ? 'l' : 'p'
+                
+                // NOTA TÉCNICA: Se asigna margin: 0 a html2pdf porque la clase .page-sheet 
+                // ya tiene exactamente el tamaño físico (ej. A4) y el padding CSS actúa como el margen. 
+                // Si pusiéramos margen en html2pdf, la página se encogería y los tamaños de fuente serían inexactos.
+                const opciones = {
+                    margin: 0,
+                    filename: `${Date.now()}.pdf`,
+                    image: { type: 'jpeg', quality: 1 },
+                    html2canvas: { scale: 4, useCORS: true },
+                    jsPDF: { unit: 'in', format: 'a4', orientation: orientation },
+                }
+
+                if (i === 0) {
+                    worker = worker.set(opciones).from(pages[i]).toPdf()
+                } else {
+                    worker = worker
+                        .set(opciones)
+                        .get('pdf')
+                        .then((pdf) => {
+                            pdf.addPage('a4', orientation)
+                        })
+                        .from(pages[i])
+                        .toContainer()
+                        .toCanvas()
+                        .toPdf()
+                }
+            }
+
             const pdf = await worker.get('pdf')
             const totalPages = pdf.internal.getNumberOfPages()
 
@@ -127,15 +161,25 @@ export default {
                 pdf.setPage(i)
                 pdf.setFontSize(8)
                 pdf.setTextColor(150)
+                
+                const width = pdf.internal.pageSize.getWidth()
+                const height = pdf.internal.pageSize.getHeight()
+                
                 pdf.text(
                     `Página ${i} de ${totalPages}`,
-                    pdf.internal.pageSize.getWidth() / 2,
-                    pdf.internal.pageSize.getHeight() - 0.25,
+                    width / 2,
+                    height - 0.25,
                     { align: 'center' },
                 )
             }
 
             await worker.save()
+
+            // Restaurar sombras
+            pages.forEach((page, index) => {
+                page.style.boxShadow = originalShadows[index]
+            })
+
             this.auth.setLoading(false)
         },
     },

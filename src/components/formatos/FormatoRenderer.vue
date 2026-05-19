@@ -3,25 +3,38 @@
         <div class="pages-wrapper">
             <!-- Render the Root Structure -->
             <template v-if="estructura.structure?.type === 'document'">
-                <RenderBlock
-                    v-for="page in estructura.structure.children"
-                    :key="page.id"
-                    :block="page"
+                <div
                     class="page-sheet"
+                    @click="onPageSheetClick"
                     :class="[
-                        page.props?.orientation || 'portrait',
+                        estructura.config?.orientation || 'portrait',
                         estructura.config?.paperSize || 'A4',
                     ]"
-                    :editable="editable"
-                    :selectedId="selectedId"
-                    :hoveredId="hoveredId"
-                    :mode="mode"
-                    :values="values"
-                    :listas="listas"
-                    @select="(id, element) => $emit('select', { id, element })"
-                    @hover="(id) => $emit('hover', id)"
-                    @elegir-obj="(obj, fieldId) => $emit('elegir-obj', obj, fieldId)"
-                />
+                    :style="{
+                        paddingTop: estructura.config?.paddingTop,
+                        paddingRight: estructura.config?.paddingRight,
+                        paddingBottom: estructura.config?.paddingBottom,
+                        paddingLeft: estructura.config?.paddingLeft,
+                        backgroundColor: estructura.config?.backgroundColor,
+                        display: 'flex',
+                        flexDirection: 'column',
+                    }"
+                >
+                    <RenderBlock
+                        v-for="child in estructura.structure.children"
+                        :key="child.id"
+                        :block="child"
+                        :editable="editable"
+                        :selectedId="selectedId"
+                        :hoveredId="hoveredId"
+                        :mode="mode"
+                        :values="values"
+                        :listas="listas"
+                        @select="(id, element) => $emit('select', { id, element })"
+                        @hover="(id) => $emit('hover', id)"
+                        @elegir-obj="(obj, fieldId) => $emit('elegir-obj', obj, fieldId)"
+                    />
+                </div>
             </template>
 
             <div v-else class="empty-state">
@@ -48,10 +61,15 @@ const props = defineProps({
     hoveredId: { type: String, default: null },
 })
 
-defineEmits(['elegir-obj', 'select', 'hover'])
+const emit = defineEmits(['elegir-obj', 'select', 'hover'])
 
 const auth = useAuth()
 const elementoPdf = ref(null)
+
+const onPageSheetClick = () => {
+    if (!props.editable) return
+    emit('select', { id: null, element: null })
+}
 
 // Provide context to all nested blocks
 provide('formContext', {
@@ -102,7 +120,6 @@ defineExpose({
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
     position: relative;
     color: #000;
-    overflow: hidden;
     box-sizing: border-box;
     flex-shrink: 0; /* Prevent pages from squashing */
 
@@ -110,31 +127,31 @@ defineExpose({
     &.A4 {
         &.portrait {
             width: 210mm;
-            height: 297mm;
+            // min-height: 297mm;
         }
         &.landscape {
             width: 297mm;
-            height: 210mm;
+            // min-height: 210mm;
         }
     }
     &.LETTER {
         &.portrait {
             width: 215.9mm;
-            height: 279.4mm;
+            // min-height: 279.4mm;
         }
         &.landscape {
             width: 279.4mm;
-            height: 215.9mm;
+            // min-height: 215.9mm;
         }
     }
     &.LEGAL {
         &.portrait {
             width: 215.9mm;
-            height: 355.6mm;
+            // min-height: 355.6mm;
         }
         &.landscape {
             width: 355.6mm;
-            height: 215.9mm;
+            // min-height: 215.9mm;
         }
     }
 

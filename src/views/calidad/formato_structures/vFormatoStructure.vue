@@ -298,20 +298,13 @@ export default {
                 entity: '',
                 config: {
                     paperSize: 'A4',
+                    orientation: 'portrait',
+                    paddingTop: '0.5in',
+                    paddingRight: '0.5in',
+                    paddingBottom: '0.5in',
+                    paddingLeft: '0.5in',
+                    backgroundColor: '#ffffff',
                     globals: {
-                        page: {
-                            props: {
-                                orientation: 'portrait',
-                                headerId: '',
-                            },
-                            styles: {
-                                backgroundColor: '#ffffff',
-                                paddingTop: '0.5in',
-                                paddingRight: '0.5in',
-                                paddingBottom: '0.5in',
-                                paddingLeft: '0.5in',
-                            },
-                        },
                         group: {
                             props: {},
                             styles: {
@@ -398,9 +391,11 @@ export default {
                 },
             }
 
-            this.handleSelect(this.vista.data.structure.id, this.vista.data.structure)
-            const firstPage = this.addBlockToSelected('page')
-            this.handleSelect(firstPage.id, firstPage)
+            // this.handleSelect(this.vista.data.structure.id, this.vista.data.structure)
+            // const firstGroup = this.addBlockToSelected('group')
+            // if (firstGroup) {
+            //     this.handleSelect(firstGroup.id, firstGroup)
+            // }
             // this.addHeader()
         },
         async loadExistingData() {
@@ -492,10 +487,11 @@ export default {
             this.collapsedSections[key] = !this.collapsedSections[key]
         },
         addHeader() {
-            const page = this.vista.data.structure.children[0]
-            if (!page) return
+            const documentRoot = this.vista.data.structure
+            if (!documentRoot || documentRoot.children.length === 0) return
+            const firstGroup = documentRoot.children[0]
 
-            this.handleSelect(page.id, page)
+            this.handleSelect(firstGroup.id, firstGroup)
 
             // 1. Header Group
             const headerGroup = this.addBlockToSelected('grid')
@@ -579,7 +575,7 @@ export default {
             hAprov.props.content = 'APROBADO POR: GG'
             hAprov.id = 'h_aprov'
 
-            this.handleSelect(page.id, page)
+            this.handleSelect(firstGroup.id, firstGroup)
 
             // 2. Body Group
             const bodyGroup = this.addBlockToSelected('group')
@@ -714,9 +710,7 @@ export default {
             const config = ELEMENT_TYPES.find((t) => t.type === type)
             if (!config) return
 
-            // Si es una página, forzamos que el padre sea la raíz (documento)
-            const isPage = type === 'page'
-            const targetElement = isPage ? this.vista.data.structure : this.selectedElement
+            const targetElement = this.selectedElement
             const parentType = targetElement?.type || 'document'
 
             if (config.allowedParents && !config.allowedParents.includes(parentType)) {
@@ -749,9 +743,7 @@ export default {
                 children: [],
             }
 
-            if (isPage) {
-                this.vista.data.structure.children.push(newBlock)
-            } else if (targetElement && targetElement.children) {
+            if (targetElement && targetElement.children) {
                 targetElement.children.push(newBlock)
             } else {
                 this.vista.data.structure.children.push(newBlock)

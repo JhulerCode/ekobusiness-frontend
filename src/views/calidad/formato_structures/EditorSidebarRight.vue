@@ -17,7 +17,7 @@
             </button>
         </div>
 
-        <div class="editor-section" v-if="activeTab === 'document'">
+        <div class="editor-section" v-if="activeTab === 'document' && vista.data.config">
             <div class="sidebar-group">
                 <div class="group-header" @click="$emit('toggleSection', 'doc_general')">
                     <p class="group-title">General</p>
@@ -35,6 +35,15 @@
                         :lista="paperSizes"
                         :disabled="vista.mode !== 'edit'"
                     />
+                    <JdSelect
+                        v-model="vista.data.config.orientation"
+                        label="Orientación"
+                        :lista="[
+                            { id: 'portrait', nombre: 'Vertical' },
+                            { id: 'landscape', nombre: 'Horizontal' },
+                        ]"
+                        :disabled="vista.mode !== 'edit'"
+                    />
 
                     <JdInput
                         v-model="vista.data.entity"
@@ -42,6 +51,42 @@
                         placeholder="Ej: traslados, socios..."
                         :disabled="vista.mode !== 'edit'"
                     />
+
+                    <!-- Márgenes (Padding) del Documento -->
+                    <!-- <div style="margin-top: 10px; border-top: 1px solid var(--border-color); padding-top: 10px;">
+                        <p class="group-title" style="margin-bottom: 5px; font-size: 0.85rem; color: var(--text-color2);">Márgenes del Documento</p> -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem">
+                        <JdInput
+                            v-model="vista.data.config.paddingTop"
+                            label="Arriba"
+                            :disabled="vista.mode !== 'edit'"
+                        />
+                        <JdInput
+                            v-model="vista.data.config.paddingBottom"
+                            label="Abajo"
+                            :disabled="vista.mode !== 'edit'"
+                        />
+                        <JdInput
+                            v-model="vista.data.config.paddingLeft"
+                            label="Izquierda"
+                            :disabled="vista.mode !== 'edit'"
+                        />
+                        <JdInput
+                            v-model="vista.data.config.paddingRight"
+                            label="Derecha"
+                            :disabled="vista.mode !== 'edit'"
+                        />
+                    </div>
+                    <!-- </div> -->
+
+                    <!-- <div style="margin-top: 10px;"> -->
+                    <JdInput
+                        v-model="vista.data.config.backgroundColor"
+                        label="Color de Fondo"
+                        type="color"
+                        :disabled="vista.mode !== 'edit'"
+                    />
+                    <!-- </div> -->
                 </div>
             </div>
 
@@ -320,9 +365,22 @@ export default {
     methods: {
         hasConfig(key) {
             if (!this.selectedElement) return false
+            if (this.selectedElement.type === 'document') return false
             if (key === 'settings') return true
             if (key === 'visibility') return true
             return false
+        },
+    },
+    watch: {
+        selectedId: {
+            handler(val) {
+                if (!val) {
+                    this.activeTab = 'document'
+                } else {
+                    this.activeTab = 'componente'
+                }
+            },
+            immediate: true,
         },
     },
 }

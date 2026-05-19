@@ -296,7 +296,7 @@ export default {
         async openFormatos(item) {
             const qry = {
                 fltr: {
-                    entity: { op: 'Es', val: 'lotes' },
+                    entity: { op: 'Es', val: 'lote' },
                 },
                 cols: { exclude: [] },
             }

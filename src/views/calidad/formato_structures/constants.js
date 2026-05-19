@@ -60,6 +60,8 @@ export const COMMON_STYLES = [
     'borderWidth',
     'borderColor',
     'borderRadius',
+    'gridColumn',
+    'gridRow',
 ]
 
 export const ORDER_ELEMENT_TYPES = ['DESIGN', 'TEXT', 'MEDIA', 'INPUTS']

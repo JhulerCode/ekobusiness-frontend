@@ -87,7 +87,7 @@ export default {
             }
 
             this.modals.show.mFormatosRelated = false
-            console.log(send)
+
             if (res_values.data.length > 0) {
                 send.formato_value = res_values.data[0]
                 this.modals.setModal('mFormatoValue', '', 3, send, true)

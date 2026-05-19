@@ -135,6 +135,8 @@ const STYLE_FIELDS_DEF = {
     },
     gap: { label: 'Gap', section: 'layout' },
     flex: { label: 'Flex (Ancho)', section: 'layout' },
+    gridColumn: { label: 'Columnas Span', section: 'layout' },
+    gridRow: { label: 'Filas Span', section: 'layout' },
 
     // Dimensiones y espaciado
     width: { label: 'Ancho', grid: 2, section: 'box' },
@@ -413,7 +415,7 @@ export default {
         //--- Header actions ---//
         async guardar() {
             if (this.checkDatos()) return
-            console.log(this.vista.data)
+
             this.handleSelect(null, null)
             this.auth.setLoading(true, 'Guardando...')
             let res

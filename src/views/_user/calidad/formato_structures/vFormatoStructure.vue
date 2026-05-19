@@ -7,23 +7,26 @@
         @runMethod="runMethod"
     >
         <template #principal-datos>
-            <JdInput v-model="vista.data.codigo" label="Código" :disabled="vista.mode !== 'edit'" />
-            <JdInput v-model="vista.data.nombre" label="Nombre" :disabled="vista.mode !== 'edit'" />
-            <!-- <JdSelect
-                v-model="vista.data.tipo"
-                label="Tipo"
-                :lista="[
-                    { id: 'REGISTRO', nombre: 'Registro' },
-                    { id: 'FORMATO', nombre: 'Formato' },
-                ]"
+            <JdInput
+                v-model="vista.data.codigo"
+                label="Código"
+                :nec="true"
                 :disabled="vista.mode !== 'edit'"
-            /> -->
+            />
+            <JdInput
+                v-model="vista.data.nombre"
+                label="Nombre"
+                :nec="true"
+                :disabled="vista.mode !== 'edit'"
+                style="grid-column: 2/4"
+            />
             <div style="display: flex; gap: 0.25rem">
-                <JdButton tipo="2" text="nuevo" @click="loadNewData" />
+                <!-- <JdButton tipo="2" text="nuevo" @click="loadNewData" /> -->
                 <JdButton
                     tipo="2"
                     :text="verInputs ? 'ver final' : 'ver inputs'"
                     @click="toggleVerInputs"
+                    v-if="vista.mode == 'edit'"
                 />
             </div>
         </template>
@@ -45,6 +48,7 @@
                 @delete="deleteBlock"
                 @duplicate="duplicateBlock"
                 @move="handleMove"
+                v-if="vista.mode == 'edit'"
             />
 
             <!-- MAIN RENDERER -->
@@ -75,6 +79,7 @@
                 :fieldList="fieldList"
                 :vista="vista"
                 @toggleSection="toggleSection"
+                v-if="vista.mode == 'edit'"
             />
         </div>
     </VistaDetalleLayout>
@@ -101,7 +106,6 @@ import {
     ORIENTATIONS,
     STYLE_SECTIONS_LABELS,
     TYPOGRAPHY_STYLES,
-    COMMON_STYLES,
     ORDER_ELEMENT_TYPES,
     ELEMENT_TYPES,
     TEXT_ALIGN_OPTIONS,
@@ -197,6 +201,7 @@ export default {
             VIEW_CONFIG: {
                 apiPath: 'formato_structures',
                 pathKey: 'formato_structure_id',
+                titleKey: 'codigo',
                 permisoEditar: 'vFormatoStructures:editar',
                 permisoCrear: 'vFormatoStructures:crear',
                 fullWidth: true,

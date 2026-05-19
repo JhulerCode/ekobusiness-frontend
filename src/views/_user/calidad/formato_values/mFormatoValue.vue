@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import FormatoRenderer from './FormatoRenderer.vue'
+import FormatoRenderer from '@/components/formatos/FormatoRenderer.vue'
 import { useModals } from '@/pinia/modals'
 import { useAuth } from '@/pinia/auth'
 import { urls, post, patch } from '@/utils/crud'
@@ -126,9 +126,9 @@ export default {
 
             for (let i = 0; i < pages.length; i++) {
                 const orientation = docConfig.orientation === 'landscape' ? 'l' : 'p'
-                
-                // NOTA TÉCNICA: Se asigna margin: 0 a html2pdf porque la clase .page-sheet 
-                // ya tiene exactamente el tamaño físico (ej. A4) y el padding CSS actúa como el margen. 
+
+                // NOTA TÉCNICA: Se asigna margin: 0 a html2pdf porque la clase .page-sheet
+                // ya tiene exactamente el tamaño físico (ej. A4) y el padding CSS actúa como el margen.
                 // Si pusiéramos margen en html2pdf, la página se encogería y los tamaños de fuente serían inexactos.
                 const opciones = {
                     margin: 0,
@@ -161,10 +161,10 @@ export default {
                 pdf.setPage(i)
                 pdf.setFontSize(8)
                 pdf.setTextColor(150)
-                
+
                 const width = pdf.internal.pageSize.getWidth()
                 const height = pdf.internal.pageSize.getHeight()
-                
+
                 pdf.text(
                     `Página ${i} de ${totalPages}`,
                     width / 2,

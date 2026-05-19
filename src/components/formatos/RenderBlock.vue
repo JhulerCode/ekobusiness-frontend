@@ -98,7 +98,7 @@
 <script setup>
 import { computed, inject } from 'vue'
 import FieldRenderer from './FieldRenderer.vue'
-import { ELEMENT_TYPES } from '@/views/calidad/formato_structures/constants'
+import { ELEMENT_TYPES } from '@/views/_user/calidad/formato_structures/constants'
 const props = defineProps({
     block: { type: Object, required: true },
     editable: { type: Boolean, default: false },

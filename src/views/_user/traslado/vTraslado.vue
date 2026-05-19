@@ -68,7 +68,7 @@
 <script>
 import vTrasladoLine from './vTrasladoLine.vue'
 import mFormatosRelated from '@/components/formatos/mFormatosRelated.vue'
-import mFormatoValue from '@/components/formatos/mFormatoValue.vue'
+import mFormatoValue from '@/views/_user/calidad/formato_values/mFormatoValue.vue'
 
 import VIEW_CONFIG from './traslado.config.js'
 import { useSystem } from '@/pinia/system.js'

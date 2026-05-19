@@ -49,7 +49,7 @@
 import { ref, provide } from 'vue'
 import RenderBlock from './RenderBlock.vue'
 import { useAuth } from '@/pinia/auth'
-import { ELEMENT_TYPES } from '@/views/calidad/formato_structures/constants'
+import { ELEMENT_TYPES } from '@/views/_user/calidad/formato_structures/constants'
 
 const props = defineProps({
     estructura: { type: Object, required: true },

@@ -148,7 +148,7 @@
 import vProduccionOrdenInsumos from './vProduccionOrdenInsumos.vue'
 import vProduccionOrdenPts from './vProduccionOrdenPts.vue'
 import mFormatosRelated from '@/components/formatos/mFormatosRelated.vue'
-import mFormatoValue from '@/components/formatos/mFormatoValue.vue'
+import mFormatoValue from '@/views/_user/calidad/formato_values/mFormatoValue.vue'
 
 import VIEW_CONFIG from './produccion_orden.config.js'
 import { useAuth } from '@/pinia/auth'
